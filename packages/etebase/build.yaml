@@ -1,0 +1,15 @@
+builders:
+  etebase_builder:
+    import: "tool/etebase_builder.dart"
+    builder_factories: ["etebaseBuilder"]
+    build_extensions: { ".dart": [".api.dart"] }
+    auto_apply: dependents
+    build_to: source
+
+targets:
+  $default:
+    builders:
+      etebase:etebase_builder:
+        enabled: true
+        generate_for:
+          - lib/gen/ffi/libetebase.ffi.dart
