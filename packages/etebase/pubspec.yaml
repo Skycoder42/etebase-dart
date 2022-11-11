@@ -1,0 +1,16 @@
+name: etebase
+description: A starting point for Dart libraries or applications.
+version: 1.0.0
+# homepage: https://www.example.com
+
+environment:
+  sdk: ">=2.18.3 <3.0.0"
+
+dependencies:
+  ffi: ^2.0.1
+
+dev_dependencies:
+  dart_pre_commit: ^4.0.0
+  dart_test_tools: ^4.5.3+1
+  ffigen: ^7.2.0
+  test: ^1.16.0
