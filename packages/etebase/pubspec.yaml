@@ -14,3 +14,32 @@ dev_dependencies:
   dart_test_tools: ^4.5.3+1
   ffigen: ^7.2.0
   test: ^1.16.0
+
+ffigen:
+  output: lib/gen/ffi/libetebase.ffi.dart
+  name: LibEtebaseFFI
+  description: Bindings for libetebase
+  headers:
+    entry-points:
+      - /usr/include/etebase/etebase.h
+  macros:
+    include:
+      - ETEBASE_.*
+  globals:
+    include:
+      - ETEBASE_.*
+  enums:
+    include:
+      - Etebase_.*
+  structs:
+    include:
+      - Etebase.*
+  unions:
+    include:
+      - Etebase.*
+  functions:
+    include:
+      - etebase_.*
+  comments: true
+  compiler-opts:
+    - "-I/usr/lib/clang/14.0.6/include/"

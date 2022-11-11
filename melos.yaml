@@ -1,0 +1,22 @@
+name: etebase
+
+packages:
+  - packages/etebase/*
+
+scripts:
+  pre-commit:init:
+    run: >-
+      bash -c "echo -e
+      '#!/bin/sh\nexec dart pub global run melos run pre-commit:run'
+      > .git/hooks/pre-commit && chmod a+x .git/hooks/pre-commit"
+    description: Setup pre commit hooks
+
+  pre-commit:remove:
+    run: rm -f .git/hooks/pre-commit
+    description: Remove pre commit hooks
+
+  pre-commit:run:
+    run: >-
+      dart pub global run melos exec -c1 --no-flutter -- dart run dart_pre_commit &&
+      dart pub global run melos exec -c1 --flutter -- flutter pub run dart_pre_commit
+    description: Run pre commit hooks in all projects
