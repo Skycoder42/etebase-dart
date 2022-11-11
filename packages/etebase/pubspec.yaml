@@ -22,6 +22,8 @@ ffigen:
   headers:
     entry-points:
       - /usr/include/etebase/etebase.h
+  compiler-opts:
+    - "-I/usr/lib/clang/14.0.6/include/"
   macros:
     include:
       - ETEBASE_.*
@@ -41,5 +43,12 @@ ffigen:
     include:
       - etebase_.*
   comments: true
-  compiler-opts:
-    - "-I/usr/lib/clang/14.0.6/include/"
+  preamble: >-
+    // ignore_for_file:
+    require_trailing_commas,
+    non_constant_identifier_names,
+    prefer_expression_function_bodies,
+    lines_longer_than_80_chars,
+    comment_references,
+    avoid_positional_boolean_parameters,
+    camel_case_types
