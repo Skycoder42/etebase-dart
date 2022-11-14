@@ -1,9 +1,14 @@
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 
+import 'etebase_context.dart';
+
 class EtebaseTypeParser {
-  const EtebaseTypeParser();
+  final EtebaseContext context;
+
+  const EtebaseTypeParser(this.context);
 
   Reference parseType(DartType type, {bool isArray = false}) {
     if (type.isVoid) {
@@ -29,7 +34,15 @@ class EtebaseTypeParser {
       return TypeReference((b) => b..symbol = 'dynamic');
     }
 
-    switch (pointerType.element!.name) {
+    final pointerElement = pointerType.element;
+    if (pointerElement is ClassElement) {
+      final resolvedElement = context.resolveAlias(pointerElement);
+      if (!identical(resolvedElement, pointerElement)) {
+        return TypeReference((b) => b..symbol = resolvedElement.name);
+      }
+    }
+
+    switch (pointerElement!.name) {
       case 'Char':
         return TypeReference((b) => b..symbol = 'String');
       case 'Int64':

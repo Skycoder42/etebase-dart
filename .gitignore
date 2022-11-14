@@ -22,4 +22,4 @@ pubspec.lock
 *.js.map
 
 # Generated files
-**/lib/gen/
+# **/lib/gen/

@@ -33,6 +33,7 @@ class EteClassBuilder {
     return Class(
       (b) => b
         ..name = resolvedClass.name
+        ..abstract = true
         ..methods.addAll(
           context
               .membersOf(resolvedClass)
@@ -54,7 +55,7 @@ class EteClassBuilder {
         ..modifier = MethodModifier.async
         ..returns = _mapReturnType(method, hasRetSizeRef)
         ..requiredParameters.addAll(mappedParameters)
-        ..body = Block(),
+        ..body = _isStatic(method) ? Block() : null,
     );
   }
 
@@ -88,9 +89,9 @@ class EteClassBuilder {
       final Reference type;
       if (nextParam != null && nextParam.name == '${param.name}_size') {
         ++i; // skip the _size param
-        type = const EtebaseTypeParser().parseType(param.type, isArray: true);
+        type = EtebaseTypeParser(context).parseType(param.type, isArray: true);
       } else {
-        type = const EtebaseTypeParser().parseType(param.type);
+        type = EtebaseTypeParser(context).parseType(param.type);
       }
 
       yield Parameter(
@@ -103,7 +104,7 @@ class EteClassBuilder {
 
   Reference _mapReturnType(MethodElement method, Ref<bool> hasRetSizeRef) =>
       _returnTypeMapping[method.name] ??
-      const EtebaseTypeParser().parseType(
+      EtebaseTypeParser(context).parseType(
         method.returnType,
         isArray: hasRetSizeRef.value,
       );

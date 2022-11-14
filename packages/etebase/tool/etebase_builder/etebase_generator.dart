@@ -25,6 +25,12 @@ class EtebaseGenerator extends Generator {
           ..body.addAll(context.classes.map(classBuilder.build)),
       ).accept(emitter, buffer);
 
+      if (context.unprocessedMethods.isNotEmpty) {
+        print(
+          'Unprocessed methods: ${context.unprocessedMethods.map((e) => e.name).toList()}',
+        );
+      }
+
       return buffer.toString();
     } catch (e, s) {
       print(e);
