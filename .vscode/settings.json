@@ -1,5 +1,7 @@
 {
   "cSpell.words": [
-    "etebase"
-  ]
+    "etebase",
+    "Libetebase"
+  ],
+  "dart.runPubGetOnPubspecChanges": "never"
 }
