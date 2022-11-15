@@ -3,40 +3,60 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 
-import 'etebase_context.dart';
+import 'etebase_parser.dart';
 
-class EtebaseTypeParser {
-  final EtebaseContext context;
+class TypeRef {
+  final DartType ffiTyp;
+  final TypeReference dartType;
 
-  const EtebaseTypeParser(this.context);
+  const TypeRef(this.ffiTyp, this.dartType);
+}
 
-  Reference parseType(DartType type, {bool isArray = false}) {
+class TypeContext {
+  final DartType type;
+  final bool isArray;
+
+  final TypedefRef typeDefs;
+
+  const TypeContext({
+    required this.type,
+    required this.isArray,
+    required this.typeDefs,
+  });
+}
+
+class TypeParser {
+  const TypeParser();
+
+  TypeRef parseType(TypeContext context) {
+    final type = context.type;
     if (type.isVoid) {
-      return TypeReference((b) => b..symbol = 'void');
+      return TypeRef(type, TypeReference((b) => b..symbol = 'void'));
     }
 
     if (type is! InterfaceType) {
-      return type.typeReference;
+      return TypeRef(type, type.typeReference);
     }
 
     if (type.isPointer) {
       final pointerType = type.typeArguments.single;
-      return isArray
-          ? _mapPointerArrayType(pointerType)
-          : _mapPointerType(pointerType);
+      final typeRef = context.isArray
+          ? _mapPointerArrayType(context, pointerType)
+          : _mapPointerType(context, pointerType);
+      return TypeRef(type, typeRef);
     }
 
-    return type.typeReference;
+    return TypeRef(type, type.typeReference);
   }
 
-  Reference _mapPointerType(DartType pointerType) {
+  TypeReference _mapPointerType(TypeContext context, DartType pointerType) {
     if (pointerType is InterfaceType && pointerType.isPointer) {
       return TypeReference((b) => b..symbol = 'dynamic');
     }
 
     final pointerElement = pointerType.element;
     if (pointerElement is ClassElement) {
-      final resolvedElement = context.resolveAlias(pointerElement);
+      final resolvedElement = context.typeDefs.elementFor(pointerElement);
       if (!identical(resolvedElement, pointerElement)) {
         return TypeReference((b) => b..symbol = resolvedElement.name);
       }
@@ -52,15 +72,30 @@ class EtebaseTypeParser {
     }
   }
 
-  Reference _mapPointerArrayType(DartType pointerType) {
+  TypeReference _mapPointerArrayType(
+    TypeContext context,
+    DartType pointerType,
+  ) {
     switch (pointerType.element!.name) {
       case 'Void':
-        return TypeReference((b) => b..symbol = 'Uint8List');
+        return TypeReference(
+          (b) => b
+            ..symbol = 'Uint8List'
+            ..url = 'dart:typed_data',
+        );
       default:
         return TypeReference(
           (b) => b
             ..symbol = 'List'
-            ..types.add(parseType(pointerType)),
+            ..types.add(
+              parseType(
+                TypeContext(
+                  type: pointerType,
+                  isArray: false,
+                  typeDefs: context.typeDefs,
+                ),
+              ).dartType,
+            ),
         );
     }
   }

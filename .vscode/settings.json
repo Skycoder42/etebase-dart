@@ -1,7 +1,13 @@
 {
   "cSpell.words": [
+    "disinvite",
     "etebase",
-    "Libetebase"
+    "Libetebase",
+    "pubkey",
+    "Pubkey",
+    "signup",
+    "stoken",
+    "Stoken"
   ],
   "dart.runPubGetOnPubspecChanges": "never"
 }

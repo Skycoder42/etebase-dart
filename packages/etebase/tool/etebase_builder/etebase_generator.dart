@@ -2,32 +2,31 @@ import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:source_gen/source_gen.dart';
 
-import 'builders/ete_class_builder.dart';
+import 'builders/client_builder.dart';
 import 'parsers/etebase_parser.dart';
 
 class EtebaseGenerator extends Generator {
   @override
   String generate(LibraryReader library, BuildStep buildStep) {
     try {
-      final context = EtebaseParser().parse(library);
+      const parser = EtebaseParser();
+      const clientBuilder = ClientBuilder();
 
-      final buffer = StringBuffer();
-      final emitter = DartEmitter(
+      final buffer = StringBuffer()
+        ..writeln(
+          '// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters',
+        );
+      final emitter = DartEmitter.scoped(
         orderDirectives: true,
         useNullSafetySyntax: true,
       );
 
-      final classBuilder = EteClassBuilder(context);
+      final etebaseRef = parser.parse(library);
+      clientBuilder.build(etebaseRef).accept(emitter, buffer);
 
-      Library(
-        (b) => b
-          ..directives.add(Directive.import('dart:typed_data'))
-          ..body.addAll(context.classes.map(classBuilder.build)),
-      ).accept(emitter, buffer);
-
-      if (context.unprocessedMethods.isNotEmpty) {
+      if (etebaseRef.functions.isNotEmpty) {
         print(
-          'Unprocessed methods: ${context.unprocessedMethods.map((e) => e.name).toList()}',
+          'Unprocessed methods: ${etebaseRef.functions.map((e) => e.name).toList()}',
         );
       }
 
