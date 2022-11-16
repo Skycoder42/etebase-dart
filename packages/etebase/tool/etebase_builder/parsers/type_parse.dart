@@ -76,7 +76,11 @@ class TypeParser {
   ) {
     if (pointerType is InterfaceType && pointerType.isPointer) {
       isOutParam.value = true;
-      return pointerType.typeArguments.single.typeReference;
+      return TypeReference(
+        (b) => b
+          ..symbol = 'List'
+          ..types.add(pointerType.typeArguments.single.typeReference),
+      );
     }
 
     final pointerElement = pointerType.element;
@@ -90,8 +94,8 @@ class TypeParser {
     switch (pointerElement!.name) {
       case 'Char':
         return TypeReference((b) => b..symbol = 'String');
-      case 'Int64':
-        return TypeReference((b) => b..symbol = 'int');
+      case 'Int64': // is always a date time in etebase context
+        return TypeReference((b) => b..symbol = 'DateTime');
       default:
         return pointerType.typeReference;
     }

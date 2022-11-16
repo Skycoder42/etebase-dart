@@ -57,7 +57,9 @@ class EtebaseParser {
     final libEtebaseFfi = ArgumentError.checkNotNull(
       library.findType('LibEtebaseFFI'),
     );
-    final libEtebaseFfiMethods = libEtebaseFfi.methods;
+    final libEtebaseFfiMethods = libEtebaseFfi.methods
+        .where((method) => !method.name.startsWith('etebase_error_'))
+        .toList();
 
     final typeDefs = TypedefRef(
       library.allElements.whereType<TypeAliasElement>().toList(),

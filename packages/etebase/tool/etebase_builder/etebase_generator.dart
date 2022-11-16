@@ -14,7 +14,7 @@ class EtebaseGenerator extends Generator {
 
       final buffer = StringBuffer()
         ..writeln(
-          '// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters',
+          '// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars',
         );
       final emitter = DartEmitter.scoped(
         orderDirectives: true,
@@ -23,12 +23,6 @@ class EtebaseGenerator extends Generator {
 
       final etebaseRef = parser.parse(library);
       clientBuilder.build(etebaseRef).accept(emitter, buffer);
-
-      if (etebaseRef.functions.isNotEmpty) {
-        print(
-          'Unprocessed methods: ${etebaseRef.functions.map((e) => e.name).toList()}',
-        );
-      }
 
       return buffer.toString();
     } catch (e, s) {

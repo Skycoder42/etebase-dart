@@ -38,6 +38,7 @@ class MethodRef {
   final bool isNew;
   final bool isDestroy;
   final bool isPubkeySize;
+  final bool isGetLength;
   final bool isStatic;
 
   final List<ParameterRef> parameters;
@@ -49,6 +50,7 @@ class MethodRef {
     required this.isNew,
     required this.isDestroy,
     required this.isPubkeySize,
+    required this.isGetLength,
     required this.isStatic,
     required this.parameters,
     required this.returnType,
@@ -98,6 +100,7 @@ class GlobalMethodContext extends MethodContext {
 
 class MethodParser {
   static const _thisParamName = 'this_';
+  static final _isGetLengthRegExp = RegExp('_get_.*_length');
 
   static final _returnTypeMapping = {
     'etebase_user_profile_get_pubkey': TypeReference(
@@ -123,15 +126,17 @@ class MethodParser {
         ..symbol = 'Uint8List'
         ..url = 'dart:typed_data',
     ),
-    'etebase_signed_invitation_get_access_level': TypeReference(
-      (b) => b
-        ..symbol = 'EtebaseCollectionAccessLevel'
-        ..url = '../../src/model/etebase_collection_access_level.dart',
+    'etebase_client_check_etebase_server': TypeReference(
+      (b) => b..symbol = 'bool',
+    ),
+    'etebase_utils_pretty_fingerprint': TypeReference(
+      (b) => b..symbol = 'String',
     ),
   };
 
   static final _parameterTypeMapping = <String, Map<String, ParameterRef?>>{
-    'etebase_utils_randombytes': const {'buf': null}
+    'etebase_utils_randombytes': const {'buf': null},
+    'etebase_utils_pretty_fingerprint': const {'buf': null},
   };
 
   final TypeParser _typeParser;
@@ -152,6 +157,7 @@ class MethodParser {
       isNew: methodName.endsWith('_new'),
       isDestroy: methodName.endsWith('_destroy'),
       isPubkeySize: methodName.endsWith('_pubkey_size'),
+      isGetLength: _isGetLengthRegExp.hasMatch(methodName),
       isStatic: _isStatic(context.method),
       parameters: mappedParams,
       returnType: _mapReturnType(
@@ -176,6 +182,7 @@ class MethodParser {
       isNew: false,
       isDestroy: false,
       isPubkeySize: false,
+      isGetLength: _isGetLengthRegExp.hasMatch(context.method.name),
       isStatic: true,
       parameters: mappedParams,
       returnType: _mapReturnType(
@@ -241,7 +248,7 @@ class MethodParser {
           isRetSize: false,
           type: _typeParser.parseType(
             TypeContext(
-              type: param.type,
+              type: nextParam.type,
               isArray: false,
               typeDefs: typeDefs,
             ),
@@ -274,7 +281,19 @@ class MethodParser {
   ) {
     final mappedType = _returnTypeMapping[method.name];
     if (mappedType != null) {
-      return TypeRef(ffiType: method.returnType, dartType: mappedType);
+      return TypeRef(
+        ffiType: method.returnType,
+        dartType: mappedType,
+      );
+    } else if (method.name.endsWith('_get_access_level')) {
+      return TypeRef(
+        ffiType: method.returnType,
+        dartType: TypeReference(
+          (b) => b
+            ..symbol = 'EtebaseCollectionAccessLevel'
+            ..url = '../../src/model/etebase_collection_access_level.dart',
+        ),
+      );
     } else {
       return _typeParser.parseType(
         TypeContext(
