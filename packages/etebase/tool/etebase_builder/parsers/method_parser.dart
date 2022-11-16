@@ -26,6 +26,8 @@ class ParameterRef {
     required this.isRetSize,
     required this.type,
   });
+
+  bool get isOutParam => type.isOutParam;
 }
 
 class MethodRef {
@@ -53,6 +55,13 @@ class MethodRef {
   });
 
   bool get hasRetSize => parameters.any((p) => p.isRetSize);
+
+  bool get hasOutParam => parameters.any((p) => p.isOutParam);
+
+  TypeRef get outOrReturnType => parameters.map((p) => p.type).firstWhere(
+        (p) => p.isOutParam,
+        orElse: () => returnType,
+      );
 }
 
 class MethodContext {
@@ -109,6 +118,20 @@ class MethodParser {
     'etebase_signed_invitation_get_from_username': TypeReference(
       (b) => b..symbol = 'String',
     ),
+    'etebase_utils_randombytes': TypeReference(
+      (b) => b
+        ..symbol = 'Uint8List'
+        ..url = 'dart:typed_data',
+    ),
+    'etebase_signed_invitation_get_access_level': TypeReference(
+      (b) => b
+        ..symbol = 'EtebaseCollectionAccessLevel'
+        ..url = '../../src/model/etebase_collection_access_level.dart',
+    ),
+  };
+
+  static final _parameterTypeMapping = <String, Map<String, ParameterRef?>>{
+    'etebase_utils_randombytes': const {'buf': null}
   };
 
   final TypeParser _typeParser;
@@ -175,10 +198,20 @@ class MethodParser {
     MethodElement method,
     TypedefRef typeDefs,
   ) sync* {
+    final paramMap = _parameterTypeMapping[method.name] ?? const {};
     final params = method.parameters;
     for (var i = 0; i < params.length; ++i) {
       final param = params[i];
       final nextParam = i < params.length - 1 ? params[i + 1] : null;
+
+      if (paramMap.containsKey(param.name)) {
+        final paramOverwrite = paramMap[param.name];
+        if (paramOverwrite != null) {
+          yield paramOverwrite;
+        }
+
+        continue;
+      }
 
       if (nextParam != null && nextParam.name == '${param.name}_size') {
         ++i; // skip the _size param
@@ -241,7 +274,7 @@ class MethodParser {
   ) {
     final mappedType = _returnTypeMapping[method.name];
     if (mappedType != null) {
-      return TypeRef(method.returnType, mappedType);
+      return TypeRef(ffiType: method.returnType, dartType: mappedType);
     } else {
       return _typeParser.parseType(
         TypeContext(

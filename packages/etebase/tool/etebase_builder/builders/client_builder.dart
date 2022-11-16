@@ -40,13 +40,14 @@ class ClientBuilder {
           ..returns = TypeReference(
             (b) => b
               ..symbol = 'Future'
-              ..types.add(method.returnType.dartType),
+              ..types.add(method.outOrReturnType.dartType),
           )
           ..requiredParameters.addAll(
             method.parameters
                 .where((param) => !param.isThisParam)
                 .where((param) => !param.isListLength)
                 .where((param) => !param.isRetSize)
+                .where((param) => !param.isOutParam)
                 .map(_buildParameter),
           )
           ..body = TypeReference((b) => b..symbol = 'UnimplementedError')

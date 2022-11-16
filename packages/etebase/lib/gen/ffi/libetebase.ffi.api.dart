@@ -8,6 +8,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:typed_data' as _i1;
 
+import '../../src/model/etebase_collection_access_level.dart' as _i2;
+
 class EtebaseUserProfile {
   Future<_i1.Uint8List> getPubkey() async => throw UnimplementedError();
 }
@@ -29,7 +31,8 @@ class EtebaseSignedInvitation {
   Future<String> getUid() async => throw UnimplementedError();
   Future<String> getUsername() async => throw UnimplementedError();
   Future<String> getCollection() async => throw UnimplementedError();
-  Future<int> getAccessLevel() async => throw UnimplementedError();
+  Future<_i2.EtebaseCollectionAccessLevel> getAccessLevel() async =>
+      throw UnimplementedError();
   Future<String> getFromUsername() async => throw UnimplementedError();
   Future<_i1.Uint8List> getFromPubkey() async => throw UnimplementedError();
 }
@@ -40,21 +43,21 @@ class EtebaseRemovedCollection {
 
 class EtebaseInvitationListResponse {
   Future<String> getIterator() async => throw UnimplementedError();
-  Future<int> getData(dynamic data) async => throw UnimplementedError();
+  Future<EtebaseSignedInvitation> getData() async => throw UnimplementedError();
   Future<int> getDataLength() async => throw UnimplementedError();
   Future<bool> isDone() async => throw UnimplementedError();
 }
 
 class EtebaseItemRevisionsListResponse {
   Future<String> getIterator() async => throw UnimplementedError();
-  Future<int> getData(dynamic data) async => throw UnimplementedError();
+  Future<EtebaseItem> getData() async => throw UnimplementedError();
   Future<int> getDataLength() async => throw UnimplementedError();
   Future<bool> isDone() async => throw UnimplementedError();
 }
 
 class EtebaseMemberListResponse {
   Future<String> getIterator() async => throw UnimplementedError();
-  Future<int> getData(dynamic data) async => throw UnimplementedError();
+  Future<EtebaseCollectionMember> getData() async => throw UnimplementedError();
   Future<int> getDataLength() async => throw UnimplementedError();
   Future<bool> isDone() async => throw UnimplementedError();
 }
@@ -99,33 +102,33 @@ class EtebaseItemManager {
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<EtebaseItemListResponse> fetchUpdates(
+  Future<EtebaseItem> fetchUpdates(
     List<EtebaseItem> items,
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<EtebaseItemListResponse> fetchMulti(
+  Future<Char> fetchMulti(
     List<String> items,
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<int> batch(
+  Future<EtebaseItem> batch(
     List<EtebaseItem> items,
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<int> batchDeps(
+  Future<EtebaseItem> batchDeps(
     List<EtebaseItem> items,
     List<EtebaseItem> deps,
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<int> transaction(
+  Future<EtebaseItem> transaction(
     List<EtebaseItem> items,
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<int> transactionDeps(
+  Future<EtebaseItem> transactionDeps(
     List<EtebaseItem> items,
     List<EtebaseItem> deps,
     EtebaseFetchOptions fetchOptions,
@@ -141,7 +144,7 @@ class EtebaseItemManager {
 
 class EtebaseItemListResponse {
   Future<String> getStoken() async => throw UnimplementedError();
-  Future<int> getData(dynamic data) async => throw UnimplementedError();
+  Future<EtebaseItem> getData() async => throw UnimplementedError();
   Future<int> getDataLength() async => throw UnimplementedError();
   Future<bool> isDone() async => throw UnimplementedError();
 }
@@ -280,7 +283,7 @@ class EtebaseCollectionManager {
     EtebaseFetchOptions fetchOptions,
   ) async =>
       throw UnimplementedError();
-  Future<EtebaseCollectionListResponse> listMulti(
+  Future<Char> listMulti(
     List<String> collectionTypes,
     EtebaseFetchOptions fetchOptions,
   ) async =>
@@ -309,10 +312,10 @@ class EtebaseCollectionManager {
 
 class EtebaseCollectionListResponse {
   Future<String> getStoken() async => throw UnimplementedError();
-  Future<int> getData(dynamic data) async => throw UnimplementedError();
+  Future<EtebaseCollection> getData() async => throw UnimplementedError();
   Future<int> getDataLength() async => throw UnimplementedError();
   Future<bool> isDone() async => throw UnimplementedError();
-  Future<int> getRemovedMemberships(dynamic data) async =>
+  Future<EtebaseRemovedCollection> getRemovedMemberships() async =>
       throw UnimplementedError();
   Future<int> getRemovedMembershipsLength() async => throw UnimplementedError();
 }
@@ -413,10 +416,7 @@ class EtebaseAccount {
 abstract class EtebaseUtils {
   EtebaseUtils._();
 
-  static Future<int> randombytes(
-    Void buf,
-    int size,
-  ) async =>
+  static Future<_i1.Uint8List> randombytes(int size) async =>
       throw UnimplementedError();
   static Future<int> prettyFingerprint(
     _i1.Uint8List content,

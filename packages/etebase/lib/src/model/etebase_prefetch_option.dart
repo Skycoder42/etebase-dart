@@ -1,0 +1,4 @@
+enum EtebasePrefetchOption {
+  optionAuto,
+  optionMedium,
+}

@@ -6,10 +6,16 @@ import 'package:code_builder/code_builder.dart';
 import 'etebase_parser.dart';
 
 class TypeRef {
-  final DartType ffiTyp;
+  final DartType ffiType;
   final TypeReference dartType;
 
-  const TypeRef(this.ffiTyp, this.dartType);
+  final bool isOutParam;
+
+  const TypeRef({
+    required this.ffiType,
+    required this.dartType,
+    this.isOutParam = false,
+  });
 }
 
 class TypeContext {
@@ -31,27 +37,46 @@ class TypeParser {
   TypeRef parseType(TypeContext context) {
     final type = context.type;
     if (type.isVoid) {
-      return TypeRef(type, TypeReference((b) => b..symbol = 'void'));
+      return TypeRef(
+        ffiType: type,
+        dartType: TypeReference((b) => b..symbol = 'void'),
+      );
     }
 
     if (type is! InterfaceType) {
-      return TypeRef(type, type.typeReference);
+      return TypeRef(
+        ffiType: type,
+        dartType: type.typeReference,
+      );
     }
 
     if (type.isPointer) {
       final pointerType = type.typeArguments.single;
+      final isOutParam = _Ref<bool>(false);
       final typeRef = context.isArray
           ? _mapPointerArrayType(context, pointerType)
-          : _mapPointerType(context, pointerType);
-      return TypeRef(type, typeRef);
+          : _mapPointerType(context, pointerType, isOutParam);
+      return TypeRef(
+        ffiType: type,
+        dartType: typeRef,
+        isOutParam: isOutParam.value,
+      );
     }
 
-    return TypeRef(type, type.typeReference);
+    return TypeRef(
+      ffiType: type,
+      dartType: type.typeReference,
+    );
   }
 
-  TypeReference _mapPointerType(TypeContext context, DartType pointerType) {
+  TypeReference _mapPointerType(
+    TypeContext context,
+    DartType pointerType,
+    _Ref<bool> isOutParam,
+  ) {
     if (pointerType is InterfaceType && pointerType.isPointer) {
-      return TypeReference((b) => b..symbol = 'dynamic');
+      isOutParam.value = true;
+      return pointerType.typeArguments.single.typeReference;
     }
 
     final pointerElement = pointerType.element;
@@ -118,4 +143,10 @@ extension _DartTypeX on DartType {
 
 extension _InterfaceTypeX on InterfaceType {
   bool get isPointer => element.name == 'Pointer';
+}
+
+class _Ref<T> {
+  T value;
+
+  _Ref(this.value);
 }
