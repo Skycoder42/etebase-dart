@@ -42,12 +42,8 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
   );
 
 // TODO: to be fixed
-// methods:
-// - getMetaRaw
-// - getContent
-//
-// params:
-// - prefetch
-//
 // members:
 // - etebase_client_check_etebase_server
+//
+// constants:
+// - ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE

@@ -18,24 +18,14 @@ class TypeRef {
   });
 }
 
-class TypeContext {
-  final DartType type;
-  final bool isArray;
-
-  final TypedefRef typeDefs;
-
-  const TypeContext({
-    required this.type,
-    required this.isArray,
-    required this.typeDefs,
-  });
-}
-
 class TypeParser {
   const TypeParser();
 
-  TypeRef parseType(TypeContext context) {
-    final type = context.type;
+  TypeRef parseType({
+    required DartType type,
+    bool isArray = false,
+    required TypedefRef typeDefs,
+  }) {
     if (type.isVoid) {
       return TypeRef(
         ffiType: type,
@@ -53,9 +43,9 @@ class TypeParser {
     if (type.isPointer) {
       final pointerType = type.typeArguments.single;
       final isOutParam = _Ref<bool>(false);
-      final typeRef = context.isArray
-          ? _mapPointerArrayType(context, pointerType)
-          : _mapPointerType(context, pointerType, isOutParam);
+      final typeRef = isArray
+          ? _mapPointerArrayType(pointerType, typeDefs)
+          : _mapPointerType(pointerType, typeDefs, isOutParam);
       return TypeRef(
         ffiType: type,
         dartType: typeRef,
@@ -69,9 +59,33 @@ class TypeParser {
     );
   }
 
+  TypeRef createAccessLevelFor(DartType type) {
+    assert(type.isDartCoreInt, 'type should be int, but was $type');
+    return TypeRef(
+      ffiType: type,
+      dartType: TypeReference(
+        (b) => b
+          ..symbol = 'EtebaseCollectionAccessLevel'
+          ..url = '../../src/model/etebase_collection_access_level.dart',
+      ),
+    );
+  }
+
+  TypeRef createPrefetchOptionFor(DartType type) {
+    assert(type.isDartCoreInt, 'type should be int, but was $type');
+    return TypeRef(
+      ffiType: type,
+      dartType: TypeReference(
+        (b) => b
+          ..symbol = 'EtebasePrefetchOption'
+          ..url = '../../src/model/etebase_prefetch_option.dart',
+      ),
+    );
+  }
+
   TypeReference _mapPointerType(
-    TypeContext context,
     DartType pointerType,
+    TypedefRef typeDefs,
     _Ref<bool> isOutParam,
   ) {
     if (pointerType is InterfaceType && pointerType.isPointer) {
@@ -85,7 +99,7 @@ class TypeParser {
 
     final pointerElement = pointerType.element;
     if (pointerElement is ClassElement) {
-      final resolvedElement = context.typeDefs.elementFor(pointerElement);
+      final resolvedElement = typeDefs.elementFor(pointerElement);
       if (!identical(resolvedElement, pointerElement)) {
         return TypeReference((b) => b..symbol = resolvedElement.name);
       }
@@ -102,8 +116,8 @@ class TypeParser {
   }
 
   TypeReference _mapPointerArrayType(
-    TypeContext context,
     DartType pointerType,
+    TypedefRef typeDefs,
   ) {
     switch (pointerType.element!.name) {
       case 'Void':
@@ -117,13 +131,7 @@ class TypeParser {
           (b) => b
             ..symbol = 'List'
             ..types.add(
-              parseType(
-                TypeContext(
-                  type: pointerType,
-                  isArray: false,
-                  typeDefs: context.typeDefs,
-                ),
-              ).dartType,
+              parseType(type: pointerType, typeDefs: typeDefs).dartType,
             ),
         );
     }

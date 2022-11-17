@@ -10,6 +10,7 @@ import 'dart:ffi' as _i1;
 import 'dart:typed_data' as _i3;
 
 import '../../src/model/etebase_collection_access_level.dart' as _i4;
+import '../../src/model/etebase_prefetch_option.dart' as _i5;
 import 'libetebase.ffi.dart' as _i2;
 
 /// The URL of the main hosted server
@@ -501,8 +502,7 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getMetaRaw(_i3.Uint8List buf) async =>
-      throw UnimplementedError();
+  Future<_i3.Uint8List> getMetaRaw() async => throw UnimplementedError();
 
   /// Set the content of the item
   ///
@@ -517,8 +517,7 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getContent(_i3.Uint8List buf) async =>
-      throw UnimplementedError();
+  Future<_i3.Uint8List> getContent() async => throw UnimplementedError();
 
   /// Mark the item as deleted
   ///
@@ -714,7 +713,8 @@ class EtebaseFetchOptions {
   ///
   /// @param this_ the object handle
   /// @param prefetch the prefetch option to set
-  Future<void> setPrefetch(int prefetch) async => throw UnimplementedError();
+  Future<void> setPrefetch(_i5.EtebasePrefetchOption prefetch) async =>
+      throw UnimplementedError();
 
   /// Toggle fetching the collection's item
   ///
@@ -1083,8 +1083,7 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getMetaRaw(_i3.Uint8List buf) async =>
-      throw UnimplementedError();
+  Future<_i3.Uint8List> getMetaRaw() async => throw UnimplementedError();
 
   /// Set the content of the collection
   ///
@@ -1099,8 +1098,7 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getContent(_i3.Uint8List buf) async =>
-      throw UnimplementedError();
+  Future<_i3.Uint8List> getContent() async => throw UnimplementedError();
 
   /// Mark the collection as deleted
   ///

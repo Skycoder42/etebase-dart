@@ -75,11 +75,9 @@ class EtebaseParser {
       classes: classElements
           .map(
             (clazz) => _classParser.parse(
-              ClassContext(
-                clazz,
-                libEtebaseFfiMethods,
-                typeDefs,
-              ),
+              clazz: clazz,
+              libEtebaseFfiMethods: libEtebaseFfiMethods,
+              typeDefs: typeDefs,
             ),
           )
           .toList(),
@@ -87,11 +85,8 @@ class EtebaseParser {
       functions: libEtebaseFfiMethods
           .map(
             (method) => _methodParser.parseGlobal(
-              GlobalMethodContext(
-                method: method,
-                typeDefs: typeDefs,
-                methodPrefix: null,
-              ),
+              method: method,
+              typeDefs: typeDefs,
             ),
           )
           .toList(),
@@ -105,23 +100,18 @@ class EtebaseParser {
   ) {
     final utilsMethods = libEtebaseFfiMethods
         .where((method) => method.name.startsWith(_etebaseUtilsPrefix))
-        .toList();
+        .toList()
+      ..forEach(libEtebaseFfiMethods.remove);
 
-    final methods = utilsMethods
+    return utilsMethods
         .where((method) => !method.name.contains('base64'))
         .map(
           (method) => _methodParser.parseGlobal(
-            GlobalMethodContext(
-              method: method,
-              typeDefs: typeDefs,
-              methodPrefix: _etebaseUtilsPrefix,
-            ),
+            method: method,
+            typeDefs: typeDefs,
+            methodPrefix: _etebaseUtilsPrefix,
           ),
         )
         .toList();
-
-    utilsMethods.forEach(libEtebaseFfiMethods.remove);
-
-    return methods;
   }
 }

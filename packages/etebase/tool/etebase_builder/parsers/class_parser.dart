@@ -20,19 +20,6 @@ class ClassRef {
   });
 }
 
-class ClassContext {
-  final ClassElement clazz;
-  final List<MethodElement> libEtebaseFfiMethods;
-
-  final TypedefRef typeDefs;
-
-  const ClassContext(
-    this.clazz,
-    this.libEtebaseFfiMethods,
-    this.typeDefs,
-  );
-}
-
 class ClassParser {
   static const _memberPrefixMap = {
     'EtebaseFileSystemCache': 'etebase_fs_cache',
@@ -43,24 +30,26 @@ class ClassParser {
 
   const ClassParser([this._methodParser = const MethodParser()]);
 
-  ClassRef parse(ClassContext context) {
-    final typeAlias = context.typeDefs.typedefFor(context.clazz);
-    final resolvedType = (typeAlias ?? context.clazz) as TypeDefiningElement;
+  ClassRef parse({
+    required ClassElement clazz,
+    required List<MethodElement> libEtebaseFfiMethods,
+    required TypedefRef typeDefs,
+  }) {
+    final typeAlias = typeDefs.typedefFor(clazz);
+    final resolvedType = (typeAlias ?? clazz) as TypeDefiningElement;
     final methodPrefix = _prefixFor(resolvedType);
 
     return ClassRef(
-      element: context.clazz,
+      element: clazz,
       typeAlias: typeAlias,
       name: resolvedType.name!,
-      methods: _findMembers(context, resolvedType, methodPrefix)
+      methods: _findMembers(libEtebaseFfiMethods, resolvedType, methodPrefix)
           .map(
             (method) => _methodParser.parseMember(
-              MemberMethodContext(
-                method: method,
-                clazz: resolvedType,
-                typeDefs: context.typeDefs,
-                methodPrefix: methodPrefix,
-              ),
+              method: method,
+              clazz: resolvedType,
+              typeDefs: typeDefs,
+              methodPrefix: methodPrefix,
             ),
           )
           .toList(),
@@ -73,16 +62,16 @@ class ClassParser {
   }
 
   List<MethodElement> _findMembers(
-    ClassContext context,
+    List<MethodElement> libEtebaseFfiMethods,
     TypeDefiningElement resolvedType,
     String methodPrefix, {
     bool markProcessed = true,
   }) {
-    final methods = context.libEtebaseFfiMethods
+    final methods = libEtebaseFfiMethods
         .where((method) => method.name.startsWith(methodPrefix))
         .toList();
     if (markProcessed) {
-      methods.forEach(context.libEtebaseFfiMethods.remove);
+      methods.forEach(libEtebaseFfiMethods.remove);
     }
     return methods;
   }

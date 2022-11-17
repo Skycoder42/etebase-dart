@@ -3,6 +3,7 @@ import 'package:code_builder/code_builder.dart';
 import '../parsers/class_parser.dart';
 import '../parsers/etebase_parser.dart';
 import '../parsers/method_parser.dart';
+import '../parsers/param_parser.dart';
 
 class ClientBuilder {
   const ClientBuilder();
