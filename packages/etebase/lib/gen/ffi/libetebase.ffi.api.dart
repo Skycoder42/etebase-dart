@@ -4,21 +4,33 @@
 // EtebaseGenerator
 // **************************************************************************
 
-// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars
+// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:typed_data' as _i1;
+import 'dart:ffi' as _i1;
+import 'dart:typed_data' as _i3;
 
-import '../../src/model/etebase_collection_access_level.dart' as _i2;
-import '../../src/model/etebase_error_code.dart' as _i3;
+import '../../src/model/etebase_collection_access_level.dart' as _i4;
+import 'libetebase.ffi.dart' as _i2;
+
+/// The URL of the main hosted server
+Future<String> etebaseGetDefaultServerUrl() async => throw UnimplementedError();
 
 class EtebaseUserProfile {
+  EtebaseUserProfile._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseUserProfile> _pointer;
+
   /// The user's identity public key
   ///
   /// This is used for identifying the user and safely sending them data (such as \ref invitations EtebaseSignedInvitation).
-  Future<_i1.Uint8List> getPubkey() async => throw UnimplementedError();
+  Future<_i3.Uint8List> getPubkey() async => throw UnimplementedError();
 }
 
 class EtebaseUser {
+  EtebaseUser._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseUser> _pointer;
+
   /// Return a new user instance
   ///
   /// Should be destroyed with `etebase_user_destroy`
@@ -55,6 +67,10 @@ class EtebaseUser {
 }
 
 class EtebaseSignedInvitation {
+  EtebaseSignedInvitation._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseSignedInvitation> _pointer;
+
   /// Clone the invitation object
   ///
   /// @param this_ the object handle
@@ -78,7 +94,7 @@ class EtebaseSignedInvitation {
   /// The access level offered in this invitation
   ///
   /// @param this_ the object handle
-  Future<_i2.EtebaseCollectionAccessLevel> getAccessLevel() async =>
+  Future<_i4.EtebaseCollectionAccessLevel> getAccessLevel() async =>
       throw UnimplementedError();
 
   /// The username this invitation is from
@@ -89,10 +105,14 @@ class EtebaseSignedInvitation {
   /// The public key of the inviting user
   ///
   /// @param this_ the object handle
-  Future<_i1.Uint8List> getFromPubkey() async => throw UnimplementedError();
+  Future<_i3.Uint8List> getFromPubkey() async => throw UnimplementedError();
 }
 
 class EtebaseRemovedCollection {
+  EtebaseRemovedCollection._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseRemovedCollection> _pointer;
+
   /// The uid of the removed collection
   ///
   /// @param this_ the object handle
@@ -100,6 +120,10 @@ class EtebaseRemovedCollection {
 }
 
 class EtebaseInvitationListResponse {
+  EtebaseInvitationListResponse._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseInvitationListResponse> _pointer;
+
   /// Iterator for the list response
   ///
   /// @param this_ the object handle
@@ -119,6 +143,10 @@ class EtebaseInvitationListResponse {
 }
 
 class EtebaseItemRevisionsListResponse {
+  EtebaseItemRevisionsListResponse._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseItemRevisionsListResponse> _pointer;
+
   /// Iterator for the list response
   ///
   /// @param this_ the object handle
@@ -137,6 +165,10 @@ class EtebaseItemRevisionsListResponse {
 }
 
 class EtebaseMemberListResponse {
+  EtebaseMemberListResponse._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseMemberListResponse> _pointer;
+
   /// Iterator for the list response
   ///
   /// @param this_ the object handle
@@ -156,6 +188,10 @@ class EtebaseMemberListResponse {
 }
 
 class EtebaseItemMetadata {
+  EtebaseItemMetadata._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseItemMetadata> _pointer;
+
   /// Create a new metadata object
   ///
   /// Should be destroyed with `etebase_item_metadata_destroy`
@@ -222,6 +258,10 @@ class EtebaseItemMetadata {
 }
 
 class EtebaseItemManager {
+  EtebaseItemManager._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseItemManager> _pointer;
+
   /// Fetch a single item from the server using its UID
   ///
   /// @param this_ the object handle
@@ -243,7 +283,7 @@ class EtebaseItemManager {
   /// @param content_size the content size
   Future<EtebaseItem> create(
     EtebaseItemMetadata meta,
-    _i1.Uint8List content,
+    _i3.Uint8List content,
   ) async =>
       throw UnimplementedError();
 
@@ -260,8 +300,8 @@ class EtebaseItemManager {
   /// @param content the item's content as a byte array
   /// @param content_size the content size
   Future<EtebaseItem> createRaw(
-    _i1.Uint8List meta,
-    _i1.Uint8List content,
+    _i3.Uint8List meta,
+    _i3.Uint8List content,
   ) async =>
       throw UnimplementedError();
 
@@ -373,7 +413,7 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param cached the byte buffer holding the cached item obtained using [cache_save]
   /// @param cached_size size of the buffer
-  Future<EtebaseItem> cacheLoad(_i1.Uint8List cached) async =>
+  Future<EtebaseItem> cacheLoad(_i3.Uint8List cached) async =>
       throw UnimplementedError();
 
   /// Save the item object to a byte buffer for caching
@@ -383,7 +423,7 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i1.Uint8List> cacheSave(EtebaseItem item) async =>
+  Future<_i3.Uint8List> cacheSave(EtebaseItem item) async =>
       throw UnimplementedError();
 
   /// Save the item object and its content to a byte buffer for caching
@@ -393,11 +433,15 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i1.Uint8List> cacheSaveWithContent(EtebaseItem item) async =>
+  Future<_i3.Uint8List> cacheSaveWithContent(EtebaseItem item) async =>
       throw UnimplementedError();
 }
 
 class EtebaseItemListResponse {
+  EtebaseItemListResponse._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseItemListResponse> _pointer;
+
   /// Sync token for the list response
   ///
   /// @param this_ the object handle
@@ -416,6 +460,10 @@ class EtebaseItemListResponse {
 }
 
 class EtebaseItem {
+  EtebaseItem._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseItem> _pointer;
+
   /// Clone an item object
   ///
   /// @param this_ the object handle
@@ -445,7 +493,7 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param meta the metadata for the item. This needs to be a valid `EtebaseItemMetadata`-like struct encoded using `msgpack`.
   /// @param meta_size the metadata size
-  Future<void> setMetaRaw(_i1.Uint8List meta) async =>
+  Future<void> setMetaRaw(_i3.Uint8List meta) async =>
       throw UnimplementedError();
 
   /// Write the metadata of the item to a byte array and return its length
@@ -453,7 +501,7 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getMetaRaw(_i1.Uint8List buf) async =>
+  Future<void> getMetaRaw(_i3.Uint8List buf) async =>
       throw UnimplementedError();
 
   /// Set the content of the item
@@ -461,7 +509,7 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param content the content of the item as a byte array
   /// @param content_size the content size
-  Future<void> setContent(_i1.Uint8List content) async =>
+  Future<void> setContent(_i3.Uint8List content) async =>
       throw UnimplementedError();
 
   /// Write the content of the item to a byte array and return its length
@@ -469,7 +517,7 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getContent(_i1.Uint8List buf) async =>
+  Future<void> getContent(_i3.Uint8List buf) async =>
       throw UnimplementedError();
 
   /// Mark the item as deleted
@@ -496,6 +544,10 @@ class EtebaseItem {
 }
 
 class EtebaseFileSystemCache {
+  EtebaseFileSystemCache._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseFileSystemCache> _pointer;
+
   /// Initialize a file system cache object
   ///
   /// Should be destroyed with `etebase_fs_cache_destroy`
@@ -523,7 +575,7 @@ class EtebaseFileSystemCache {
   /// @param encryption_key_size the size of the encryption_key
   Future<void> saveAccount(
     EtebaseAccount etebase,
-    _i1.Uint8List encryptionKey,
+    _i3.Uint8List encryptionKey,
   ) async =>
       throw UnimplementedError();
 
@@ -535,7 +587,7 @@ class EtebaseFileSystemCache {
   /// @param encryption_key_size the size of the encryption_key
   Future<EtebaseAccount> loadAccount(
     EtebaseClient client,
-    _i1.Uint8List encryptionKey,
+    _i3.Uint8List encryptionKey,
   ) async =>
       throw UnimplementedError();
 
@@ -642,6 +694,10 @@ class EtebaseFileSystemCache {
 }
 
 class EtebaseFetchOptions {
+  EtebaseFetchOptions._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseFetchOptions> _pointer;
+
   /// Return a new fetch options object
   ///
   /// Should be destroyed with `etebase_fetch_options_destroy`
@@ -681,6 +737,10 @@ class EtebaseFetchOptions {
 }
 
 class EtebaseCollectionMemberManager {
+  EtebaseCollectionMemberManager._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseCollectionMemberManager> _pointer;
+
   /// List the members of a collection
   ///
   /// @param this_ the object handle
@@ -707,12 +767,16 @@ class EtebaseCollectionMemberManager {
   /// @param access_level the new `EtebaseCollectionAccessLevel`
   Future<void> modifyAccessLevel(
     String username,
-    int accessLevel,
+    _i4.EtebaseCollectionAccessLevel accessLevel,
   ) async =>
       throw UnimplementedError();
 }
 
 class EtebaseCollectionMember {
+  EtebaseCollectionMember._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseCollectionMember> _pointer;
+
   /// Clone the object
   ///
   /// @param this_ the object handle
@@ -726,11 +790,15 @@ class EtebaseCollectionMember {
   /// The access_level of the member
   ///
   /// @param this_ the object handle
-  Future<_i2.EtebaseCollectionAccessLevel> getAccessLevel() async =>
+  Future<_i4.EtebaseCollectionAccessLevel> getAccessLevel() async =>
       throw UnimplementedError();
 }
 
 class EtebaseCollectionManager {
+  EtebaseCollectionManager._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseCollectionManager> _pointer;
+
   /// Fetch a single collection from the server using its UID
   ///
   /// @param this_ the object handle
@@ -754,7 +822,7 @@ class EtebaseCollectionManager {
   Future<EtebaseCollection> create(
     String collectionType,
     EtebaseItemMetadata meta,
-    _i1.Uint8List content,
+    _i3.Uint8List content,
   ) async =>
       throw UnimplementedError();
 
@@ -773,8 +841,8 @@ class EtebaseCollectionManager {
   /// @param content_size the content size
   Future<EtebaseCollection> createRaw(
     String collectionType,
-    _i1.Uint8List meta,
-    _i1.Uint8List content,
+    _i3.Uint8List meta,
+    _i3.Uint8List content,
   ) async =>
       throw UnimplementedError();
 
@@ -837,7 +905,7 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param cached the byte buffer holding the cached collection obtained using [cache_save]
   /// @param cached_size size of the buffer
-  Future<EtebaseCollection> cacheLoad(_i1.Uint8List cached) async =>
+  Future<EtebaseCollection> cacheLoad(_i3.Uint8List cached) async =>
       throw UnimplementedError();
 
   /// Save the collection object to a byte buffer for caching
@@ -847,7 +915,7 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i1.Uint8List> cacheSave(EtebaseCollection collection) async =>
+  Future<_i3.Uint8List> cacheSave(EtebaseCollection collection) async =>
       throw UnimplementedError();
 
   /// Save the collection object and its content to a byte buffer for caching
@@ -857,7 +925,7 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i1.Uint8List> cacheSaveWithContent(
+  Future<_i3.Uint8List> cacheSaveWithContent(
           EtebaseCollection collection) async =>
       throw UnimplementedError();
 
@@ -871,6 +939,10 @@ class EtebaseCollectionManager {
 }
 
 class EtebaseCollectionListResponse {
+  EtebaseCollectionListResponse._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseCollectionListResponse> _pointer;
+
   /// Sync token for the list response
   ///
   /// @param this_ the object handle
@@ -896,6 +968,10 @@ class EtebaseCollectionListResponse {
 }
 
 class EtebaseCollectionInvitationManager {
+  EtebaseCollectionInvitationManager._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseCollectionInvitationManager> _pointer;
+
   /// List the incoming collection invitations for the account
   ///
   /// @param this_ the object handle
@@ -944,8 +1020,8 @@ class EtebaseCollectionInvitationManager {
   Future<void> invite(
     EtebaseCollection collection,
     String username,
-    _i1.Uint8List pubkey,
-    int accessLevel,
+    _i3.Uint8List pubkey,
+    _i4.EtebaseCollectionAccessLevel accessLevel,
   ) async =>
       throw UnimplementedError();
 
@@ -962,10 +1038,14 @@ class EtebaseCollectionInvitationManager {
   /// Can be pretty printed with `etebase_utils_pretty_fingerprint`.
   ///
   /// @param this_ the object handle
-  Future<_i1.Uint8List> getPubkey() async => throw UnimplementedError();
+  Future<_i3.Uint8List> getPubkey() async => throw UnimplementedError();
 }
 
 class EtebaseCollection {
+  EtebaseCollection._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseCollection> _pointer;
+
   /// Clone a collection object
   ///
   /// @param this_ the object handle
@@ -995,7 +1075,7 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param meta the metadata for the collection. This needs to be a valid `EtebaseItemMetadata`-like struct encoded using `msgpack`.
   /// @param meta_size the metadata size
-  Future<void> setMetaRaw(_i1.Uint8List meta) async =>
+  Future<void> setMetaRaw(_i3.Uint8List meta) async =>
       throw UnimplementedError();
 
   /// Write the metadata of the collection to a byte array and return its length
@@ -1003,7 +1083,7 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getMetaRaw(_i1.Uint8List buf) async =>
+  Future<void> getMetaRaw(_i3.Uint8List buf) async =>
       throw UnimplementedError();
 
   /// Set the content of the collection
@@ -1011,7 +1091,7 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param content the content of the collection as a byte array
   /// @param content_size the content size
-  Future<void> setContent(_i1.Uint8List content) async =>
+  Future<void> setContent(_i3.Uint8List content) async =>
       throw UnimplementedError();
 
   /// Write the content of the collection to a byte array and return its length
@@ -1019,7 +1099,7 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<void> getContent(_i1.Uint8List buf) async =>
+  Future<void> getContent(_i3.Uint8List buf) async =>
       throw UnimplementedError();
 
   /// Mark the collection as deleted
@@ -1064,11 +1144,15 @@ class EtebaseCollection {
   /// Return the access level of the collection for the current user
   ///
   /// @param this_ the object handle
-  Future<_i2.EtebaseCollectionAccessLevel> getAccessLevel() async =>
+  Future<_i4.EtebaseCollectionAccessLevel> getAccessLevel() async =>
       throw UnimplementedError();
 }
 
 class EtebaseClient {
+  EtebaseClient._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseClient> _pointer;
+
   static Future<EtebaseClient> create(
     String clientName,
     String serverUrl,
@@ -1085,6 +1169,10 @@ class EtebaseClient {
 }
 
 class EtebaseAccount {
+  EtebaseAccount._(this._pointer);
+
+  final _i1.Pointer<_i2.EtebaseAccount> _pointer;
+
   /// Login a user and return a handle to an `EtebaseAccount` object
   ///
   /// @param client the already setup `EtebaseClient` object
@@ -1155,7 +1243,7 @@ class EtebaseAccount {
   /// @param this_ the object handle
   /// @param encryption_key used to encrypt the returned account string to enhance security
   /// @param encryption_key_size size of the encryption_key
-  Future<String> save(_i1.Uint8List encryptionKey) async =>
+  Future<String> save(_i3.Uint8List encryptionKey) async =>
       throw UnimplementedError();
 
   /// Restore and return the account object from the string obtained using `etebase_account_save`
@@ -1167,7 +1255,7 @@ class EtebaseAccount {
   static Future<EtebaseAccount> restore(
     EtebaseClient client,
     String accountDataStored,
-    _i1.Uint8List encryptionKey,
+    _i3.Uint8List encryptionKey,
   ) async =>
       throw UnimplementedError();
 }
@@ -1179,7 +1267,7 @@ abstract class EtebaseUtils {
   ///
   /// @param[out] buf the output byte buffer
   /// @param size the size of the returned buffer
-  static Future<_i1.Uint8List> randombytes(int size) async =>
+  Future<_i3.Uint8List> randombytes(int size) async =>
       throw UnimplementedError();
 
   /// Return a pretty formatted fingerprint of the content
@@ -1194,20 +1282,6 @@ abstract class EtebaseUtils {
   /// @param content the content to create a fingerprint for
   /// @param content_size the size of the content buffer
   /// @param[out] buf the output byte buffer
-  static Future<String> prettyFingerprint(_i1.Uint8List content) async =>
+  Future<String> prettyFingerprint(_i3.Uint8List content) async =>
       throw UnimplementedError();
-}
-
-class EtebaseException implements Exception {
-  EtebaseException._(
-    this.code,
-    this.message,
-  );
-
-  final _i3.EtebaseErrorCode code;
-
-  final String message;
-
-  @override
-  String toString() => 'EtebaseError(${code.name}): $message';
 }

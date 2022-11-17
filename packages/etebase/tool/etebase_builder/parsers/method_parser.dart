@@ -134,7 +134,8 @@ class MethodParser {
     ),
   };
 
-  static final _parameterTypeMapping = <String, Map<String, ParameterRef?>>{
+  static final _methodParameterTypeMapping =
+      <String, Map<String, ParameterRef?>>{
     'etebase_utils_randombytes': const {'buf': null},
     'etebase_utils_pretty_fingerprint': const {'buf': null},
   };
@@ -183,7 +184,7 @@ class MethodParser {
       isDestroy: false,
       isPubkeySize: false,
       isGetLength: _isGetLengthRegExp.hasMatch(context.method.name),
-      isStatic: true,
+      isStatic: false,
       parameters: mappedParams,
       returnType: _mapReturnType(
         context.method,
@@ -205,7 +206,7 @@ class MethodParser {
     MethodElement method,
     TypedefRef typeDefs,
   ) sync* {
-    final paramMap = _parameterTypeMapping[method.name] ?? const {};
+    final paramMap = _methodParameterTypeMapping[method.name] ?? const {};
     final params = method.parameters;
     for (var i = 0; i < params.length; ++i) {
       final param = params[i];
@@ -255,6 +256,26 @@ class MethodParser {
           ),
         );
       } else {
+        final TypeRef typeRef;
+        if (param.name == 'access_level' && param.type.isDartCoreInt) {
+          typeRef = TypeRef(
+            ffiType: param.type,
+            dartType: TypeReference(
+              (b) => b
+                ..symbol = 'EtebaseCollectionAccessLevel'
+                ..url = '../../src/model/etebase_collection_access_level.dart',
+            ),
+          );
+        } else {
+          typeRef = _typeParser.parseType(
+            TypeContext(
+              type: param.type,
+              isArray: false,
+              typeDefs: typeDefs,
+            ),
+          );
+        }
+
         yield ParameterRef(
           element: param,
           name: param.name.snakeToDart(),
@@ -262,13 +283,7 @@ class MethodParser {
           isList: false,
           isListLength: false,
           isRetSize: param.name == 'ret_size',
-          type: _typeParser.parseType(
-            TypeContext(
-              type: param.type,
-              isArray: false,
-              typeDefs: typeDefs,
-            ),
-          ),
+          type: typeRef,
         );
       }
     }

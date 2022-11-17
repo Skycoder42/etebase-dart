@@ -9,14 +9,46 @@ class ClientBuilder {
 
   Library build(EtebaseRef etebase) => Library(
         (b) => b
+          ..body.addAll(etebase.functions.map(_buildMethod))
           ..body.addAll(etebase.classes.map(_buildClass))
-          ..body.add(_buildUtilsClass(etebase))
-          ..body.add(_buildEtebaseError()),
+          ..body.add(_buildUtilsClass(etebase)),
       );
 
   Class _buildClass(ClassRef clazz) => Class(
         (b) => b
           ..name = clazz.name
+          ..fields.add(
+            Field(
+              (b) => b
+                ..name = '_pointer'
+                ..type = TypeReference(
+                  (b) => b
+                    ..symbol = 'Pointer'
+                    ..types.add(
+                      TypeReference(
+                        (b) => b
+                          ..symbol = clazz.name
+                          ..url = 'libetebase.ffi.dart',
+                      ),
+                    )
+                    ..url = 'dart:ffi',
+                )
+                ..modifier = FieldModifier.final$,
+            ),
+          )
+          ..constructors.add(
+            Constructor(
+              (b) => b
+                ..name = '_'
+                ..requiredParameters.add(
+                  Parameter(
+                    (b) => b
+                      ..name = '_pointer'
+                      ..toThis = true,
+                  ),
+                ),
+            ),
+          )
           ..methods.addAll(
             clazz.methods
                 .where((method) => !method.isDestroy)
@@ -81,60 +113,4 @@ class ClientBuilder {
 
     return returnType;
   }
-
-  Class _buildEtebaseError() => Class(
-        (b) => b
-          ..name = 'EtebaseException'
-          ..implements.add(TypeReference((b) => b..symbol = 'Exception'))
-          ..fields.add(
-            Field(
-              (b) => b
-                ..name = 'code'
-                ..type = TypeReference(
-                  (b) => b
-                    ..symbol = 'EtebaseErrorCode'
-                    ..url = '../../src/model/etebase_error_code.dart',
-                )
-                ..modifier = FieldModifier.final$,
-            ),
-          )
-          ..fields.add(
-            Field(
-              (b) => b
-                ..name = 'message'
-                ..type = TypeReference((b) => b..symbol = 'String')
-                ..modifier = FieldModifier.final$,
-            ),
-          )
-          ..constructors.add(
-            Constructor(
-              (b) => b
-                ..name = '_'
-                ..requiredParameters.add(
-                  Parameter(
-                    (b) => b
-                      ..name = 'code'
-                      ..toThis = true,
-                  ),
-                )
-                ..requiredParameters.add(
-                  Parameter(
-                    (b) => b
-                      ..name = 'message'
-                      ..toThis = true,
-                  ),
-                ),
-            ),
-          )
-          ..methods.add(
-            Method(
-              (b) => b
-                ..name = 'toString'
-                ..annotations.add(const Reference('override'))
-                ..returns = TypeReference((b) => b..symbol = 'String')
-                ..body =
-                    literalString(r'EtebaseError(${code.name}): $message').code,
-            ),
-          ),
-      );
 }

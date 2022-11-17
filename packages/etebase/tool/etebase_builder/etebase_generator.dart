@@ -9,20 +9,17 @@ class EtebaseGenerator extends Generator {
   @override
   String generate(LibraryReader library, BuildStep buildStep) {
     try {
-      const parser = EtebaseParser();
-      const clientBuilder = ClientBuilder();
+      final etebaseRef = const EtebaseParser().parse(library);
 
-      final buffer = StringBuffer()
-        ..writeln(
-          '// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars',
-        );
+      final buffer = StringBuffer();
+      _writeIgnoreComment(buffer);
+
       final emitter = DartEmitter.scoped(
         orderDirectives: true,
         useNullSafetySyntax: true,
       );
 
-      final etebaseRef = parser.parse(library);
-      clientBuilder.build(etebaseRef).accept(emitter, buffer);
+      const ClientBuilder().build(etebaseRef).accept(emitter, buffer);
 
       return buffer.toString();
     } catch (e, s) {
@@ -32,3 +29,25 @@ class EtebaseGenerator extends Generator {
     }
   }
 }
+
+void _writeIgnoreComment(StringBuffer buffer) => buffer
+  ..write('// ignore_for_file: ')
+  ..writeln(
+    const [
+      'require_trailing_commas',
+      'avoid_positional_boolean_parameters',
+      'lines_longer_than_80_chars',
+      'comment_references'
+    ].join(', '),
+  );
+
+// TODO: to be fixed
+// methods:
+// - getMetaRaw
+// - getContent
+//
+// params:
+// - prefetch
+//
+// members:
+// - etebase_client_check_etebase_server
