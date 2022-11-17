@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'dart:isolate';
 
 import '../../gen/ffi/libetebase.ffi.dart';
+import '../model/etebase_exception.dart';
 import 'isolate_terminated.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
@@ -34,7 +35,7 @@ class EtebaseIsolate {
     this._sendPort,
   );
 
-  Future<Object?> invoke(Symbol method, List<Object?> arguments) {
+  Future<T> invoke<T>(Symbol method, List<Object?> arguments) {
     final id = _invocationCounter++;
     final result = _receiveBroadcast.firstWhere(
       (r) => r.id == id,
@@ -43,7 +44,13 @@ class EtebaseIsolate {
 
     _sendPort.send(MethodInvocation(id, method, arguments));
 
-    return result.then((r) => r.result);
+    return result.then((r) {
+      if (r.isError) {
+        throw EtebaseException(r.errorCode!, r.errorMessage!);
+      } else {
+        return r.result as T;
+      }
+    });
   }
 
   void terminate() {
@@ -96,7 +103,7 @@ class EtebaseIsolate {
     final receivePort = ReceivePort('$EtebaseIsolate._main');
 
     try {
-      sendPort.send(MethodResult(-1, receivePort.sendPort));
+      sendPort.send(MethodResult.success(-1, receivePort.sendPort));
 
       final dyLib = await message.loadLibetebase();
       final libetebase = LibEtebaseFFI(dyLib);

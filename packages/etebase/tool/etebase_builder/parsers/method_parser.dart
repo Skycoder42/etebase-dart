@@ -37,7 +37,7 @@ class MethodRef {
   bool get hasOutParam => parameters.any((p) => p.isOutParam);
 
   TypeRef get outOrReturnType => parameters
-      .where((p) => p.isOutParam)
+      .where((p) => p.isOutParam && !p.noReturn)
       .map((p) => p.type)
       .singleWhere((_) => true, orElse: () => returnType);
 }
@@ -83,13 +83,11 @@ class MethodParser {
   }) {
     final methodName = method.name;
 
-    final mappedParams = _paramParser
-        .parseParameters(
-          methodName: method.name,
-          parameters: method.parameters,
-          typeDefs: typeDefs,
-        )
-        .toList();
+    final mappedParams = _paramParser.parse(
+      methodName: method.name,
+      parameters: method.parameters,
+      typeDefs: typeDefs,
+    );
 
     return MethodRef(
       element: method,
@@ -112,16 +110,15 @@ class MethodParser {
     required MethodElement method,
     String? methodPrefix,
     required TypedefRef typeDefs,
+    bool forceStatic = false,
   }) {
     final prefixLength = methodPrefix?.length ?? -1;
 
-    final mappedParams = _paramParser
-        .parseParameters(
-          methodName: method.name,
-          parameters: method.parameters,
-          typeDefs: typeDefs,
-        )
-        .toList();
+    final mappedParams = _paramParser.parse(
+      methodName: method.name,
+      parameters: method.parameters,
+      typeDefs: typeDefs,
+    );
 
     return MethodRef(
       element: method,
@@ -130,7 +127,7 @@ class MethodParser {
       isDestroy: false,
       isPubkeySize: false,
       isGetLength: _isGetLengthRegExp.hasMatch(method.name),
-      isStatic: false,
+      isStatic: forceStatic,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,

@@ -14,6 +14,7 @@ class ParameterRef {
   final bool isListLength;
   final bool isRetSize;
   final bool isOutBuf;
+  final bool noReturn;
 
   final TypeRef type;
 
@@ -25,43 +26,73 @@ class ParameterRef {
     required this.isListLength,
     required this.isRetSize,
     required this.isOutBuf,
+    this.noReturn = false,
     required this.type,
   });
 
   bool get isOutParam => type.isOutParam || isOutBuf;
+
+  ParameterRef copyWith({
+    bool? isThisParam,
+    bool? isOutBuf,
+    bool? noReturn,
+  }) =>
+      ParameterRef(
+        element: element,
+        name: name,
+        isThisParam: isThisParam ?? this.isThisParam,
+        isList: isList,
+        isListLength: isListLength,
+        isRetSize: isRetSize,
+        isOutBuf: isOutBuf ?? this.isOutBuf,
+        noReturn: noReturn ?? this.noReturn,
+        type: type,
+      );
 }
 
 class ParamParser {
   static const _thisParamName = 'this_';
 
-  static final _methodParameterTypeMapping =
-      <String, Map<String, ParameterRef?>>{
-    'etebase_utils_pretty_fingerprint': const {'buf': null},
+  static final _methodParameterTypeMapping = <
+      String,
+      Map<
+          String,
+          ParameterRef Function(
+    ParameterRef param,
+  )>>{
+    'etebase_utils_pretty_fingerprint': {
+      'buf': (param) => param.copyWith(isOutBuf: true, noReturn: true),
+    },
+    'etebase_client_check_etebase_server': {
+      'client': (param) => param.copyWith(isThisParam: true),
+    },
   };
 
   final TypeParser _typeParser;
 
   const ParamParser([this._typeParser = const TypeParser()]);
 
-  Iterable<ParameterRef> parseParameters({
+  List<ParameterRef> parse({
+    required String methodName,
+    required List<ParameterElement> parameters,
+    required TypedefRef typeDefs,
+  }) {
+    final paramMap = _methodParameterTypeMapping[methodName];
+    return _parseParams(
+      methodName: methodName,
+      parameters: parameters,
+      typeDefs: typeDefs,
+    ).map((p) => paramMap?[p.name]?.call(p) ?? p).toList();
+  }
+
+  Iterable<ParameterRef> _parseParams({
     required String methodName,
     required List<ParameterElement> parameters,
     required TypedefRef typeDefs,
   }) sync* {
-    final paramMap = _methodParameterTypeMapping[methodName] ?? const {};
     for (var i = 0; i < parameters.length; ++i) {
       final param = parameters[i];
       final nextParam = i < parameters.length - 1 ? parameters[i + 1] : null;
-
-      if (paramMap.containsKey(param.name)) {
-        final paramOverwrite = paramMap[param.name];
-        if (paramOverwrite != null) {
-          yield paramOverwrite;
-        }
-
-        continue;
-      }
-
       final isBufParam = param.name == 'buf';
 
       if (nextParam != null && nextParam.name == '${param.name}_size') {

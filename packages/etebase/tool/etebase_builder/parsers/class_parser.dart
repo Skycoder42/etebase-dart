@@ -18,6 +18,8 @@ class ClassRef {
     required this.name,
     required this.methods,
   });
+
+  bool get hasDestroy => methods.any((m) => m.isDestroy);
 }
 
 class ClassParser {

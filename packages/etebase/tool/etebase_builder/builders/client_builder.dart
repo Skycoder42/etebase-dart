@@ -10,7 +10,9 @@ class ClientBuilder {
 
   Library build(EtebaseRef etebase) => Library(
         (b) => b
-          ..body.addAll(etebase.functions.map(_buildMethod))
+          ..body.addAll(
+            etebase.functions.map((f) => _buildMethod(f, global: true)),
+          )
           ..body.addAll(etebase.classes.map(_buildClass))
           ..body.add(_buildUtilsClass(etebase)),
       );
@@ -18,45 +20,30 @@ class ClientBuilder {
   Class _buildClass(ClassRef clazz) => Class(
         (b) => b
           ..name = clazz.name
-          ..fields.add(
+          ..fields.addAll([
+            Field(
+              (b) => b
+                ..name = '_finalizer'
+                ..static = true
+                ..modifier = FieldModifier.final$
+                ..assignment = TypeReference((b) => b..symbol = 'Finalizer')
+                    .newInstance([refer('_destroy')]).code,
+            ),
             Field(
               (b) => b
                 ..name = '_pointer'
-                ..type = TypeReference(
-                  (b) => b
-                    ..symbol = 'Pointer'
-                    ..types.add(
-                      TypeReference(
-                        (b) => b
-                          ..symbol = clazz.name
-                          ..url = 'libetebase.ffi.dart',
-                      ),
-                    )
-                    ..url = 'dart:ffi',
-                )
+                ..type = _pointerType(clazz.name)
                 ..modifier = FieldModifier.final$,
             ),
-          )
-          ..constructors.add(
-            Constructor(
-              (b) => b
-                ..name = '_'
-                ..requiredParameters.add(
-                  Parameter(
-                    (b) => b
-                      ..name = '_pointer'
-                      ..toThis = true,
-                  ),
-                ),
-            ),
-          )
-          ..methods.addAll(
-            clazz.methods
-                .where((method) => !method.isDestroy)
+          ])
+          ..constructors.add(_buildConstructor())
+          ..methods.addAll([
+            ...clazz.methods
                 .where((method) => !method.isPubkeySize)
                 .where((method) => !method.isGetLength)
                 .map(_buildMethod),
-          ),
+            _buildDispose(clazz.methods),
+          ]),
       );
 
   Class _buildUtilsClass(EtebaseRef etebase) => Class(
@@ -67,29 +54,104 @@ class ClientBuilder {
           ..methods.addAll(etebase.utilsFunctions.map(_buildMethod)),
       );
 
-  Method _buildMethod(MethodRef method) => Method(
+  Constructor _buildConstructor() => Constructor(
+        (b) => b
+          ..name = '_'
+          ..requiredParameters.add(
+            Parameter(
+              (b) => b
+                ..name = '_pointer'
+                ..toThis = true,
+            ),
+          )
+          ..body = Block(
+            (b) => b.addExpression(
+              refer('_finalizer').property('attach').call(
+                [refer('this'), refer('_pointer')],
+                {'detach': refer('this')},
+              ),
+            ),
+          ),
+      );
+
+  Method _buildDispose(List<MethodRef> methods) => Method(
         (b) {
           b
-            ..name = method.isNew ? 'create' : method.name
-            ..static = method.isStatic
+            ..name = 'dispose'
+            ..returns = TypeReference(
+              (b) => b
+                ..symbol = 'Future'
+                ..types.add(TypeReference((b) => b..symbol = 'void')),
+            )
+            ..modifier = MethodModifier.async
+            ..body = Block(
+              (b) => b
+                ..addExpression(
+                  refer('_finalizer').property('detach').call([refer('this')]),
+                )
+                ..addExpression(
+                  refer('_destroy').call([refer('_pointer')]).awaited,
+                ),
+            );
+
+          final docs = methods
+              .where((m) => m.isDestroy)
+              .map((m) => m.element.documentationComment)
+              .singleWhere(
+                (comment) => comment != null,
+                orElse: () => null,
+              );
+
+          if (docs != null) {
+            b.docs.add('\n$docs');
+          }
+        },
+      );
+
+  Method _buildMethod(MethodRef method, {bool global = false}) => Method(
+        (b) {
+          final parameters = method.parameters
+              .where((param) => method.isDestroy || !param.isThisParam)
+              .where((param) => !param.isListLength)
+              .where((param) => !param.isRetSize)
+              .where((param) => !param.isOutParam)
+              .map(_buildParameter)
+              .toList();
+
+          final invokeParameters = [
+            if (!global && !method.isStatic && !method.isDestroy)
+              refer('_pointer').property('address'),
+            ...parameters.map((p) {
+              final paramType = p.type!.type as TypeReference;
+              if (paramType.symbol == 'Pointer') {
+                return refer(p.name).property('address');
+              }
+              return refer(p.name);
+            }),
+          ];
+
+          b
+            ..name = _findMethodName(method)
+            ..static = method.isStatic || method.isDestroy
             ..modifier = MethodModifier.async
             ..returns = TypeReference(
               (b) => b
                 ..symbol = 'Future'
                 ..types.add(_buildReturnType(method)),
             )
-            ..requiredParameters.addAll(
-              method.parameters
-                  .where((param) => !param.isThisParam)
-                  .where((param) => !param.isListLength)
-                  .where((param) => !param.isRetSize)
-                  .where((param) => !param.isOutParam)
-                  .map(_buildParameter),
-            )
-            ..body = TypeReference((b) => b..symbol = 'UnimplementedError')
-                .newInstance(const [])
-                .thrown
-                .code;
+            ..requiredParameters.addAll(parameters)
+            ..body = TypeReference(
+              (b) => b
+                ..symbol = 'EtebaseIsolate'
+                ..url = '../../src/isolate/etebase_isolate.dart',
+            ).property('current').property('invoke').call([
+              refer('#${method.element.name}'),
+              if (invokeParameters.isEmpty)
+                literalConstList([])
+              else
+                literalList(invokeParameters),
+            ]).code;
+
           final docComment = method.element.documentationComment;
           if (docComment != null) {
             b.docs.add('\n$docComment');
@@ -97,13 +159,31 @@ class ClientBuilder {
         },
       );
 
+  String _findMethodName(MethodRef method) {
+    if (method.isNew) {
+      return 'create';
+    } else if (method.isDestroy) {
+      return '_destroy';
+    } else {
+      return method.name;
+    }
+  }
+
   Parameter _buildParameter(
     ParameterRef param,
   ) =>
       Parameter(
         (b) => b
           ..name = param.name
-          ..type = param.type.dartType,
+          ..type = param.isThisParam
+              ? _asPointer(
+                  TypeReference(
+                    (b) => b
+                      ..replace(param.type.dartType)
+                      ..url = 'libetebase.ffi.dart',
+                  ),
+                )
+              : param.type.dartType,
       );
 
   TypeReference _buildReturnType(MethodRef method) {
@@ -114,4 +194,19 @@ class ClientBuilder {
 
     return returnType;
   }
+
+  TypeReference _asPointer(TypeReference type) => TypeReference(
+        (b) => b
+          ..symbol = 'Pointer'
+          ..url = 'dart:ffi'
+          ..types.add(type),
+      );
+
+  TypeReference _pointerType(String name) => _asPointer(
+        TypeReference(
+          (b) => b
+            ..symbol = name
+            ..url = 'libetebase.ffi.dart',
+        ),
+      );
 }

@@ -110,6 +110,7 @@ class EtebaseParser {
             method: method,
             typeDefs: typeDefs,
             methodPrefix: _etebaseUtilsPrefix,
+            forceStatic: true,
           ),
         )
         .toList();
