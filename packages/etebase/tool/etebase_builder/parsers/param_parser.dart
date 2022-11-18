@@ -30,36 +30,12 @@ class ParameterRef {
   });
 
   bool get isOutParam => type.isOutParam || isOutBuf;
-
-  ParameterRef copyWith({
-    bool? isThisParam,
-    bool? isOutBuf,
-  }) =>
-      ParameterRef(
-        element: element,
-        name: name,
-        isThisParam: isThisParam ?? this.isThisParam,
-        isList: isList,
-        isListLength: isListLength,
-        isRetSize: isRetSize,
-        isOutBuf: isOutBuf ?? this.isOutBuf,
-        type: type,
-      );
 }
 
 class ParamParser {
   static const _thisParamName = 'this_';
-
-  static final _methodParameterTypeMapping = <
-      String,
-      Map<
-          String,
-          ParameterRef Function(
-    ParameterRef param,
-  )>>{
-    'etebase_client_check_etebase_server': {
-      'client': (param) => param.copyWith(isThisParam: true),
-    },
+  static const _thisParamOverrides = {
+    'etebase_client_check_etebase_server': {'client': true},
   };
 
   final TypeParser _typeParser;
@@ -70,14 +46,12 @@ class ParamParser {
     required String methodName,
     required List<ParameterElement> parameters,
     required TypedefRef typeDefs,
-  }) {
-    final paramMap = _methodParameterTypeMapping[methodName];
-    return _parseParams(
-      methodName: methodName,
-      parameters: parameters,
-      typeDefs: typeDefs,
-    ).map((p) => paramMap?[p.name]?.call(p) ?? p).toList();
-  }
+  }) =>
+      _parseParams(
+        methodName: methodName,
+        parameters: parameters,
+        typeDefs: typeDefs,
+      ).toList();
 
   Iterable<ParameterRef> _parseParams({
     required String methodName,
@@ -124,7 +98,8 @@ class ParamParser {
         yield ParameterRef(
           element: param,
           name: param.name.snakeToDart(),
-          isThisParam: param.name == _thisParamName,
+          isThisParam: _thisParamOverrides[methodName]?[param.name] ??
+              param.name == _thisParamName,
           isList: isBufParam && _isBufList(param),
           isListLength: false,
           isRetSize: param.name == 'ret_size',
