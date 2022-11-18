@@ -18,6 +18,9 @@ class TypeRef {
     this.isOpaquePointer = false,
     this.isOutParam = false,
   });
+
+  @override
+  String toString() => '$ffiType -> $dartType [$isOpaquePointer] [$isOutParam]';
 }
 
 class TypeParser {
@@ -95,6 +98,7 @@ class TypeParser {
   ) {
     if (pointerType is InterfaceType && pointerType.isPointer) {
       isOutParam.value = true;
+      isOpaquePointer.value = true;
       return TypeReference(
         (b) => b
           ..symbol = 'List'
