@@ -25,6 +25,7 @@ class ClientMethodBuilder {
           b
             ..name = _findMethodName(method)
             ..static = method.isStatic || method.isDestroy
+            ..type = method.isGetter ? MethodType.getter : null
             ..modifier = method.outOrReturnType.isOpaquePointer
                 ? MethodModifier.async
                 : null
@@ -70,7 +71,7 @@ class ClientMethodBuilder {
 
   TypeReference _buildReturnType(MethodRef method) {
     final returnType = method.outOrReturnType.dartType;
-    if (!method.hasOutParam && returnType.symbol == 'int') {
+    if (!method.hasOutParam && !method.isGetter && returnType.symbol == 'int') {
       return TypeReference((b) => b..symbol = 'void');
     }
 

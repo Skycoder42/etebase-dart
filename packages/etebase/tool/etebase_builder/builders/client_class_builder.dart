@@ -38,7 +38,6 @@ class ClientClassBuilder {
           ..constructors.add(_buildConstructor())
           ..methods.addAll([
             ...clazz.methods
-                .where((method) => !method.isPubkeySize)
                 .where((method) => !method.isGetLength)
                 .map(_clientMethodBuilder.buildMethod),
             _buildDispose(clazz.methods),

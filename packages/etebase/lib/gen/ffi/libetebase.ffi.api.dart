@@ -2567,6 +2567,11 @@ class EtebaseAccount {
 abstract class EtebaseUtils {
   EtebaseUtils._();
 
+  Future<int> get prettyFingerprintSize => _i1.EtebaseIsolate.current.invoke(
+        #ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE,
+        const [],
+      );
+
   /// Return a buffer filled with cryptographically random bytes
   ///
   /// @param[out] buf the output byte buffer

@@ -14,7 +14,7 @@ class ParameterRef {
   final bool isListLength;
   final bool isRetSize;
   final bool isOutBuf;
-  final bool noReturn;
+  final bool noReturn; // TODO remove this
 
   final TypeRef type;
 

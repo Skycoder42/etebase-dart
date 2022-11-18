@@ -7,15 +7,15 @@ import 'param_parser.dart';
 import 'type_parse.dart';
 
 class MethodRef {
-  final MethodElement element;
+  final ExecutableElement element;
 
   final String name;
 
   final bool isNew;
   final bool isDestroy;
-  final bool isPubkeySize;
   final bool isGetLength;
   final bool isStatic;
+  final bool isGetter;
 
   final List<ParameterRef> parameters;
   final TypeRef returnType;
@@ -25,14 +25,12 @@ class MethodRef {
     required this.name,
     required this.isNew,
     required this.isDestroy,
-    required this.isPubkeySize,
     required this.isGetLength,
     required this.isStatic,
+    required this.isGetter,
     required this.parameters,
     required this.returnType,
   });
-
-  bool get hasRetSize => parameters.any((p) => p.isRetSize);
 
   bool get hasOutParam => parameters.any((p) => p.isOutParam);
 
@@ -43,7 +41,7 @@ class MethodRef {
 }
 
 class MethodParser {
-  static final _isGetLengthRegExp = RegExp('_get_.*_length');
+  static final _isGetLengthRegExp = RegExp('_get_.*_(length|size)');
 
   static final _returnTypeMapping = {
     RegExp(r'.*_pubkey$'): TypeReference(
@@ -94,9 +92,9 @@ class MethodParser {
       name: methodName.substring(methodPrefix.length + 1).snakeToDart(),
       isNew: methodName.endsWith('_new'),
       isDestroy: methodName.endsWith('_destroy'),
-      isPubkeySize: methodName.endsWith('_pubkey_size'),
       isGetLength: _isGetLengthRegExp.hasMatch(methodName),
       isStatic: !mappedParams.any((p) => p.isThisParam),
+      isGetter: false,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,
@@ -125,9 +123,9 @@ class MethodParser {
       name: method.name.substring(prefixLength + 1).snakeToDart(),
       isNew: false,
       isDestroy: false,
-      isPubkeySize: false,
       isGetLength: _isGetLengthRegExp.hasMatch(method.name),
       isStatic: forceStatic,
+      isGetter: false,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,

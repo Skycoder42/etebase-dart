@@ -1,8 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
+import '../util/string_extensions.dart';
 import 'class_parser.dart';
 import 'method_parser.dart';
+import 'type_parse.dart';
 
 class TypedefRef {
   final List<TypeAliasElement> _typeAliases;
@@ -47,10 +49,12 @@ class EtebaseParser {
 
   final ClassParser _classParser;
   final MethodParser _methodParser;
+  final TypeParser _typeParser;
 
   const EtebaseParser([
     this._classParser = const ClassParser(),
     this._methodParser = const MethodParser(),
+    this._typeParser = const TypeParser(),
   ]);
 
   EtebaseRef parse(LibraryReader library) {
@@ -58,6 +62,7 @@ class EtebaseParser {
       library.findType('LibEtebaseFFI'),
     );
     final libEtebaseFfiMethods = libEtebaseFfi.methods
+        .where((method) => method.isPublic)
         .where((method) => !method.name.startsWith('etebase_error_'))
         .toList();
 
@@ -81,7 +86,11 @@ class EtebaseParser {
             ),
           )
           .toList(),
-      utilsFunctions: _parseUtilsMethods(libEtebaseFfiMethods, typeDefs),
+      utilsFunctions: _parseUtilsMethods(
+        libEtebaseFfi,
+        libEtebaseFfiMethods,
+        typeDefs,
+      ),
       functions: libEtebaseFfiMethods
           .map(
             (method) => _methodParser.parseGlobal(
@@ -95,24 +104,54 @@ class EtebaseParser {
   }
 
   List<MethodRef> _parseUtilsMethods(
+    ClassElement libEtebaseFfi,
     List<MethodElement> libEtebaseFfiMethods,
     TypedefRef typeDefs,
   ) {
+    final getters = libEtebaseFfi.accessors
+        .where((accessor) => accessor.isPublic && accessor.isGetter)
+        .map((getter) => _parseGetter(getter, typeDefs));
+
     final utilsMethods = libEtebaseFfiMethods
         .where((method) => method.name.startsWith(_etebaseUtilsPrefix))
         .toList()
       ..forEach(libEtebaseFfiMethods.remove);
 
-    return utilsMethods
-        .where((method) => !method.name.contains('base64'))
-        .map(
-          (method) => _methodParser.parseGlobal(
-            method: method,
-            typeDefs: typeDefs,
-            methodPrefix: _etebaseUtilsPrefix,
-            forceStatic: true,
-          ),
-        )
-        .toList();
+    final methods =
+        utilsMethods.where((method) => !method.name.contains('base64')).map(
+              (method) => _methodParser.parseGlobal(
+                method: method,
+                typeDefs: typeDefs,
+                methodPrefix: _etebaseUtilsPrefix,
+                forceStatic: true,
+              ),
+            );
+
+    return getters.followedBy(methods).toList();
+  }
+
+  MethodRef _parseGetter(
+    PropertyAccessorElement getter,
+    TypedefRef typeDefs,
+  ) {
+    assert(
+      getter.name.startsWith('ETEBASE_UTILS_'),
+      'Can only parse utils getters',
+    );
+
+    return MethodRef(
+      element: getter,
+      name: getter.name.toLowerCase().substring(14).snakeToDart(),
+      isNew: false,
+      isDestroy: false,
+      isGetLength: false,
+      isStatic: false,
+      isGetter: true,
+      parameters: const [],
+      returnType: _typeParser.parseType(
+        type: getter.returnType,
+        typeDefs: typeDefs,
+      ),
+    );
   }
 }
