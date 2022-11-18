@@ -140,17 +140,7 @@ class ClientBuilder {
                 ..types.add(_buildReturnType(method)),
             )
             ..requiredParameters.addAll(parameters)
-            ..body = TypeReference(
-              (b) => b
-                ..symbol = 'EtebaseIsolate'
-                ..url = '../../src/isolate/etebase_isolate.dart',
-            ).property('current').property('invoke').call([
-              refer('#${method.element.name}'),
-              if (invokeParameters.isEmpty)
-                literalConstList([])
-              else
-                literalList(invokeParameters),
-            ]).code;
+            ..body = _buildBody(method);
 
           final docComment = method.element.documentationComment;
           if (docComment != null) {
@@ -193,6 +183,60 @@ class ClientBuilder {
     }
 
     return returnType;
+  }
+
+  Code _buildBody(MethodRef method) {
+    var expression = TypeReference(
+      (b) => b
+        ..symbol = 'EtebaseIsolate'
+        ..url = '../../src/isolate/etebase_isolate.dart',
+    ).property('current').property('invoke');
+
+    final inParams = method.parameters
+        .where((param) => !param.isListLength)
+        .where((param) => !param.isRetSize)
+        .where((param) => !param.isOutParam)
+        .map((param) => _mapCallParam(param, method))
+        .toList();
+
+    expression = expression.call([
+      refer('#${method.element.name}'),
+      if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
+    ]);
+
+    return expression.code;
+  }
+
+  Expression _mapCallParam(ParameterRef param, MethodRef method) {
+    if (param.isThisParam) {
+      final ref = method.isDestroy ? refer(param.name) : refer('_pointer');
+      return ref.property('address');
+    }
+
+    if (param.type.isOpaquePointer) {
+      if (param.isList) {
+        return refer(param.name)
+            .property('map')
+            .call([
+              Method(
+                (b) => b
+                  ..requiredParameters.add(
+                    Parameter((b) => b..name = 'element'),
+                  )
+                  ..body = refer('element')
+                      .property('_pointer')
+                      .property('address')
+                      .code,
+              ).closure,
+            ])
+            .property('toList')
+            .call(const []);
+      } else {
+        return refer(param.name).property('_pointer').property('address');
+      }
+    }
+
+    return refer(param.name);
   }
 
   TypeReference _asPointer(TypeReference type) => TypeReference(

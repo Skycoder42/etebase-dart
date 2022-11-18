@@ -9,11 +9,13 @@ class TypeRef {
   final DartType ffiType;
   final TypeReference dartType;
 
+  final bool isOpaquePointer;
   final bool isOutParam;
 
   const TypeRef({
     required this.ffiType,
     required this.dartType,
+    this.isOpaquePointer = false,
     this.isOutParam = false,
   });
 }
@@ -43,13 +45,15 @@ class TypeParser {
     if (type.isPointer) {
       final pointerType = type.typeArguments.single;
       final isOutParam = _Ref<bool>(false);
+      final isOpaquePointer = _Ref<bool>(false);
       final typeRef = isArray
-          ? _mapPointerArrayType(pointerType, typeDefs)
-          : _mapPointerType(pointerType, typeDefs, isOutParam);
+          ? _mapPointerArrayType(pointerType, typeDefs, isOpaquePointer)
+          : _mapPointerType(pointerType, typeDefs, isOutParam, isOpaquePointer);
       return TypeRef(
         ffiType: type,
         dartType: typeRef,
         isOutParam: isOutParam.value,
+        isOpaquePointer: isOpaquePointer.value,
       );
     }
 
@@ -87,6 +91,7 @@ class TypeParser {
     DartType pointerType,
     TypedefRef typeDefs,
     _Ref<bool> isOutParam,
+    _Ref<bool> isOpaquePointer,
   ) {
     if (pointerType is InterfaceType && pointerType.isPointer) {
       isOutParam.value = true;
@@ -99,6 +104,7 @@ class TypeParser {
 
     final pointerElement = pointerType.element;
     if (pointerElement is ClassElement) {
+      isOpaquePointer.value = pointerElement.name.startsWith('Etebase');
       final resolvedElement = typeDefs.elementFor(pointerElement);
       if (!identical(resolvedElement, pointerElement)) {
         return TypeReference((b) => b..symbol = resolvedElement.name);
@@ -118,6 +124,7 @@ class TypeParser {
   TypeReference _mapPointerArrayType(
     DartType pointerType,
     TypedefRef typeDefs,
+    _Ref<bool> isOpaquePointer,
   ) {
     switch (pointerType.element!.name) {
       case 'Void':
@@ -127,18 +134,20 @@ class TypeParser {
             ..url = 'dart:typed_data',
         );
       default:
+        final listType = parseType(type: pointerType, typeDefs: typeDefs);
+        isOpaquePointer.value = listType.isOpaquePointer;
         return TypeReference(
           (b) => b
             ..symbol = 'List'
-            ..types.add(
-              parseType(type: pointerType, typeDefs: typeDefs).dartType,
-            ),
+            ..types.add(listType.dartType),
         );
     }
   }
 }
 
 extension _DartTypeX on DartType {
+  bool get isPointer => this is InterfaceType && element!.name == 'Pointer';
+
   TypeReference get typeReference => TypeReference(
         (b) {
           b
@@ -151,10 +160,6 @@ extension _DartTypeX on DartType {
           }
         },
       );
-}
-
-extension _InterfaceTypeX on InterfaceType {
-  bool get isPointer => element.name == 'Pointer';
 }
 
 class _Ref<T> {

@@ -631,7 +631,7 @@ class EtebaseItemManager {
         [
           _pointer.address,
           itemUid,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -651,7 +651,7 @@ class EtebaseItemManager {
         #etebase_item_manager_create,
         [
           _pointer.address,
-          meta,
+          meta._pointer.address,
           content,
         ],
       );
@@ -691,7 +691,7 @@ class EtebaseItemManager {
         #etebase_item_manager_list,
         [
           _pointer.address,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -708,8 +708,8 @@ class EtebaseItemManager {
         #etebase_item_manager_item_revisions,
         [
           _pointer.address,
-          item,
-          fetchOptions,
+          item._pointer.address,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -727,8 +727,8 @@ class EtebaseItemManager {
         #etebase_item_manager_fetch_updates,
         [
           _pointer.address,
-          items,
-          fetchOptions,
+          items.map((element) => element._pointer.address).toList(),
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -749,7 +749,7 @@ class EtebaseItemManager {
         [
           _pointer.address,
           items,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -767,8 +767,8 @@ class EtebaseItemManager {
         #etebase_item_manager_batch,
         [
           _pointer.address,
-          items,
-          fetchOptions,
+          items.map((element) => element._pointer.address).toList(),
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -791,9 +791,9 @@ class EtebaseItemManager {
         #etebase_item_manager_batch_deps,
         [
           _pointer.address,
-          items,
-          deps,
-          fetchOptions,
+          items.map((element) => element._pointer.address).toList(),
+          deps.map((element) => element._pointer.address).toList(),
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -813,8 +813,8 @@ class EtebaseItemManager {
         #etebase_item_manager_transaction,
         [
           _pointer.address,
-          items,
-          fetchOptions,
+          items.map((element) => element._pointer.address).toList(),
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -835,9 +835,9 @@ class EtebaseItemManager {
         #etebase_item_manager_transaction_deps,
         [
           _pointer.address,
-          items,
-          deps,
-          fetchOptions,
+          items.map((element) => element._pointer.address).toList(),
+          deps.map((element) => element._pointer.address).toList(),
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -867,7 +867,7 @@ class EtebaseItemManager {
         #etebase_item_manager_cache_save,
         [
           _pointer.address,
-          item,
+          item._pointer.address,
         ],
       );
 
@@ -883,7 +883,7 @@ class EtebaseItemManager {
         #etebase_item_manager_cache_save_with_content,
         [
           _pointer.address,
-          item,
+          item._pointer.address,
         ],
       );
 
@@ -1004,7 +1004,7 @@ class EtebaseItem {
         #etebase_item_set_meta,
         [
           _pointer.address,
-          meta,
+          meta._pointer.address,
         ],
       );
 
@@ -1172,7 +1172,7 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_save_account,
         [
           _pointer.address,
-          etebase,
+          etebase._pointer.address,
           encryptionKey,
         ],
       );
@@ -1191,7 +1191,7 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_load_account,
         [
           _pointer.address,
-          client,
+          client._pointer.address,
           encryptionKey,
         ],
       );
@@ -1261,8 +1261,8 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_collection_set,
         [
           _pointer.address,
-          colMgr,
-          col,
+          colMgr._pointer.address,
+          col._pointer.address,
         ],
       );
 
@@ -1279,7 +1279,7 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_collection_unset,
         [
           _pointer.address,
-          colMgr,
+          colMgr._pointer.address,
           colUid,
         ],
       );
@@ -1297,7 +1297,7 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_collection_get,
         [
           _pointer.address,
-          colMgr,
+          colMgr._pointer.address,
           colUid,
         ],
       );
@@ -1317,9 +1317,9 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_item_set,
         [
           _pointer.address,
-          itemMgr,
+          itemMgr._pointer.address,
           colUid,
-          item,
+          item._pointer.address,
         ],
       );
 
@@ -1338,7 +1338,7 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_item_unset,
         [
           _pointer.address,
-          itemMgr,
+          itemMgr._pointer.address,
           colUid,
           itemUid,
         ],
@@ -1359,7 +1359,7 @@ class EtebaseFileSystemCache {
         #etebase_fs_cache_item_get,
         [
           _pointer.address,
-          itemMgr,
+          itemMgr._pointer.address,
           colUid,
           itemUid,
         ],
@@ -1512,7 +1512,7 @@ class EtebaseCollectionMemberManager {
         #etebase_collection_member_manager_list,
         [
           _pointer.address,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1659,7 +1659,7 @@ class EtebaseCollectionManager {
         [
           _pointer.address,
           colUid,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1682,7 +1682,7 @@ class EtebaseCollectionManager {
         [
           _pointer.address,
           collectionType,
-          meta,
+          meta._pointer.address,
           content,
         ],
       );
@@ -1724,7 +1724,7 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_get_item_manager,
         [
           _pointer.address,
-          col,
+          col._pointer.address,
         ],
       );
 
@@ -1742,7 +1742,7 @@ class EtebaseCollectionManager {
         [
           _pointer.address,
           collectionType,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1761,7 +1761,7 @@ class EtebaseCollectionManager {
         [
           _pointer.address,
           collectionTypes,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1778,8 +1778,8 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_upload,
         [
           _pointer.address,
-          collection,
-          fetchOptions,
+          collection._pointer.address,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1798,8 +1798,8 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_transaction,
         [
           _pointer.address,
-          collection,
-          fetchOptions,
+          collection._pointer.address,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1829,7 +1829,7 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_cache_save,
         [
           _pointer.address,
-          collection,
+          collection._pointer.address,
         ],
       );
 
@@ -1846,7 +1846,7 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_cache_save_with_content,
         [
           _pointer.address,
-          collection,
+          collection._pointer.address,
         ],
       );
 
@@ -1860,7 +1860,7 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_get_member_manager,
         [
           _pointer.address,
-          col,
+          col._pointer.address,
         ],
       );
 
@@ -1974,7 +1974,7 @@ class EtebaseCollectionInvitationManager {
         #etebase_invitation_manager_list_incoming,
         [
           _pointer.address,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -1988,7 +1988,7 @@ class EtebaseCollectionInvitationManager {
         #etebase_invitation_manager_list_outgoing,
         [
           _pointer.address,
-          fetchOptions,
+          fetchOptions._pointer.address,
         ],
       );
 
@@ -2001,7 +2001,7 @@ class EtebaseCollectionInvitationManager {
         #etebase_invitation_manager_accept,
         [
           _pointer.address,
-          invitation,
+          invitation._pointer.address,
         ],
       );
 
@@ -2014,7 +2014,7 @@ class EtebaseCollectionInvitationManager {
         #etebase_invitation_manager_reject,
         [
           _pointer.address,
-          invitation,
+          invitation._pointer.address,
         ],
       );
 
@@ -2049,7 +2049,7 @@ class EtebaseCollectionInvitationManager {
         #etebase_invitation_manager_invite,
         [
           _pointer.address,
-          collection,
+          collection._pointer.address,
           username,
           pubkey,
           accessLevel,
@@ -2065,7 +2065,7 @@ class EtebaseCollectionInvitationManager {
         #etebase_invitation_manager_disinvite,
         [
           _pointer.address,
-          invitation,
+          invitation._pointer.address,
         ],
       );
 
@@ -2139,7 +2139,7 @@ class EtebaseCollection {
         #etebase_collection_set_meta,
         [
           _pointer.address,
-          meta,
+          meta._pointer.address,
         ],
       );
 
@@ -2373,7 +2373,7 @@ class EtebaseAccount {
       _i1.EtebaseIsolate.current.invoke(
         #etebase_account_login,
         [
-          client,
+          client._pointer.address,
           username,
           password,
         ],
@@ -2392,8 +2392,8 @@ class EtebaseAccount {
       _i1.EtebaseIsolate.current.invoke(
         #etebase_account_signup,
         [
-          client,
-          user,
+          client._pointer.address,
+          user._pointer.address,
           password,
         ],
       );
@@ -2494,7 +2494,7 @@ class EtebaseAccount {
       _i1.EtebaseIsolate.current.invoke(
         #etebase_account_restore,
         [
-          client,
+          client._pointer.address,
           accountDataStored,
           encryptionKey,
         ],
