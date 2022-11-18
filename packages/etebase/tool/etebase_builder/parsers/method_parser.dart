@@ -35,7 +35,7 @@ class MethodRef {
   bool get hasOutParam => parameters.any((p) => p.isOutParam);
 
   TypeRef get outOrReturnType => parameters
-      .where((p) => p.isOutParam && !p.noReturn)
+      .where((p) => p.isOutParam)
       .map((p) => p.type)
       .singleWhere((_) => true, orElse: () => returnType);
 }
@@ -59,9 +59,6 @@ class MethodParser {
     ),
     'etebase_client_check_etebase_server': TypeReference(
       (b) => b..symbol = 'bool',
-    ),
-    'etebase_utils_pretty_fingerprint': TypeReference(
-      (b) => b..symbol = 'String',
     ),
   };
 

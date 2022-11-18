@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 
+import '../util/dart_type_extensions.dart';
 import '../util/string_extensions.dart';
 import 'etebase_parser.dart';
 import 'type_parse.dart';
@@ -14,7 +15,6 @@ class ParameterRef {
   final bool isListLength;
   final bool isRetSize;
   final bool isOutBuf;
-  final bool noReturn; // TODO remove this
 
   final TypeRef type;
 
@@ -26,7 +26,6 @@ class ParameterRef {
     required this.isListLength,
     required this.isRetSize,
     required this.isOutBuf,
-    this.noReturn = false,
     required this.type,
   });
 
@@ -35,7 +34,6 @@ class ParameterRef {
   ParameterRef copyWith({
     bool? isThisParam,
     bool? isOutBuf,
-    bool? noReturn,
   }) =>
       ParameterRef(
         element: element,
@@ -45,7 +43,6 @@ class ParameterRef {
         isListLength: isListLength,
         isRetSize: isRetSize,
         isOutBuf: isOutBuf ?? this.isOutBuf,
-        noReturn: noReturn ?? this.noReturn,
         type: type,
       );
 }
@@ -60,9 +57,6 @@ class ParamParser {
           ParameterRef Function(
     ParameterRef param,
   )>>{
-    'etebase_utils_pretty_fingerprint': {
-      'buf': (param) => param.copyWith(isOutBuf: true, noReturn: true),
-    },
     'etebase_client_check_etebase_server': {
       'client': (param) => param.copyWith(isThisParam: true),
     },
@@ -131,14 +125,29 @@ class ParamParser {
           element: param,
           name: param.name.snakeToDart(),
           isThisParam: param.name == _thisParamName,
-          isList: isBufParam,
+          isList: isBufParam && _isBufList(param),
           isListLength: false,
           isRetSize: param.name == 'ret_size',
           isOutBuf: isBufParam,
-          type: _parseTypeOrEnum(param, typeDefs, isArray: isBufParam),
+          type: _parseTypeOrEnum(
+            param,
+            typeDefs,
+            isArray: isBufParam && _isBufList(param),
+          ),
         );
       }
     }
+  }
+
+  bool _isBufList(ParameterElement param) {
+    if (param.type.isPointer) {
+      final pointerType = param.type.asPointer;
+      if (pointerType.element?.name == 'Char') {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   TypeRef _parseTypeOrEnum(

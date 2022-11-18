@@ -40,7 +40,3 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'comment_references'
     ].join(', '),
   );
-
-// TODO: to be fixed
-// constants:
-// - ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE

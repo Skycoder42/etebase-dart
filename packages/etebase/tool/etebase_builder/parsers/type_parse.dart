@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 
+import '../util/dart_type_extensions.dart';
 import 'etebase_parser.dart';
 
 class TypeRef {
@@ -46,7 +46,7 @@ class TypeParser {
     }
 
     if (type.isPointer) {
-      final pointerType = type.typeArguments.single;
+      final pointerType = type.asPointer;
       final isOutParam = _Ref<bool>(false);
       final isOpaquePointer = _Ref<bool>(false);
       final typeRef = isArray
@@ -96,13 +96,13 @@ class TypeParser {
     _Ref<bool> isOutParam,
     _Ref<bool> isOpaquePointer,
   ) {
-    if (pointerType is InterfaceType && pointerType.isPointer) {
+    if (pointerType.isPointer) {
       isOutParam.value = true;
       isOpaquePointer.value = true;
       return TypeReference(
         (b) => b
           ..symbol = 'List'
-          ..types.add(pointerType.typeArguments.single.typeReference),
+          ..types.add(pointerType.asPointer.typeReference),
       );
     }
 
@@ -147,23 +147,6 @@ class TypeParser {
         );
     }
   }
-}
-
-extension _DartTypeX on DartType {
-  bool get isPointer => this is InterfaceType && element!.name == 'Pointer';
-
-  TypeReference get typeReference => TypeReference(
-        (b) {
-          b
-            ..symbol = element!.name
-            ..isNullable = nullabilitySuffix != NullabilitySuffix.none;
-
-          final self = this;
-          if (self is InterfaceType) {
-            b.types.addAll(self.typeArguments.map((t) => t.typeReference));
-          }
-        },
-      );
 }
 
 class _Ref<T> {
