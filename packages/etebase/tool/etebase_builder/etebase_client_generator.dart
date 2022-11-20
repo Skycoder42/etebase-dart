@@ -5,28 +5,22 @@ import 'package:source_gen/source_gen.dart';
 import 'builders/client_builder.dart';
 import 'parsers/etebase_parser.dart';
 
-class EtebaseGenerator extends Generator {
+class EtebaseClientGenerator extends Generator {
   @override
   String generate(LibraryReader library, BuildStep buildStep) {
-    try {
-      final etebaseRef = const EtebaseParser().parse(library);
+    final etebaseRef = const EtebaseParser().parse(library);
 
-      final buffer = StringBuffer();
-      _writeIgnoreComment(buffer);
+    final buffer = StringBuffer();
+    _writeIgnoreComment(buffer);
 
-      final emitter = DartEmitter.scoped(
-        orderDirectives: true,
-        useNullSafetySyntax: true,
-      );
+    final emitter = DartEmitter.scoped(
+      orderDirectives: true,
+      useNullSafetySyntax: true,
+    );
 
-      const ClientBuilder().build(etebaseRef).accept(emitter, buffer);
+    const ClientBuilder().build(etebaseRef).accept(emitter, buffer);
 
-      return buffer.toString();
-    } catch (e, s) {
-      print(e);
-      print(s);
-      rethrow;
-    }
+    return buffer.toString();
   }
 }
 

@@ -1,15 +1,25 @@
 builders:
-  etebase_builder:
+  etebase_client_builder:
     import: "tool/etebase_builder.dart"
-    builder_factories: ["etebaseBuilder"]
-    build_extensions: { ".dart": [".api.dart"] }
+    builder_factories: ["etebaseClientBuilder"]
+    build_extensions: { ".dart": [".client.dart"] }
+    auto_apply: dependents
+    build_to: source
+  etebase_isolate_builder:
+    import: "tool/etebase_builder.dart"
+    builder_factories: ["etebaseIsolateBuilder"]
+    build_extensions: { ".dart": [".isolate.dart"] }
     auto_apply: dependents
     build_to: source
 
 targets:
   $default:
     builders:
-      etebase:etebase_builder:
+      etebase:etebase_client_builder:
+        enabled: true
+        generate_for:
+          - lib/gen/ffi/libetebase.ffi.dart
+      etebase:etebase_isolate_builder:
         enabled: true
         generate_for:
           - lib/gen/ffi/libetebase.ffi.dart
