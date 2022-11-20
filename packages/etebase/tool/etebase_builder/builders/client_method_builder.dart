@@ -26,7 +26,7 @@ class ClientMethodBuilder {
             ..name = _findMethodName(method)
             ..static = method.isStatic || method.isDestroy
             ..type = method.isGetter ? MethodType.getter : null
-            ..modifier = method.outOrReturnType.isOpaquePointer
+            ..modifier = method.outOrReturnType.pointerKind.isPointer
                 ? MethodModifier.async
                 : null
             ..returns = TypeReference(

@@ -5,22 +5,31 @@ import 'package:code_builder/code_builder.dart';
 import '../util/dart_type_extensions.dart';
 import 'etebase_parser.dart';
 
+enum PointerKind {
+  none(false),
+  opaque(true),
+  opaqueOut(true);
+
+  final bool isPointer;
+
+  // ignore: avoid_positional_boolean_parameters
+  const PointerKind(this.isPointer);
+}
+
 class TypeRef {
   final DartType ffiType;
   final TypeReference dartType;
 
-  final bool isOpaquePointer;
-  final bool isOutParam;
+  final PointerKind pointerKind;
 
   const TypeRef({
     required this.ffiType,
     required this.dartType,
-    this.isOpaquePointer = false,
-    this.isOutParam = false,
+    this.pointerKind = PointerKind.none,
   });
 
   @override
-  String toString() => '$ffiType -> $dartType [$isOpaquePointer] [$isOutParam]';
+  String toString() => '$ffiType -> $dartType [$pointerKind]';
 }
 
 class TypeParser {
@@ -47,16 +56,14 @@ class TypeParser {
 
     if (type.isPointer) {
       final pointerType = type.asPointer;
-      final isOutParam = _Ref<bool>(false);
-      final isOpaquePointer = _Ref<bool>(false);
+      final pointerKindRef = _Ref<PointerKind>(PointerKind.none);
       final typeRef = isArray
-          ? _mapPointerArrayType(pointerType, typeDefs, isOpaquePointer)
-          : _mapPointerType(pointerType, typeDefs, isOutParam, isOpaquePointer);
+          ? _mapPointerArrayType(pointerType, typeDefs, pointerKindRef)
+          : _mapPointerType(pointerType, typeDefs, pointerKindRef);
       return TypeRef(
         ffiType: type,
         dartType: typeRef,
-        isOutParam: isOutParam.value,
-        isOpaquePointer: isOpaquePointer.value,
+        pointerKind: pointerKindRef.value,
       );
     }
 
@@ -93,12 +100,10 @@ class TypeParser {
   TypeReference _mapPointerType(
     DartType pointerType,
     TypedefRef typeDefs,
-    _Ref<bool> isOutParam,
-    _Ref<bool> isOpaquePointer,
+    _Ref<PointerKind> pointerKindRef,
   ) {
     if (pointerType.isPointer) {
-      isOutParam.value = true;
-      isOpaquePointer.value = true;
+      pointerKindRef.value = PointerKind.opaqueOut;
       return TypeReference(
         (b) => b
           ..symbol = 'List'
@@ -108,7 +113,9 @@ class TypeParser {
 
     final pointerElement = pointerType.element;
     if (pointerElement is ClassElement) {
-      isOpaquePointer.value = pointerElement.name.startsWith('Etebase');
+      pointerKindRef.value = pointerElement.name.startsWith('Etebase')
+          ? PointerKind.opaque
+          : PointerKind.none;
       final resolvedElement = typeDefs.elementFor(pointerElement);
       if (!identical(resolvedElement, pointerElement)) {
         return TypeReference((b) => b..symbol = resolvedElement.name);
@@ -128,7 +135,7 @@ class TypeParser {
   TypeReference _mapPointerArrayType(
     DartType pointerType,
     TypedefRef typeDefs,
-    _Ref<bool> isOpaquePointer,
+    _Ref<PointerKind> pointerKindRef,
   ) {
     switch (pointerType.element!.name) {
       case 'Void':
@@ -139,7 +146,7 @@ class TypeParser {
         );
       default:
         final listType = parseType(type: pointerType, typeDefs: typeDefs);
-        isOpaquePointer.value = listType.isOpaquePointer;
+        pointerKindRef.value = listType.pointerKind;
         return TypeReference(
           (b) => b
             ..symbol = 'List'

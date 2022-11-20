@@ -22,8 +22,8 @@ class ClientMethodBodyBuilder {
         .toList();
 
     final returnType = method.outOrReturnType;
-    final isPointerList =
-        returnType.isOpaquePointer && returnType.dartType.symbol == 'List';
+    final isPointerList = returnType.pointerKind.isPointer &&
+        returnType.dartType.symbol == 'List';
 
     expression = expression.call([
       refer('#${method.element.name}'),
@@ -41,7 +41,7 @@ class ClientMethodBodyBuilder {
       return _buildListMethodBody(expression, returnType);
     }
 
-    if (returnType.isOpaquePointer) {
+    if (returnType.pointerKind.isPointer) {
       expression = _fromAddress(returnType.dartType, expression.awaited);
     }
 
@@ -80,7 +80,7 @@ class ClientMethodBodyBuilder {
       return ref.property('address');
     }
 
-    if (param.type.isOpaquePointer) {
+    if (param.type.pointerKind.isPointer) {
       if (param.isList) {
         return refer(param.name)
             .property('map')

@@ -29,7 +29,7 @@ class ParameterRef {
     required this.type,
   });
 
-  bool get isOutParam => type.isOutParam || isOutBuf;
+  bool get isOutParam => isOutBuf || type.pointerKind == PointerKind.opaqueOut;
 }
 
 class ParamParser {
@@ -117,12 +117,12 @@ class ParamParser {
   bool _isBufList(ParameterElement param) {
     if (param.type.isPointer) {
       final pointerType = param.type.asPointer;
-      if (pointerType.element?.name == 'Char') {
-        return false;
+      if (pointerType.element?.name == 'Void') {
+        return true;
       }
     }
 
-    return true;
+    return false;
   }
 
   TypeRef _parseTypeOrEnum(
