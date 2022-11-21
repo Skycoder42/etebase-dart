@@ -1,8 +1,9 @@
 import 'package:code_builder/code_builder.dart';
 
-import '../parsers/etebase_parser.dart';
-import '../parsers/method_parser.dart';
-import '../util/case_builder.dart';
+import '../../parsers/etebase_parser.dart';
+import '../../parsers/method_parser.dart';
+import '../../util/case_builder.dart';
+import '../../util/types.dart';
 import 'isolate_implementation_builder.dart';
 
 class IsolateBuilder {
@@ -16,6 +17,8 @@ class IsolateBuilder {
     final methods = _allMethods(etebase);
     return Library(
       (b) => b
+        ..directives.add(Directive.import('package:collection/collection.dart'))
+        ..directives.add(Directive.import('package:ffi/ffi.dart'))
         ..body.add(_buildHandler(methods))
         ..body.addAll(methods.map(_buildImplementation)),
     );
@@ -25,6 +28,7 @@ class IsolateBuilder {
       .expand((clazz) => clazz.methods)
       .followedBy(etebase.utilsFunctions)
       .followedBy(etebase.functions)
+      .where((method) => !method.isGetLength)
       .toList();
 
   Method _buildHandler(List<MethodRef> methods) {
@@ -70,17 +74,13 @@ class IsolateBuilder {
           ..returns = TypeReference(
             (b) => b
               ..symbol = 'MethodResult'
-              ..url = '../../src/isolate/method_result.dart',
+              ..url = 'package:etebase/src/isolate/method_result.dart',
           )
           ..requiredParameters.addAll([
             Parameter(
               (b) => b
                 ..name = 'libEtebase'
-                ..type = TypeReference(
-                  (b) => b
-                    ..symbol = 'LibEtebaseFFI'
-                    ..url = 'libetebase.ffi.dart',
-                ),
+                ..type = Types.ffi(refer('LibEtebaseFFI')),
             ),
             Parameter(
               (b) => b
@@ -88,7 +88,8 @@ class IsolateBuilder {
                 ..type = TypeReference(
                   (b) => b
                     ..symbol = 'MethodInvocation'
-                    ..url = '../../src/isolate/method_invocation.dart',
+                    ..url =
+                        'package:etebase/src/isolate/method_invocation.dart',
                 ),
             ),
           ]),

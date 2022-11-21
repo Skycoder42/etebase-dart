@@ -12,15 +12,20 @@ extension DartTypeX on DartType {
     return (this as InterfaceType).typeArguments.single;
   }
 
-  TypeReference get typeReference => TypeReference(
+  TypeReference typeReference({bool stripUrl = false}) => TypeReference(
         (b) {
           b
             ..symbol = element!.name
-            ..isNullable = nullabilitySuffix != NullabilitySuffix.none;
+            ..isNullable = nullabilitySuffix != NullabilitySuffix.none
+            ..url =
+                stripUrl ? null : element?.library?.location?.components.single;
 
           final self = this;
           if (self is InterfaceType) {
-            b.types.addAll(self.typeArguments.map((t) => t.typeReference));
+            b.types.addAll(
+              self.typeArguments
+                  .map((t) => t.typeReference(stripUrl: stripUrl)),
+            );
           }
         },
       );

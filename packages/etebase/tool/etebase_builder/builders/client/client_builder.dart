@@ -1,6 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 
-import '../parsers/etebase_parser.dart';
+import '../../parsers/etebase_parser.dart';
 import 'client_class_builder.dart';
 import 'client_method_builder.dart';
 

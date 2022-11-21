@@ -2,7 +2,7 @@ import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:source_gen/source_gen.dart';
 
-import 'builders/client_builder.dart';
+import 'builders/client/client_builder.dart';
 import 'parsers/etebase_parser.dart';
 
 class EtebaseClientGenerator extends Generator {
@@ -31,6 +31,7 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'require_trailing_commas',
       'avoid_positional_boolean_parameters',
       'lines_longer_than_80_chars',
-      'comment_references'
+      'comment_references',
+      'prefer_relative_imports',
     ].join(', '),
   );

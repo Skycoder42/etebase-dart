@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 
 import '../util/dart_type_extensions.dart';
+import '../util/types.dart';
 import 'etebase_parser.dart';
 
 enum PointerKind {
@@ -18,18 +19,22 @@ enum PointerKind {
 
 class TypeRef {
   final DartType ffiType;
-  final TypeReference dartType;
+  final TypeReference publicType;
+  final TypeReference transferType;
 
   final PointerKind pointerKind;
 
   const TypeRef({
     required this.ffiType,
-    required this.dartType,
+    required this.publicType,
+    required this.transferType,
     this.pointerKind = PointerKind.none,
   });
 
+  bool get isList => publicType.symbol == 'List';
+
   @override
-  String toString() => '$ffiType -> $dartType [$pointerKind]';
+  String toString() => '$ffiType --$transferType--> $publicType [$pointerKind]';
 }
 
 class TypeParser {
@@ -43,121 +48,107 @@ class TypeParser {
     if (type.isVoid) {
       return TypeRef(
         ffiType: type,
-        dartType: TypeReference((b) => b..symbol = 'void'),
+        publicType: Types.void$,
+        transferType: Types.void$,
       );
     }
 
     if (type is! InterfaceType) {
       return TypeRef(
         ffiType: type,
-        dartType: type.typeReference,
+        publicType: type.typeReference(),
+        transferType: type.typeReference(),
       );
     }
 
     if (type.isPointer) {
       final pointerType = type.asPointer;
-      final pointerKindRef = _Ref<PointerKind>(PointerKind.none);
-      final typeRef = isArray
-          ? _mapPointerArrayType(pointerType, typeDefs, pointerKindRef)
-          : _mapPointerType(pointerType, typeDefs, pointerKindRef);
-      return TypeRef(
-        ffiType: type,
-        dartType: typeRef,
-        pointerKind: pointerKindRef.value,
-      );
+      return isArray
+          ? _mapPointerArrayType(type, pointerType, typeDefs)
+          : _mapPointerType(type, pointerType, typeDefs);
     }
 
     return TypeRef(
       ffiType: type,
-      dartType: type.typeReference,
+      publicType: type.typeReference(),
+      transferType: type.typeReference(),
     );
   }
 
-  TypeRef createAccessLevelFor(DartType type) {
-    assert(type.isDartCoreInt, 'type should be int, but was $type');
-    return TypeRef(
-      ffiType: type,
-      dartType: TypeReference(
-        (b) => b
-          ..symbol = 'EtebaseCollectionAccessLevel'
-          ..url = '../../src/model/etebase_collection_access_level.dart',
-      ),
-    );
-  }
-
-  TypeRef createPrefetchOptionFor(DartType type) {
-    assert(type.isDartCoreInt, 'type should be int, but was $type');
-    return TypeRef(
-      ffiType: type,
-      dartType: TypeReference(
-        (b) => b
-          ..symbol = 'EtebasePrefetchOption'
-          ..url = '../../src/model/etebase_prefetch_option.dart',
-      ),
-    );
-  }
-
-  TypeReference _mapPointerType(
+  TypeRef _mapPointerType(
+    DartType ffiType,
     DartType pointerType,
     TypedefRef typeDefs,
-    _Ref<PointerKind> pointerKindRef,
   ) {
     if (pointerType.isPointer) {
-      pointerKindRef.value = PointerKind.opaqueOut;
-      return TypeReference(
-        (b) => b
-          ..symbol = 'List'
-          ..types.add(pointerType.asPointer.typeReference),
+      return TypeRef(
+        ffiType: ffiType,
+        publicType:
+            Types.list(pointerType.asPointer.typeReference(stripUrl: true)),
+        transferType: Types.list(Types.int$),
+        pointerKind: PointerKind.opaqueOut,
       );
     }
 
     final pointerElement = pointerType.element;
+    var pointerKind = PointerKind.none;
     if (pointerElement is ClassElement) {
-      pointerKindRef.value = pointerElement.name.startsWith('Etebase')
-          ? PointerKind.opaque
-          : PointerKind.none;
+      if (pointerElement.name.startsWith('Etebase')) {
+        pointerKind = PointerKind.opaque;
+      }
+
       final resolvedElement = typeDefs.elementFor(pointerElement);
       if (!identical(resolvedElement, pointerElement)) {
-        return TypeReference((b) => b..symbol = resolvedElement.name);
+        return TypeRef(
+          ffiType: ffiType,
+          publicType: TypeReference((b) => b..symbol = resolvedElement.name),
+          transferType: Types.int$,
+          pointerKind: pointerKind,
+        );
       }
     }
 
+    final TypeReference publicType;
     switch (pointerElement!.name) {
       case 'Char':
-        return TypeReference((b) => b..symbol = 'String');
+        publicType = Types.String$;
+        break;
       case 'Int64': // is always a date time in etebase context
-        return TypeReference((b) => b..symbol = 'DateTime');
+        publicType = Types.DateTime$;
+        break;
       default:
-        return pointerType.typeReference;
+        publicType = pointerType.typeReference(stripUrl: true);
+        break;
     }
+
+    return TypeRef(
+      ffiType: ffiType,
+      publicType: publicType,
+      transferType: pointerKind.isPointer ? Types.int$ : publicType,
+      pointerKind: pointerKind,
+    );
   }
 
-  TypeReference _mapPointerArrayType(
+  TypeRef _mapPointerArrayType(
+    DartType ffiType,
     DartType pointerType,
     TypedefRef typeDefs,
-    _Ref<PointerKind> pointerKindRef,
   ) {
     switch (pointerType.element!.name) {
       case 'Void':
-        return TypeReference(
-          (b) => b
-            ..symbol = 'Uint8List'
-            ..url = 'dart:typed_data',
+        return TypeRef(
+          ffiType: ffiType,
+          publicType: Types.Uint8List$,
+          transferType: Types.Uint8List$,
         );
       default:
         final listType = parseType(type: pointerType, typeDefs: typeDefs);
-        pointerKindRef.value = listType.pointerKind;
-        return TypeReference(
-          (b) => b
-            ..symbol = 'List'
-            ..types.add(listType.dartType),
+        return TypeRef(
+          ffiType: ffiType,
+          publicType: Types.list(listType.publicType),
+          transferType: Types.list(listType.transferType),
+          pointerKind: listType.pointerKind,
         );
     }
   }
-}
-
-class _Ref<T> {
-  T value;
-
-  _Ref(this.value);
 }

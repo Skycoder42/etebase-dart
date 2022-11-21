@@ -1,8 +1,9 @@
 import 'package:code_builder/code_builder.dart';
 
-import '../parsers/method_parser.dart';
-import '../parsers/param_parser.dart';
-import '../parsers/type_parse.dart';
+import '../../parsers/method_parser.dart';
+import '../../parsers/param_parser.dart';
+import '../../parsers/type_parse.dart';
+import '../../util/types.dart';
 
 class ClientMethodBodyBuilder {
   const ClientMethodBodyBuilder();
@@ -11,30 +12,23 @@ class ClientMethodBodyBuilder {
     var expression = TypeReference(
       (b) => b
         ..symbol = 'EtebaseIsolate'
-        ..url = '../../src/isolate/etebase_isolate.dart',
+        ..url = 'package:etebase/src/isolate/etebase_isolate.dart',
     ).property('current').property('invoke');
 
     final inParams = method.parameters
-        .where((param) => !param.isListLength)
         .where((param) => !param.isRetSize)
         .where((param) => !param.isOutParam)
         .map((param) => _mapCallParam(param, method))
         .toList();
 
     final returnType = method.outOrReturnType;
-    final isPointerList = returnType.pointerKind.isPointer &&
-        returnType.dartType.symbol == 'List';
+    final isPointerList = returnType.pointerKind.isPointer && returnType.isList;
 
     expression = expression.call([
       refer('#${method.element.name}'),
       if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
     ], const {}, [
-      if (isPointerList)
-        TypeReference(
-          (b) => b
-            ..symbol = 'List'
-            ..types.add(TypeReference((b) => b..symbol = 'int')),
-        )
+      if (isPointerList) returnType.transferType
     ]);
 
     if (isPointerList) {
@@ -42,7 +36,7 @@ class ClientMethodBodyBuilder {
     }
 
     if (returnType.pointerKind.isPointer) {
-      expression = _fromAddress(returnType.dartType, expression.awaited);
+      expression = _fromAddress(returnType.publicType, expression.awaited);
     }
 
     return expression.code;
@@ -63,7 +57,7 @@ class ClientMethodBodyBuilder {
                       ..requiredParameters
                           .add(Parameter((b) => b..name = 'address'))
                       ..body = _fromAddress(
-                        returnType.dartType.types.single,
+                        returnType.publicType.types.single,
                         refer('address'),
                       ).code,
                   ).closure
@@ -108,11 +102,7 @@ class ClientMethodBodyBuilder {
 
   Expression _fromAddress(Reference classType, Expression address) =>
       classType.newInstanceNamed('_', [
-        TypeReference(
-          (b) => b
-            ..symbol = 'Pointer'
-            ..url = 'dart:ffi',
-        ).newInstanceNamed(
+        Types.pointer(null).newInstanceNamed(
           'fromAddress',
           [address],
         )

@@ -1,8 +1,8 @@
 import 'package:code_builder/code_builder.dart';
 
-import '../parsers/class_parser.dart';
-import '../parsers/method_parser.dart';
-import '../util/type_reference_extensions.dart';
+import '../../parsers/class_parser.dart';
+import '../../parsers/method_parser.dart';
+import '../../util/types.dart';
 import 'client_method_builder.dart';
 
 class ClientClassBuilder {
@@ -21,17 +21,15 @@ class ClientClassBuilder {
                 ..name = '_finalizer'
                 ..static = true
                 ..modifier = FieldModifier.final$
-                ..assignment = TypeReference((b) => b..symbol = 'Finalizer')
-                    .newInstance([refer('_destroy')]).code,
+                ..assignment =
+                    refer('Finalizer').newInstance([refer('_destroy')]).code,
             ),
             Field(
               (b) => b
                 ..name = '_pointer'
-                ..type = TypeReference(
-                  (b) => b
-                    ..symbol = clazz.name
-                    ..url = 'libetebase.ffi.dart',
-                ).asPointer
+                ..type = Types.pointer(
+                  Types.ffi(refer(clazz.name)),
+                )
                 ..modifier = FieldModifier.final$,
             ),
           ])
@@ -68,11 +66,7 @@ class ClientClassBuilder {
         (b) {
           b
             ..name = 'dispose'
-            ..returns = TypeReference(
-              (b) => b
-                ..symbol = 'Future'
-                ..types.add(TypeReference((b) => b..symbol = 'void')),
-            )
+            ..returns = Types.future(Types.void$)
             ..modifier = MethodModifier.async
             ..body = Block(
               (b) => b

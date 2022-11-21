@@ -4,15 +4,15 @@
 // EtebaseClientGenerator
 // **************************************************************************
 
-// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references
+// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references, prefer_relative_imports
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i2;
 import 'dart:typed_data' as _i4;
 
-import '../../src/isolate/etebase_isolate.dart' as _i1;
-import '../../src/model/etebase_collection_access_level.dart' as _i5;
-import '../../src/model/etebase_prefetch_option.dart' as _i6;
-import 'libetebase.ffi.dart' as _i3;
+import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i3;
+import 'package:etebase/src/isolate/etebase_isolate.dart' as _i1;
+import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i5;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i6;
 
 /// The URL of the main hosted server
 Future<String> etebaseGetDefaultServerUrl() =>

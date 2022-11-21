@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
 
 import '../util/string_extensions.dart';
+import '../util/types.dart';
 import 'etebase_parser.dart';
 import 'param_parser.dart';
 import 'type_parse.dart';
@@ -34,9 +35,8 @@ class MethodRef {
 
   bool get hasOutParam => parameters.any((p) => p.isOutParam);
 
-  Iterable<ParameterRef> get exportedParams => parameters
-      .where((param) => isDestroy || !param.isThisParam)
-      .where((param) => !param.isListLength)
+  Iterable<ParameterRef> exportedParams({required bool withThis}) => parameters
+      .where((param) => withThis || isDestroy || !param.isThisParam)
       .where((param) => !param.isRetSize)
       .where((param) => !param.isOutParam);
 
@@ -50,22 +50,10 @@ class MethodParser {
   static final _isGetLengthRegExp = RegExp('_get_.*_(length|size)');
 
   static final _returnTypeMapping = {
-    RegExp(r'.*_pubkey$'): TypeReference(
-      (b) => b
-        ..symbol = 'Uint8List'
-        ..url = 'dart:typed_data',
-    ),
-    RegExp(r'.*_get_access_level$'): TypeReference(
-      (b) => b
-        ..symbol = 'EtebaseCollectionAccessLevel'
-        ..url = '../../src/model/etebase_collection_access_level.dart',
-    ),
-    'etebase_signed_invitation_get_from_username': TypeReference(
-      (b) => b..symbol = 'String',
-    ),
-    'etebase_client_check_etebase_server': TypeReference(
-      (b) => b..symbol = 'bool',
-    ),
+    RegExp(r'.*_pubkey$'): Types.Uint8List$,
+    RegExp(r'.*_get_access_level$'): Types.EtebaseCollectionAccessLevel$,
+    'etebase_signed_invitation_get_from_username': Types.String$,
+    'etebase_client_check_etebase_server': Types.bool$,
   };
 
   final ParamParser _paramParser;
@@ -152,7 +140,8 @@ class MethodParser {
     if (mappedType != null) {
       return TypeRef(
         ffiType: method.returnType,
-        dartType: mappedType,
+        publicType: mappedType,
+        transferType: mappedType,
       );
     } else {
       return _typeParser.parseType(

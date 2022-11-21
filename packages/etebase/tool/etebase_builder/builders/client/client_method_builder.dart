@@ -1,8 +1,8 @@
 import 'package:code_builder/code_builder.dart';
 
-import '../parsers/method_parser.dart';
-import '../parsers/param_parser.dart';
-import '../util/type_reference_extensions.dart';
+import '../../parsers/method_parser.dart';
+import '../../parsers/param_parser.dart';
+import '../../util/types.dart';
 import 'client_method_body_builder.dart';
 
 class ClientMethodBuilder {
@@ -14,8 +14,10 @@ class ClientMethodBuilder {
 
   Method buildMethod(MethodRef method, {bool global = false}) => Method(
         (b) {
-          final parameters =
-              method.exportedParams.map(_buildParameter).toList();
+          final parameters = method
+              .exportedParams(withThis: false)
+              .map(_buildParameter)
+              .toList();
 
           b
             ..name = _findMethodName(method)
@@ -24,11 +26,7 @@ class ClientMethodBuilder {
             ..modifier = method.outOrReturnType.pointerKind.isPointer
                 ? MethodModifier.async
                 : null
-            ..returns = TypeReference(
-              (b) => b
-                ..symbol = 'Future'
-                ..types.add(_buildReturnType(method)),
-            )
+            ..returns = Types.future(_buildReturnType(method))
             ..requiredParameters.addAll(parameters)
             ..body = _clientMethodBodyBuilder.buildBody(method);
 
@@ -56,18 +54,15 @@ class ClientMethodBuilder {
         (b) => b
           ..name = param.name
           ..type = param.isThisParam
-              ? TypeReference(
-                  (b) => b
-                    ..replace(param.type.dartType)
-                    ..url = 'libetebase.ffi.dart',
-                ).asPointer
-              : param.type.dartType,
+              ? Types.pointer(Types.ffi(param.type.publicType)) // TODO
+              : param.type.publicType,
       );
 
   TypeReference _buildReturnType(MethodRef method) {
-    final returnType = method.outOrReturnType.dartType;
+    final returnType = method.outOrReturnType.publicType;
+    // TODO
     if (!method.hasOutParam && !method.isGetter && returnType.symbol == 'int') {
-      return TypeReference((b) => b..symbol = 'void');
+      return Types.void$;
     }
 
     return returnType;

@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 
 import '../util/dart_type_extensions.dart';
 import '../util/string_extensions.dart';
+import '../util/types.dart';
 import 'etebase_parser.dart';
 import 'type_parse.dart';
 
@@ -12,7 +13,7 @@ class ParameterRef {
 
   final bool isThisParam;
   final bool isList;
-  final bool isListLength;
+  final bool hasLength;
   final bool isRetSize;
   final bool isOutBuf;
 
@@ -23,7 +24,7 @@ class ParameterRef {
     required this.name,
     required this.isThisParam,
     required this.isList,
-    required this.isListLength,
+    required this.hasLength,
     required this.isRetSize,
     required this.isOutBuf,
     required this.type,
@@ -71,26 +72,12 @@ class ParamParser {
           name: param.name.snakeToDart(),
           isThisParam: false,
           isList: true,
-          isListLength: false,
+          hasLength: true,
           isRetSize: false,
           isOutBuf: isBufParam,
           type: _typeParser.parseType(
             type: param.type,
             isArray: true,
-            typeDefs: typeDefs,
-          ),
-        );
-
-        yield ParameterRef(
-          element: nextParam,
-          name: nextParam.name.snakeToDart(),
-          isThisParam: false,
-          isList: false,
-          isListLength: true,
-          isRetSize: false,
-          isOutBuf: false,
-          type: _typeParser.parseType(
-            type: nextParam.type,
             typeDefs: typeDefs,
           ),
         );
@@ -101,7 +88,7 @@ class ParamParser {
           isThisParam: _thisParamOverrides[methodName]?[param.name] ??
               param.name == _thisParamName,
           isList: isBufParam && _isBufList(param),
-          isListLength: false,
+          hasLength: false,
           isRetSize: param.name == 'ret_size',
           isOutBuf: isBufParam,
           type: _parseTypeOrEnum(
@@ -131,9 +118,19 @@ class ParamParser {
     required bool isArray,
   }) {
     if (param.name == 'access_level') {
-      return _typeParser.createAccessLevelFor(param.type);
+      assert(param.type.isDartCoreInt, 'access_level must be an int parameter');
+      return TypeRef(
+        ffiType: param.type,
+        publicType: Types.EtebaseCollectionAccessLevel$,
+        transferType: Types.EtebaseCollectionAccessLevel$,
+      );
     } else if (param.name == 'prefetch') {
-      return _typeParser.createPrefetchOptionFor(param.type);
+      assert(param.type.isDartCoreInt, 'prefetch must be an int parameter');
+      return TypeRef(
+        ffiType: param.type,
+        publicType: Types.EtebasePrefetchOption$,
+        transferType: Types.EtebasePrefetchOption$,
+      );
     } else {
       return _typeParser.parseType(
         type: param.type,

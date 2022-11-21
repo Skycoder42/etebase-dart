@@ -3,6 +3,12 @@ import 'package:code_builder/code_builder.dart';
 extension ExpressionX on Expression {
   static final DartEmitter _emitter = DartEmitter(useNullSafetySyntax: true);
 
+  Expression get incremented {
+    final codeBuffer = StringBuffer('++');
+    accept(_emitter, codeBuffer);
+    return CodeExpression(Code(codeBuffer.toString()));
+  }
+
   Expression asserted([String? message]) {
     final codeBuffer = StringBuffer('assert(');
     accept(_emitter, codeBuffer);
