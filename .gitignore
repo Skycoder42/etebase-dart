@@ -23,3 +23,4 @@ pubspec.lock
 
 # Generated files
 # **/lib/gen/
+*.freezed.dart

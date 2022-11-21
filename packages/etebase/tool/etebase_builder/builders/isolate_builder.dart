@@ -3,9 +3,14 @@ import 'package:code_builder/code_builder.dart';
 import '../parsers/etebase_parser.dart';
 import '../parsers/method_parser.dart';
 import '../util/case_builder.dart';
+import 'isolate_implementation_builder.dart';
 
 class IsolateBuilder {
-  const IsolateBuilder();
+  final IsolateImplementationBuilder _isolateImplementationBuilder;
+
+  const IsolateBuilder([
+    this._isolateImplementationBuilder = const IsolateImplementationBuilder(),
+  ]);
 
   Library build(EtebaseRef etebase) {
     final methods = _allMethods(etebase);
@@ -28,7 +33,7 @@ class IsolateBuilder {
     for (final method in methods) {
       caseBuilder.addCase(refer('#${method.element.name}'), [
         refer('_${method.element.name}')
-            .call([refer('invocation')])
+            .call([refer('libEtebase'), refer('invocation')])
             .returned
             .statement,
       ]);
@@ -47,36 +52,36 @@ class IsolateBuilder {
 
     return Method(
       (b) => b
+        ..replace(_buildHandlerSignature())
         ..name = 'etebaseIsolateMessageHandler'
-        ..returns = TypeReference(
-          (b) => b
-            ..symbol = 'MethodResult'
-            ..url = '../../src/isolate/method_result.dart',
-        )
-        ..requiredParameters.add(
-          Parameter(
-            (b) => b
-              ..name = 'invocation'
-              ..type = TypeReference(
-                (b) => b
-                  ..symbol = 'MethodInvocation'
-                  ..url = '../../src/isolate/method_invocation.dart',
-              ),
-          ),
-        )
         ..body = Block.of([caseBuilder.build()]),
     );
   }
 
   Method _buildImplementation(MethodRef method) => Method(
         (b) => b
+          ..replace(_buildHandlerSignature())
           ..name = '_${method.element.name}'
+          ..body = _isolateImplementationBuilder.build(method),
+      );
+
+  Method _buildHandlerSignature() => Method(
+        (b) => b
           ..returns = TypeReference(
             (b) => b
               ..symbol = 'MethodResult'
               ..url = '../../src/isolate/method_result.dart',
           )
-          ..requiredParameters.add(
+          ..requiredParameters.addAll([
+            Parameter(
+              (b) => b
+                ..name = 'libEtebase'
+                ..type = TypeReference(
+                  (b) => b
+                    ..symbol = 'LibEtebaseFFI'
+                    ..url = 'libetebase.ffi.dart',
+                ),
+            ),
             Parameter(
               (b) => b
                 ..name = 'invocation'
@@ -86,10 +91,6 @@ class IsolateBuilder {
                     ..url = '../../src/isolate/method_invocation.dart',
                 ),
             ),
-          )
-          ..body = TypeReference((b) => b..symbol = 'UnimplementedError')
-              .newInstance([])
-              .thrown
-              .code,
+          ]),
       );
 }

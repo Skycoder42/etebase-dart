@@ -34,6 +34,12 @@ class MethodRef {
 
   bool get hasOutParam => parameters.any((p) => p.isOutParam);
 
+  Iterable<ParameterRef> get exportedParams => parameters
+      .where((param) => isDestroy || !param.isThisParam)
+      .where((param) => !param.isListLength)
+      .where((param) => !param.isRetSize)
+      .where((param) => !param.isOutParam);
+
   TypeRef get outOrReturnType => parameters
       .where((p) => p.isOutParam)
       .map((p) => p.type)

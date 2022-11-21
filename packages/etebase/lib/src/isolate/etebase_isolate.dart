@@ -3,19 +3,25 @@ import 'dart:ffi';
 import 'dart:isolate';
 
 import '../../gen/ffi/libetebase.ffi.dart';
-import '../model/etebase_exception.dart';
 import 'isolate_terminated.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
 
 typedef LoadLibetebaseFn = FutureOr<DynamicLibrary> Function();
 
+typedef MethodInvocationHandler = MethodResult Function(
+  LibEtebaseFFI libEtebaseFFI,
+  MethodInvocation invocation,
+);
+
 class _EtebaseIsolateInitMessage {
   final LoadLibetebaseFn loadLibetebase;
+  final MethodInvocationHandler methodInvocationHandler;
   final SendPort sendPort;
 
   const _EtebaseIsolateInitMessage(
     this.loadLibetebase,
+    this.methodInvocationHandler,
     this.sendPort,
   );
 }
@@ -44,13 +50,7 @@ class EtebaseIsolate {
 
     _sendPort.send(MethodInvocation(id, method, arguments));
 
-    return result.then((r) {
-      if (r.isError) {
-        throw EtebaseException(r.errorCode!, r.errorMessage!);
-      } else {
-        return r.result as T;
-      }
-    });
+    return result.then((r) => r.asResult<T>());
   }
 
   void terminate() {
@@ -69,6 +69,7 @@ class EtebaseIsolate {
 
   static Future<EtebaseIsolate> spawn({
     required LoadLibetebaseFn loadLibetebase,
+    required MethodInvocationHandler methodInvocationHandler,
   }) async {
     if (_instance != null) {
       return _instance!;
@@ -81,7 +82,11 @@ class EtebaseIsolate {
     final setupResultFuture = receiveBroadcast.first;
     final isolate = await Isolate.spawn(
       _main,
-      _EtebaseIsolateInitMessage(loadLibetebase, receivePort.sendPort),
+      _EtebaseIsolateInitMessage(
+        loadLibetebase,
+        methodInvocationHandler,
+        receivePort.sendPort,
+      ),
       debugName: '$EtebaseIsolate',
       errorsAreFatal: false, // TODO ???
     );
@@ -94,22 +99,35 @@ class EtebaseIsolate {
       receivePort,
       receiveBroadcast,
       // ignore: cast_nullable_to_non_nullable
-      setupResult.result as SendPort,
+      setupResult.asResult<SendPort>(),
     );
   }
 
-  static Future<void> _main(_EtebaseIsolateInitMessage message) async {
-    final sendPort = message.sendPort;
+  static Future<void> _main(_EtebaseIsolateInitMessage initMessage) async {
+    final sendPort = initMessage.sendPort;
     final receivePort = ReceivePort('$EtebaseIsolate._main');
 
     try {
       sendPort.send(MethodResult.success(-1, receivePort.sendPort));
 
-      final dyLib = await message.loadLibetebase();
-      final libetebase = LibEtebaseFFI(dyLib);
+      final dyLib = await initMessage.loadLibetebase();
+      final libEtebase = LibEtebaseFFI(dyLib);
 
       await for (final invocation in receivePort.cast<MethodInvocation>()) {
-        // TODO process invocation
+        try {
+          final result = initMessage.methodInvocationHandler(
+            libEtebase,
+            invocation,
+          );
+          assert(
+            result.id == invocation.id,
+            'methodInvocationHandler must not change the invocation id',
+          );
+          sendPort.send(result);
+          // ignore: avoid_catches_without_on_clauses
+        } catch (error) {
+          sendPort.send(MethodResult.exception(invocation.id, error));
+        }
       }
     } finally {
       receivePort.close();

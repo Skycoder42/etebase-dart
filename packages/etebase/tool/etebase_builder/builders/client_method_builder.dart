@@ -14,13 +14,8 @@ class ClientMethodBuilder {
 
   Method buildMethod(MethodRef method, {bool global = false}) => Method(
         (b) {
-          final parameters = method.parameters
-              .where((param) => method.isDestroy || !param.isThisParam)
-              .where((param) => !param.isListLength)
-              .where((param) => !param.isRetSize)
-              .where((param) => !param.isOutParam)
-              .map(_buildParameter)
-              .toList();
+          final parameters =
+              method.exportedParams.map(_buildParameter).toList();
 
           b
             ..name = _findMethodName(method)

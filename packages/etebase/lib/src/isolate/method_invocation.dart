@@ -1,7 +1,12 @@
-class MethodInvocation {
-  final int id;
-  final Symbol method;
-  final List<Object?> arguments;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const MethodInvocation(this.id, this.method, this.arguments);
+part 'method_invocation.freezed.dart';
+
+@freezed
+class MethodInvocation with _$MethodInvocation {
+  const factory MethodInvocation(
+    int id,
+    Symbol method,
+    List<Object?> arguments,
+  ) = _MethodInvocation;
 }
