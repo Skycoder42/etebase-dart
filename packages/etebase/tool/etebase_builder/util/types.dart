@@ -23,6 +23,12 @@ abstract class Types {
       ..url = 'dart:typed_data',
   );
 
+  static final Void$ = TypeReference(
+    (b) => b
+      ..symbol = 'Void'
+      ..url = 'dart:ffi',
+  );
+
   static final Uint8$ = TypeReference(
     (b) => b
       ..symbol = 'Uint8'
@@ -32,6 +38,12 @@ abstract class Types {
   static final Char$ = TypeReference(
     (b) => b
       ..symbol = 'Char'
+      ..url = 'dart:ffi',
+  );
+
+  static final Int64$ = TypeReference(
+    (b) => b
+      ..symbol = 'Int64'
       ..url = 'dart:ffi',
   );
 

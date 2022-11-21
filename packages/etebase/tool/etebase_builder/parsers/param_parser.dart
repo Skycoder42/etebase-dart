@@ -5,6 +5,7 @@ import '../util/string_extensions.dart';
 import '../util/types.dart';
 import 'etebase_parser.dart';
 import 'type_parse.dart';
+import 'type_refs/type_ref.dart';
 
 class ParameterRef {
   final ParameterElement element;
