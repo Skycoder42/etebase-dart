@@ -139,12 +139,19 @@ class ByteArrayTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get transferType => Types.Uint8List$;
 }
 
-class EtebaseCollectionAccessLevelTypeRef extends _SingleTypeRef {
+class EnumTypeRef extends _SingleTypeRef {
+  EnumTypeRef(super.type);
+
+  @override
+  TypeReference get ffiType => Types.int$;
+}
+
+class EtebaseCollectionAccessLevelTypeRef extends EnumTypeRef {
   EtebaseCollectionAccessLevelTypeRef()
       : super(Types.EtebaseCollectionAccessLevel$);
 }
 
-class EtebasePrefetchOptionTypeRef extends _SingleTypeRef {
+class EtebasePrefetchOptionTypeRef extends EnumTypeRef {
   EtebasePrefetchOptionTypeRef() : super(Types.EtebasePrefetchOption$);
 }
 
