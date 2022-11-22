@@ -83,7 +83,7 @@ class ClientClassBuilder {
 
           final docs = methods
               .where((m) => m.isDestroy)
-              .map((m) => m.element.documentationComment)
+              .map((m) => m.documentation)
               .singleWhere(
                 (comment) => comment != null,
                 orElse: () => null,

@@ -1,6 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 
-import '../../util/types.dart';
+import '../util/types.dart';
 
 abstract class TypeRef {
   TypeReference get publicType;

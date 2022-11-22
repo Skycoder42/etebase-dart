@@ -2,7 +2,7 @@ import 'package:code_builder/code_builder.dart';
 
 import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
-import '../../parsers/type_refs/type_ref.dart';
+import '../../parsers/type_ref.dart';
 import '../../util/types.dart';
 
 class ClientMethodBodyBuilder {
@@ -23,7 +23,7 @@ class ClientMethodBodyBuilder {
     final returnType = method.outOrReturnType;
     expression = expression.call(
       [
-        refer('#${method.element.name}'),
+        refer('#${method.ffiName}'),
         if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
       ],
       const {},

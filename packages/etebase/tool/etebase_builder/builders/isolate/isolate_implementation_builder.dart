@@ -19,15 +19,22 @@ class IsolateImplementationBuilder {
       ]);
 
   Iterable<Code> _buildParameters(MethodRef method) sync* {
-    final paramLength = method.exportedParams(withThis: true).length;
+    final params = method.exportedParams(withThis: true).toList();
+    final paramsLength = params.length;
     final arguments = refer('invocation').property('arguments');
     yield arguments
         .property('length')
-        .equalTo(literalNum(paramLength))
-        .asserted('Invocation must have exactly $paramLength arguments')
+        .equalTo(literalNum(paramsLength))
+        .asserted('Invocation must have exactly $paramsLength arguments')
         .statement;
 
-    final autoFree = <String>[]; // TODO use
+    // for (var argumentIndex = 0; argumentIndex < paramsLength; ++argumentIndex) {
+    //   final parameter = params[argumentIndex];
+    //   final variable = declareFinal(parameter.name);
+    //   final argument = arguments
+    //       .index(literalNum(argumentIndex))
+    //       .asA(parameter.type.transferType);
+    // }
 
     var argumentIndex = 0;
     for (final parameter in method.parameters) {
@@ -47,7 +54,7 @@ class IsolateImplementationBuilder {
           .index(literalNum(argumentIndex++))
           .asA(parameter.type.transferType);
       if (parameter.isList) {
-        yield* _buildListParam(parameter, variable, argument, autoFree);
+        yield* _buildListParam(parameter, variable, argument);
         continue;
       }
 
@@ -69,7 +76,6 @@ class IsolateImplementationBuilder {
     ParameterRef parameter,
     Expression variable,
     Expression argument,
-    List<String> autoFree,
   ) sync* {
     yield declareFinal('${parameter.name}_size')
         .assign(
@@ -95,7 +101,6 @@ class IsolateImplementationBuilder {
       [rawListType],
     );
     yield variable.assign(allocation).statement;
-    autoFree.add(parameter.name);
 
     if (isUint8List) {
       yield refer(parameter.name)

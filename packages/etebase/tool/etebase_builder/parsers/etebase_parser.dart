@@ -27,8 +27,6 @@ class TypedefRef {
 }
 
 class EtebaseRef {
-  final ClassElement libEtebaseFfi;
-
   final List<ClassRef> classes;
   final List<MethodRef> utilsFunctions;
   final List<MethodRef> functions;
@@ -36,7 +34,6 @@ class EtebaseRef {
   final TypedefRef typeDefs;
 
   const EtebaseRef({
-    required this.libEtebaseFfi,
     required this.classes,
     required this.utilsFunctions,
     required this.functions,
@@ -76,7 +73,6 @@ class EtebaseParser {
       ..sort((a, b) => b.name.compareTo(a.name));
 
     return EtebaseRef(
-      libEtebaseFfi: libEtebaseFfi,
       classes: classElements
           .map(
             (clazz) => _classParser.parse(
@@ -140,8 +136,8 @@ class EtebaseParser {
     );
 
     return MethodRef(
-      element: getter,
       name: getter.name.toLowerCase().substring(14).snakeToDart(),
+      ffiName: getter.name,
       isNew: false,
       isDestroy: false,
       isGetLength: false,
@@ -152,6 +148,7 @@ class EtebaseParser {
         type: getter.returnType,
         typeDefs: typeDefs,
       ),
+      documentation: getter.documentationComment,
     );
   }
 }

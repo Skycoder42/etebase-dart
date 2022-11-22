@@ -4,11 +4,9 @@ import '../util/dart_type_extensions.dart';
 import '../util/string_extensions.dart';
 import 'etebase_parser.dart';
 import 'type_parse.dart';
-import 'type_refs/type_ref.dart';
+import 'type_ref.dart';
 
 class ParameterRef {
-  final ParameterElement element;
-
   final String name;
 
   final bool isThisParam;
@@ -19,7 +17,6 @@ class ParameterRef {
   final TypeRef type;
 
   const ParameterRef({
-    required this.element,
     required this.name,
     required this.isThisParam,
     required this.hasLength,
@@ -68,7 +65,6 @@ class ParamParser {
         ++i; // skip the _size param
 
         yield ParameterRef(
-          element: param,
           name: param.name.snakeToDart(),
           isThisParam: false,
           hasLength: true,
@@ -82,7 +78,6 @@ class ParamParser {
         );
       } else {
         yield ParameterRef(
-          element: param,
           name: param.name.snakeToDart(),
           isThisParam: _thisParamOverrides[methodName]?[param.name] ??
               param.name == _thisParamName,

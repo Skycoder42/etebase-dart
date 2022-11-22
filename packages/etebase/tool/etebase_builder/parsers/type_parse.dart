@@ -4,7 +4,7 @@ import 'package:analyzer/dart/element/type.dart';
 import '../util/dart_type_extensions.dart';
 import 'etebase_parser.dart';
 
-import 'type_refs/type_ref.dart';
+import 'type_ref.dart';
 
 class TypeParser {
   const TypeParser();

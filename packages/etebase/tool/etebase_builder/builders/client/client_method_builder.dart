@@ -36,7 +36,7 @@ class ClientMethodBuilder {
             )
             ..body = _clientMethodBodyBuilder.buildBody(method);
 
-          final docComment = method.element.documentationComment;
+          final docComment = method.documentation;
           if (docComment != null && !method.isDestroy) {
             b.docs.add('\n$docComment');
           }

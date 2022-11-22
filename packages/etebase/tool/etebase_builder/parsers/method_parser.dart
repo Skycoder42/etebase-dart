@@ -4,12 +4,11 @@ import '../util/string_extensions.dart';
 import 'etebase_parser.dart';
 import 'param_parser.dart';
 import 'type_parse.dart';
-import 'type_refs/type_ref.dart';
+import 'type_ref.dart';
 
 class MethodRef {
-  final ExecutableElement element;
-
   final String name;
+  final String ffiName;
 
   final bool isNew;
   final bool isDestroy;
@@ -20,9 +19,11 @@ class MethodRef {
   final List<ParameterRef> parameters;
   final TypeRef returnType;
 
+  final String? documentation;
+
   const MethodRef({
-    required this.element,
     required this.name,
+    required this.ffiName,
     required this.isNew,
     required this.isDestroy,
     required this.isGetLength,
@@ -30,6 +31,7 @@ class MethodRef {
     required this.isGetter,
     required this.parameters,
     required this.returnType,
+    required this.documentation,
   });
 
   bool get hasOutParam => parameters.any((p) => p.isOutParam);
@@ -78,8 +80,8 @@ class MethodParser {
     );
 
     return MethodRef(
-      element: method,
       name: methodName.substring(methodPrefix.length + 1).snakeToDart(),
+      ffiName: methodName,
       isNew: methodName.endsWith('_new'),
       isDestroy: methodName.endsWith('_destroy'),
       isGetLength: _isGetLengthRegExp.hasMatch(methodName),
@@ -91,6 +93,7 @@ class MethodParser {
         mappedParams.any((p) => p.isRetSize),
         typeDefs,
       ),
+      documentation: method.documentationComment,
     );
   }
 
@@ -109,8 +112,8 @@ class MethodParser {
     );
 
     return MethodRef(
-      element: method,
       name: method.name.substring(prefixLength + 1).snakeToDart(),
+      ffiName: method.name,
       isNew: false,
       isDestroy: false,
       isGetLength: _isGetLengthRegExp.hasMatch(method.name),
@@ -122,6 +125,7 @@ class MethodParser {
         mappedParams.any((p) => p.isRetSize),
         typeDefs,
       ),
+      documentation: method.documentationComment,
     );
   }
 

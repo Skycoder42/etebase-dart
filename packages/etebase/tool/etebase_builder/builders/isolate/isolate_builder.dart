@@ -36,8 +36,8 @@ class IsolateBuilder {
     final caseBuilder = refer('invocation').property('method').switchCase;
 
     for (final method in methods) {
-      caseBuilder.addCase(refer('#${method.element.name}'), [
-        refer('_${method.element.name}')
+      caseBuilder.addCase(refer('#${method.ffiName}'), [
+        refer('_${method.ffiName}')
             .call([refer('libEtebase'), refer('invocation'), refer('alloc')])
             .returned
             .statement,
@@ -90,7 +90,7 @@ class IsolateBuilder {
                 ),
             ),
           )
-          ..name = '_${method.element.name}'
+          ..name = '_${method.ffiName}'
           ..body = _isolateImplementationBuilder.build(method),
       );
 
