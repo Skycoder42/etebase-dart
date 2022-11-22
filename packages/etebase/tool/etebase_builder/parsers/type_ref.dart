@@ -178,9 +178,12 @@ class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
 
   EtebaseClassListTypeRef(this.name);
 
+  TypeReference get publicInnerType => TypeReference((b) => b..symbol = name);
+
+  TypeReference get ffiInnerType => Types.pointer(Types.ffi(refer(name)));
+
   @override
-  TypeReference get ffiType =>
-      Types.pointer(Types.pointer(Types.ffi(refer(name))));
+  TypeReference get ffiType => Types.pointer(ffiInnerType);
 
   @override
   bool get isListType => true;
@@ -189,8 +192,7 @@ class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
   bool get isPointer => true;
 
   @override
-  TypeReference get publicType =>
-      Types.list(TypeReference((b) => b..symbol = name));
+  TypeReference get publicType => Types.list(publicInnerType);
 
   @override
   TypeReference get transferType => Types.list(Types.int$);
@@ -198,8 +200,6 @@ class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
 
 class EtebaseOutListTypeRef extends EtebaseClassListTypeRef {
   EtebaseOutListTypeRef(super.name);
-
-  TypeReference get publicInnerType => TypeReference((b) => b..symbol = name);
 
   @override
   bool get isOutType => true;

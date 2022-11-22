@@ -49,6 +49,8 @@ class IsolateImplementationBuilder {
         yield* _buildEnumParam(param, paramType, variable, argument);
       } else if (paramType is EtebaseClassTypeRef) {
         yield* _buildClassParam(param, paramType, variable, argument);
+      } else if (paramType is EtebaseClassListTypeRef) {
+        yield* _buildClassListParam(param, paramType, variable, argument);
       } else {
         yield variable.assign(argument).statement;
       }
@@ -127,13 +129,8 @@ class IsolateImplementationBuilder {
 
     yield _assignPointerArray(
       refer(parameter.name),
-      argument.property('map').call([
-        Method(
-          (b) => b
-            ..requiredParameters.add(Parameter((b) => b..name = 'e'))
-            ..body = _stringToPointer(refer('e')).code,
-        ).closure
-      ]),
+      argument,
+      _stringToPointer,
     ).statement;
   }
 
@@ -181,6 +178,26 @@ class IsolateImplementationBuilder {
           ),
         )
         .statement;
+  }
+
+  Iterable<Code> _buildClassListParam(
+    ParameterRef parameter,
+    EtebaseClassListTypeRef parameterType,
+    Expression variable,
+    Expression argument,
+  ) sync* {
+    yield* _buildListAllocation(
+      parameter,
+      variable,
+      argument,
+      parameterType.ffiInnerType,
+    );
+
+    yield _assignPointerArray(
+      refer(parameter.name),
+      argument,
+      _stringToPointer, // TODO here
+    ).statement;
   }
 
   Iterable<Code> _buildListParam(
@@ -278,15 +295,29 @@ class IsolateImplementationBuilder {
         .statement;
   }
 
-  Expression _assignPointerArray(Expression variable, Expression argument) =>
-      argument.property('forEachIndexed').call([
-        Method(
-          (b) => b
-            ..requiredParameters.addAll([
-              Parameter((b) => b..name = 'i'),
-              Parameter((b) => b..name = 'e'),
-            ])
-            ..body = variable.index(refer('i')).assign(refer('e')).code,
-        ).closure,
-      ]);
+  Expression _assignPointerArray(
+    Expression variable,
+    Expression argument,
+    Expression Function(Reference argument) castArgument,
+  ) =>
+      argument
+          .property('map')
+          .call([
+            Method(
+              (b) => b
+                ..requiredParameters.add(Parameter((b) => b..name = 'e'))
+                ..body = castArgument(refer('e')).code,
+            ).closure
+          ])
+          .property('forEachIndexed')
+          .call([
+            Method(
+              (b) => b
+                ..requiredParameters.addAll([
+                  Parameter((b) => b..name = 'i'),
+                  Parameter((b) => b..name = 'e'),
+                ])
+                ..body = variable.index(refer('i')).assign(refer('e')).code,
+            ).closure,
+          ]);
 }
