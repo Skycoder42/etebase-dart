@@ -1,11 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:code_builder/code_builder.dart';
 
 import '../util/string_extensions.dart';
-import '../util/types.dart';
 import 'etebase_parser.dart';
 import 'param_parser.dart';
 import 'type_parse.dart';
+import 'type_refs/type_ref.dart';
 
 class MethodRef {
   final ExecutableElement element;
@@ -50,10 +49,10 @@ class MethodParser {
   static final _isGetLengthRegExp = RegExp('_get_.*_(length|size)');
 
   static final _returnTypeMapping = {
-    RegExp(r'.*_pubkey$'): Types.Uint8List$,
-    RegExp(r'.*_get_access_level$'): Types.EtebaseCollectionAccessLevel$,
-    'etebase_signed_invitation_get_from_username': Types.String$,
-    'etebase_client_check_etebase_server': Types.bool$,
+    RegExp(r'.*_pubkey$'): TypeRef.byteArray(),
+    RegExp(r'.*_get_access_level$'): TypeRef.etebaseCollectionAccessLevel(),
+    'etebase_signed_invitation_get_from_username': TypeRef.string(),
+    'etebase_client_check_etebase_server': TypeRef.bool(),
   };
 
   final ParamParser _paramParser;
@@ -130,25 +129,17 @@ class MethodParser {
     MethodElement method,
     bool hasRetSize,
     TypedefRef typeDefs,
-  ) {
-    final mappedType = _returnTypeMapping.entries
-        .where((entry) => entry.key.matchAsPrefix(method.name) != null)
-        .map((entry) => entry.value)
-        .cast<TypeReference?>()
-        .firstWhere((_) => true, orElse: () => null);
-
-    if (mappedType != null) {
-      return TypeRef(
-        ffiType: method.returnType,
-        publicType: mappedType,
-        transferType: mappedType,
-      );
-    } else {
-      return _typeParser.parseType(
-        type: method.returnType,
-        isArray: hasRetSize,
-        typeDefs: typeDefs,
-      );
-    }
-  }
+  ) =>
+      _returnTypeMapping.entries
+          .where((entry) => entry.key.matchAsPrefix(method.name) != null)
+          .map((entry) => entry.value)
+          .singleWhere(
+            (_) => true,
+            orElse: () => _typeParser.parseType(
+              type: method.returnType,
+              isArray: hasRetSize,
+              typeDefs: typeDefs,
+              asReturn: true,
+            ),
+          );
 }

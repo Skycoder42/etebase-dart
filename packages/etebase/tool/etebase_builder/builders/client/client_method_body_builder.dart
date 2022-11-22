@@ -2,7 +2,7 @@ import 'package:code_builder/code_builder.dart';
 
 import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
-import '../../parsers/type_parse.dart';
+import '../../parsers/type_refs/type_ref.dart';
 import '../../util/types.dart';
 
 class ClientMethodBodyBuilder {
@@ -22,27 +22,27 @@ class ClientMethodBodyBuilder {
         .toList();
 
     final returnType = method.outOrReturnType;
-    final isPointerList = returnType.pointerKind.isPointer && returnType.isList;
+    final isOutList = returnType.isOutType && returnType.isListType;
 
     expression = expression.call([
       refer('#${method.element.name}'),
       if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
     ], const {}, [
-      if (isPointerList) returnType.transferType
+      if (isOutList) returnType.transferType
     ]);
 
-    if (isPointerList) {
-      return _buildListMethodBody(expression, returnType);
+    if (isOutList) {
+      return _buildOutListMethodBody(expression, returnType);
     }
 
-    if (returnType.pointerKind.isPointer) {
+    if (returnType.isPointer) {
       expression = _fromAddress(returnType.publicType, expression.awaited);
     }
 
     return expression.code;
   }
 
-  Block _buildListMethodBody(Expression expression, TypeRef returnType) =>
+  Block _buildOutListMethodBody(Expression expression, TypeRef returnType) =>
       Block(
         (p) => p
           ..addExpression(
@@ -74,7 +74,7 @@ class ClientMethodBodyBuilder {
       return ref.property('address');
     }
 
-    if (param.type.pointerKind.isPointer) {
+    if (param.type.isPointer) {
       if (param.isList) {
         return refer(param.name)
             .property('map')

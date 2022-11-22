@@ -2,7 +2,6 @@ import 'package:code_builder/code_builder.dart';
 
 import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
-import '../../util/dart_type_extensions.dart';
 import '../../util/expression_extensions.dart';
 import '../../util/types.dart';
 
@@ -60,11 +59,10 @@ class IsolateImplementationBuilder {
         continue;
       }
 
-      if (parameter.type.pointerKind.isPointer) {
+      if (parameter.type.isPointer) {
         yield variable
             .assign(
               parameter.type.ffiType
-                  .typeReference()
                   .newInstanceNamed('fromAddress', [argument]),
             )
             .statement;
@@ -96,7 +94,7 @@ class IsolateImplementationBuilder {
       rawListType = Types.Uint8$;
     } else {
       // assume pointer list -> nested pointer value
-      rawListType = parameter.type.ffiType.typeReference().types.single;
+      rawListType = parameter.type.ffiType.types.single;
     }
 
     final allocation = _malloc.call(

@@ -1083,9 +1083,8 @@ _i1.MethodResult _etebase_invitation_list_response_get_iterator(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_SignedInvitation>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -1095,9 +1094,8 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_SignedInvitation>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   final data = null;
   throw UnimplementedError();
 }
@@ -1108,9 +1106,8 @@ _i1.MethodResult _etebase_invitation_list_response_is_done(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_SignedInvitation>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -1120,9 +1117,8 @@ _i1.MethodResult _etebase_invitation_list_response_destroy(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_SignedInvitation>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -1132,7 +1128,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseIteratorListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
@@ -1143,7 +1139,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseIteratorListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final data = null;
   throw UnimplementedError();
@@ -1155,7 +1151,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_is_done(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseIteratorListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
@@ -1166,7 +1162,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_destroy(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseIteratorListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
@@ -1177,9 +1173,8 @@ _i1.MethodResult _etebase_member_list_response_get_iterator(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_CollectionMember>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -1189,9 +1184,8 @@ _i1.MethodResult _etebase_member_list_response_get_data(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_CollectionMember>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   final data = null;
   throw UnimplementedError();
 }
@@ -1202,9 +1196,8 @@ _i1.MethodResult _etebase_member_list_response_is_done(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_CollectionMember>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -1214,9 +1207,8 @@ _i1.MethodResult _etebase_member_list_response_destroy(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseIteratorListResponse_CollectionMember>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -1470,7 +1462,7 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
   final this_ = _i4.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<String>).length;
-  final items = _i6.malloc<_i4.Pointer<_i4.Char>>(items_size);
+  final items = _i6.malloc<_i4.Char>(items_size);
   (invocation.arguments[1] as List<String>)
       .map((e) => e.toNativeUtf8(allocator: _i6.malloc).cast<_i4.Char>())
       .forEachIndexed((
@@ -1651,7 +1643,7 @@ _i1.MethodResult _etebase_item_list_response_get_stoken(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
@@ -1662,7 +1654,7 @@ _i1.MethodResult _etebase_item_list_response_get_data(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final data = null;
   throw UnimplementedError();
@@ -1674,7 +1666,7 @@ _i1.MethodResult _etebase_item_list_response_is_done(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
@@ -1685,7 +1677,7 @@ _i1.MethodResult _etebase_item_list_response_destroy(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse_Item>.fromAddress(
+  final this_ = _i4.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
@@ -2336,8 +2328,7 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
   final this_ = _i4.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionTypes_size = (invocation.arguments[1] as List<String>).length;
-  final collectionTypes =
-      _i6.malloc<_i4.Pointer<_i4.Char>>(collectionTypes_size);
+  final collectionTypes = _i6.malloc<_i4.Char>(collectionTypes_size);
   (invocation.arguments[1] as List<String>)
       .map((e) => e.toNativeUtf8(allocator: _i6.malloc).cast<_i4.Char>())
       .forEachIndexed((
@@ -2455,9 +2446,8 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseCollectionListResponse_Collection>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -2467,9 +2457,8 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseCollectionListResponse_Collection>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   final data = null;
   throw UnimplementedError();
 }
@@ -2480,9 +2469,8 @@ _i1.MethodResult _etebase_collection_list_response_is_done(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseCollectionListResponse_Collection>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 
@@ -2492,9 +2480,8 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseCollectionListResponse_Collection>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   final data = null;
   throw UnimplementedError();
 }
@@ -2505,9 +2492,8 @@ _i1.MethodResult _etebase_collection_list_response_destroy(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final this_ =
-      _i4.Pointer<_i2.EtebaseCollectionListResponse_Collection>.fromAddress(
-          (invocation.arguments[0] as int));
+  final this_ = _i4.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+      (invocation.arguments[0] as int));
   throw UnimplementedError();
 }
 

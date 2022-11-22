@@ -23,9 +23,8 @@ class ClientMethodBuilder {
             ..name = _findMethodName(method)
             ..static = method.isStatic || method.isDestroy
             ..type = method.isGetter ? MethodType.getter : null
-            ..modifier = method.outOrReturnType.pointerKind.isPointer
-                ? MethodModifier.async
-                : null
+            ..modifier =
+                method.outOrReturnType.isPointer ? MethodModifier.async : null
             ..returns = Types.future(_buildReturnType(method))
             ..requiredParameters.addAll(parameters)
             ..body = _clientMethodBodyBuilder.buildBody(method);
@@ -60,11 +59,6 @@ class ClientMethodBuilder {
 
   TypeReference _buildReturnType(MethodRef method) {
     final returnType = method.outOrReturnType.publicType;
-    // TODO
-    if (!method.hasOutParam && !method.isGetter && returnType.symbol == 'int') {
-      return Types.void$;
-    }
-
     return returnType;
   }
 }

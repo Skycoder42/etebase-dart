@@ -47,6 +47,12 @@ abstract class Types {
       ..url = 'dart:ffi',
   );
 
+  static final UnsignedLong$ = TypeReference(
+    (b) => b
+      ..symbol = 'UnsignedLong'
+      ..url = 'dart:ffi',
+  );
+
   static final EtebaseCollectionAccessLevel$ = TypeReference(
     (b) => b
       ..symbol = 'EtebaseCollectionAccessLevel'

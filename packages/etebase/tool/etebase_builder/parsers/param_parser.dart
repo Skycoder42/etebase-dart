@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 
 import '../util/dart_type_extensions.dart';
 import '../util/string_extensions.dart';
-import '../util/types.dart';
 import 'etebase_parser.dart';
 import 'type_parse.dart';
 import 'type_refs/type_ref.dart';
@@ -31,7 +30,7 @@ class ParameterRef {
     required this.type,
   });
 
-  bool get isOutParam => isOutBuf || type.pointerKind == PointerKind.opaqueOut;
+  bool get isOutParam => isOutBuf || type.isOutType;
 }
 
 class ParamParser {
@@ -120,18 +119,10 @@ class ParamParser {
   }) {
     if (param.name == 'access_level') {
       assert(param.type.isDartCoreInt, 'access_level must be an int parameter');
-      return TypeRef(
-        ffiType: param.type,
-        publicType: Types.EtebaseCollectionAccessLevel$,
-        transferType: Types.EtebaseCollectionAccessLevel$,
-      );
+      return TypeRef.etebaseCollectionAccessLevel();
     } else if (param.name == 'prefetch') {
       assert(param.type.isDartCoreInt, 'prefetch must be an int parameter');
-      return TypeRef(
-        ffiType: param.type,
-        publicType: Types.EtebasePrefetchOption$,
-        transferType: Types.EtebasePrefetchOption$,
-      );
+      return TypeRef.etebasePrefetchOption();
     } else {
       return _typeParser.parseType(
         type: param.type,
