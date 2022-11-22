@@ -11,24 +11,35 @@ abstract class TypeRef {
   bool get isListType;
   bool get isPointer;
 
-  factory TypeRef.void$() = _VoidTypeRef;
-  factory TypeRef.bool() = _BoolTypeRef;
+  factory TypeRef.void$() = VoidTypeRef;
+  factory TypeRef.bool() = BoolTypeRef;
   // ignore: avoid_positional_boolean_parameters
-  factory TypeRef.int(bool asReturn) = _IntTypeRef;
-  factory TypeRef.returnSize() = _ReturnSizeTypeRef;
-  factory TypeRef.string() = _StringTypeRef;
-  factory TypeRef.dateTime() = _DateTimeTypeRef;
-  factory TypeRef.stringList() = _StringListTypeRef;
-  factory TypeRef.byteArray() = _ByteArrayTypeRef;
+  factory TypeRef.int(bool asReturn) = IntTypeRef;
+  factory TypeRef.returnSize() = ReturnSizeTypeRef;
+  factory TypeRef.string() = StringTypeRef;
+  factory TypeRef.dateTime() = DateTimeTypeRef;
+  factory TypeRef.stringList() = StringListTypeRef;
+  factory TypeRef.byteArray() = ByteArrayTypeRef;
   factory TypeRef.etebaseCollectionAccessLevel() =
-      _EtebaseCollectionAccessLevelTypeRef;
-  factory TypeRef.etebasePrefetchOption() = _EtebasePrefetchOptionTypeRef;
-  factory TypeRef.etebaseClass(String name) = _EtebaseClassTypeRef;
-  factory TypeRef.etebaseClassList(String name) = _EtebaseClassListTypeRef;
-  factory TypeRef.etebaseOutList(String name) = _EtebaseOutListTypeRef;
+      EtebaseCollectionAccessLevelTypeRef;
+  factory TypeRef.etebasePrefetchOption() = EtebasePrefetchOptionTypeRef;
+  factory TypeRef.etebaseClass(String name) = EtebaseClassTypeRef;
+  factory TypeRef.etebaseClassList(String name) = EtebaseClassListTypeRef;
+  factory TypeRef.etebaseOutList(String name) = EtebaseOutListTypeRef;
 }
 
-abstract class _SingleTypeRef implements TypeRef {
+mixin _TypeRefDefaults implements TypeRef {
+  @override
+  bool get isListType => false;
+
+  @override
+  bool get isOutType => false;
+
+  @override
+  bool get isPointer => false;
+}
+
+abstract class _SingleTypeRef with _TypeRefDefaults implements TypeRef {
   final TypeReference _type;
 
   _SingleTypeRef(this._type);
@@ -37,46 +48,28 @@ abstract class _SingleTypeRef implements TypeRef {
   TypeReference get ffiType => _type;
 
   @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
-
-  @override
   TypeReference get publicType => _type;
 
   @override
   TypeReference get transferType => _type;
 }
 
-class _VoidTypeRef extends _SingleTypeRef {
-  _VoidTypeRef() : super(Types.void$);
+class VoidTypeRef extends _SingleTypeRef {
+  VoidTypeRef() : super(Types.void$);
 }
 
-class _BoolTypeRef extends _SingleTypeRef {
-  _BoolTypeRef() : super(Types.bool$);
+class BoolTypeRef extends _SingleTypeRef {
+  BoolTypeRef() : super(Types.bool$);
 }
 
-class _IntTypeRef implements TypeRef {
+class IntTypeRef with _TypeRefDefaults implements TypeRef {
   final bool asReturn;
 
   // ignore: avoid_positional_boolean_parameters
-  _IntTypeRef(this.asReturn);
+  IntTypeRef(this.asReturn);
 
   @override
   TypeReference get ffiType => Types.int$;
-
-  @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
 
   @override
   TypeReference get publicType => asReturn ? Types.void$ : Types.int$;
@@ -85,18 +78,9 @@ class _IntTypeRef implements TypeRef {
   TypeReference get transferType => asReturn ? Types.void$ : Types.int$;
 }
 
-class _ReturnSizeTypeRef implements TypeRef {
+class ReturnSizeTypeRef with _TypeRefDefaults implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.UnsignedLong$);
-
-  @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
 
   @override
   TypeReference get publicType => Types.int$;
@@ -105,18 +89,9 @@ class _ReturnSizeTypeRef implements TypeRef {
   TypeReference get transferType => Types.int$;
 }
 
-class _StringTypeRef implements TypeRef {
+class StringTypeRef with _TypeRefDefaults implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.Char$);
-
-  @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
 
   @override
   TypeReference get publicType => Types.String$;
@@ -125,18 +100,9 @@ class _StringTypeRef implements TypeRef {
   TypeReference get transferType => Types.String$;
 }
 
-class _DateTimeTypeRef implements TypeRef {
+class DateTimeTypeRef with _TypeRefDefaults implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.Int64$);
-
-  @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
 
   @override
   TypeReference get publicType => Types.DateTime$;
@@ -145,18 +111,12 @@ class _DateTimeTypeRef implements TypeRef {
   TypeReference get transferType => Types.DateTime$;
 }
 
-class _StringListTypeRef implements TypeRef {
+class StringListTypeRef with _TypeRefDefaults implements TypeRef {
   @override
-  TypeReference get ffiType => Types.pointer(Types.Char$);
+  TypeReference get ffiType => Types.pointer(Types.pointer(Types.Char$));
 
   @override
   bool get isListType => true;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
 
   @override
   TypeReference get publicType => Types.list(Types.String$);
@@ -165,18 +125,12 @@ class _StringListTypeRef implements TypeRef {
   TypeReference get transferType => Types.list(Types.String$);
 }
 
-class _ByteArrayTypeRef implements TypeRef {
+class ByteArrayTypeRef with _TypeRefDefaults implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.Void$);
 
   @override
   bool get isListType => true;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
 
   @override
   TypeReference get publicType => Types.Uint8List$;
@@ -185,28 +139,22 @@ class _ByteArrayTypeRef implements TypeRef {
   TypeReference get transferType => Types.Uint8List$;
 }
 
-class _EtebaseCollectionAccessLevelTypeRef extends _SingleTypeRef {
-  _EtebaseCollectionAccessLevelTypeRef()
+class EtebaseCollectionAccessLevelTypeRef extends _SingleTypeRef {
+  EtebaseCollectionAccessLevelTypeRef()
       : super(Types.EtebaseCollectionAccessLevel$);
 }
 
-class _EtebasePrefetchOptionTypeRef extends _SingleTypeRef {
-  _EtebasePrefetchOptionTypeRef() : super(Types.EtebasePrefetchOption$);
+class EtebasePrefetchOptionTypeRef extends _SingleTypeRef {
+  EtebasePrefetchOptionTypeRef() : super(Types.EtebasePrefetchOption$);
 }
 
-class _EtebaseClassTypeRef implements TypeRef {
+class EtebaseClassTypeRef with _TypeRefDefaults implements TypeRef {
   final String name;
 
-  _EtebaseClassTypeRef(this.name);
+  EtebaseClassTypeRef(this.name);
 
   @override
   TypeReference get ffiType => Types.pointer(Types.ffi(refer(name)));
-
-  @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
 
   @override
   bool get isPointer => true;
@@ -218,10 +166,10 @@ class _EtebaseClassTypeRef implements TypeRef {
   TypeReference get transferType => Types.int$;
 }
 
-class _EtebaseClassListTypeRef implements TypeRef {
+class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
   final String name;
 
-  _EtebaseClassListTypeRef(this.name);
+  EtebaseClassListTypeRef(this.name);
 
   @override
   TypeReference get ffiType =>
@@ -229,9 +177,6 @@ class _EtebaseClassListTypeRef implements TypeRef {
 
   @override
   bool get isListType => true;
-
-  @override
-  bool get isOutType => false;
 
   @override
   bool get isPointer => true;
@@ -244,28 +189,11 @@ class _EtebaseClassListTypeRef implements TypeRef {
   TypeReference get transferType => Types.list(Types.int$);
 }
 
-class _EtebaseOutListTypeRef implements TypeRef {
-  final String name;
+class EtebaseOutListTypeRef extends EtebaseClassListTypeRef {
+  EtebaseOutListTypeRef(super.name);
 
-  _EtebaseOutListTypeRef(this.name);
-
-  @override
-  TypeReference get ffiType =>
-      Types.pointer(Types.pointer(Types.ffi(refer(name))));
-
-  @override
-  bool get isListType => true;
+  TypeReference get publicInnerType => TypeReference((b) => b..symbol = name);
 
   @override
   bool get isOutType => true;
-
-  @override
-  bool get isPointer => true;
-
-  @override
-  TypeReference get publicType =>
-      Types.list(TypeReference((b) => b..symbol = name));
-
-  @override
-  TypeReference get transferType => Types.list(Types.int$);
 }

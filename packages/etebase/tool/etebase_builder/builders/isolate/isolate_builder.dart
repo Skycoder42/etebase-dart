@@ -3,6 +3,7 @@ import 'package:code_builder/code_builder.dart';
 import '../../parsers/etebase_parser.dart';
 import '../../parsers/method_parser.dart';
 import '../../util/case_builder.dart';
+import '../../util/try_catch.dart';
 import '../../util/types.dart';
 import 'isolate_implementation_builder.dart';
 
@@ -37,7 +38,7 @@ class IsolateBuilder {
     for (final method in methods) {
       caseBuilder.addCase(refer('#${method.element.name}'), [
         refer('_${method.element.name}')
-            .call([refer('libEtebase'), refer('invocation')])
+            .call([refer('libEtebase'), refer('invocation'), refer('alloc')])
             .returned
             .statement,
       ]);
@@ -58,13 +59,37 @@ class IsolateBuilder {
       (b) => b
         ..replace(_buildHandlerSignature())
         ..name = 'etebaseIsolateMessageHandler'
-        ..body = Block.of([caseBuilder.build()]),
+        ..body = Block.of([
+          declareFinal('alloc')
+              .assign(
+                TypeReference(
+                  (b) => b
+                    ..symbol = 'Arena'
+                    ..url = 'package:ffi/ffi.dart',
+                ).newInstance(const []),
+              )
+              .statement,
+          TryCatch.try$([caseBuilder.build()]).finally$([
+            refer('alloc').property('releaseAll').call(const []).statement,
+          ]).code,
+        ]),
     );
   }
 
   Method _buildImplementation(MethodRef method) => Method(
         (b) => b
           ..replace(_buildHandlerSignature())
+          ..requiredParameters.add(
+            Parameter(
+              (b) => b
+                ..name = 'alloc'
+                ..type = TypeReference(
+                  (b) => b
+                    ..symbol = 'Allocator'
+                    ..url = 'dart:ffi',
+                ),
+            ),
+          )
           ..name = '_${method.element.name}'
           ..body = _isolateImplementationBuilder.build(method),
       );

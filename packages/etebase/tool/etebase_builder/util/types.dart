@@ -53,6 +53,12 @@ abstract class Types {
       ..url = 'dart:ffi',
   );
 
+  static final Utf8$ = TypeReference(
+    (b) => b
+      ..symbol = 'Utf8'
+      ..url = 'package:ffi/ffi.dart',
+  );
+
   static final EtebaseCollectionAccessLevel$ = TypeReference(
     (b) => b
       ..symbol = 'EtebaseCollectionAccessLevel'

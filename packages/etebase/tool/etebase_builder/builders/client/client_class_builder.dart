@@ -12,35 +12,38 @@ class ClientClassBuilder {
     this._clientMethodBuilder = const ClientMethodBuilder(),
   ]);
 
-  Class buildClass(ClassRef clazz) => Class(
-        (b) => b
-          ..name = clazz.name
-          ..fields.addAll([
-            Field(
-              (b) => b
-                ..name = '_finalizer'
-                ..static = true
-                ..modifier = FieldModifier.final$
-                ..assignment =
-                    refer('Finalizer').newInstance([refer('_destroy')]).code,
-            ),
-            Field(
-              (b) => b
-                ..name = '_pointer'
-                ..type = Types.pointer(
-                  Types.ffi(refer(clazz.name)),
-                )
-                ..modifier = FieldModifier.final$,
-            ),
-          ])
-          ..constructors.add(_buildConstructor())
-          ..methods.addAll([
-            ...clazz.methods
-                .where((method) => !method.isGetLength)
-                .map(_clientMethodBuilder.buildMethod),
-            _buildDispose(clazz.methods),
-          ]),
-      );
+  Class buildClass(ClassRef clazz) {
+    assert(clazz.hasDestroy, 'Can only build destroyable classes');
+    return Class(
+      (b) => b
+        ..name = clazz.name
+        ..fields.addAll([
+          Field(
+            (b) => b
+              ..name = '_finalizer'
+              ..static = true
+              ..modifier = FieldModifier.final$
+              ..assignment =
+                  refer('Finalizer').newInstance([refer('_destroy')]).code,
+          ),
+          Field(
+            (b) => b
+              ..name = '_pointer'
+              ..type = Types.pointer(
+                Types.ffi(refer(clazz.name)),
+              )
+              ..modifier = FieldModifier.final$,
+          ),
+        ])
+        ..constructors.add(_buildConstructor())
+        ..methods.addAll([
+          ...clazz.methods
+              .where((method) => !method.isGetLength)
+              .map(_clientMethodBuilder.buildMethod),
+          _buildDispose(clazz.methods),
+        ]),
+    );
+  }
 
   Constructor _buildConstructor() => Constructor(
         (b) => b

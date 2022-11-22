@@ -15,23 +15,22 @@ class ClientMethodBodyBuilder {
         ..url = 'package:etebase/src/isolate/etebase_isolate.dart',
     ).property('current').property('invoke');
 
-    final inParams = method.parameters
-        .where((param) => !param.isRetSize)
-        .where((param) => !param.isOutParam)
+    final inParams = method
+        .exportedParams(withThis: true)
         .map((param) => _mapCallParam(param, method))
         .toList();
 
     final returnType = method.outOrReturnType;
-    final isOutList = returnType.isOutType && returnType.isListType;
+    expression = expression.call(
+      [
+        refer('#${method.element.name}'),
+        if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
+      ],
+      const {},
+      [returnType.transferType],
+    );
 
-    expression = expression.call([
-      refer('#${method.element.name}'),
-      if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
-    ], const {}, [
-      if (isOutList) returnType.transferType
-    ]);
-
-    if (isOutList) {
+    if (returnType is EtebaseOutListTypeRef) {
       return _buildOutListMethodBody(expression, returnType);
     }
 
@@ -42,7 +41,10 @@ class ClientMethodBodyBuilder {
     return expression.code;
   }
 
-  Block _buildOutListMethodBody(Expression expression, TypeRef returnType) =>
+  Block _buildOutListMethodBody(
+    Expression expression,
+    EtebaseOutListTypeRef returnType,
+  ) =>
       Block(
         (p) => p
           ..addExpression(
@@ -54,11 +56,10 @@ class ClientMethodBodyBuilder {
                 .call([
                   Method(
                     (b) => b
-                      ..requiredParameters
-                          .add(Parameter((b) => b..name = 'address'))
+                      ..requiredParameters.add(Parameter((b) => b..name = 'a'))
                       ..body = _fromAddress(
-                        returnType.publicType.types.single,
-                        refer('address'),
+                        returnType.publicInnerType,
+                        refer('a'),
                       ).code,
                   ).closure
                 ])
@@ -75,16 +76,14 @@ class ClientMethodBodyBuilder {
     }
 
     if (param.type.isPointer) {
-      if (param.isList) {
+      if (param.type.isListType) {
         return refer(param.name)
             .property('map')
             .call([
               Method(
                 (b) => b
-                  ..requiredParameters.add(
-                    Parameter((b) => b..name = 'element'),
-                  )
-                  ..body = _toAddress(refer('element')).code,
+                  ..requiredParameters.add(Parameter((b) => b..name = 'e'))
+                  ..body = _toAddress(refer('e')).code,
               ).closure,
             ])
             .property('toList')

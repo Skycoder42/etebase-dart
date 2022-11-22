@@ -12,7 +12,6 @@ class ParameterRef {
   final String name;
 
   final bool isThisParam;
-  final bool isList;
   final bool hasLength;
   final bool isRetSize;
   final bool isOutBuf;
@@ -23,12 +22,13 @@ class ParameterRef {
     required this.element,
     required this.name,
     required this.isThisParam,
-    required this.isList,
     required this.hasLength,
     required this.isRetSize,
     required this.isOutBuf,
     required this.type,
   });
+
+  bool get isList => type.isListType;
 
   bool get isOutParam => isOutBuf || type.isOutType;
 }
@@ -71,7 +71,6 @@ class ParamParser {
           element: param,
           name: param.name.snakeToDart(),
           isThisParam: false,
-          isList: true,
           hasLength: true,
           isRetSize: false,
           isOutBuf: isBufParam,
@@ -87,7 +86,6 @@ class ParamParser {
           name: param.name.snakeToDart(),
           isThisParam: _thisParamOverrides[methodName]?[param.name] ??
               param.name == _thisParamName,
-          isList: isBufParam && _isBufList(param),
           hasLength: false,
           isRetSize: param.name == 'ret_size',
           isOutBuf: isBufParam,

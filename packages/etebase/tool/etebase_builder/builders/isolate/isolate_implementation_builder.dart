@@ -6,7 +6,7 @@ import '../../util/expression_extensions.dart';
 import '../../util/types.dart';
 
 class IsolateImplementationBuilder {
-  static const _malloc = Reference('malloc', 'package:ffi/ffi.dart');
+  static const _alloc = Reference('alloc');
 
   const IsolateImplementationBuilder();
 
@@ -21,19 +21,11 @@ class IsolateImplementationBuilder {
   Iterable<Code> _buildParameters(MethodRef method) sync* {
     final paramLength = method.exportedParams(withThis: true).length;
     final arguments = refer('invocation').property('arguments');
-
-    if (paramLength == 0) {
-      yield arguments
-          .property('isEmpty')
-          .asserted('Invocation must not have any arguments')
-          .statement;
-    } else {
-      yield arguments
-          .property('length')
-          .equalTo(literalNum(paramLength))
-          .asserted('Invocation must have exactly $paramLength arguments')
-          .statement;
-    }
+    yield arguments
+        .property('length')
+        .equalTo(literalNum(paramLength))
+        .asserted('Invocation must have exactly $paramLength arguments')
+        .statement;
 
     final autoFree = <String>[]; // TODO use
 
@@ -97,7 +89,7 @@ class IsolateImplementationBuilder {
       rawListType = parameter.type.ffiType.types.single;
     }
 
-    final allocation = _malloc.call(
+    final allocation = _alloc.call(
       [refer('${parameter.name}_size')],
       const {},
       [rawListType],
@@ -121,7 +113,7 @@ class IsolateImplementationBuilder {
               ..requiredParameters.add(Parameter((b) => b..name = 'e'))
               ..body = refer('e')
                   .property('toNativeUtf8')
-                  .call(const [], const {'allocator': _malloc})
+                  .call(const [], const {'allocator': _alloc})
                   .property('cast')
                   .call(const [], const {}, [Types.Char$])
                   .code,
