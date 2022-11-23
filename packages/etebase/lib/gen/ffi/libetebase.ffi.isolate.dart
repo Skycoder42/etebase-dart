@@ -4062,7 +4062,7 @@ _i1.MethodResult _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
-  libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE();
+  libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE;
   throw UnimplementedError();
 }
 

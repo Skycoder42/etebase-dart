@@ -24,16 +24,21 @@ class IsolateImplementationBuilder {
             .statement,
       ]);
 
-  Expression _buildInvocation(MethodRef method) =>
-      refer('libEtebase').property(method.ffiName).call(
-            method.parameters.expand(
-              (parameter) => [
-                if (parameter.type is ByteArrayTypeRef)
-                  refer(parameter.name).property('cast').call(const [])
-                else
-                  refer(parameter.name),
-                if (parameter.hasLength) refer('${parameter.name}_size'),
-              ],
-            ),
-          );
+  Expression _buildInvocation(MethodRef method) {
+    if (method.isGetter) {
+      return refer('libEtebase').property(method.ffiName);
+    }
+
+    return refer('libEtebase').property(method.ffiName).call(
+          method.parameters.expand(
+            (parameter) => [
+              if (parameter.type is ByteArrayTypeRef)
+                refer(parameter.name).property('cast').call(const [])
+              else
+                refer(parameter.name),
+              if (parameter.hasLength) refer('${parameter.name}_size'),
+            ],
+          ),
+        );
+  }
 }
