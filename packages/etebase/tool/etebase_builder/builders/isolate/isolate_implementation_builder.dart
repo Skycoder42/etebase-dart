@@ -17,28 +17,34 @@ class IsolateImplementationBuilder {
   Code build(MethodRef method) => Block.of([
         ..._isolateInParamBuilder.buildInParameters(method),
         ..._isolateOutParamBuilder.buildOutParameters(method),
-        _buildInvocation(method).statement,
+        _buildInvocation(method),
         TypeReference((b) => b..symbol = 'UnimplementedError')
             .newInstance([])
             .thrown
             .statement,
       ]);
 
-  Expression _buildInvocation(MethodRef method) {
-    if (method.isGetter) {
-      return refer('libEtebase').property(method.ffiName);
+  Code _buildInvocation(MethodRef method) {
+    var expression = refer('libEtebase').property(method.ffiName);
+
+    if (!method.isGetter) {
+      expression = expression.call(
+        method.parameters.expand(
+          (parameter) => [
+            if (parameter.type is ByteArrayTypeRef)
+              refer(parameter.name).property('cast').call(const [])
+            else
+              refer(parameter.name),
+            if (parameter.hasLength) refer('${parameter.name}_size'),
+          ],
+        ),
+      );
     }
 
-    return refer('libEtebase').property(method.ffiName).call(
-          method.parameters.expand(
-            (parameter) => [
-              if (parameter.type is ByteArrayTypeRef)
-                refer(parameter.name).property('cast').call(const [])
-              else
-                refer(parameter.name),
-              if (parameter.hasLength) refer('${parameter.name}_size'),
-            ],
-          ),
-        );
+    if (method.returnType is VoidTypeRef) {
+      return expression.statement;
+    } else {
+      return declareFinal('result').assign(expression).statement;
+    }
   }
 }
