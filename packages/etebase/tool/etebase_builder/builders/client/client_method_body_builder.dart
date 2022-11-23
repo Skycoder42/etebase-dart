@@ -32,9 +32,9 @@ class ClientMethodBodyBuilder {
 
     if (returnType is EtebaseOutListTypeRef) {
       return _buildOutListMethodBody(expression, returnType);
-    }
-
-    if (returnType.isPointer) {
+    } else if (returnType is ByteArrayTypeRef) {
+      return _buildByteArrayMethodBody(expression, returnType);
+    } else if (returnType.isPointer) {
       expression = _fromAddress(returnType.publicType, expression.awaited);
     }
 
@@ -69,10 +69,36 @@ class ClientMethodBodyBuilder {
           ),
       );
 
+  Block _buildByteArrayMethodBody(
+    Expression expression,
+    ByteArrayTypeRef returnType,
+  ) =>
+      Block(
+        (b) => b
+          ..addExpression(declareFinal('data').assign(expression.awaited))
+          ..addExpression(
+            refer('data')
+                .property('materialize')
+                .call(const [])
+                .property('asUint8List')
+                .call(const [])
+                .returned,
+          ),
+      );
+
   Expression _mapCallParam(ParameterRef param, MethodRef method) {
     if (param.isThisParam) {
       final ref = method.isDestroy ? refer(param.name) : refer('_pointer');
       return ref.property('address');
+    }
+
+    if (param.type is ByteArrayTypeRef) {
+      return Types.TransferableTypedData$.newInstanceNamed(
+        'fromList',
+        [
+          literalList([refer(param.name)]),
+        ],
+      );
     }
 
     if (param.type.isPointer) {

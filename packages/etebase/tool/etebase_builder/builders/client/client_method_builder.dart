@@ -1,6 +1,7 @@
 import 'package:code_builder/code_builder.dart';
 
 import '../../parsers/method_parser.dart';
+import '../../parsers/type_ref.dart';
 import '../../util/types.dart';
 import 'client_method_body_builder.dart';
 
@@ -18,7 +19,7 @@ class ClientMethodBuilder {
             ..static = method.isStatic || method.isDestroy
             ..type = method.isGetter ? MethodType.getter : null
             ..modifier =
-                method.outOrReturnType.isPointer ? MethodModifier.async : null
+                _isAsync(method.outOrReturnType) ? MethodModifier.async : null
             ..returns = Types.future(_buildReturnType(method))
             ..requiredParameters.addAll(
               method
@@ -42,6 +43,8 @@ class ClientMethodBuilder {
           }
         },
       );
+
+  bool _isAsync(TypeRef type) => type.isPointer || type is ByteArrayTypeRef;
 
   String _findMethodName(MethodRef method) {
     if (method.isNew) {

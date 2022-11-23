@@ -7,7 +7,7 @@
 // ignore_for_file: non_constant_identifier_names, require_trailing_commas, cast_nullable_to_non_nullable, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i5;
-import 'dart:typed_data' as _i6;
+import 'dart:isolate' as _i6;
 
 import 'package:collection/collection.dart';
 import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i2;
@@ -1605,11 +1605,14 @@ _i1.MethodResult _etebase_item_manager_create(
       (invocation.arguments[0] as int));
   final meta = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[1] as int));
-  final content_size = (invocation.arguments[2] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[2] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[2] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }
@@ -1623,17 +1626,23 @@ _i1.MethodResult _etebase_item_manager_create_raw(
       'Invocation must have exactly 3 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final meta_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final meta_size = meta_buffer.length;
   final meta = alloc<_i5.Uint8>(meta_size);
   meta.asTypedList(meta_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        meta_buffer,
       );
-  final content_size = (invocation.arguments[2] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[2] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[2] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }
@@ -1677,7 +1686,15 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
       'Invocation must have exactly 3 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final items = (invocation.arguments[1] as List<int>);
+  final items_size = (invocation.arguments[1] as List<int>).length;
+  final items = alloc<_i5.Pointer<_i2.EtebaseItem>>(items_size);
+  (invocation.arguments[1] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          items[i] = e);
   final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[2] as int));
   throw UnimplementedError();
@@ -1715,7 +1732,15 @@ _i1.MethodResult _etebase_item_manager_batch(
       'Invocation must have exactly 3 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final items = (invocation.arguments[1] as List<int>);
+  final items_size = (invocation.arguments[1] as List<int>).length;
+  final items = alloc<_i5.Pointer<_i2.EtebaseItem>>(items_size);
+  (invocation.arguments[1] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          items[i] = e);
   final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[2] as int));
   throw UnimplementedError();
@@ -1730,8 +1755,24 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
       'Invocation must have exactly 4 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final items = (invocation.arguments[1] as List<int>);
-  final deps = (invocation.arguments[2] as List<int>);
+  final items_size = (invocation.arguments[1] as List<int>).length;
+  final items = alloc<_i5.Pointer<_i2.EtebaseItem>>(items_size);
+  (invocation.arguments[1] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          items[i] = e);
+  final deps_size = (invocation.arguments[2] as List<int>).length;
+  final deps = alloc<_i5.Pointer<_i2.EtebaseItem>>(deps_size);
+  (invocation.arguments[2] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          deps[i] = e);
   final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[3] as int));
   throw UnimplementedError();
@@ -1746,7 +1787,15 @@ _i1.MethodResult _etebase_item_manager_transaction(
       'Invocation must have exactly 3 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final items = (invocation.arguments[1] as List<int>);
+  final items_size = (invocation.arguments[1] as List<int>).length;
+  final items = alloc<_i5.Pointer<_i2.EtebaseItem>>(items_size);
+  (invocation.arguments[1] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          items[i] = e);
   final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[2] as int));
   throw UnimplementedError();
@@ -1761,8 +1810,24 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
       'Invocation must have exactly 4 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final items = (invocation.arguments[1] as List<int>);
-  final deps = (invocation.arguments[2] as List<int>);
+  final items_size = (invocation.arguments[1] as List<int>).length;
+  final items = alloc<_i5.Pointer<_i2.EtebaseItem>>(items_size);
+  (invocation.arguments[1] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          items[i] = e);
+  final deps_size = (invocation.arguments[2] as List<int>).length;
+  final deps = alloc<_i5.Pointer<_i2.EtebaseItem>>(deps_size);
+  (invocation.arguments[2] as List<int>)
+      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
+      .forEachIndexed((
+        i,
+        e,
+      ) =>
+          deps[i] = e);
   final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[3] as int));
   throw UnimplementedError();
@@ -1777,11 +1842,14 @@ _i1.MethodResult _etebase_item_manager_cache_load(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final cached_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final cached_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final cached_size = cached_buffer.length;
   final cached = alloc<_i5.Uint8>(cached_size);
   cached.asTypedList(cached_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        cached_buffer,
       );
   throw UnimplementedError();
 }
@@ -1933,11 +2001,14 @@ _i1.MethodResult _etebase_item_set_meta_raw(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final meta_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final meta_size = meta_buffer.length;
   final meta = alloc<_i5.Uint8>(meta_size);
   meta.asTypedList(meta_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        meta_buffer,
       );
   throw UnimplementedError();
 }
@@ -1963,11 +2034,14 @@ _i1.MethodResult _etebase_item_set_content(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final content_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }
@@ -2083,11 +2157,15 @@ _i1.MethodResult _etebase_fs_cache_save_account(
       (invocation.arguments[0] as int));
   final etebase = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[1] as int));
-  final encryptionKey_size = (invocation.arguments[2] as _i6.Uint8List).length;
+  final encryptionKey_buffer =
+      (invocation.arguments[2] as _i6.TransferableTypedData)
+          .materialize()
+          .asUint8List();
+  final encryptionKey_size = encryptionKey_buffer.length;
   final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
   encryptionKey.asTypedList(encryptionKey_size).setAll(
         0,
-        (invocation.arguments[2] as _i6.Uint8List),
+        encryptionKey_buffer,
       );
   throw UnimplementedError();
 }
@@ -2103,11 +2181,15 @@ _i1.MethodResult _etebase_fs_cache_load_account(
       (invocation.arguments[0] as int));
   final client = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[1] as int));
-  final encryptionKey_size = (invocation.arguments[2] as _i6.Uint8List).length;
+  final encryptionKey_buffer =
+      (invocation.arguments[2] as _i6.TransferableTypedData)
+          .materialize()
+          .asUint8List();
+  final encryptionKey_size = encryptionKey_buffer.length;
   final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
   encryptionKey.asTypedList(encryptionKey_size).setAll(
         0,
-        (invocation.arguments[2] as _i6.Uint8List),
+        encryptionKey_buffer,
       );
   throw UnimplementedError();
 }
@@ -2533,11 +2615,14 @@ _i1.MethodResult _etebase_collection_manager_create(
       .cast<_i5.Char>();
   final meta = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[2] as int));
-  final content_size = (invocation.arguments[3] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[3] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[3] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }
@@ -2554,17 +2639,23 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
   final collectionType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
-  final meta_size = (invocation.arguments[2] as _i6.Uint8List).length;
+  final meta_buffer = (invocation.arguments[2] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final meta_size = meta_buffer.length;
   final meta = alloc<_i5.Uint8>(meta_size);
   meta.asTypedList(meta_size).setAll(
         0,
-        (invocation.arguments[2] as _i6.Uint8List),
+        meta_buffer,
       );
-  final content_size = (invocation.arguments[3] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[3] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[3] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }
@@ -2664,11 +2755,14 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final cached_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final cached_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final cached_size = cached_buffer.length;
   final cached = alloc<_i5.Uint8>(cached_size);
   cached.asTypedList(cached_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        cached_buffer,
       );
   throw UnimplementedError();
 }
@@ -2872,11 +2966,14 @@ _i1.MethodResult _etebase_invitation_manager_invite(
   final username = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
-  final pubkey_size = (invocation.arguments[3] as _i6.Uint8List).length;
+  final pubkey_buffer = (invocation.arguments[3] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final pubkey_size = pubkey_buffer.length;
   final pubkey = alloc<_i5.Uint8>(pubkey_size);
   pubkey.asTypedList(pubkey_size).setAll(
         0,
-        (invocation.arguments[3] as _i6.Uint8List),
+        pubkey_buffer,
       );
   final accessLevel =
       (invocation.arguments[4] as _i8.EtebaseCollectionAccessLevel).index;
@@ -2980,11 +3077,14 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final meta_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final meta_size = meta_buffer.length;
   final meta = alloc<_i5.Uint8>(meta_size);
   meta.asTypedList(meta_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        meta_buffer,
       );
   throw UnimplementedError();
 }
@@ -3010,11 +3110,14 @@ _i1.MethodResult _etebase_collection_set_content(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final content_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[1] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }
@@ -3328,11 +3431,15 @@ _i1.MethodResult _etebase_account_save(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
-  final encryptionKey_size = (invocation.arguments[1] as _i6.Uint8List).length;
+  final encryptionKey_buffer =
+      (invocation.arguments[1] as _i6.TransferableTypedData)
+          .materialize()
+          .asUint8List();
+  final encryptionKey_size = encryptionKey_buffer.length;
   final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
   encryptionKey.asTypedList(encryptionKey_size).setAll(
         0,
-        (invocation.arguments[1] as _i6.Uint8List),
+        encryptionKey_buffer,
       );
   throw UnimplementedError();
 }
@@ -3349,11 +3456,15 @@ _i1.MethodResult _etebase_account_restore(
   final accountDataStored = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
-  final encryptionKey_size = (invocation.arguments[2] as _i6.Uint8List).length;
+  final encryptionKey_buffer =
+      (invocation.arguments[2] as _i6.TransferableTypedData)
+          .materialize()
+          .asUint8List();
+  final encryptionKey_size = encryptionKey_buffer.length;
   final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
   encryptionKey.asTypedList(encryptionKey_size).setAll(
         0,
-        (invocation.arguments[2] as _i6.Uint8List),
+        encryptionKey_buffer,
       );
   throw UnimplementedError();
 }
@@ -3398,11 +3509,14 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final content_size = (invocation.arguments[0] as _i6.Uint8List).length;
+  final content_buffer = (invocation.arguments[0] as _i6.TransferableTypedData)
+      .materialize()
+      .asUint8List();
+  final content_size = content_buffer.length;
   final content = alloc<_i5.Uint8>(content_size);
   content.asTypedList(content_size).setAll(
         0,
-        (invocation.arguments[0] as _i6.Uint8List),
+        content_buffer,
       );
   throw UnimplementedError();
 }

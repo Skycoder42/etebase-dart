@@ -7,12 +7,13 @@
 // ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references, prefer_relative_imports
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i2;
+import 'dart:isolate' as _i5;
 import 'dart:typed_data' as _i4;
 
 import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i3;
 import 'package:etebase/src/isolate/etebase_isolate.dart' as _i1;
-import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i5;
-import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i6;
+import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i6;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i7;
 
 /// The URL of the main hosted server
 Future<String> etebaseGetDefaultServerUrl() =>
@@ -37,11 +38,15 @@ class EtebaseUserProfile {
   /// The user's identity public key
   ///
   /// This is used for identifying the user and safely sending them data (such as \ref invitations EtebaseSignedInvitation).
-  Future<_i4.Uint8List> getPubkey() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_user_profile_get_pubkey,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getPubkey() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_user_profile_get_pubkey,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
+
   static Future<void> _destroy(_i2.Pointer<_i3.EtebaseUserProfile> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_user_profile_destroy,
@@ -194,8 +199,8 @@ class EtebaseSignedInvitation {
   /// The access level offered in this invitation
   ///
   /// @param this_ the object handle
-  Future<_i5.EtebaseCollectionAccessLevel> getAccessLevel() =>
-      _i1.EtebaseIsolate.current.invoke<_i5.EtebaseCollectionAccessLevel>(
+  Future<_i6.EtebaseCollectionAccessLevel> getAccessLevel() =>
+      _i1.EtebaseIsolate.current.invoke<_i6.EtebaseCollectionAccessLevel>(
         #etebase_signed_invitation_get_access_level,
         [_pointer.address],
       );
@@ -211,11 +216,15 @@ class EtebaseSignedInvitation {
   /// The public key of the inviting user
   ///
   /// @param this_ the object handle
-  Future<_i4.Uint8List> getFromPubkey() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_signed_invitation_get_from_pubkey,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getFromPubkey() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_signed_invitation_get_from_pubkey,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
+
   static Future<void> _destroy(
           _i2.Pointer<_i3.EtebaseSignedInvitation> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
@@ -634,7 +643,7 @@ class EtebaseItemManager {
         [
           _pointer.address,
           meta._pointer.address,
-          content,
+          _i5.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -659,8 +668,8 @@ class EtebaseItemManager {
         #etebase_item_manager_create_raw,
         [
           _pointer.address,
-          meta,
-          content,
+          _i5.TransferableTypedData.fromList([meta]),
+          _i5.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -838,7 +847,7 @@ class EtebaseItemManager {
         #etebase_item_manager_cache_load,
         [
           _pointer.address,
-          cached,
+          _i5.TransferableTypedData.fromList([cached]),
         ],
       )));
 
@@ -849,14 +858,17 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSave(EtebaseItem item) =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_item_manager_cache_save,
-        [
-          _pointer.address,
-          item._pointer.address,
-        ],
-      );
+  Future<_i4.Uint8List> cacheSave(EtebaseItem item) async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_item_manager_cache_save,
+      [
+        _pointer.address,
+        item._pointer.address,
+      ],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Save the item object and its content to a byte buffer for caching
   ///
@@ -865,14 +877,18 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSaveWithContent(EtebaseItem item) =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_item_manager_cache_save_with_content,
-        [
-          _pointer.address,
-          item._pointer.address,
-        ],
-      );
+  Future<_i4.Uint8List> cacheSaveWithContent(EtebaseItem item) async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_item_manager_cache_save_with_content,
+      [
+        _pointer.address,
+        item._pointer.address,
+      ],
+    );
+    return data.materialize().asUint8List();
+  }
+
   static Future<void> _destroy(_i2.Pointer<_i3.EtebaseItemManager> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_manager_destroy,
@@ -1010,7 +1026,7 @@ class EtebaseItem {
         #etebase_item_set_meta_raw,
         [
           _pointer.address,
-          meta,
+          _i5.TransferableTypedData.fromList([meta]),
         ],
       );
 
@@ -1019,11 +1035,14 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getMetaRaw() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_item_get_meta_raw,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getMetaRaw() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_item_get_meta_raw,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Set the content of the item
   ///
@@ -1035,7 +1054,7 @@ class EtebaseItem {
         #etebase_item_set_content,
         [
           _pointer.address,
-          content,
+          _i5.TransferableTypedData.fromList([content]),
         ],
       );
 
@@ -1044,11 +1063,14 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getContent() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_item_get_content,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getContent() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_item_get_content,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Mark the item as deleted
   ///
@@ -1155,7 +1177,7 @@ class EtebaseFileSystemCache {
         [
           _pointer.address,
           etebase._pointer.address,
-          encryptionKey,
+          _i5.TransferableTypedData.fromList([encryptionKey]),
         ],
       );
 
@@ -1175,7 +1197,7 @@ class EtebaseFileSystemCache {
         [
           _pointer.address,
           client._pointer.address,
-          encryptionKey,
+          _i5.TransferableTypedData.fromList([encryptionKey]),
         ],
       )));
 
@@ -1402,7 +1424,7 @@ class EtebaseFetchOptions {
   ///
   /// @param this_ the object handle
   /// @param prefetch the prefetch option to set
-  Future<void> setPrefetch(_i6.EtebasePrefetchOption prefetch) =>
+  Future<void> setPrefetch(_i7.EtebasePrefetchOption prefetch) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_fetch_options_set_prefetch,
         [
@@ -1520,7 +1542,7 @@ class EtebaseCollectionMemberManager {
   /// @param access_level the new `EtebaseCollectionAccessLevel`
   Future<void> modifyAccessLevel(
     String username,
-    _i5.EtebaseCollectionAccessLevel accessLevel,
+    _i6.EtebaseCollectionAccessLevel accessLevel,
   ) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_member_manager_modify_access_level,
@@ -1579,8 +1601,8 @@ class EtebaseCollectionMember {
   /// The access_level of the member
   ///
   /// @param this_ the object handle
-  Future<_i5.EtebaseCollectionAccessLevel> getAccessLevel() =>
-      _i1.EtebaseIsolate.current.invoke<_i5.EtebaseCollectionAccessLevel>(
+  Future<_i6.EtebaseCollectionAccessLevel> getAccessLevel() =>
+      _i1.EtebaseIsolate.current.invoke<_i6.EtebaseCollectionAccessLevel>(
         #etebase_collection_member_get_access_level,
         [_pointer.address],
       );
@@ -1653,7 +1675,7 @@ class EtebaseCollectionManager {
           _pointer.address,
           collectionType,
           meta._pointer.address,
-          content,
+          _i5.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -1681,8 +1703,8 @@ class EtebaseCollectionManager {
         [
           _pointer.address,
           collectionType,
-          meta,
-          content,
+          _i5.TransferableTypedData.fromList([meta]),
+          _i5.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -1788,7 +1810,7 @@ class EtebaseCollectionManager {
         #etebase_collection_manager_cache_load,
         [
           _pointer.address,
-          cached,
+          _i5.TransferableTypedData.fromList([cached]),
         ],
       )));
 
@@ -1799,14 +1821,17 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSave(EtebaseCollection collection) =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_collection_manager_cache_save,
-        [
-          _pointer.address,
-          collection._pointer.address,
-        ],
-      );
+  Future<_i4.Uint8List> cacheSave(EtebaseCollection collection) async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_collection_manager_cache_save,
+      [
+        _pointer.address,
+        collection._pointer.address,
+      ],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Save the collection object and its content to a byte buffer for caching
   ///
@@ -1815,14 +1840,18 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSaveWithContent(EtebaseCollection collection) =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_collection_manager_cache_save_with_content,
-        [
-          _pointer.address,
-          collection._pointer.address,
-        ],
-      );
+  Future<_i4.Uint8List> cacheSaveWithContent(
+      EtebaseCollection collection) async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_collection_manager_cache_save_with_content,
+      [
+        _pointer.address,
+        collection._pointer.address,
+      ],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Return the collection member manager for the supplied collection
   ///
@@ -2022,7 +2051,7 @@ class EtebaseCollectionInvitationManager {
     EtebaseCollection collection,
     String username,
     _i4.Uint8List pubkey,
-    _i5.EtebaseCollectionAccessLevel accessLevel,
+    _i6.EtebaseCollectionAccessLevel accessLevel,
   ) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_invitation_manager_invite,
@@ -2030,7 +2059,7 @@ class EtebaseCollectionInvitationManager {
           _pointer.address,
           collection._pointer.address,
           username,
-          pubkey,
+          _i5.TransferableTypedData.fromList([pubkey]),
           accessLevel,
         ],
       );
@@ -2054,11 +2083,15 @@ class EtebaseCollectionInvitationManager {
   /// Can be pretty printed with `etebase_utils_pretty_fingerprint`.
   ///
   /// @param this_ the object handle
-  Future<_i4.Uint8List> getPubkey() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_invitation_manager_get_pubkey,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getPubkey() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_invitation_manager_get_pubkey,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
+
   static Future<void> _destroy(
           _i2.Pointer<_i3.EtebaseCollectionInvitationManager> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
@@ -2139,7 +2172,7 @@ class EtebaseCollection {
         #etebase_collection_set_meta_raw,
         [
           _pointer.address,
-          meta,
+          _i5.TransferableTypedData.fromList([meta]),
         ],
       );
 
@@ -2148,11 +2181,14 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getMetaRaw() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_collection_get_meta_raw,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getMetaRaw() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_collection_get_meta_raw,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Set the content of the collection
   ///
@@ -2164,7 +2200,7 @@ class EtebaseCollection {
         #etebase_collection_set_content,
         [
           _pointer.address,
-          content,
+          _i5.TransferableTypedData.fromList([content]),
         ],
       );
 
@@ -2173,11 +2209,14 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getContent() =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_collection_get_content,
-        [_pointer.address],
-      );
+  Future<_i4.Uint8List> getContent() async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_collection_get_content,
+      [_pointer.address],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Mark the collection as deleted
   ///
@@ -2244,8 +2283,8 @@ class EtebaseCollection {
   /// Return the access level of the collection for the current user
   ///
   /// @param this_ the object handle
-  Future<_i5.EtebaseCollectionAccessLevel> getAccessLevel() =>
-      _i1.EtebaseIsolate.current.invoke<_i5.EtebaseCollectionAccessLevel>(
+  Future<_i6.EtebaseCollectionAccessLevel> getAccessLevel() =>
+      _i1.EtebaseIsolate.current.invoke<_i6.EtebaseCollectionAccessLevel>(
         #etebase_collection_get_access_level,
         [_pointer.address],
       );
@@ -2454,7 +2493,7 @@ class EtebaseAccount {
         #etebase_account_save,
         [
           _pointer.address,
-          encryptionKey,
+          _i5.TransferableTypedData.fromList([encryptionKey]),
         ],
       );
 
@@ -2475,7 +2514,7 @@ class EtebaseAccount {
         [
           client._pointer.address,
           accountDataStored,
-          encryptionKey,
+          _i5.TransferableTypedData.fromList([encryptionKey]),
         ],
       )));
   static Future<void> _destroy(_i2.Pointer<_i3.EtebaseAccount> this_) =>
@@ -2506,11 +2545,14 @@ abstract class EtebaseUtils {
   ///
   /// @param[out] buf the output byte buffer
   /// @param size the size of the returned buffer
-  static Future<_i4.Uint8List> randombytes(int size) =>
-      _i1.EtebaseIsolate.current.invoke<_i4.Uint8List>(
-        #etebase_utils_randombytes,
-        [size],
-      );
+  static Future<_i4.Uint8List> randombytes(int size) async {
+    final data =
+        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+      #etebase_utils_randombytes,
+      [size],
+    );
+    return data.materialize().asUint8List();
+  }
 
   /// Return a pretty formatted fingerprint of the content
   ///
@@ -2527,6 +2569,8 @@ abstract class EtebaseUtils {
   static Future<String> prettyFingerprint(_i4.Uint8List content) =>
       _i1.EtebaseIsolate.current.invoke<String>(
         #etebase_utils_pretty_fingerprint,
-        [content],
+        [
+          _i5.TransferableTypedData.fromList([content])
+        ],
       );
 }

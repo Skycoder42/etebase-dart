@@ -136,7 +136,7 @@ class ByteArrayTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get publicType => Types.Uint8List$;
 
   @override
-  TypeReference get transferType => Types.Uint8List$;
+  TypeReference get transferType => Types.TransferableTypedData$;
 }
 
 class EnumTypeRef extends _SingleTypeRef {

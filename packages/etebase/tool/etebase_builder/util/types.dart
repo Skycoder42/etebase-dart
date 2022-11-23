@@ -23,6 +23,12 @@ abstract class Types {
       ..url = 'dart:typed_data',
   );
 
+  static final TransferableTypedData$ = TypeReference(
+    (b) => b
+      ..symbol = 'TransferableTypedData'
+      ..url = 'dart:isolate',
+  );
+
   static final Void$ = TypeReference(
     (b) => b
       ..symbol = 'Void'
