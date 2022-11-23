@@ -25,9 +25,9 @@ class ParameterRef {
     required this.type,
   });
 
-  bool get isList => type.isListType;
+  bool get isOutParam => isOutBuf || type is EtebaseOutListTypeRef;
 
-  bool get isOutParam => isOutBuf || type.isOutType;
+  bool get isOptional => type.publicType.isNullable ?? false;
 }
 
 class ParamParser {
@@ -73,6 +73,7 @@ class ParamParser {
           type: _typeParser.parseType(
             type: param.type,
             isArray: true,
+            isOptional: _isOptional(methodName, param),
             typeDefs: typeDefs,
           ),
         );
@@ -88,6 +89,7 @@ class ParamParser {
             param,
             typeDefs,
             isArray: isBufParam && _isBufList(param),
+            isOptional: _isOptional(methodName, param),
           ),
         );
       }
@@ -109,6 +111,7 @@ class ParamParser {
     ParameterElement param,
     TypedefRef typeDefs, {
     required bool isArray,
+    required bool isOptional,
   }) {
     if (param.name == 'access_level') {
       assert(param.type.isDartCoreInt, 'access_level must be an int parameter');
@@ -121,7 +124,16 @@ class ParamParser {
         type: param.type,
         typeDefs: typeDefs,
         isArray: isArray,
+        isOptional: isOptional,
       );
     }
+  }
+
+  bool _isOptional(String methodName, ParameterElement param) {
+    if (param.name == 'fetch_options' || param.name == 'encryption_key') {
+      return true;
+    }
+
+    return false;
   }
 }

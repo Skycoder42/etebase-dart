@@ -9,6 +9,22 @@ extension ExpressionX on Expression {
     return CodeExpression(Code(codeBuffer.toString()));
   }
 
+  Expression nullableProperty(
+    String name, {
+    required bool isNullable,
+    Expression? withDefault,
+  }) {
+    if (isNullable) {
+      if (withDefault != null) {
+        return nullSafeProperty(name).ifNullThen(withDefault);
+      } else {
+        return nullSafeProperty(name);
+      }
+    } else {
+      return property(name);
+    }
+  }
+
   Expression asserted([String? message]) {
     final codeBuffer = StringBuffer('assert(');
     accept(_emitter, codeBuffer);
@@ -19,5 +35,14 @@ extension ExpressionX on Expression {
     codeBuffer.write(')');
 
     return CodeExpression(Code(codeBuffer.toString()));
+  }
+
+  Code ifThen(Block then) {
+    final codeBuffer = StringBuffer('if (');
+    accept(_emitter, codeBuffer);
+    codeBuffer.write(') {');
+    then.accept(_emitter, codeBuffer);
+    codeBuffer.write('}');
+    return Code(codeBuffer.toString());
   }
 }

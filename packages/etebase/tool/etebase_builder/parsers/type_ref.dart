@@ -7,10 +7,6 @@ abstract class TypeRef {
   TypeReference get transferType;
   TypeReference get ffiType;
 
-  bool get isOutType;
-  bool get isListType;
-  bool get isPointer;
-
   factory TypeRef.void$() = VoidTypeRef;
   factory TypeRef.bool() = BoolTypeRef;
   // ignore: avoid_positional_boolean_parameters
@@ -19,27 +15,17 @@ abstract class TypeRef {
   factory TypeRef.string() = StringTypeRef;
   factory TypeRef.dateTime() = DateTimeTypeRef;
   factory TypeRef.stringList() = StringListTypeRef;
-  factory TypeRef.byteArray() = ByteArrayTypeRef;
+  factory TypeRef.byteArray({bool optional}) = ByteArrayTypeRef;
   factory TypeRef.etebaseCollectionAccessLevel() =
       EtebaseCollectionAccessLevelTypeRef;
   factory TypeRef.etebasePrefetchOption() = EtebasePrefetchOptionTypeRef;
-  factory TypeRef.etebaseClass(String name) = EtebaseClassTypeRef;
+  factory TypeRef.etebaseClass(String name, {bool optional}) =
+      EtebaseClassTypeRef;
   factory TypeRef.etebaseClassList(String name) = EtebaseClassListTypeRef;
   factory TypeRef.etebaseOutList(String name) = EtebaseOutListTypeRef;
 }
 
-mixin _TypeRefDefaults implements TypeRef {
-  @override
-  bool get isListType => false;
-
-  @override
-  bool get isOutType => false;
-
-  @override
-  bool get isPointer => false;
-}
-
-abstract class _SingleTypeRef with _TypeRefDefaults implements TypeRef {
+abstract class _SingleTypeRef implements TypeRef {
   final TypeReference _type;
 
   _SingleTypeRef(this._type);
@@ -62,7 +48,7 @@ class BoolTypeRef extends _SingleTypeRef {
   BoolTypeRef() : super(Types.bool$);
 }
 
-class IntTypeRef with _TypeRefDefaults implements TypeRef {
+class IntTypeRef implements TypeRef {
   final bool asReturn;
 
   // ignore: avoid_positional_boolean_parameters
@@ -78,7 +64,7 @@ class IntTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get transferType => asReturn ? Types.void$ : Types.int$;
 }
 
-class ReturnSizeTypeRef with _TypeRefDefaults implements TypeRef {
+class ReturnSizeTypeRef implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.UnsignedLong$);
 
@@ -89,7 +75,7 @@ class ReturnSizeTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get transferType => Types.int$;
 }
 
-class StringTypeRef with _TypeRefDefaults implements TypeRef {
+class StringTypeRef implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.Char$);
 
@@ -100,7 +86,7 @@ class StringTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get transferType => Types.String$;
 }
 
-class DateTimeTypeRef with _TypeRefDefaults implements TypeRef {
+class DateTimeTypeRef implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.Int64$);
 
@@ -111,12 +97,9 @@ class DateTimeTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get transferType => Types.DateTime$;
 }
 
-class StringListTypeRef with _TypeRefDefaults implements TypeRef {
+class StringListTypeRef implements TypeRef {
   @override
   TypeReference get ffiType => Types.pointer(Types.pointer(Types.Char$));
-
-  @override
-  bool get isListType => true;
 
   @override
   TypeReference get publicType => Types.list(Types.String$);
@@ -125,18 +108,22 @@ class StringListTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get transferType => Types.list(Types.String$);
 }
 
-class ByteArrayTypeRef with _TypeRefDefaults implements TypeRef {
+class ByteArrayTypeRef implements TypeRef {
+  final bool optional;
+
+  ByteArrayTypeRef({this.optional = false});
+
   @override
   TypeReference get ffiType => Types.pointer(Types.Void$);
 
   @override
-  bool get isListType => true;
+  TypeReference get publicType =>
+      optional ? Types.Uint8List$.asNullable : Types.Uint8List$;
 
   @override
-  TypeReference get publicType => Types.Uint8List$;
-
-  @override
-  TypeReference get transferType => Types.TransferableTypedData$;
+  TypeReference get transferType => optional
+      ? Types.TransferableTypedData$.asNullable
+      : Types.TransferableTypedData$;
 }
 
 class EnumTypeRef extends _SingleTypeRef {
@@ -155,25 +142,28 @@ class EtebasePrefetchOptionTypeRef extends EnumTypeRef {
   EtebasePrefetchOptionTypeRef() : super(Types.EtebasePrefetchOption$);
 }
 
-class EtebaseClassTypeRef with _TypeRefDefaults implements TypeRef {
+class EtebaseClassTypeRef implements TypeRef {
   final String name;
+  final bool optional;
 
-  EtebaseClassTypeRef(this.name);
+  EtebaseClassTypeRef(this.name, {this.optional = false});
 
   @override
   TypeReference get ffiType => Types.pointer(Types.ffi(refer(name)));
 
   @override
-  bool get isPointer => true;
+  TypeReference get publicType => TypeReference(
+        (b) => b
+          ..symbol = name
+          ..isNullable = optional,
+      );
 
   @override
-  TypeReference get publicType => TypeReference((b) => b..symbol = name);
-
-  @override
-  TypeReference get transferType => Types.int$;
+  TypeReference get transferType =>
+      optional ? Types.int$.asNullable : Types.int$;
 }
 
-class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
+class EtebaseClassListTypeRef implements TypeRef {
   final String name;
 
   EtebaseClassListTypeRef(this.name);
@@ -186,12 +176,6 @@ class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
   TypeReference get ffiType => Types.pointer(ffiInnerType);
 
   @override
-  bool get isListType => true;
-
-  @override
-  bool get isPointer => true;
-
-  @override
   TypeReference get publicType => Types.list(publicInnerType);
 
   @override
@@ -200,7 +184,4 @@ class EtebaseClassListTypeRef with _TypeRefDefaults implements TypeRef {
 
 class EtebaseOutListTypeRef extends EtebaseClassListTypeRef {
   EtebaseOutListTypeRef(super.name);
-
-  @override
-  bool get isOutType => true;
 }

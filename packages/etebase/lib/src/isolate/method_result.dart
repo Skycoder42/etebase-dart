@@ -17,7 +17,7 @@ class MethodResult with _$MethodResult {
 
   const MethodResult._();
 
-  T asResult<T>() => when(
+  T unwrap<T>() => when(
         success: (id, dynamic result) => result as T,
         failure: (id, code, message) => throw EtebaseException(code, message),
         // ignore: only_throw_errors

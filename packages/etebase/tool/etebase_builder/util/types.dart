@@ -5,6 +5,8 @@ import 'package:code_builder/code_builder.dart';
 abstract class Types {
   Types._();
 
+  static final dynamic$ = TypeReference((b) => b..symbol = 'dynamic');
+
   static final void$ = TypeReference((b) => b..symbol = 'void');
 
   static final bool$ = TypeReference((b) => b..symbol = 'bool');
@@ -104,5 +106,13 @@ abstract class Types {
         (b) => b
           ..replace(type.type as TypeReference)
           ..url = 'package:etebase/gen/ffi/libetebase.ffi.dart',
+      );
+}
+
+extension TypeReferenceX on TypeReference {
+  TypeReference get asNullable => TypeReference(
+        (b) => b
+          ..replace(this)
+          ..isNullable = true,
       );
 }

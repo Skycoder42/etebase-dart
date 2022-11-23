@@ -41,7 +41,7 @@ class EtebaseIsolate {
     this._sendPort,
   );
 
-  Future<T> invoke<T>(Symbol method, List<Object?> arguments) {
+  Future<T> invoke<T>(Symbol method, List<dynamic> arguments) {
     final id = _invocationCounter++;
     final result = _receiveBroadcast.firstWhere(
       (r) => r.id == id,
@@ -50,7 +50,7 @@ class EtebaseIsolate {
 
     _sendPort.send(MethodInvocation(id, method, arguments));
 
-    return result.then((r) => r.asResult<T>());
+    return result.then((r) => r.unwrap<T>());
   }
 
   void terminate() {
@@ -65,7 +65,14 @@ class EtebaseIsolate {
 
   static EtebaseIsolate? _instance;
 
-  static EtebaseIsolate get current => _instance!; // TODO assert non null
+  static EtebaseIsolate get current {
+    if (_instance == null) {
+      throw StateError(
+        'No active etebase isolate - call EtebaseIsolate.spawn to create one',
+      );
+    }
+    return _instance!;
+  }
 
   static Future<EtebaseIsolate> spawn({
     required LoadLibetebaseFn loadLibetebase,
@@ -75,32 +82,40 @@ class EtebaseIsolate {
       return _instance!;
     }
 
-    final receivePort = ReceivePort('$EtebaseIsolate.spawn');
-    final receiveBroadcast =
-        receivePort.cast<MethodResult>().asBroadcastStream();
+    ReceivePort? receivePort;
+    Isolate? isolate;
+    try {
+      receivePort = ReceivePort('$EtebaseIsolate.spawn');
+      final receiveBroadcast =
+          receivePort.cast<MethodResult>().asBroadcastStream();
 
-    final setupResultFuture = receiveBroadcast.first;
-    final isolate = await Isolate.spawn(
-      _main,
-      _EtebaseIsolateInitMessage(
-        loadLibetebase,
-        methodInvocationHandler,
-        receivePort.sendPort,
-      ),
-      debugName: '$EtebaseIsolate',
-      errorsAreFatal: false, // TODO ???
-    );
+      final setupResultFuture = receiveBroadcast.first;
+      isolate = await Isolate.spawn(
+        _main,
+        _EtebaseIsolateInitMessage(
+          loadLibetebase,
+          methodInvocationHandler,
+          receivePort.sendPort,
+        ),
+        debugName: '$EtebaseIsolate',
+        errorsAreFatal: true,
+      );
 
-    final setupResult = await setupResultFuture;
-    assert(setupResult.id == -1, 'ID of setup result should be -1');
+      final setupResult = await setupResultFuture;
+      assert(setupResult.id == -1, 'ID of setup result should be -1');
 
-    return _instance = EtebaseIsolate._(
-      isolate,
-      receivePort,
-      receiveBroadcast,
-      // ignore: cast_nullable_to_non_nullable
-      setupResult.asResult<SendPort>(),
-    );
+      return _instance = EtebaseIsolate._(
+        isolate,
+        receivePort,
+        receiveBroadcast,
+        setupResult.unwrap<SendPort>(),
+      );
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
+      isolate?.kill();
+      receivePort?.close();
+      rethrow;
+    }
   }
 
   static Future<void> _main(_EtebaseIsolateInitMessage initMessage) async {

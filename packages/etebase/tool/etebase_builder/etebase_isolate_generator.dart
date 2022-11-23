@@ -30,7 +30,6 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
     const [
       'non_constant_identifier_names',
       'require_trailing_commas',
-      'cast_nullable_to_non_nullable',
       'unnecessary_parenthesis',
       'prefer_relative_imports',
       'lines_longer_than_80_chars',

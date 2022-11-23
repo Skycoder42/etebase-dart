@@ -7,6 +7,6 @@ class MethodInvocation with _$MethodInvocation {
   const factory MethodInvocation(
     int id,
     Symbol method,
-    List<Object?> arguments,
+    List<dynamic> arguments,
   ) = _MethodInvocation;
 }

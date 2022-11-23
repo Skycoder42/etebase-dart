@@ -3,6 +3,7 @@ import 'package:code_builder/code_builder.dart';
 import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
+import '../../util/expression_extensions.dart';
 import '../../util/types.dart';
 
 class ClientMethodBodyBuilder {
@@ -24,7 +25,10 @@ class ClientMethodBodyBuilder {
     expression = expression.call(
       [
         refer('#${method.ffiName}'),
-        if (inParams.isEmpty) literalConstList([]) else literalList(inParams),
+        if (inParams.isEmpty)
+          literalConstList([], Types.dynamic$)
+        else
+          literalList(inParams, Types.dynamic$),
       ],
       const {},
       [returnType.transferType],
@@ -34,7 +38,7 @@ class ClientMethodBodyBuilder {
       return _buildOutListMethodBody(expression, returnType);
     } else if (returnType is ByteArrayTypeRef) {
       return _buildByteArrayMethodBody(expression, returnType);
-    } else if (returnType.isPointer) {
+    } else if (returnType is EtebaseClassTypeRef) {
       expression = _fromAddress(returnType.publicType, expression.awaited);
     }
 
@@ -93,37 +97,46 @@ class ClientMethodBodyBuilder {
     }
 
     if (param.type is ByteArrayTypeRef) {
-      return Types.TransferableTypedData$.newInstanceNamed(
+      final expression = Types.TransferableTypedData$.newInstanceNamed(
         'fromList',
         [
           literalList([refer(param.name)]),
         ],
       );
-    }
 
-    if (param.type.isPointer) {
-      if (param.type.isListType) {
+      if (param.isOptional) {
         return refer(param.name)
-            .property('map')
-            .call([
-              Method(
-                (b) => b
-                  ..requiredParameters.add(Parameter((b) => b..name = 'e'))
-                  ..body = _toAddress(refer('e')).code,
-              ).closure,
-            ])
-            .property('toList')
-            .call(const []);
+            .equalTo(literalNull)
+            .conditional(literalNull, expression);
       } else {
-        return _toAddress(refer(param.name));
+        return expression;
       }
     }
 
-    return refer(param.name);
+    if (param.type is EtebaseClassTypeRef) {
+      return _toAddress(refer(param.name), param.type.publicType);
+    } else if (param.type is EtebaseClassListTypeRef) {
+      return refer(param.name)
+          .property('map')
+          .call([
+            Method(
+              (b) => b
+                ..requiredParameters.add(Parameter((b) => b..name = 'e'))
+                ..body = _toAddress(refer('e'), param.type.publicType).code,
+            ).closure,
+          ])
+          .property('toList')
+          .call(const []);
+    } else {
+      return refer(param.name);
+    }
   }
 
-  Expression _toAddress(Reference reference) =>
-      reference.property('_pointer').property('address');
+  Expression _toAddress(Reference reference, TypeReference publicType) =>
+      (reference.nullableProperty(
+        '_pointer',
+        isNullable: publicType.isNullable ?? false,
+      )).property('address');
 
   Expression _fromAddress(Reference classType, Expression address) =>
       classType.newInstanceNamed('_', [

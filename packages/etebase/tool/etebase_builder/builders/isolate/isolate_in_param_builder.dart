@@ -8,6 +8,7 @@ import '../../util/types.dart';
 
 class IsolateInParamBuilder {
   static const _alloc = Reference('alloc');
+  static const _nullptrRef = Reference('nullptr', 'dart:ffi');
 
   const IsolateInParamBuilder();
 
@@ -82,6 +83,7 @@ class IsolateInParamBuilder {
       variable,
       argument,
       Types.pointer(Types.Char$),
+      false,
     );
 
     yield _assignPointerArray(
@@ -103,10 +105,11 @@ class IsolateInParamBuilder {
   ) sync* {
     final bufferName = '${parameter.name}_buffer';
     final bufferRef = refer(bufferName);
+    final isNullable = parameterType.transferType.isNullable ?? false;
     yield declareFinal(bufferName)
         .assign(
           argument
-              .property('materialize')
+              .nullableProperty('materialize', isNullable: isNullable)
               .call(const [])
               .property('asUint8List')
               .call(const []),
@@ -118,14 +121,21 @@ class IsolateInParamBuilder {
       variable,
       bufferRef,
       Types.Uint8$,
+      isNullable,
     );
 
-    yield refer(parameter.name)
+    final assignment = refer(parameter.name)
         .property('asTypedList')
         .call([refer('${parameter.name}_size')])
         .property('setAll')
         .call([literalNum(0), bufferRef])
         .statement;
+
+    if (isNullable) {
+      yield bufferRef.notEqualTo(literalNull).ifThen(Block.of([assignment]));
+    } else {
+      yield assignment;
+    }
   }
 
   Iterable<Code> _buildEnumParam(
@@ -143,14 +153,30 @@ class IsolateInParamBuilder {
     Expression variable,
     Expression argument,
   ) sync* {
-    yield variable
-        .assign(
-          parameterType.ffiType.newInstanceNamed(
-            'fromAddress',
-            [argument],
-          ),
-        )
-        .statement;
+    if (parameterType.optional) {
+      final addressVarName = '${parameter.name}_address';
+      final addressVarRef = refer(addressVarName);
+      yield declareFinal(addressVarName).assign(argument).statement;
+
+      final assignment = addressVarRef.equalTo(literalNull).conditional(
+            _nullptrRef,
+            parameterType.ffiType.newInstanceNamed(
+              'fromAddress',
+              [addressVarRef],
+            ),
+          );
+
+      yield variable.assign(assignment).statement;
+    } else {
+      yield variable
+          .assign(
+            parameterType.ffiType.newInstanceNamed(
+              'fromAddress',
+              [argument],
+            ),
+          )
+          .statement;
+    }
   }
 
   Iterable<Code> _buildClassListParam(
@@ -164,6 +190,7 @@ class IsolateInParamBuilder {
       variable,
       argument,
       parameterType.ffiInnerType,
+      false,
     );
 
     yield _assignPointerArray(
@@ -184,16 +211,31 @@ class IsolateInParamBuilder {
     Expression variable,
     Expression argument,
     TypeReference pointerType,
+    bool isNullable,
   ) sync* {
     final sizeVariableName = '${parameter.name}_size';
     final sizeVariable = refer(sizeVariableName);
     yield declareFinal(sizeVariableName)
-        .assign(argument.property('length'))
+        .assign(
+          argument.nullableProperty(
+            'length',
+            isNullable: isNullable,
+            withDefault: literalNum(0),
+          ),
+        )
         .statement;
 
-    yield variable
-        .assign(_alloc.call([sizeVariable], const {}, [pointerType]))
-        .statement;
+    final allocation = _alloc.call([sizeVariable], const {}, [pointerType]);
+
+    if (isNullable) {
+      yield variable
+          .assign(
+            argument.equalTo(literalNull).conditional(_nullptrRef, allocation),
+          )
+          .statement;
+    } else {
+      yield variable.assign(allocation).statement;
+    }
   }
 
   Expression _assignPointerArray(

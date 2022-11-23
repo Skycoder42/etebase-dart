@@ -24,6 +24,7 @@ class ClientMethodBuilder {
             ..requiredParameters.addAll(
               method
                   .exportedParams(withThis: false)
+                  .where((param) => !param.isOptional)
                   .map(
                     (param) => Parameter(
                       (b) => b
@@ -31,6 +32,19 @@ class ClientMethodBuilder {
                         ..type = method.isDestroy && param.isThisParam
                             ? param.type.ffiType
                             : param.type.publicType,
+                    ),
+                  )
+                  .toList(),
+            )
+            ..optionalParameters.addAll(
+              method
+                  .exportedParams(withThis: false)
+                  .where((param) => param.isOptional)
+                  .map(
+                    (param) => Parameter(
+                      (b) => b
+                        ..name = param.name
+                        ..type = param.type.publicType,
                     ),
                   )
                   .toList(),
@@ -44,7 +58,10 @@ class ClientMethodBuilder {
         },
       );
 
-  bool _isAsync(TypeRef type) => type.isPointer || type is ByteArrayTypeRef;
+  bool _isAsync(TypeRef type) =>
+      type is EtebaseClassTypeRef ||
+      type is EtebaseClassListTypeRef ||
+      type is ByteArrayTypeRef;
 
   String _findMethodName(MethodRef method) {
     if (method.isNew) {

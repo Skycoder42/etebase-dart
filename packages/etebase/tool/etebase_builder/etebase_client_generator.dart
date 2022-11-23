@@ -33,5 +33,6 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'lines_longer_than_80_chars',
       'comment_references',
       'prefer_relative_imports',
+      'prefer_if_elements_to_conditional_expressions',
     ].join(', '),
   );

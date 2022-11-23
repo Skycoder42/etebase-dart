@@ -4,7 +4,7 @@
 // EtebaseIsolateGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, require_trailing_commas, cast_nullable_to_non_nullable, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty
+// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i5;
 import 'dart:isolate' as _i6;
@@ -1589,8 +1589,10 @@ _i1.MethodResult _etebase_item_manager_fetch(
   final itemUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1656,8 +1658,10 @@ _i1.MethodResult _etebase_item_manager_list(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[1] as int));
+  final fetchOptions_address = (invocation.arguments[1] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1672,8 +1676,10 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
       (invocation.arguments[0] as int));
   final item = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1695,8 +1701,10 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
         e,
       ) =>
           items[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1718,8 +1726,10 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
         e,
       ) =>
           items[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1741,8 +1751,10 @@ _i1.MethodResult _etebase_item_manager_batch(
         e,
       ) =>
           items[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1773,8 +1785,10 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
         e,
       ) =>
           deps[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[3] as int));
+  final fetchOptions_address = (invocation.arguments[3] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1796,8 +1810,10 @@ _i1.MethodResult _etebase_item_manager_transaction(
         e,
       ) =>
           items[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -1828,8 +1844,10 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
         e,
       ) =>
           deps[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[3] as int));
+  final fetchOptions_address = (invocation.arguments[3] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2158,15 +2176,19 @@ _i1.MethodResult _etebase_fs_cache_save_account(
   final etebase = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[1] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i6.TransferableTypedData)
-          .materialize()
+      (invocation.arguments[2] as _i6.TransferableTypedData?)
+          ?.materialize()
           .asUint8List();
-  final encryptionKey_size = encryptionKey_buffer.length;
-  final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
-  encryptionKey.asTypedList(encryptionKey_size).setAll(
-        0,
-        encryptionKey_buffer,
-      );
+  final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
+  final encryptionKey = encryptionKey_buffer == null
+      ? _i5.nullptr
+      : alloc<_i5.Uint8>(encryptionKey_size);
+  if (encryptionKey_buffer != null) {
+    encryptionKey.asTypedList(encryptionKey_size).setAll(
+          0,
+          encryptionKey_buffer,
+        );
+  }
   throw UnimplementedError();
 }
 
@@ -2182,15 +2204,19 @@ _i1.MethodResult _etebase_fs_cache_load_account(
   final client = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[1] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i6.TransferableTypedData)
-          .materialize()
+      (invocation.arguments[2] as _i6.TransferableTypedData?)
+          ?.materialize()
           .asUint8List();
-  final encryptionKey_size = encryptionKey_buffer.length;
-  final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
-  encryptionKey.asTypedList(encryptionKey_size).setAll(
-        0,
-        encryptionKey_buffer,
-      );
+  final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
+  final encryptionKey = encryptionKey_buffer == null
+      ? _i5.nullptr
+      : alloc<_i5.Uint8>(encryptionKey_size);
+  if (encryptionKey_buffer != null) {
+    encryptionKey.asTypedList(encryptionKey_size).setAll(
+          0,
+          encryptionKey_buffer,
+        );
+  }
   throw UnimplementedError();
 }
 
@@ -2475,8 +2501,10 @@ _i1.MethodResult _etebase_collection_member_manager_list(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[1] as int));
+  final fetchOptions_address = (invocation.arguments[1] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2596,8 +2624,10 @@ _i1.MethodResult _etebase_collection_manager_fetch(
   final colUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2686,8 +2716,10 @@ _i1.MethodResult _etebase_collection_manager_list(
   final collectionType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2709,8 +2741,10 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
         e,
       ) =>
           collectionTypes[i] = e);
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2725,8 +2759,10 @@ _i1.MethodResult _etebase_collection_manager_upload(
       (invocation.arguments[0] as int));
   final collection = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2741,8 +2777,10 @@ _i1.MethodResult _etebase_collection_manager_transaction(
       (invocation.arguments[0] as int));
   final collection = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[2] as int));
+  final fetchOptions_address = (invocation.arguments[2] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2890,8 +2928,10 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[1] as int));
+  final fetchOptions_address = (invocation.arguments[1] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -2904,8 +2944,10 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final fetchOptions = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
-      (invocation.arguments[1] as int));
+  final fetchOptions_address = (invocation.arguments[1] as int?);
+  final fetchOptions = fetchOptions_address == null
+      ? _i5.nullptr
+      : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
   throw UnimplementedError();
 }
 
@@ -3432,15 +3474,19 @@ _i1.MethodResult _etebase_account_save(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[1] as _i6.TransferableTypedData)
-          .materialize()
+      (invocation.arguments[1] as _i6.TransferableTypedData?)
+          ?.materialize()
           .asUint8List();
-  final encryptionKey_size = encryptionKey_buffer.length;
-  final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
-  encryptionKey.asTypedList(encryptionKey_size).setAll(
-        0,
-        encryptionKey_buffer,
-      );
+  final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
+  final encryptionKey = encryptionKey_buffer == null
+      ? _i5.nullptr
+      : alloc<_i5.Uint8>(encryptionKey_size);
+  if (encryptionKey_buffer != null) {
+    encryptionKey.asTypedList(encryptionKey_size).setAll(
+          0,
+          encryptionKey_buffer,
+        );
+  }
   throw UnimplementedError();
 }
 
@@ -3457,15 +3503,19 @@ _i1.MethodResult _etebase_account_restore(
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i6.TransferableTypedData)
-          .materialize()
+      (invocation.arguments[2] as _i6.TransferableTypedData?)
+          ?.materialize()
           .asUint8List();
-  final encryptionKey_size = encryptionKey_buffer.length;
-  final encryptionKey = alloc<_i5.Uint8>(encryptionKey_size);
-  encryptionKey.asTypedList(encryptionKey_size).setAll(
-        0,
-        encryptionKey_buffer,
-      );
+  final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
+  final encryptionKey = encryptionKey_buffer == null
+      ? _i5.nullptr
+      : alloc<_i5.Uint8>(encryptionKey_size);
+  if (encryptionKey_buffer != null) {
+    encryptionKey.asTypedList(encryptionKey_size).setAll(
+          0,
+          encryptionKey_buffer,
+        );
+  }
   throw UnimplementedError();
 }
 

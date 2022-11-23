@@ -13,6 +13,7 @@ class TypeParser {
     required DartType type,
     bool isArray = false,
     bool asReturn = false,
+    bool isOptional = false,
     required TypedefRef typeDefs,
   }) {
     if (type.isVoid) {
@@ -26,8 +27,8 @@ class TypeParser {
     if (type.isPointer) {
       final pointerType = type.asPointer;
       return isArray
-          ? _mapPointerArrayType(pointerType, typeDefs)
-          : _mapPointerType(pointerType, typeDefs);
+          ? _mapPointerArrayType(pointerType, isOptional, typeDefs)
+          : _mapPointerType(pointerType, isOptional, typeDefs);
     }
 
     throw UnsupportedError('$type is missing explicit type handling');
@@ -35,6 +36,7 @@ class TypeParser {
 
   TypeRef _mapPointerType(
     DartType pointerType,
+    bool isOptional,
     TypedefRef typeDefs,
   ) {
     if (pointerType.isPointer) {
@@ -45,7 +47,7 @@ class TypeParser {
     if (pointerElement is ClassElement &&
         pointerElement.name.startsWith('Etebase')) {
       final resolvedElement = typeDefs.elementFor(pointerElement);
-      return TypeRef.etebaseClass(resolvedElement.name!);
+      return TypeRef.etebaseClass(resolvedElement.name!, optional: isOptional);
     }
 
     switch (pointerElement!.name) {
@@ -64,11 +66,12 @@ class TypeParser {
 
   TypeRef _mapPointerArrayType(
     DartType pointerType,
+    bool isOptional,
     TypedefRef typeDefs,
   ) {
     final typeName = pointerType.element!.name!;
     if (typeName == 'Void') {
-      return TypeRef.byteArray();
+      return TypeRef.byteArray(optional: isOptional);
     }
 
     if (pointerType.isPointer) {
