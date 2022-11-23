@@ -66,7 +66,7 @@ class IsolateBuilder {
                   (b) => b
                     ..symbol = 'Arena'
                     ..url = 'package:ffi/ffi.dart',
-                ).newInstance(const []),
+                ).newInstance([refer('malloc', 'package:ffi/ffi.dart')]),
               )
               .statement,
           TryCatch.try$([caseBuilder.build()]).finally$([

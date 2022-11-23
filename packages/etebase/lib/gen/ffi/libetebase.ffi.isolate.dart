@@ -4,7 +4,7 @@
 // EtebaseIsolateGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty
+// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i5;
 import 'dart:isolate' as _i6;
@@ -22,7 +22,7 @@ _i1.MethodResult etebaseIsolateMessageHandler(
   _i2.LibEtebaseFFI libEtebase,
   _i3.MethodInvocation invocation,
 ) {
-  final alloc = _i4.Arena();
+  final alloc = _i4.Arena(_i4.malloc);
   try {
     switch (invocation.method) {
       case #etebase_user_profile_get_pubkey:
@@ -1060,6 +1060,7 @@ _i1.MethodResult _etebase_user_profile_get_pubkey(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_user_profile_get_pubkey(this_);
   throw UnimplementedError();
 }
 
@@ -1072,6 +1073,7 @@ _i1.MethodResult _etebase_user_profile_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_user_profile_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1088,6 +1090,10 @@ _i1.MethodResult _etebase_user_new(
   final email = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_user_new(
+    username,
+    email,
+  );
   throw UnimplementedError();
 }
 
@@ -1103,6 +1109,10 @@ _i1.MethodResult _etebase_user_set_username(
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_user_set_username(
+    this_,
+    username,
+  );
   throw UnimplementedError();
 }
 
@@ -1115,6 +1125,7 @@ _i1.MethodResult _etebase_user_get_username(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_user_get_username(this_);
   throw UnimplementedError();
 }
 
@@ -1130,6 +1141,10 @@ _i1.MethodResult _etebase_user_set_email(
   final email = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_user_set_email(
+    this_,
+    email,
+  );
   throw UnimplementedError();
 }
 
@@ -1142,6 +1157,7 @@ _i1.MethodResult _etebase_user_get_email(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_user_get_email(this_);
   throw UnimplementedError();
 }
 
@@ -1154,6 +1170,7 @@ _i1.MethodResult _etebase_user_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_user_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1166,6 +1183,7 @@ _i1.MethodResult _etebase_signed_invitation_clone(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_clone(this_);
   throw UnimplementedError();
 }
 
@@ -1178,6 +1196,7 @@ _i1.MethodResult _etebase_signed_invitation_get_uid(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_get_uid(this_);
   throw UnimplementedError();
 }
 
@@ -1190,6 +1209,7 @@ _i1.MethodResult _etebase_signed_invitation_get_username(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_get_username(this_);
   throw UnimplementedError();
 }
 
@@ -1202,6 +1222,7 @@ _i1.MethodResult _etebase_signed_invitation_get_collection(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_get_collection(this_);
   throw UnimplementedError();
 }
 
@@ -1214,6 +1235,7 @@ _i1.MethodResult _etebase_signed_invitation_get_access_level(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_get_access_level(this_);
   throw UnimplementedError();
 }
 
@@ -1226,6 +1248,7 @@ _i1.MethodResult _etebase_signed_invitation_get_from_username(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_get_from_username(this_);
   throw UnimplementedError();
 }
 
@@ -1238,6 +1261,7 @@ _i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_get_from_pubkey(this_);
   throw UnimplementedError();
 }
 
@@ -1250,6 +1274,7 @@ _i1.MethodResult _etebase_signed_invitation_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_signed_invitation_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1262,6 +1287,7 @@ _i1.MethodResult _etebase_removed_collection_get_uid(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_removed_collection_get_uid(this_);
   throw UnimplementedError();
 }
 
@@ -1274,6 +1300,7 @@ _i1.MethodResult _etebase_removed_collection_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_removed_collection_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1286,6 +1313,7 @@ _i1.MethodResult _etebase_invitation_list_response_get_iterator(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_invitation_list_response_get_iterator(this_);
   throw UnimplementedError();
 }
 
@@ -1298,6 +1326,13 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  final data_size =
+      libEtebase.etebase_invitation_list_response_get_data_length(this_);
+  final data = alloc<_i5.Pointer<_i2.EtebaseSignedInvitation>>(data_size);
+  libEtebase.etebase_invitation_list_response_get_data(
+    this_,
+    data,
+  );
   throw UnimplementedError();
 }
 
@@ -1310,6 +1345,7 @@ _i1.MethodResult _etebase_invitation_list_response_is_done(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_invitation_list_response_is_done(this_);
   throw UnimplementedError();
 }
 
@@ -1322,6 +1358,7 @@ _i1.MethodResult _etebase_invitation_list_response_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_invitation_list_response_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1334,6 +1371,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_revisions_list_response_get_iterator(this_);
   throw UnimplementedError();
 }
 
@@ -1346,6 +1384,13 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  final data_size =
+      libEtebase.etebase_item_revisions_list_response_get_data_length(this_);
+  final data = alloc<_i5.Pointer<_i2.EtebaseItem>>(data_size);
+  libEtebase.etebase_item_revisions_list_response_get_data(
+    this_,
+    data,
+  );
   throw UnimplementedError();
 }
 
@@ -1358,6 +1403,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_is_done(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_revisions_list_response_is_done(this_);
   throw UnimplementedError();
 }
 
@@ -1370,6 +1416,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_revisions_list_response_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1382,6 +1429,7 @@ _i1.MethodResult _etebase_member_list_response_get_iterator(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_member_list_response_get_iterator(this_);
   throw UnimplementedError();
 }
 
@@ -1394,6 +1442,13 @@ _i1.MethodResult _etebase_member_list_response_get_data(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  final data_size =
+      libEtebase.etebase_member_list_response_get_data_length(this_);
+  final data = alloc<_i5.Pointer<_i2.EtebaseCollectionMember>>(data_size);
+  libEtebase.etebase_member_list_response_get_data(
+    this_,
+    data,
+  );
   throw UnimplementedError();
 }
 
@@ -1406,6 +1461,7 @@ _i1.MethodResult _etebase_member_list_response_is_done(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_member_list_response_is_done(this_);
   throw UnimplementedError();
 }
 
@@ -1418,6 +1474,7 @@ _i1.MethodResult _etebase_member_list_response_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_member_list_response_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1428,6 +1485,7 @@ _i1.MethodResult _etebase_item_metadata_new(
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
+  libEtebase.etebase_item_metadata_new();
   throw UnimplementedError();
 }
 
@@ -1443,6 +1501,10 @@ _i1.MethodResult _etebase_item_metadata_set_item_type(
   final itemType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_item_metadata_set_item_type(
+    this_,
+    itemType,
+  );
   throw UnimplementedError();
 }
 
@@ -1455,6 +1517,7 @@ _i1.MethodResult _etebase_item_metadata_get_item_type(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_metadata_get_item_type(this_);
   throw UnimplementedError();
 }
 
@@ -1470,6 +1533,10 @@ _i1.MethodResult _etebase_item_metadata_set_name(
   final name = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_item_metadata_set_name(
+    this_,
+    name,
+  );
   throw UnimplementedError();
 }
 
@@ -1482,6 +1549,7 @@ _i1.MethodResult _etebase_item_metadata_get_name(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_metadata_get_name(this_);
   throw UnimplementedError();
 }
 
@@ -1496,6 +1564,10 @@ _i1.MethodResult _etebase_item_metadata_set_mtime(
       (invocation.arguments[0] as int));
   final mtime = alloc<_i5.Int64>()
     ..value = (invocation.arguments[1] as DateTime).millisecondsSinceEpoch;
+  libEtebase.etebase_item_metadata_set_mtime(
+    this_,
+    mtime,
+  );
   throw UnimplementedError();
 }
 
@@ -1508,6 +1580,7 @@ _i1.MethodResult _etebase_item_metadata_get_mtime(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_metadata_get_mtime(this_);
   throw UnimplementedError();
 }
 
@@ -1523,6 +1596,10 @@ _i1.MethodResult _etebase_item_metadata_set_description(
   final description = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_item_metadata_set_description(
+    this_,
+    description,
+  );
   throw UnimplementedError();
 }
 
@@ -1535,6 +1612,7 @@ _i1.MethodResult _etebase_item_metadata_get_description(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_metadata_get_description(this_);
   throw UnimplementedError();
 }
 
@@ -1550,6 +1628,10 @@ _i1.MethodResult _etebase_item_metadata_set_color(
   final color = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_item_metadata_set_color(
+    this_,
+    color,
+  );
   throw UnimplementedError();
 }
 
@@ -1562,6 +1644,7 @@ _i1.MethodResult _etebase_item_metadata_get_color(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_metadata_get_color(this_);
   throw UnimplementedError();
 }
 
@@ -1574,6 +1657,7 @@ _i1.MethodResult _etebase_item_metadata_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_metadata_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1593,6 +1677,11 @@ _i1.MethodResult _etebase_item_manager_fetch(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_fetch(
+    this_,
+    itemUid,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1616,6 +1705,12 @@ _i1.MethodResult _etebase_item_manager_create(
         0,
         content_buffer,
       );
+  libEtebase.etebase_item_manager_create(
+    this_,
+    meta,
+    content.cast(),
+    content_size,
+  );
   throw UnimplementedError();
 }
 
@@ -1646,6 +1741,13 @@ _i1.MethodResult _etebase_item_manager_create_raw(
         0,
         content_buffer,
       );
+  libEtebase.etebase_item_manager_create_raw(
+    this_,
+    meta.cast(),
+    meta_size,
+    content.cast(),
+    content_size,
+  );
   throw UnimplementedError();
 }
 
@@ -1662,6 +1764,10 @@ _i1.MethodResult _etebase_item_manager_list(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_list(
+    this_,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1680,6 +1786,11 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_item_revisions(
+    this_,
+    item,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1705,6 +1816,12 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_fetch_updates(
+    this_,
+    items,
+    items_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1730,6 +1847,12 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_fetch_multi(
+    this_,
+    items,
+    items_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1755,6 +1878,12 @@ _i1.MethodResult _etebase_item_manager_batch(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_batch(
+    this_,
+    items,
+    items_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1789,6 +1918,14 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_batch_deps(
+    this_,
+    items,
+    items_size,
+    deps,
+    deps_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1814,6 +1951,12 @@ _i1.MethodResult _etebase_item_manager_transaction(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_transaction(
+    this_,
+    items,
+    items_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1848,6 +1991,14 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_item_manager_transaction_deps(
+    this_,
+    items,
+    items_size,
+    deps,
+    deps_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -1869,6 +2020,11 @@ _i1.MethodResult _etebase_item_manager_cache_load(
         0,
         cached_buffer,
       );
+  libEtebase.etebase_item_manager_cache_load(
+    this_,
+    cached.cast(),
+    cached_size,
+  );
   throw UnimplementedError();
 }
 
@@ -1883,6 +2039,12 @@ _i1.MethodResult _etebase_item_manager_cache_save(
       (invocation.arguments[0] as int));
   final item = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
+  final retSize = alloc<_i5.UnsignedLong>()..value = 0;
+  libEtebase.etebase_item_manager_cache_save(
+    this_,
+    item,
+    retSize,
+  );
   throw UnimplementedError();
 }
 
@@ -1897,6 +2059,12 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
       (invocation.arguments[0] as int));
   final item = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
+  final retSize = alloc<_i5.UnsignedLong>()..value = 0;
+  libEtebase.etebase_item_manager_cache_save_with_content(
+    this_,
+    item,
+    retSize,
+  );
   throw UnimplementedError();
 }
 
@@ -1909,6 +2077,7 @@ _i1.MethodResult _etebase_item_manager_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_manager_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1921,6 +2090,7 @@ _i1.MethodResult _etebase_item_list_response_get_stoken(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_list_response_get_stoken(this_);
   throw UnimplementedError();
 }
 
@@ -1933,6 +2103,13 @@ _i1.MethodResult _etebase_item_list_response_get_data(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  final data_size =
+      libEtebase.etebase_item_list_response_get_data_length(this_);
+  final data = alloc<_i5.Pointer<_i2.EtebaseItem>>(data_size);
+  libEtebase.etebase_item_list_response_get_data(
+    this_,
+    data,
+  );
   throw UnimplementedError();
 }
 
@@ -1945,6 +2122,7 @@ _i1.MethodResult _etebase_item_list_response_is_done(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_list_response_is_done(this_);
   throw UnimplementedError();
 }
 
@@ -1957,6 +2135,7 @@ _i1.MethodResult _etebase_item_list_response_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_list_response_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -1969,6 +2148,7 @@ _i1.MethodResult _etebase_item_clone(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_clone(this_);
   throw UnimplementedError();
 }
 
@@ -1981,6 +2161,7 @@ _i1.MethodResult _etebase_item_verify(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_verify(this_);
   throw UnimplementedError();
 }
 
@@ -1995,6 +2176,10 @@ _i1.MethodResult _etebase_item_set_meta(
       (invocation.arguments[0] as int));
   final meta = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_item_set_meta(
+    this_,
+    meta,
+  );
   throw UnimplementedError();
 }
 
@@ -2007,6 +2192,7 @@ _i1.MethodResult _etebase_item_get_meta(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_get_meta(this_);
   throw UnimplementedError();
 }
 
@@ -2028,6 +2214,11 @@ _i1.MethodResult _etebase_item_set_meta_raw(
         0,
         meta_buffer,
       );
+  libEtebase.etebase_item_set_meta_raw(
+    this_,
+    meta.cast(),
+    meta_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2040,6 +2231,13 @@ _i1.MethodResult _etebase_item_get_meta_raw(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  const buf_size = 1024;
+  final buf = alloc<_i5.Uint8>(buf_size);
+  libEtebase.etebase_item_get_meta_raw(
+    this_,
+    buf.cast(),
+    buf_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2061,6 +2259,11 @@ _i1.MethodResult _etebase_item_set_content(
         0,
         content_buffer,
       );
+  libEtebase.etebase_item_set_content(
+    this_,
+    content.cast(),
+    content_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2073,6 +2276,13 @@ _i1.MethodResult _etebase_item_get_content(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  const buf_size = 1024;
+  final buf = alloc<_i5.Uint8>(buf_size);
+  libEtebase.etebase_item_get_content(
+    this_,
+    buf.cast(),
+    buf_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2085,6 +2295,7 @@ _i1.MethodResult _etebase_item_delete(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_delete(this_);
   throw UnimplementedError();
 }
 
@@ -2097,6 +2308,7 @@ _i1.MethodResult _etebase_item_is_deleted(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_is_deleted(this_);
   throw UnimplementedError();
 }
 
@@ -2109,6 +2321,7 @@ _i1.MethodResult _etebase_item_get_uid(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_get_uid(this_);
   throw UnimplementedError();
 }
 
@@ -2121,6 +2334,7 @@ _i1.MethodResult _etebase_item_get_etag(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_get_etag(this_);
   throw UnimplementedError();
 }
 
@@ -2133,6 +2347,7 @@ _i1.MethodResult _etebase_item_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_item_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2149,6 +2364,10 @@ _i1.MethodResult _etebase_fs_cache_new(
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_new(
+    path,
+    username,
+  );
   throw UnimplementedError();
 }
 
@@ -2161,6 +2380,7 @@ _i1.MethodResult _etebase_fs_cache_clear_user(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_fs_cache_clear_user(this_);
   throw UnimplementedError();
 }
 
@@ -2189,6 +2409,12 @@ _i1.MethodResult _etebase_fs_cache_save_account(
           encryptionKey_buffer,
         );
   }
+  libEtebase.etebase_fs_cache_save_account(
+    this_,
+    etebase,
+    encryptionKey.cast(),
+    encryptionKey_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2217,6 +2443,12 @@ _i1.MethodResult _etebase_fs_cache_load_account(
           encryptionKey_buffer,
         );
   }
+  libEtebase.etebase_fs_cache_load_account(
+    this_,
+    client,
+    encryptionKey.cast(),
+    encryptionKey_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2232,6 +2464,10 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
   final stoken = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_save_stoken(
+    this_,
+    stoken,
+  );
   throw UnimplementedError();
 }
 
@@ -2244,6 +2480,7 @@ _i1.MethodResult _etebase_fs_cache_load_stoken(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_fs_cache_load_stoken(this_);
   throw UnimplementedError();
 }
 
@@ -2262,6 +2499,11 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
   final stoken = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_collection_save_stoken(
+    this_,
+    colUid,
+    stoken,
+  );
   throw UnimplementedError();
 }
 
@@ -2277,6 +2519,10 @@ _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
   final colUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_collection_load_stoken(
+    this_,
+    colUid,
+  );
   throw UnimplementedError();
 }
 
@@ -2293,6 +2539,11 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
       (invocation.arguments[1] as int));
   final col = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[2] as int));
+  libEtebase.etebase_fs_cache_collection_set(
+    this_,
+    colMgr,
+    col,
+  );
   throw UnimplementedError();
 }
 
@@ -2310,6 +2561,11 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_collection_unset(
+    this_,
+    colMgr,
+    colUid,
+  );
   throw UnimplementedError();
 }
 
@@ -2327,6 +2583,11 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_collection_get(
+    this_,
+    colMgr,
+    colUid,
+  );
   throw UnimplementedError();
 }
 
@@ -2346,6 +2607,12 @@ _i1.MethodResult _etebase_fs_cache_item_set(
       .cast<_i5.Char>();
   final item = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[3] as int));
+  libEtebase.etebase_fs_cache_item_set(
+    this_,
+    itemMgr,
+    colUid,
+    item,
+  );
   throw UnimplementedError();
 }
 
@@ -2366,6 +2633,12 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
   final itemUid = (invocation.arguments[3] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_item_unset(
+    this_,
+    itemMgr,
+    colUid,
+    itemUid,
+  );
   throw UnimplementedError();
 }
 
@@ -2386,6 +2659,12 @@ _i1.MethodResult _etebase_fs_cache_item_get(
   final itemUid = (invocation.arguments[3] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fs_cache_item_get(
+    this_,
+    itemMgr,
+    colUid,
+    itemUid,
+  );
   throw UnimplementedError();
 }
 
@@ -2398,6 +2677,7 @@ _i1.MethodResult _etebase_fs_cache_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_fs_cache_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2408,6 +2688,7 @@ _i1.MethodResult _etebase_fetch_options_new(
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
+  libEtebase.etebase_fetch_options_new();
   throw UnimplementedError();
 }
 
@@ -2421,6 +2702,10 @@ _i1.MethodResult _etebase_fetch_options_set_limit(
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final limit = (invocation.arguments[1] as int);
+  libEtebase.etebase_fetch_options_set_limit(
+    this_,
+    limit,
+  );
   throw UnimplementedError();
 }
 
@@ -2434,6 +2719,10 @@ _i1.MethodResult _etebase_fetch_options_set_prefetch(
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final prefetch = (invocation.arguments[1] as _i7.EtebasePrefetchOption).index;
+  libEtebase.etebase_fetch_options_set_prefetch(
+    this_,
+    prefetch,
+  );
   throw UnimplementedError();
 }
 
@@ -2447,6 +2736,10 @@ _i1.MethodResult _etebase_fetch_options_set_with_collection(
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final withCollection = (invocation.arguments[1] as bool);
+  libEtebase.etebase_fetch_options_set_with_collection(
+    this_,
+    withCollection,
+  );
   throw UnimplementedError();
 }
 
@@ -2462,6 +2755,10 @@ _i1.MethodResult _etebase_fetch_options_set_iterator(
   final iterator = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fetch_options_set_iterator(
+    this_,
+    iterator,
+  );
   throw UnimplementedError();
 }
 
@@ -2477,6 +2774,10 @@ _i1.MethodResult _etebase_fetch_options_set_stoken(
   final stoken = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_fetch_options_set_stoken(
+    this_,
+    stoken,
+  );
   throw UnimplementedError();
 }
 
@@ -2489,6 +2790,7 @@ _i1.MethodResult _etebase_fetch_options_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_fetch_options_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2505,6 +2807,10 @@ _i1.MethodResult _etebase_collection_member_manager_list(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_collection_member_manager_list(
+    this_,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2520,6 +2826,10 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_collection_member_manager_remove(
+    this_,
+    username,
+  );
   throw UnimplementedError();
 }
 
@@ -2532,6 +2842,7 @@ _i1.MethodResult _etebase_collection_member_manager_leave(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_member_manager_leave(this_);
   throw UnimplementedError();
 }
 
@@ -2549,6 +2860,11 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
       .cast<_i5.Char>();
   final accessLevel =
       (invocation.arguments[2] as _i8.EtebaseCollectionAccessLevel).index;
+  libEtebase.etebase_collection_member_manager_modify_access_level(
+    this_,
+    username,
+    accessLevel,
+  );
   throw UnimplementedError();
 }
 
@@ -2561,6 +2877,7 @@ _i1.MethodResult _etebase_collection_member_manager_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_member_manager_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2573,6 +2890,7 @@ _i1.MethodResult _etebase_collection_member_clone(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_member_clone(this_);
   throw UnimplementedError();
 }
 
@@ -2585,6 +2903,7 @@ _i1.MethodResult _etebase_collection_member_get_username(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_member_get_username(this_);
   throw UnimplementedError();
 }
 
@@ -2597,6 +2916,7 @@ _i1.MethodResult _etebase_collection_member_get_access_level(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_member_get_access_level(this_);
   throw UnimplementedError();
 }
 
@@ -2609,6 +2929,7 @@ _i1.MethodResult _etebase_collection_member_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_member_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2628,6 +2949,11 @@ _i1.MethodResult _etebase_collection_manager_fetch(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_collection_manager_fetch(
+    this_,
+    colUid,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2654,6 +2980,13 @@ _i1.MethodResult _etebase_collection_manager_create(
         0,
         content_buffer,
       );
+  libEtebase.etebase_collection_manager_create(
+    this_,
+    collectionType,
+    meta,
+    content.cast(),
+    content_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2687,6 +3020,14 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
         0,
         content_buffer,
       );
+  libEtebase.etebase_collection_manager_create_raw(
+    this_,
+    collectionType,
+    meta.cast(),
+    meta_size,
+    content.cast(),
+    content_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2701,6 +3042,10 @@ _i1.MethodResult _etebase_collection_manager_get_item_manager(
       (invocation.arguments[0] as int));
   final col = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_collection_manager_get_item_manager(
+    this_,
+    col,
+  );
   throw UnimplementedError();
 }
 
@@ -2720,6 +3065,11 @@ _i1.MethodResult _etebase_collection_manager_list(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_collection_manager_list(
+    this_,
+    collectionType,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2745,6 +3095,12 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_collection_manager_list_multi(
+    this_,
+    collectionTypes,
+    collectionTypes_size,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2763,6 +3119,11 @@ _i1.MethodResult _etebase_collection_manager_upload(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_collection_manager_upload(
+    this_,
+    collection,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2781,6 +3142,11 @@ _i1.MethodResult _etebase_collection_manager_transaction(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_collection_manager_transaction(
+    this_,
+    collection,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2802,6 +3168,11 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
         0,
         cached_buffer,
       );
+  libEtebase.etebase_collection_manager_cache_load(
+    this_,
+    cached.cast(),
+    cached_size,
+  );
   throw UnimplementedError();
 }
 
@@ -2816,6 +3187,12 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
       (invocation.arguments[0] as int));
   final collection = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
+  final retSize = alloc<_i5.UnsignedLong>()..value = 0;
+  libEtebase.etebase_collection_manager_cache_save(
+    this_,
+    collection,
+    retSize,
+  );
   throw UnimplementedError();
 }
 
@@ -2830,6 +3207,12 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
       (invocation.arguments[0] as int));
   final collection = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
+  final retSize = alloc<_i5.UnsignedLong>()..value = 0;
+  libEtebase.etebase_collection_manager_cache_save_with_content(
+    this_,
+    collection,
+    retSize,
+  );
   throw UnimplementedError();
 }
 
@@ -2844,6 +3227,10 @@ _i1.MethodResult _etebase_collection_manager_get_member_manager(
       (invocation.arguments[0] as int));
   final col = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_collection_manager_get_member_manager(
+    this_,
+    col,
+  );
   throw UnimplementedError();
 }
 
@@ -2856,6 +3243,7 @@ _i1.MethodResult _etebase_collection_manager_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_manager_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2868,6 +3256,7 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_list_response_get_stoken(this_);
   throw UnimplementedError();
 }
 
@@ -2880,6 +3269,13 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  final data_size =
+      libEtebase.etebase_collection_list_response_get_data_length(this_);
+  final data = alloc<_i5.Pointer<_i2.EtebaseCollection>>(data_size);
+  libEtebase.etebase_collection_list_response_get_data(
+    this_,
+    data,
+  );
   throw UnimplementedError();
 }
 
@@ -2892,6 +3288,7 @@ _i1.MethodResult _etebase_collection_list_response_is_done(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_list_response_is_done(this_);
   throw UnimplementedError();
 }
 
@@ -2904,6 +3301,13 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  final data_size = libEtebase
+      .etebase_collection_list_response_get_removed_memberships_length(this_);
+  final data = alloc<_i5.Pointer<_i2.EtebaseRemovedCollection>>(data_size);
+  libEtebase.etebase_collection_list_response_get_removed_memberships(
+    this_,
+    data,
+  );
   throw UnimplementedError();
 }
 
@@ -2916,6 +3320,7 @@ _i1.MethodResult _etebase_collection_list_response_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_list_response_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -2932,6 +3337,10 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_invitation_manager_list_incoming(
+    this_,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2948,6 +3357,10 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
       : _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(fetchOptions_address);
+  libEtebase.etebase_invitation_manager_list_outgoing(
+    this_,
+    fetchOptions,
+  );
   throw UnimplementedError();
 }
 
@@ -2962,6 +3375,10 @@ _i1.MethodResult _etebase_invitation_manager_accept(
       (invocation.arguments[0] as int));
   final invitation = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_invitation_manager_accept(
+    this_,
+    invitation,
+  );
   throw UnimplementedError();
 }
 
@@ -2976,6 +3393,10 @@ _i1.MethodResult _etebase_invitation_manager_reject(
       (invocation.arguments[0] as int));
   final invitation = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_invitation_manager_reject(
+    this_,
+    invitation,
+  );
   throw UnimplementedError();
 }
 
@@ -2991,6 +3412,10 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_invitation_manager_fetch_user_profile(
+    this_,
+    username,
+  );
   throw UnimplementedError();
 }
 
@@ -3019,6 +3444,14 @@ _i1.MethodResult _etebase_invitation_manager_invite(
       );
   final accessLevel =
       (invocation.arguments[4] as _i8.EtebaseCollectionAccessLevel).index;
+  libEtebase.etebase_invitation_manager_invite(
+    this_,
+    collection,
+    username,
+    pubkey.cast(),
+    pubkey_size,
+    accessLevel,
+  );
   throw UnimplementedError();
 }
 
@@ -3033,6 +3466,10 @@ _i1.MethodResult _etebase_invitation_manager_disinvite(
       (invocation.arguments[0] as int));
   final invitation = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_invitation_manager_disinvite(
+    this_,
+    invitation,
+  );
   throw UnimplementedError();
 }
 
@@ -3045,6 +3482,7 @@ _i1.MethodResult _etebase_invitation_manager_get_pubkey(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_invitation_manager_get_pubkey(this_);
   throw UnimplementedError();
 }
 
@@ -3057,6 +3495,7 @@ _i1.MethodResult _etebase_invitation_manager_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_invitation_manager_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -3069,6 +3508,7 @@ _i1.MethodResult _etebase_collection_clone(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_clone(this_);
   throw UnimplementedError();
 }
 
@@ -3081,6 +3521,7 @@ _i1.MethodResult _etebase_collection_verify(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_verify(this_);
   throw UnimplementedError();
 }
 
@@ -3095,6 +3536,10 @@ _i1.MethodResult _etebase_collection_set_meta(
       (invocation.arguments[0] as int));
   final meta = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[1] as int));
+  libEtebase.etebase_collection_set_meta(
+    this_,
+    meta,
+  );
   throw UnimplementedError();
 }
 
@@ -3107,6 +3552,7 @@ _i1.MethodResult _etebase_collection_get_meta(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_get_meta(this_);
   throw UnimplementedError();
 }
 
@@ -3128,6 +3574,11 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
         0,
         meta_buffer,
       );
+  libEtebase.etebase_collection_set_meta_raw(
+    this_,
+    meta.cast(),
+    meta_size,
+  );
   throw UnimplementedError();
 }
 
@@ -3140,6 +3591,13 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  const buf_size = 1024;
+  final buf = alloc<_i5.Uint8>(buf_size);
+  libEtebase.etebase_collection_get_meta_raw(
+    this_,
+    buf.cast(),
+    buf_size,
+  );
   throw UnimplementedError();
 }
 
@@ -3161,6 +3619,11 @@ _i1.MethodResult _etebase_collection_set_content(
         0,
         content_buffer,
       );
+  libEtebase.etebase_collection_set_content(
+    this_,
+    content.cast(),
+    content_size,
+  );
   throw UnimplementedError();
 }
 
@@ -3173,6 +3636,13 @@ _i1.MethodResult _etebase_collection_get_content(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  const buf_size = 1024;
+  final buf = alloc<_i5.Uint8>(buf_size);
+  libEtebase.etebase_collection_get_content(
+    this_,
+    buf.cast(),
+    buf_size,
+  );
   throw UnimplementedError();
 }
 
@@ -3185,6 +3655,7 @@ _i1.MethodResult _etebase_collection_delete(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_delete(this_);
   throw UnimplementedError();
 }
 
@@ -3197,6 +3668,7 @@ _i1.MethodResult _etebase_collection_is_deleted(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_is_deleted(this_);
   throw UnimplementedError();
 }
 
@@ -3209,6 +3681,7 @@ _i1.MethodResult _etebase_collection_get_uid(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_get_uid(this_);
   throw UnimplementedError();
 }
 
@@ -3221,6 +3694,7 @@ _i1.MethodResult _etebase_collection_get_etag(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_get_etag(this_);
   throw UnimplementedError();
 }
 
@@ -3233,6 +3707,7 @@ _i1.MethodResult _etebase_collection_get_stoken(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_get_stoken(this_);
   throw UnimplementedError();
 }
 
@@ -3245,6 +3720,7 @@ _i1.MethodResult _etebase_collection_as_item(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_as_item(this_);
   throw UnimplementedError();
 }
 
@@ -3257,6 +3733,7 @@ _i1.MethodResult _etebase_collection_get_collection_type(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_get_collection_type(this_);
   throw UnimplementedError();
 }
 
@@ -3269,6 +3746,7 @@ _i1.MethodResult _etebase_collection_get_access_level(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_get_access_level(this_);
   throw UnimplementedError();
 }
 
@@ -3281,6 +3759,7 @@ _i1.MethodResult _etebase_collection_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_collection_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -3297,6 +3776,10 @@ _i1.MethodResult _etebase_client_new(
   final serverUrl = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_client_new(
+    clientName,
+    serverUrl,
+  );
   throw UnimplementedError();
 }
 
@@ -3312,6 +3795,10 @@ _i1.MethodResult _etebase_client_set_server_url(
   final serverUrl = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_client_set_server_url(
+    this_,
+    serverUrl,
+  );
   throw UnimplementedError();
 }
 
@@ -3324,6 +3811,7 @@ _i1.MethodResult _etebase_client_check_etebase_server(
       'Invocation must have exactly 1 arguments');
   final client = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_client_check_etebase_server(client);
   throw UnimplementedError();
 }
 
@@ -3336,6 +3824,7 @@ _i1.MethodResult _etebase_client_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_client_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -3354,6 +3843,11 @@ _i1.MethodResult _etebase_account_login(
   final password = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_account_login(
+    client,
+    username,
+    password,
+  );
   throw UnimplementedError();
 }
 
@@ -3371,6 +3865,11 @@ _i1.MethodResult _etebase_account_signup(
   final password = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_account_signup(
+    client,
+    user,
+    password,
+  );
   throw UnimplementedError();
 }
 
@@ -3383,6 +3882,7 @@ _i1.MethodResult _etebase_account_fetch_token(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_account_fetch_token(this_);
   throw UnimplementedError();
 }
 
@@ -3395,6 +3895,7 @@ _i1.MethodResult _etebase_account_fetch_dashboard_url(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_account_fetch_dashboard_url(this_);
   throw UnimplementedError();
 }
 
@@ -3410,6 +3911,10 @@ _i1.MethodResult _etebase_account_force_server_url(
   final serverUrl = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_account_force_server_url(
+    this_,
+    serverUrl,
+  );
   throw UnimplementedError();
 }
 
@@ -3425,6 +3930,10 @@ _i1.MethodResult _etebase_account_change_password(
   final password = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: alloc)
       .cast<_i5.Char>();
+  libEtebase.etebase_account_change_password(
+    this_,
+    password,
+  );
   throw UnimplementedError();
 }
 
@@ -3437,6 +3946,7 @@ _i1.MethodResult _etebase_account_logout(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_account_logout(this_);
   throw UnimplementedError();
 }
 
@@ -3449,6 +3959,7 @@ _i1.MethodResult _etebase_account_get_collection_manager(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_account_get_collection_manager(this_);
   throw UnimplementedError();
 }
 
@@ -3461,6 +3972,7 @@ _i1.MethodResult _etebase_account_get_invitation_manager(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_account_get_invitation_manager(this_);
   throw UnimplementedError();
 }
 
@@ -3487,6 +3999,11 @@ _i1.MethodResult _etebase_account_save(
           encryptionKey_buffer,
         );
   }
+  libEtebase.etebase_account_save(
+    this_,
+    encryptionKey.cast(),
+    encryptionKey_size,
+  );
   throw UnimplementedError();
 }
 
@@ -3516,6 +4033,12 @@ _i1.MethodResult _etebase_account_restore(
           encryptionKey_buffer,
         );
   }
+  libEtebase.etebase_account_restore(
+    client,
+    accountDataStored,
+    encryptionKey.cast(),
+    encryptionKey_size,
+  );
   throw UnimplementedError();
 }
 
@@ -3528,6 +4051,7 @@ _i1.MethodResult _etebase_account_destroy(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
+  libEtebase.etebase_account_destroy(this_);
   throw UnimplementedError();
 }
 
@@ -3538,6 +4062,7 @@ _i1.MethodResult _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
+  libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE();
   throw UnimplementedError();
 }
 
@@ -3549,6 +4074,12 @@ _i1.MethodResult _etebase_utils_randombytes(
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   final size = (invocation.arguments[0] as int);
+  const buf_size = 1024;
+  final buf = alloc<_i5.Uint8>(buf_size);
+  libEtebase.etebase_utils_randombytes(
+    buf.cast(),
+    size,
+  );
   throw UnimplementedError();
 }
 
@@ -3568,6 +4099,12 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
         0,
         content_buffer,
       );
+  final buf = alloc<_i5.Char>(libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE);
+  libEtebase.etebase_utils_pretty_fingerprint(
+    content.cast(),
+    content_size,
+    buf,
+  );
   throw UnimplementedError();
 }
 
@@ -3578,5 +4115,6 @@ _i1.MethodResult _etebase_get_default_server_url(
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
+  libEtebase.etebase_get_default_server_url();
   throw UnimplementedError();
 }

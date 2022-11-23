@@ -34,5 +34,6 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'prefer_relative_imports',
       'lines_longer_than_80_chars',
       'prefer_is_empty',
+      'constant_identifier_names',
     ].join(', '),
   );
