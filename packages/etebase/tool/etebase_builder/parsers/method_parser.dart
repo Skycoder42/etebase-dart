@@ -38,6 +38,8 @@ class MethodRef {
 
   bool get hasRetSize => parameters.any((p) => p.isRetSize);
 
+  bool get needsSizeHint => parameters.any((p) => p.needsSizeHint);
+
   Iterable<ParameterRef> exportedParams({required bool withThis}) => parameters
       .where((param) => withThis || isDestroy || !param.isThisParam)
       .where((param) => !param.isRetSize)

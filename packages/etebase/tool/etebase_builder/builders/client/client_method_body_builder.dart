@@ -20,6 +20,9 @@ class ClientMethodBodyBuilder {
         .exportedParams(withThis: true)
         .map((param) => _mapCallParam(param, method))
         .toList();
+    if (method.needsSizeHint) {
+      inParams.add(refer('sizeHint'));
+    }
 
     final returnType = method.outOrReturnType;
     expression = expression.call(
@@ -94,9 +97,7 @@ class ClientMethodBodyBuilder {
     if (param.isThisParam) {
       final ref = method.isDestroy ? refer(param.name) : refer('_pointer');
       return ref.property('address');
-    }
-
-    if (param.type is ByteArrayTypeRef) {
+    } else if (param.type is ByteArrayTypeRef) {
       final expression = Types.TransferableTypedData$.newInstanceNamed(
         'fromList',
         [
@@ -111,9 +112,7 @@ class ClientMethodBodyBuilder {
       } else {
         return expression;
       }
-    }
-
-    if (param.type is EtebaseClassTypeRef) {
+    } else if (param.type is EtebaseClassTypeRef) {
       return _toAddress(refer(param.name), param.type.publicType);
     } else if (param.type is EtebaseClassListTypeRef) {
       return refer(param.name)

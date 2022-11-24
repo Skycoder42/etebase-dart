@@ -28,6 +28,8 @@ class ParameterRef {
   bool get isOutParam => isOutBuf || type is EtebaseOutListTypeRef;
 
   bool get isOptional => type.publicType.isNullable ?? false;
+
+  bool get needsSizeHint => isOutBuf && hasLength;
 }
 
 class ParamParser {

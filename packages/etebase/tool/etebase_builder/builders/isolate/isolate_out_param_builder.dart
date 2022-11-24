@@ -26,7 +26,7 @@ class IsolateOutParamBuilder {
 
       if (outParam.isOutBuf) {
         if (outParamType is ByteArrayTypeRef) {
-          yield* _buildOutByteArray(outParam, outParamType);
+          yield* _buildOutByteArray(method, outParam, outParamType);
         } else {
           throw UnsupportedError(
             'An out buf parameter cannot be of type $outParamType',
@@ -65,16 +65,18 @@ class IsolateOutParamBuilder {
   }
 
   Iterable<Code> _buildOutByteArray(
+    MethodRef method,
     ParameterRef parameter,
     ByteArrayTypeRef type,
   ) sync* {
-    final sizeVarName = '${parameter.name}_size';
-    yield declareConst(sizeVarName)
-        .assign(literalNum(1024)) // TODO maybe as actual parameter?
-        .statement;
-
     yield declareFinal(parameter.name)
-        .assign(_alloc.call([refer(sizeVarName)], const {}, [Types.Uint8$]))
+        .assign(
+          _alloc.call(
+            [refer(method.needsSizeHint ? '${parameter.name}_size' : 'size')],
+            const {},
+            [Types.Uint8$],
+          ),
+        )
         .statement;
 
     // TODO see https://docs.etebase.com/guides/using_items#binary-content

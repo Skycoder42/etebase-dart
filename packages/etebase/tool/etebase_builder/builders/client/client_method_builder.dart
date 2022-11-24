@@ -1,6 +1,7 @@
 import 'package:code_builder/code_builder.dart';
 
 import '../../parsers/method_parser.dart';
+import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/types.dart';
 import 'client_method_body_builder.dart';
@@ -24,31 +25,22 @@ class ClientMethodBuilder {
             ..requiredParameters.addAll(
               method
                   .exportedParams(withThis: false)
-                  .where((param) => !param.isOptional)
-                  .map(
-                    (param) => Parameter(
-                      (b) => b
-                        ..name = param.name
-                        ..type = method.isDestroy && param.isThisParam
-                            ? param.type.ffiType
-                            : param.type.publicType,
-                    ),
-                  )
+                  .where((p) => !p.isOptional)
+                  .map((p) => _buildParam(p, isDestroy: method.isDestroy))
                   .toList(),
             )
-            ..optionalParameters.addAll(
-              method
+            ..optionalParameters.addAll([
+              if (method.needsSizeHint)
+                Parameter(
+                  (b) => b
+                    ..name = 'sizeHint'
+                    ..type = Types.int$.asNullable,
+                ),
+              ...method
                   .exportedParams(withThis: false)
-                  .where((param) => param.isOptional)
-                  .map(
-                    (param) => Parameter(
-                      (b) => b
-                        ..name = param.name
-                        ..type = param.type.publicType,
-                    ),
-                  )
-                  .toList(),
-            )
+                  .where((p) => p.isOptional)
+                  .map(_buildParam),
+            ])
             ..body = _clientMethodBodyBuilder.buildBody(method);
 
           final docComment = method.documentation;
@@ -72,6 +64,15 @@ class ClientMethodBuilder {
       return method.name;
     }
   }
+
+  Parameter _buildParam(ParameterRef param, {bool isDestroy = false}) =>
+      Parameter(
+        (b) => b
+          ..name = param.name
+          ..type = isDestroy && param.isThisParam
+              ? param.type.ffiType
+              : param.type.publicType,
+      );
 
   TypeReference _buildReturnType(MethodRef method) {
     final returnType = method.outOrReturnType.publicType;

@@ -2233,7 +2233,7 @@ _i1.MethodResult _etebase_item_get_meta_raw(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  const buf_size = 1024;
+  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
   final buf = alloc<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_item_get_meta_raw(
     this_,
@@ -2278,7 +2278,7 @@ _i1.MethodResult _etebase_item_get_content(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  const buf_size = 1024;
+  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
   final buf = alloc<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_item_get_content(
     this_,
@@ -3595,7 +3595,7 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  const buf_size = 1024;
+  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
   final buf = alloc<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_collection_get_meta_raw(
     this_,
@@ -3640,7 +3640,7 @@ _i1.MethodResult _etebase_collection_get_content(
       'Invocation must have exactly 1 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  const buf_size = 1024;
+  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
   final buf = alloc<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_collection_get_content(
     this_,
@@ -4078,8 +4078,7 @@ _i1.MethodResult _etebase_utils_randombytes(
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   final size = (invocation.arguments[0] as int);
-  const buf_size = 1024;
-  final buf = alloc<_i5.Uint8>(buf_size);
+  final buf = alloc<_i5.Uint8>(size);
   final result = libEtebase.etebase_utils_randombytes(
     buf.cast(),
     size,

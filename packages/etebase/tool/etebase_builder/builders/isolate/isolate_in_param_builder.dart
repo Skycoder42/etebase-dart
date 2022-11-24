@@ -48,6 +48,22 @@ class IsolateInParamBuilder {
         yield variable.assign(argument).statement;
       }
     }
+
+    if (method.needsSizeHint) {
+      final paramName = method.parameters
+          .where((p) => p.needsSizeHint)
+          .map((p) => p.name)
+          .single;
+
+      yield declareFinal('${paramName}_size')
+          .assign(
+            arguments
+                .index(literalNum(paramsLength))
+                .asA(Types.int$.asNullable),
+          )
+          .ifNullThen(literalNum(1024)) // TODO global constant/param
+          .statement;
+    }
   }
 
   Iterable<Code> _buildStringParam(

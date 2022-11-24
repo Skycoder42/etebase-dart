@@ -1035,11 +1035,14 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getMetaRaw() async {
+  Future<_i4.Uint8List> getMetaRaw([int? sizeHint]) async {
     final data =
         await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
       #etebase_item_get_meta_raw,
-      <dynamic>[_pointer.address],
+      <dynamic>[
+        _pointer.address,
+        sizeHint,
+      ],
     );
     return data.materialize().asUint8List();
   }
@@ -1063,11 +1066,14 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getContent() async {
+  Future<_i4.Uint8List> getContent([int? sizeHint]) async {
     final data =
         await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
       #etebase_item_get_content,
-      <dynamic>[_pointer.address],
+      <dynamic>[
+        _pointer.address,
+        sizeHint,
+      ],
     );
     return data.materialize().asUint8List();
   }
@@ -2185,11 +2191,14 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getMetaRaw() async {
+  Future<_i4.Uint8List> getMetaRaw([int? sizeHint]) async {
     final data =
         await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
       #etebase_collection_get_meta_raw,
-      <dynamic>[_pointer.address],
+      <dynamic>[
+        _pointer.address,
+        sizeHint,
+      ],
     );
     return data.materialize().asUint8List();
   }
@@ -2213,11 +2222,14 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getContent() async {
+  Future<_i4.Uint8List> getContent([int? sizeHint]) async {
     final data =
         await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
       #etebase_collection_get_content,
-      <dynamic>[_pointer.address],
+      <dynamic>[
+        _pointer.address,
+        sizeHint,
+      ],
     );
     return data.materialize().asUint8List();
   }
