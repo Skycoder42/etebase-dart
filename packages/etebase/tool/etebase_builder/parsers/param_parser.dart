@@ -116,10 +116,10 @@ class ParamParser {
     required bool isOptional,
   }) {
     if (param.name == 'access_level') {
-      assert(param.type.isDartCoreInt, 'access_level must be an int parameter');
+      _assertIsInt(param);
       return TypeRef.etebaseCollectionAccessLevel();
     } else if (param.name == 'prefetch') {
-      assert(param.type.isDartCoreInt, 'prefetch must be an int parameter');
+      _assertIsInt(param);
       return TypeRef.etebasePrefetchOption();
     } else {
       return _typeParser.parseType(
@@ -137,5 +137,11 @@ class ParamParser {
     }
 
     return false;
+  }
+
+  void _assertIsInt(ParameterElement param) {
+    if (!param.type.isDartCoreInt) {
+      throw UnsupportedError('${param.name} must be an int parameter');
+    }
   }
 }

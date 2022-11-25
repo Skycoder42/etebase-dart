@@ -40,15 +40,16 @@ class TryCatch {
       );
 
   TryCatch finally$(Iterable<Code> body) {
-    assert(_finally == null, 'Can only define finally once');
+    if (_finally != null) {
+      throw StateError('Can only define finally once');
+    }
     return TryCatch._(_try, _catch, body, _emitter);
   }
 
   Code get code {
-    assert(
-      _catch.isNotEmpty || _finally != null,
-      'Must define at least one catch or finally',
-    );
+    if (_catch.isEmpty && _finally == null) {
+      throw StateError('Must define at least one catch or finally');
+    }
 
     final codeBuffer = StringBuffer('try {');
     _try.acceptAll(_emitter, codeBuffer);

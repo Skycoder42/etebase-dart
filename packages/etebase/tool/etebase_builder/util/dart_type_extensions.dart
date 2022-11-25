@@ -8,7 +8,9 @@ extension DartTypeX on DartType {
   bool get isPointer => this is InterfaceType && element!.name == 'Pointer';
 
   DartType get asPointer {
-    assert(isPointer, 'Type $this is not a pointer');
+    if (!isPointer) {
+      throw UnsupportedError('Type $this is not a pointer');
+    }
     return (this as InterfaceType).typeArguments.single;
   }
 

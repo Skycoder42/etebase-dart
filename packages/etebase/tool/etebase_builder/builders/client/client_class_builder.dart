@@ -13,7 +13,10 @@ class ClientClassBuilder {
   ]);
 
   Class buildClass(ClassRef clazz) {
-    assert(clazz.hasDestroy, 'Can only build destroyable classes');
+    if (!clazz.hasDestroy) {
+      throw UnsupportedError('Can only build destroyable classes');
+    }
+
     return Class(
       (b) => b
         ..name = clazz.name

@@ -130,10 +130,9 @@ class EtebaseParser {
     PropertyAccessorElement getter,
     TypedefRef typeDefs,
   ) {
-    assert(
-      getter.name.startsWith('ETEBASE_UTILS_'),
-      'Can only parse utils getters',
-    );
+    if (!getter.name.startsWith('ETEBASE_UTILS_')) {
+      throw UnsupportedError('Can only parse utils getters');
+    }
 
     return MethodRef(
       name: getter.name.toLowerCase().substring(14).snakeToDart(),
