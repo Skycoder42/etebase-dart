@@ -6,7 +6,7 @@ import '../../parsers/type_ref.dart';
 import '../../util/types.dart';
 
 class IsolateOutParamBuilder {
-  static const _alloc = Reference('alloc');
+  static const _arena = Reference('arena');
 
   const IsolateOutParamBuilder();
 
@@ -44,7 +44,7 @@ class IsolateOutParamBuilder {
 
   Code _buildFingerprintBuf() => declareFinal('buf')
       .assign(
-        _alloc.call(
+        _arena.call(
           [
             refer('libEtebase')
                 .property('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE')
@@ -58,7 +58,7 @@ class IsolateOutParamBuilder {
   Code _buildRetSize(MethodRef method) {
     final retSizeParam = method.parameters.singleWhere((p) => p.isRetSize);
     return declareFinal(retSizeParam.name)
-        .assign(_alloc.call(const [], const {}, [Types.UnsignedLong$]))
+        .assign(_arena.call(const [], const {}, [Types.UnsignedLong$]))
         .cascade('value')
         .assign(literalNum(0))
         .statement;
@@ -71,7 +71,7 @@ class IsolateOutParamBuilder {
   ) sync* {
     yield declareFinal(parameter.name)
         .assign(
-          _alloc.call(
+          _arena.call(
             [refer(method.needsSizeHint ? '${parameter.name}_size' : 'size')],
             const {},
             [Types.Uint8$],
@@ -100,7 +100,7 @@ class IsolateOutParamBuilder {
 
     yield declareFinal(parameter.name)
         .assign(
-          _alloc.call([refer(sizeVarName)], const {}, [type.ffiInnerType]),
+          _arena.call([refer(sizeVarName)], const {}, [type.ffiInnerType]),
         )
         .statement;
   }

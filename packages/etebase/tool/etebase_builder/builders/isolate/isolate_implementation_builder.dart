@@ -4,24 +4,24 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/type_ref.dart';
 import 'isolate_in_param_builder.dart';
 import 'isolate_out_param_builder.dart';
+import 'isolate_return_builder.dart';
 
 class IsolateImplementationBuilder {
   final IsolateInParamBuilder _isolateInParamBuilder;
   final IsolateOutParamBuilder _isolateOutParamBuilder;
+  final IsolateReturnBuilder _isolateReturnBuilder;
 
   const IsolateImplementationBuilder([
     this._isolateInParamBuilder = const IsolateInParamBuilder(),
     this._isolateOutParamBuilder = const IsolateOutParamBuilder(),
+    this._isolateReturnBuilder = const IsolateReturnBuilder(),
   ]);
 
   Code build(MethodRef method) => Block.of([
         ..._isolateInParamBuilder.buildInParameters(method),
         ..._isolateOutParamBuilder.buildOutParameters(method),
         _buildInvocation(method),
-        TypeReference((b) => b..symbol = 'UnimplementedError')
-            .newInstance([])
-            .thrown
-            .statement,
+        ..._isolateReturnBuilder.buildReturn(method),
       ]);
 
   Code _buildInvocation(MethodRef method) {

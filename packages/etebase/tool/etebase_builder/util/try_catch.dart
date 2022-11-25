@@ -1,29 +1,26 @@
 import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/src/visitors.dart';
 
 class _CatchInfo {
-  final TypeReference? on;
-  final Reference? error;
-  final Reference? stackTrace;
-  final Iterable<Code> body;
+  final Spec? on;
+  final Spec? error;
+  final Spec? stackTrace;
+  final Iterable<Spec> body;
 
   _CatchInfo(this.on, this.error, this.stackTrace, this.body);
 }
 
-class TryCatch {
-  final DartEmitter _emitter;
-
-  final Iterable<Code> _try;
+class TryCatch implements Code, Spec {
+  final Iterable<Spec> _try;
   final List<_CatchInfo> _catch;
-  final Iterable<Code>? _finally;
+  final Iterable<Spec>? _finally;
 
-  TryCatch._(this._try, this._catch, this._finally, this._emitter);
+  TryCatch._(this._try, this._catch, this._finally);
 
-  factory TryCatch.try$(Iterable<Code> body, [DartEmitter? emitter]) =>
-      TryCatch._(
+  factory TryCatch.try$(Iterable<Code> body) => TryCatch._(
         body,
         const [],
         null,
-        emitter ?? DartEmitter(useNullSafetySyntax: true),
       );
 
   TryCatch catch$({
@@ -36,61 +33,64 @@ class TryCatch {
         _try,
         [..._catch, _CatchInfo(on, error, stackTrace, body)],
         _finally,
-        _emitter,
       );
 
   TryCatch finally$(Iterable<Code> body) {
     if (_finally != null) {
       throw StateError('Can only define finally once');
     }
-    return TryCatch._(_try, _catch, body, _emitter);
+    return TryCatch._(_try, _catch, body);
   }
 
-  Code get code {
+  @override
+  R accept<R>(SpecVisitor<R> visitor, [R? context]) {
+    if (context is! StringSink) {
+      throw UnsupportedError('Cannot use try-catch without a sink');
+    }
+
     if (_catch.isEmpty && _finally == null) {
       throw StateError('Must define at least one catch or finally');
     }
 
-    final codeBuffer = StringBuffer('try {');
-    _try.acceptAll(_emitter, codeBuffer);
-    codeBuffer.write('}');
+    context.write('try {');
+    _try.acceptAll(visitor, context);
+    context.write('}');
 
     for (final catchInfo in _catch) {
       if (catchInfo.on != null) {
-        codeBuffer.write(' on ');
-        catchInfo.on!.accept(_emitter, codeBuffer);
+        context.write(' on ');
+        catchInfo.on!.accept(visitor, context);
       }
 
       if (catchInfo.error != null) {
-        codeBuffer.write(' catch(');
-        catchInfo.error!.accept(_emitter, codeBuffer);
+        context.write(' catch(');
+        catchInfo.error!.accept(visitor, context);
 
         if (catchInfo.stackTrace != null) {
-          codeBuffer.write(', ');
-          catchInfo.stackTrace!.accept(_emitter, codeBuffer);
+          context.write(', ');
+          catchInfo.stackTrace!.accept(visitor, context);
         }
 
-        codeBuffer.write(') ');
+        context.write(') ');
       }
 
-      codeBuffer.write('{');
-      catchInfo.body.acceptAll(_emitter, codeBuffer);
-      codeBuffer.write('}');
+      context.write('{');
+      catchInfo.body.acceptAll(visitor, context);
+      context.write('}');
     }
 
     if (_finally != null) {
-      codeBuffer.write(' finally {');
-      _finally!.acceptAll(_emitter, codeBuffer);
-      codeBuffer.write('}');
+      context.write(' finally {');
+      _finally!.acceptAll(visitor, context);
+      context.write('}');
     }
 
-    return Code(codeBuffer.toString());
+    return context;
   }
 }
 
-extension _CodeListX on Iterable<Code> {
-  void acceptAll(DartEmitter visitor, StringBuffer context) =>
-      forEach((element) {
-        element.accept(visitor, context);
+extension _CodeListX on Iterable<Spec> {
+  void acceptAll<R>(SpecVisitor<R> visitor, [R? context]) => forEach((element) {
+        element.accept<R>(visitor, context);
       });
 }

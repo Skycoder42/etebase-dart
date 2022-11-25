@@ -79,6 +79,30 @@ abstract class Types {
       ..url = 'package:etebase/src/model/etebase_prefetch_option.dart',
   );
 
+  static final EtebaseErrorCode$ = TypeReference(
+    (b) => b
+      ..symbol = 'EtebaseErrorCode'
+      ..url = 'package:etebase/src/model/etebase_error_code.dart',
+  );
+
+  static final MethodResult$ = TypeReference(
+    (b) => b
+      ..symbol = 'MethodResult'
+      ..url = 'package:etebase/src/isolate/method_result.dart',
+  );
+
+  static final MethodInvocation$ = TypeReference(
+    (b) => b
+      ..symbol = 'MethodInvocation'
+      ..url = 'package:etebase/src/isolate/method_invocation.dart',
+  );
+
+  static final EtebaseArena$ = TypeReference(
+    (b) => b
+      ..symbol = 'EtebaseArena'
+      ..url = 'package:etebase/src/isolate/etebase_arena.dart',
+  );
+
   static TypeReference list(TypeReference type) => TypeReference(
         (b) => b
           ..symbol = 'List'

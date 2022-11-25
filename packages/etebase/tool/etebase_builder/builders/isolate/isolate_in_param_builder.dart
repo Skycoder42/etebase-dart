@@ -4,10 +4,11 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
+import '../../util/if_then.dart';
 import '../../util/types.dart';
 
 class IsolateInParamBuilder {
-  static const _alloc = Reference('alloc');
+  static const _arena = Reference('arena');
   static const _nullptrRef = Reference('nullptr', 'dart:ffi');
 
   const IsolateInParamBuilder();
@@ -19,8 +20,7 @@ class IsolateInParamBuilder {
     yield arguments
         .property('length')
         .equalTo(literalNum(paramsLength))
-        .asserted('Invocation must have exactly $paramsLength arguments')
-        .statement;
+        .asserted('Invocation must have exactly $paramsLength arguments');
 
     for (var argumentIndex = 0; argumentIndex < paramsLength; ++argumentIndex) {
       final param = params[argumentIndex];
@@ -82,7 +82,7 @@ class IsolateInParamBuilder {
     Expression argument,
   ) sync* {
     yield variable
-        .assign(_alloc.call(const [], const {}, [Types.Int64$]))
+        .assign(_arena.call(const [], const {}, [Types.Int64$]))
         .cascade('value')
         .assign(argument.property('millisecondsSinceEpoch'))
         .statement;
@@ -148,7 +148,7 @@ class IsolateInParamBuilder {
         .statement;
 
     if (isNullable) {
-      yield bufferRef.notEqualTo(literalNull).ifThen(Block.of([assignment]));
+      yield IfThen.if$(bufferRef.notEqualTo(literalNull), [assignment]);
     } else {
       yield assignment;
     }
@@ -218,7 +218,7 @@ class IsolateInParamBuilder {
 
   Expression _stringToPointer(Expression variable) => variable
       .property('toNativeUtf8')
-      .call(const [], const {'allocator': _alloc})
+      .call(const [], const {'allocator': _arena})
       .property('cast')
       .call(const [], const {}, [Types.Char$]);
 
@@ -241,7 +241,7 @@ class IsolateInParamBuilder {
         )
         .statement;
 
-    final allocation = _alloc.call([sizeVariable], const {}, [pointerType]);
+    final allocation = _arena.call([sizeVariable], const {}, [pointerType]);
 
     if (isNullable) {
       yield variable
