@@ -4,7 +4,6 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
-import '../../util/for_each.dart';
 import '../../util/if_then.dart';
 import '../../util/types.dart';
 
@@ -104,12 +103,12 @@ class IsolateInParamBuilder {
     );
 
     yield _assignPointerArray(
-      refer(parameter.name),
+      parameter.name,
       argument,
       Method(
         (b) => b
-          ..requiredParameters.add(Parameter((b) => b..name = 'e'))
-          ..body = _stringToPointer(refer('e')).code,
+          ..requiredParameters.add(Parameter((b) => b..name = 's'))
+          ..body = _stringToPointer(refer('s')).code,
       ).closure,
     ).statement;
   }
@@ -211,7 +210,7 @@ class IsolateInParamBuilder {
     );
 
     yield _assignPointerArray(
-      refer(parameter.name),
+      parameter.name,
       argument,
       parameterType.ffiInnerType.property('fromAddress'),
     ).statement;
@@ -255,19 +254,14 @@ class IsolateInParamBuilder {
     }
   }
 
-  Iterable<Code> _assignPointerArray(
-    Expression variable,
-    Expression sizeVariable,
+  Expression _assignPointerArray(
+    String variableName,
     Expression argument,
     Expression map,
-  ) sync* {
-    yield forRange$(
-      declareVar('i').assign(literalNum(0)),
-      refer('i').lessThan(sizeVariable),
-      refer('i').incremented,
-      [
-        variable.index(refer('i')).assign(argument.index(refer('i'))).statement,
-      ],
-    );
-  }
+  ) =>
+      Types.FfiHelpers$.property('assignPointerList').call([
+        refer(variableName),
+        argument,
+        map,
+      ]);
 }

@@ -8,7 +8,7 @@ abstract class TypeRef {
   TypeReference get ffiType;
 
   factory TypeRef.void$() = VoidTypeRef;
-  factory TypeRef.bool() = BoolTypeRef;
+  factory TypeRef.bool({bool fromInt}) = BoolTypeRef;
   // ignore: avoid_positional_boolean_parameters
   factory TypeRef.int(bool asReturn) = IntTypeRef;
   factory TypeRef.returnSize() = ReturnSizeTypeRef;
@@ -45,7 +45,12 @@ class VoidTypeRef extends _SingleTypeRef {
 }
 
 class BoolTypeRef extends _SingleTypeRef {
-  BoolTypeRef() : super(Types.bool$);
+  final bool fromInt;
+
+  BoolTypeRef({this.fromInt = false}) : super(Types.bool$);
+
+  @override
+  TypeReference get ffiType => fromInt ? Types.int$ : Types.bool$;
 }
 
 class IntTypeRef implements TypeRef {

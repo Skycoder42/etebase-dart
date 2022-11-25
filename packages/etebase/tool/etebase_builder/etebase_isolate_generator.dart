@@ -35,5 +35,6 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'lines_longer_than_80_chars',
       'prefer_is_empty',
       'constant_identifier_names',
+      'avoid_bool_literals_in_conditional_expressions',
     ].join(', '),
   );

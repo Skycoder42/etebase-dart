@@ -58,7 +58,7 @@ class MethodParser {
     RegExp(r'.*_pubkey$'): TypeRef.byteArray(),
     RegExp(r'.*_get_access_level$'): TypeRef.etebaseCollectionAccessLevel(),
     'etebase_signed_invitation_get_from_username': TypeRef.string(),
-    'etebase_client_check_etebase_server': TypeRef.bool(),
+    'etebase_client_check_etebase_server': TypeRef.bool(fromInt: true),
   };
 
   final ParamParser _paramParser;

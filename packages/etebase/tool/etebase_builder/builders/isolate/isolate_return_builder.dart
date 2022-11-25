@@ -7,32 +7,103 @@ import '../../util/types.dart';
 
 class IsolateReturnBuilder {
   static const _arena = Reference('arena');
+  static const _nullptrRef = Reference('nullptr', 'dart:ffi');
 
   const IsolateReturnBuilder();
 
   Iterable<Code> buildReturn(MethodRef method) sync* {
-    final returnType = method.returnType;
-
     final resultRef = refer('result');
+
     final Expression transformedResult;
-    if (returnType is VoidTypeRef) {
-      transformedResult = literalNull;
-    } else if (returnType is IntTypeRef) {
-      yield* _checkSuccess(resultRef);
-      // TODO handle ourParams
-      transformedResult = returnType.asReturn ? literalNull : resultRef;
+    if (method.hasOutParam) {
+      final returnParam = method.parameters.singleWhere((p) => p.isOutParam);
+      final returnParamRef = refer(returnParam.name);
+      final returnType = returnParam.type;
+
+      yield _checkIntSuccess(resultRef);
+      if (returnType is StringTypeRef) {
+        // TODO assert is fingerprint
+        transformedResult = transformedResult = _transformString(
+          returnParamRef,
+          returnType,
+          // TODO check if needed - might be null terminated already, so actual
+          // size is ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE - 1
+          length: refer('libEtebase')
+              .property('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE'),
+        );
+      } else if (returnType is ByteArrayTypeRef) {
+        // TODO so many special cases...
+        transformedResult = _transformByteArray(
+          method,
+          returnParamRef,
+          returnType,
+          listLength: method.ffiName == 'etebase_utils_randombytes'
+              ? refer('size')
+              : refer('${returnParam.name}_size'),
+        );
+      } else if (returnType is EtebaseOutListTypeRef) {
+        transformedResult = _transformEtebaseOutList(
+          returnParamRef,
+          refer('${returnParam.name}_size'),
+          returnType,
+        );
+      } else {
+        throw UnsupportedError(
+          'Cannot build out return ref for type $returnType',
+        );
+      }
     } else {
-      transformedResult = resultRef;
+      final returnType = method.returnType;
+      final ptrResultRef = _arena.property('attach').call([resultRef]);
+
+      if (returnType is VoidTypeRef) {
+        transformedResult = literalNull;
+      } else if (returnType is BoolTypeRef) {
+        if (returnType.fromInt) {
+          yield _checkIntSuccess(resultRef);
+          transformedResult = _transformIntBool(resultRef, returnType);
+        } else {
+          transformedResult = resultRef;
+        }
+      } else if (returnType is IntTypeRef) {
+        yield _checkIntSuccess(resultRef);
+        // TODO handle outParams
+        transformedResult = returnType.asReturn ? literalNull : resultRef;
+      } else if (returnType is StringTypeRef) {
+        yield _checkPointerSuccess(resultRef);
+        transformedResult = _transformString(ptrResultRef, returnType);
+      } else if (returnType is DateTimeTypeRef) {
+        yield _checkPointerSuccess(resultRef);
+        transformedResult = _transformDateTime(ptrResultRef, returnType);
+      } else if (returnType is ByteArrayTypeRef) {
+        yield _checkPointerSuccess(resultRef);
+        transformedResult =
+            _transformByteArray(method, ptrResultRef, returnType);
+      } else if (returnType is EnumTypeRef) {
+        yield _checkIntSuccess(resultRef);
+        transformedResult = _transformEnum(resultRef, returnType);
+      } else if (returnType is EtebaseClassTypeRef) {
+        yield _checkPointerSuccess(resultRef);
+        transformedResult = _transformEtebaseClass(resultRef, returnType);
+      } else {
+        throw UnsupportedError(
+          'Cannot create return value for type $returnType',
+        );
+      }
     }
 
     yield _buildReturnStatement(transformedResult).statement;
   }
 
-  Iterable<Code> _checkSuccess(Expression result) sync* {
-    yield if$(result.equalTo(literalNum(-1)), [
-      _buildErrorReturn().statement,
-    ]);
-  }
+  Code _checkIntSuccess(Expression result) =>
+      if$(result.equalTo(literalNum(-1)), [
+        _buildErrorReturn().statement,
+      ]);
+
+  Code _checkPointerSuccess(Expression result) =>
+      if$(result.equalTo(_nullptrRef), [
+        _buildErrorReturn().statement,
+      ]);
 
   Expression _buildReturnStatement(Expression result) =>
       Types.MethodResult$.newInstanceNamed(
@@ -46,4 +117,80 @@ class IsolateReturnBuilder {
         _arena,
         refer('invocation').property('id'),
       ]).returned;
+
+  Expression _transformIntBool(Reference resultRef, BoolTypeRef type) =>
+      resultRef.equalTo(literalNum(0)).conditional(literalFalse, literalTrue);
+
+  Expression _transformString(
+    Expression result,
+    StringTypeRef type, {
+    Expression? length,
+  }) =>
+      result
+          .property('cast')
+          .call(const [], const {}, [Types.Utf8$])
+          .property('toDartString')
+          .call(const [], {if (length != null) 'length': length});
+
+  Expression _transformDateTime(Expression result, DateTimeTypeRef type) =>
+      Types.DateTime$.newInstanceNamed('fromMillisecondsSinceEpoch', [
+        result.property('value'),
+      ]);
+
+  Expression _transformByteArray(
+    MethodRef method,
+    Expression result,
+    ByteArrayTypeRef type, {
+    Expression? listLength,
+  }) {
+    final Expression length;
+    if (method.hasRetSize) {
+      length = refer('retSize').property('value');
+    } else if (method.ffiName.contains('pubkey')) {
+      // TODO use method.hasSizeGetter ?
+      length = refer('libEtebase')
+          .property('${method.ffiName}_size')
+          .call([refer('this_')]);
+    } else if (listLength != null) {
+      length = listLength;
+    } else {
+      throw UnsupportedError(
+        'Cannot create byte array without retSize or length getter',
+      );
+    }
+
+    return Types.TransferableTypedData$.newInstanceNamed('fromList', [
+      literalList([
+        result
+            .property('cast')
+            .call(const [], const {}, [Types.Uint8$])
+            .property('asTypedList')
+            .call([length])
+      ]),
+    ]);
+  }
+
+  Expression _transformEnum(Expression result, EnumTypeRef type) =>
+      type.transferType.property('values').index(result);
+
+  Expression _transformEtebaseClass(
+    Expression result,
+    EtebaseClassTypeRef type,
+  ) =>
+      result.property('address');
+
+  Expression _transformEtebaseOutList(
+    Expression result,
+    Expression resultLength,
+    EtebaseOutListTypeRef type,
+  ) =>
+      Types.FfiHelpers$.property('extractPointerList').call([
+        result,
+        resultLength,
+        Method(
+          (b) => b
+            ..requiredParameters.add(Parameter((b) => b..name = 'p'))
+            ..body = refer('p').property('address').code,
+        ).closure,
+      ]);
 }

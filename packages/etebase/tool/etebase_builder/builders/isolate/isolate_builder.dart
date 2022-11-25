@@ -18,7 +18,6 @@ class IsolateBuilder {
     final methods = _allMethods(etebase);
     return Library(
       (b) => b
-        ..directives.add(Directive.import('package:collection/collection.dart'))
         ..directives.add(Directive.import('package:ffi/ffi.dart'))
         ..body.add(_buildHandler(methods))
         ..body.addAll(methods.map(_buildImplementation)),

@@ -4,19 +4,19 @@
 // EtebaseIsolateGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names, avoid_bool_literals_in_conditional_expressions
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i5;
 import 'dart:isolate' as _i7;
 
-import 'package:collection/collection.dart';
 import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i2;
 import 'package:etebase/src/isolate/etebase_arena.dart' as _i4;
 import 'package:etebase/src/isolate/ffi_helpers.dart' as _i6;
 import 'package:etebase/src/isolate/method_invocation.dart' as _i3;
 import 'package:etebase/src/isolate/method_result.dart' as _i1;
 import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i9;
-import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i8;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i10;
+import 'package:ffi/ffi.dart' as _i8;
 import 'package:ffi/ffi.dart';
 
 _i1.MethodResult etebaseIsolateMessageHandler(
@@ -1062,9 +1062,21 @@ _i1.MethodResult _etebase_user_profile_get_pubkey(
   final this_ = _i5.Pointer<_i2.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_user_profile_get_pubkey(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList([
+      arena
+          .attach(result)
+          .cast<_i5.Uint8>()
+          .asTypedList(libEtebase.etebase_user_profile_get_pubkey_size(this_))
+    ]),
   );
 }
 
@@ -1101,9 +1113,16 @@ _i1.MethodResult _etebase_user_new(
     username,
     email,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1139,9 +1158,16 @@ _i1.MethodResult _etebase_user_get_username(
   final this_ = _i5.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_user_get_username(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1177,9 +1203,16 @@ _i1.MethodResult _etebase_user_get_email(
   final this_ = _i5.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_user_get_email(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1209,9 +1242,16 @@ _i1.MethodResult _etebase_signed_invitation_clone(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_clone(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1225,9 +1265,16 @@ _i1.MethodResult _etebase_signed_invitation_get_uid(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_uid(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1241,9 +1288,16 @@ _i1.MethodResult _etebase_signed_invitation_get_username(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_username(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1257,9 +1311,16 @@ _i1.MethodResult _etebase_signed_invitation_get_collection(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_collection(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1273,9 +1334,16 @@ _i1.MethodResult _etebase_signed_invitation_get_access_level(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_access_level(this_);
+  if (result == -1) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i9.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
@@ -1289,9 +1357,16 @@ _i1.MethodResult _etebase_signed_invitation_get_from_username(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_from_username(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1305,9 +1380,19 @@ _i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_from_pubkey(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList([
+      arena.attach(result).cast<_i5.Uint8>().asTypedList(
+          libEtebase.etebase_signed_invitation_get_from_pubkey_size(this_))
+    ]),
   );
 }
 
@@ -1337,9 +1422,16 @@ _i1.MethodResult _etebase_removed_collection_get_uid(
   final this_ = _i5.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_removed_collection_get_uid(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1370,9 +1462,16 @@ _i1.MethodResult _etebase_invitation_list_response_get_iterator(
       (invocation.arguments[0] as int));
   final result =
       libEtebase.etebase_invitation_list_response_get_iterator(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1401,7 +1500,11 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i6.FfiHelpers.extractPointerList(
+      data,
+      data_size,
+      (p) => p.address,
+    ),
   );
 }
 
@@ -1448,9 +1551,16 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
       (invocation.arguments[0] as int));
   final result =
       libEtebase.etebase_item_revisions_list_response_get_iterator(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1479,7 +1589,11 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i6.FfiHelpers.extractPointerList(
+      data,
+      data_size,
+      (p) => p.address,
+    ),
   );
 }
 
@@ -1525,9 +1639,16 @@ _i1.MethodResult _etebase_member_list_response_get_iterator(
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_member_list_response_get_iterator(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1556,7 +1677,11 @@ _i1.MethodResult _etebase_member_list_response_get_data(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i6.FfiHelpers.extractPointerList(
+      data,
+      data_size,
+      (p) => p.address,
+    ),
   );
 }
 
@@ -1600,9 +1725,16 @@ _i1.MethodResult _etebase_item_metadata_new(
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.etebase_item_metadata_new();
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1638,9 +1770,16 @@ _i1.MethodResult _etebase_item_metadata_get_item_type(
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_item_type(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1676,9 +1815,16 @@ _i1.MethodResult _etebase_item_metadata_get_name(
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_name(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1713,9 +1859,16 @@ _i1.MethodResult _etebase_item_metadata_get_mtime(
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_mtime(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    DateTime.fromMillisecondsSinceEpoch(arena.attach(result).value),
   );
 }
 
@@ -1751,9 +1904,16 @@ _i1.MethodResult _etebase_item_metadata_get_description(
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_description(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1789,9 +1949,16 @@ _i1.MethodResult _etebase_item_metadata_get_color(
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_color(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -1832,9 +1999,16 @@ _i1.MethodResult _etebase_item_manager_fetch(
     itemUid,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1864,9 +2038,16 @@ _i1.MethodResult _etebase_item_manager_create(
     content.cast(),
     content_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1904,9 +2085,16 @@ _i1.MethodResult _etebase_item_manager_create_raw(
     content.cast(),
     content_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1927,9 +2115,16 @@ _i1.MethodResult _etebase_item_manager_list(
     this_,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1953,9 +2148,16 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
     item,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -1970,13 +2172,11 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<int>).length;
   final items = arena<_i5.Pointer<_i2.EtebaseItem>>(items_size);
-  (invocation.arguments[1] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          items[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    items,
+    (invocation.arguments[1] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -1987,9 +2187,16 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
     items_size,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2004,13 +2211,11 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<String>).length;
   final items = arena<_i5.Pointer<_i5.Char>>(items_size);
-  (invocation.arguments[1] as List<String>)
-      .map((e) => e.toNativeUtf8(allocator: arena).cast<_i5.Char>())
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          items[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    items,
+    (invocation.arguments[1] as List<String>),
+    (s) => s.toNativeUtf8(allocator: arena).cast<_i5.Char>(),
+  );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -2021,9 +2226,16 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
     items_size,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2038,13 +2250,11 @@ _i1.MethodResult _etebase_item_manager_batch(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<int>).length;
   final items = arena<_i5.Pointer<_i2.EtebaseItem>>(items_size);
-  (invocation.arguments[1] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          items[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    items,
+    (invocation.arguments[1] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -2079,22 +2289,18 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<int>).length;
   final items = arena<_i5.Pointer<_i2.EtebaseItem>>(items_size);
-  (invocation.arguments[1] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          items[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    items,
+    (invocation.arguments[1] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final deps_size = (invocation.arguments[2] as List<int>).length;
   final deps = arena<_i5.Pointer<_i2.EtebaseItem>>(deps_size);
-  (invocation.arguments[2] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          deps[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    deps,
+    (invocation.arguments[2] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final fetchOptions_address = (invocation.arguments[3] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -2131,13 +2337,11 @@ _i1.MethodResult _etebase_item_manager_transaction(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<int>).length;
   final items = arena<_i5.Pointer<_i2.EtebaseItem>>(items_size);
-  (invocation.arguments[1] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          items[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    items,
+    (invocation.arguments[1] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -2172,22 +2376,18 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
       (invocation.arguments[0] as int));
   final items_size = (invocation.arguments[1] as List<int>).length;
   final items = arena<_i5.Pointer<_i2.EtebaseItem>>(items_size);
-  (invocation.arguments[1] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          items[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    items,
+    (invocation.arguments[1] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final deps_size = (invocation.arguments[2] as List<int>).length;
   final deps = arena<_i5.Pointer<_i2.EtebaseItem>>(deps_size);
-  (invocation.arguments[2] as List<int>)
-      .map(_i5.Pointer<_i2.EtebaseItem>.fromAddress)
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          deps[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    deps,
+    (invocation.arguments[2] as List<int>),
+    _i5.Pointer<_i2.EtebaseItem>.fromAddress,
+  );
   final fetchOptions_address = (invocation.arguments[3] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -2236,9 +2436,16 @@ _i1.MethodResult _etebase_item_manager_cache_load(
     cached.cast(),
     cached_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2259,9 +2466,17 @@ _i1.MethodResult _etebase_item_manager_cache_save(
     item,
     retSize,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList(
+        [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -2282,9 +2497,17 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
     item,
     retSize,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList(
+        [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -2314,9 +2537,16 @@ _i1.MethodResult _etebase_item_list_response_get_stoken(
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_list_response_get_stoken(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -2345,7 +2575,11 @@ _i1.MethodResult _etebase_item_list_response_get_data(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i6.FfiHelpers.extractPointerList(
+      data,
+      data_size,
+      (p) => p.address,
+    ),
   );
 }
 
@@ -2391,9 +2625,16 @@ _i1.MethodResult _etebase_item_clone(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_clone(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2451,9 +2692,16 @@ _i1.MethodResult _etebase_item_get_meta(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_meta(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2518,7 +2766,8 @@ _i1.MethodResult _etebase_item_get_meta_raw(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i7.TransferableTypedData.fromList(
+        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
   );
 }
 
@@ -2583,7 +2832,8 @@ _i1.MethodResult _etebase_item_get_content(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i7.TransferableTypedData.fromList(
+        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
   );
 }
 
@@ -2636,9 +2886,16 @@ _i1.MethodResult _etebase_item_get_uid(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_uid(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -2652,9 +2909,16 @@ _i1.MethodResult _etebase_item_get_etag(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_etag(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -2691,9 +2955,16 @@ _i1.MethodResult _etebase_fs_cache_new(
     path,
     username,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2795,9 +3066,16 @@ _i1.MethodResult _etebase_fs_cache_load_account(
     encryptionKey.cast(),
     encryptionKey_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -2840,9 +3118,16 @@ _i1.MethodResult _etebase_fs_cache_load_stoken(
   final this_ = _i5.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_load_stoken(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -2895,9 +3180,16 @@ _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
     this_,
     colUid,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -2983,9 +3275,16 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
     colMgr,
     colUid,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3083,9 +3382,16 @@ _i1.MethodResult _etebase_fs_cache_item_get(
     colUid,
     itemUid,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3113,9 +3419,16 @@ _i1.MethodResult _etebase_fetch_options_new(
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.etebase_fetch_options_new();
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3148,7 +3461,8 @@ _i1.MethodResult _etebase_fetch_options_set_prefetch(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
-  final prefetch = (invocation.arguments[1] as _i8.EtebasePrefetchOption).index;
+  final prefetch =
+      (invocation.arguments[1] as _i10.EtebasePrefetchOption).index;
   libEtebase.etebase_fetch_options_set_prefetch(
     this_,
     prefetch,
@@ -3256,9 +3570,16 @@ _i1.MethodResult _etebase_collection_member_manager_list(
     this_,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3373,9 +3694,16 @@ _i1.MethodResult _etebase_collection_member_clone(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_clone(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3389,9 +3717,16 @@ _i1.MethodResult _etebase_collection_member_get_username(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_username(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -3405,9 +3740,16 @@ _i1.MethodResult _etebase_collection_member_get_access_level(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_access_level(this_);
+  if (result == -1) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i9.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
@@ -3448,9 +3790,16 @@ _i1.MethodResult _etebase_collection_manager_fetch(
     colUid,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3484,9 +3833,16 @@ _i1.MethodResult _etebase_collection_manager_create(
     content.cast(),
     content_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3528,9 +3884,16 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
     content.cast(),
     content_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3549,9 +3912,16 @@ _i1.MethodResult _etebase_collection_manager_get_item_manager(
     this_,
     col,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3576,9 +3946,16 @@ _i1.MethodResult _etebase_collection_manager_list(
     collectionType,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3593,13 +3970,11 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
       (invocation.arguments[0] as int));
   final collectionTypes_size = (invocation.arguments[1] as List<String>).length;
   final collectionTypes = arena<_i5.Pointer<_i5.Char>>(collectionTypes_size);
-  (invocation.arguments[1] as List<String>)
-      .map((e) => e.toNativeUtf8(allocator: arena).cast<_i5.Char>())
-      .forEachIndexed((
-        i,
-        e,
-      ) =>
-          collectionTypes[i] = e);
+  _i6.FfiHelpers.assignPointerList(
+    collectionTypes,
+    (invocation.arguments[1] as List<String>),
+    (s) => s.toNativeUtf8(allocator: arena).cast<_i5.Char>(),
+  );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
       ? _i5.nullptr
@@ -3610,9 +3985,16 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
     collectionTypes_size,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3705,9 +4087,16 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
     cached.cast(),
     cached_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3728,9 +4117,17 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
     collection,
     retSize,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList(
+        [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -3751,9 +4148,17 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
     collection,
     retSize,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList(
+        [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -3772,9 +4177,16 @@ _i1.MethodResult _etebase_collection_manager_get_member_manager(
     this_,
     col,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3804,9 +4216,16 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_list_response_get_stoken(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -3835,7 +4254,11 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i6.FfiHelpers.extractPointerList(
+      data,
+      data_size,
+      (p) => p.address,
+    ),
   );
 }
 
@@ -3881,7 +4304,11 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i6.FfiHelpers.extractPointerList(
+      data,
+      data_size,
+      (p) => p.address,
+    ),
   );
 }
 
@@ -3918,9 +4345,16 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
     this_,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -3941,9 +4375,16 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
     this_,
     fetchOptions,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4019,9 +4460,16 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
     this_,
     username,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4109,9 +4557,19 @@ _i1.MethodResult _etebase_invitation_manager_get_pubkey(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_invitation_manager_get_pubkey(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i7.TransferableTypedData.fromList([
+      arena.attach(result).cast<_i5.Uint8>().asTypedList(
+          libEtebase.etebase_invitation_manager_get_pubkey_size(this_))
+    ]),
   );
 }
 
@@ -4141,9 +4599,16 @@ _i1.MethodResult _etebase_collection_clone(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_clone(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4201,9 +4666,16 @@ _i1.MethodResult _etebase_collection_get_meta(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_meta(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4268,7 +4740,8 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i7.TransferableTypedData.fromList(
+        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
   );
 }
 
@@ -4333,7 +4806,8 @@ _i1.MethodResult _etebase_collection_get_content(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i7.TransferableTypedData.fromList(
+        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
   );
 }
 
@@ -4386,9 +4860,16 @@ _i1.MethodResult _etebase_collection_get_uid(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_uid(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -4402,9 +4883,16 @@ _i1.MethodResult _etebase_collection_get_etag(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_etag(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -4418,9 +4906,16 @@ _i1.MethodResult _etebase_collection_get_stoken(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_stoken(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -4434,9 +4929,16 @@ _i1.MethodResult _etebase_collection_as_item(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_as_item(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4450,9 +4952,16 @@ _i1.MethodResult _etebase_collection_get_collection_type(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_collection_type(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -4466,9 +4975,16 @@ _i1.MethodResult _etebase_collection_get_access_level(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_access_level(this_);
+  if (result == -1) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    _i9.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
@@ -4505,9 +5021,16 @@ _i1.MethodResult _etebase_client_new(
     clientName,
     serverUrl,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4550,9 +5073,16 @@ _i1.MethodResult _etebase_client_check_etebase_server(
   final client = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_client_check_etebase_server(client);
+  if (result == -1) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result == 0 ? false : true,
   );
 }
 
@@ -4592,9 +5122,16 @@ _i1.MethodResult _etebase_account_login(
     username,
     password,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4617,9 +5154,16 @@ _i1.MethodResult _etebase_account_signup(
     user,
     password,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4656,9 +5200,16 @@ _i1.MethodResult _etebase_account_fetch_dashboard_url(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_dashboard_url(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -4753,9 +5304,16 @@ _i1.MethodResult _etebase_account_get_collection_manager(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_get_collection_manager(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4769,9 +5327,16 @@ _i1.MethodResult _etebase_account_get_invitation_manager(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_get_invitation_manager(this_);
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4803,9 +5368,16 @@ _i1.MethodResult _etebase_account_save(
     encryptionKey.cast(),
     encryptionKey_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }
 
@@ -4841,9 +5413,16 @@ _i1.MethodResult _etebase_account_restore(
     encryptionKey.cast(),
     encryptionKey_size,
   );
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    result.address,
   );
 }
 
@@ -4906,7 +5485,8 @@ _i1.MethodResult _etebase_utils_randombytes(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    _i7.TransferableTypedData.fromList(
+        [buf.cast<_i5.Uint8>().asTypedList(size)]),
   );
 }
 
@@ -4941,7 +5521,9 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
   }
   return _i1.MethodResult.success(
     invocation.id,
-    null,
+    buf
+        .cast<_i8.Utf8>()
+        .toDartString(length: libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE),
   );
 }
 
@@ -4953,8 +5535,15 @@ _i1.MethodResult _etebase_get_default_server_url(
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.etebase_get_default_server_url();
+  if (result == _i5.nullptr) {
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
+      invocation.id,
+    );
+  }
   return _i1.MethodResult.success(
     invocation.id,
-    result,
+    arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
 }

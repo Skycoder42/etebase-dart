@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
 
 import '../../gen/ffi/libetebase.ffi.dart' as ffi;
@@ -21,4 +23,25 @@ abstract class FfiHelpers {
       errorMessage.cast<Utf8>().toDartString(),
     );
   }
+
+  static void assignPointerList<TPtr extends NativeType, TData>(
+    Pointer<Pointer<TPtr>> pointerList,
+    List<TData> dataList,
+    Pointer<TPtr> Function(TData) mapper,
+  ) {
+    for (var i = 0; i < dataList.length; ++i) {
+      pointerList[i] = mapper(dataList[i]);
+    }
+  }
+
+  static List<TData> extractPointerList<TPtr extends NativeType, TData>(
+    Pointer<Pointer<TPtr>> pointerList,
+    int pointerListLength,
+    TData Function(Pointer<TPtr>) mapper,
+  ) =>
+      List.generate(
+        pointerListLength,
+        (index) => mapper(pointerList[index]),
+        growable: false,
+      );
 }
