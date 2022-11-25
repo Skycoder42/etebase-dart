@@ -4,6 +4,7 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
+import '../../util/for_each.dart';
 import '../../util/if_then.dart';
 import '../../util/types.dart';
 
@@ -254,19 +255,19 @@ class IsolateInParamBuilder {
     }
   }
 
-  Expression _assignPointerArray(
+  Iterable<Code> _assignPointerArray(
     Expression variable,
+    Expression sizeVariable,
     Expression argument,
     Expression map,
-  ) =>
-      argument.property('map').call([map]).property('forEachIndexed').call([
-            Method(
-              (b) => b
-                ..requiredParameters.addAll([
-                  Parameter((b) => b..name = 'i'),
-                  Parameter((b) => b..name = 'e'),
-                ])
-                ..body = variable.index(refer('i')).assign(refer('e')).code,
-            ).closure,
-          ]);
+  ) sync* {
+    yield forRange$(
+      declareVar('i').assign(literalNum(0)),
+      refer('i').lessThan(sizeVariable),
+      refer('i').incremented,
+      [
+        variable.index(refer('i')).assign(argument.index(refer('i'))).statement,
+      ],
+    );
+  }
 }

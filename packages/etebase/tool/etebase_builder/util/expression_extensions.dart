@@ -27,6 +27,23 @@ class _AssertStatement implements Code, Spec {
   }
 }
 
+class _IncrementExpression extends Expression implements Spec {
+  final Spec _expression;
+
+  _IncrementExpression(this._expression);
+
+  @override
+  R accept<R>(SpecVisitor<R> visitor, [R? context]) {
+    if (context is! StringSink) {
+      throw UnsupportedError('Cannot use try-catch without a sink');
+    }
+
+    context.write('++');
+    _expression.accept(visitor, context);
+    return context;
+  }
+}
+
 extension ExpressionX on Expression {
   Expression nullableProperty(
     String name, {
@@ -45,6 +62,8 @@ extension ExpressionX on Expression {
   }
 
   Code asserted([String? message]) => _AssertStatement(this, message);
+
+  Expression get incremented => _IncrementExpression(this);
 }
 
 extension SpecIterableX on Iterable<Spec> {
