@@ -1,6 +1,8 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:code_builder/src/visitors.dart';
 
+import 'expression_extensions.dart';
+
 class _CatchInfo {
   final Spec? on;
   final Spec? error;
@@ -16,12 +18,6 @@ class TryCatch implements Code, Spec {
   final Iterable<Spec>? _finally;
 
   TryCatch._(this._try, this._catch, this._finally);
-
-  factory TryCatch.try$(Iterable<Code> body) => TryCatch._(
-        body,
-        const [],
-        null,
-      );
 
   TryCatch catch$({
     TypeReference? on,
@@ -89,8 +85,8 @@ class TryCatch implements Code, Spec {
   }
 }
 
-extension _CodeListX on Iterable<Spec> {
-  void acceptAll<R>(SpecVisitor<R> visitor, [R? context]) => forEach((element) {
-        element.accept<R>(visitor, context);
-      });
-}
+TryCatch try$(Iterable<Code> body) => TryCatch._(
+      body,
+      const [],
+      null,
+    );

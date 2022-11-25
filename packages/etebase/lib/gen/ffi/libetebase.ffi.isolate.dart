@@ -7,17 +7,16 @@
 // ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i5;
-import 'dart:isolate' as _i8;
+import 'dart:isolate' as _i7;
 
 import 'package:collection/collection.dart';
 import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i2;
 import 'package:etebase/src/isolate/etebase_arena.dart' as _i4;
+import 'package:etebase/src/isolate/ffi_helpers.dart' as _i6;
 import 'package:etebase/src/isolate/method_invocation.dart' as _i3;
 import 'package:etebase/src/isolate/method_result.dart' as _i1;
-import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i10;
-import 'package:etebase/src/model/etebase_error_code.dart' as _i6;
-import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i9;
-import 'package:ffi/ffi.dart' as _i7;
+import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i9;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i8;
 import 'package:ffi/ffi.dart';
 
 _i1.MethodResult etebaseIsolateMessageHandler(
@@ -1394,12 +1393,10 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
     data,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -1474,12 +1471,10 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
     data,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -1553,12 +1548,10 @@ _i1.MethodResult _etebase_member_list_response_get_data(
     data,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -1856,7 +1849,7 @@ _i1.MethodResult _etebase_item_manager_create(
       (invocation.arguments[0] as int));
   final meta = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[1] as int));
-  final content_buffer = (invocation.arguments[2] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[2] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -1886,7 +1879,7 @@ _i1.MethodResult _etebase_item_manager_create_raw(
       'Invocation must have exactly 3 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final meta_size = meta_buffer.length;
@@ -1895,7 +1888,7 @@ _i1.MethodResult _etebase_item_manager_create_raw(
         0,
         meta_buffer,
       );
-  final content_buffer = (invocation.arguments[2] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[2] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -2063,12 +2056,10 @@ _i1.MethodResult _etebase_item_manager_batch(
     fetchOptions,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2117,12 +2108,10 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
     fetchOptions,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2160,12 +2149,10 @@ _i1.MethodResult _etebase_item_manager_transaction(
     fetchOptions,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2214,12 +2201,10 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
     fetchOptions,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2237,7 +2222,7 @@ _i1.MethodResult _etebase_item_manager_cache_load(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final cached_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final cached_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final cached_size = cached_buffer.length;
@@ -2352,12 +2337,10 @@ _i1.MethodResult _etebase_item_list_response_get_data(
     data,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2446,12 +2429,10 @@ _i1.MethodResult _etebase_item_set_meta(
     meta,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2485,7 +2466,7 @@ _i1.MethodResult _etebase_item_set_meta_raw(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final meta_size = meta_buffer.length;
@@ -2500,12 +2481,10 @@ _i1.MethodResult _etebase_item_set_meta_raw(
     meta_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2531,12 +2510,10 @@ _i1.MethodResult _etebase_item_get_meta_raw(
     buf_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2554,7 +2531,7 @@ _i1.MethodResult _etebase_item_set_content(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final content_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -2569,12 +2546,10 @@ _i1.MethodResult _etebase_item_set_content(
     content_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2600,12 +2575,10 @@ _i1.MethodResult _etebase_item_get_content(
     buf_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2625,12 +2598,10 @@ _i1.MethodResult _etebase_item_delete(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_delete(this_);
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2737,12 +2708,10 @@ _i1.MethodResult _etebase_fs_cache_clear_user(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_clear_user(this_);
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2763,7 +2732,7 @@ _i1.MethodResult _etebase_fs_cache_save_account(
   final etebase = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[1] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i8.TransferableTypedData?)
+      (invocation.arguments[2] as _i7.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
@@ -2783,12 +2752,10 @@ _i1.MethodResult _etebase_fs_cache_save_account(
     encryptionKey_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2809,7 +2776,7 @@ _i1.MethodResult _etebase_fs_cache_load_account(
   final client = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[1] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i8.TransferableTypedData?)
+      (invocation.arguments[2] as _i7.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
@@ -2851,12 +2818,10 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
     stoken,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2902,12 +2867,10 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
     stoken,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2957,12 +2920,10 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
     col,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -2991,12 +2952,10 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
     colUid,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3053,12 +3012,10 @@ _i1.MethodResult _etebase_fs_cache_item_set(
     item,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3091,12 +3048,10 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
     itemUid,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3193,7 +3148,7 @@ _i1.MethodResult _etebase_fetch_options_set_prefetch(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
-  final prefetch = (invocation.arguments[1] as _i9.EtebasePrefetchOption).index;
+  final prefetch = (invocation.arguments[1] as _i8.EtebasePrefetchOption).index;
   libEtebase.etebase_fetch_options_set_prefetch(
     this_,
     prefetch,
@@ -3324,12 +3279,10 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
     username,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3349,12 +3302,10 @@ _i1.MethodResult _etebase_collection_member_manager_leave(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_manager_leave(this_);
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3376,7 +3327,7 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
       .toNativeUtf8(allocator: arena)
       .cast<_i5.Char>();
   final accessLevel =
-      (invocation.arguments[2] as _i10.EtebaseCollectionAccessLevel).index;
+      (invocation.arguments[2] as _i9.EtebaseCollectionAccessLevel).index;
   final result =
       libEtebase.etebase_collection_member_manager_modify_access_level(
     this_,
@@ -3384,12 +3335,10 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
     accessLevel,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3519,7 +3468,7 @@ _i1.MethodResult _etebase_collection_manager_create(
       .cast<_i5.Char>();
   final meta = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[2] as int));
-  final content_buffer = (invocation.arguments[3] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[3] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -3553,7 +3502,7 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
   final collectionType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: arena)
       .cast<_i5.Char>();
-  final meta_buffer = (invocation.arguments[2] as _i8.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[2] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final meta_size = meta_buffer.length;
@@ -3562,7 +3511,7 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
         0,
         meta_buffer,
       );
-  final content_buffer = (invocation.arguments[3] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[3] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -3688,12 +3637,10 @@ _i1.MethodResult _etebase_collection_manager_upload(
     fetchOptions,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3723,12 +3670,10 @@ _i1.MethodResult _etebase_collection_manager_transaction(
     fetchOptions,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3746,7 +3691,7 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final cached_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final cached_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final cached_size = cached_buffer.length;
@@ -3882,12 +3827,10 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
     data,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -3930,12 +3873,10 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
     data,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4022,12 +3963,10 @@ _i1.MethodResult _etebase_invitation_manager_accept(
     invitation,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4052,12 +3991,10 @@ _i1.MethodResult _etebase_invitation_manager_reject(
     invitation,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4102,7 +4039,7 @@ _i1.MethodResult _etebase_invitation_manager_invite(
   final username = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: arena)
       .cast<_i5.Char>();
-  final pubkey_buffer = (invocation.arguments[3] as _i8.TransferableTypedData)
+  final pubkey_buffer = (invocation.arguments[3] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final pubkey_size = pubkey_buffer.length;
@@ -4112,7 +4049,7 @@ _i1.MethodResult _etebase_invitation_manager_invite(
         pubkey_buffer,
       );
   final accessLevel =
-      (invocation.arguments[4] as _i10.EtebaseCollectionAccessLevel).index;
+      (invocation.arguments[4] as _i9.EtebaseCollectionAccessLevel).index;
   final result = libEtebase.etebase_invitation_manager_invite(
     this_,
     collection,
@@ -4122,12 +4059,10 @@ _i1.MethodResult _etebase_invitation_manager_invite(
     accessLevel,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4152,12 +4087,10 @@ _i1.MethodResult _etebase_invitation_manager_disinvite(
     invitation,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4246,12 +4179,10 @@ _i1.MethodResult _etebase_collection_set_meta(
     meta,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4285,7 +4216,7 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final meta_size = meta_buffer.length;
@@ -4300,12 +4231,10 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
     meta_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4331,12 +4260,10 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
     buf_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4354,7 +4281,7 @@ _i1.MethodResult _etebase_collection_set_content(
       'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final content_buffer = (invocation.arguments[1] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[1] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -4369,12 +4296,10 @@ _i1.MethodResult _etebase_collection_set_content(
     content_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4400,12 +4325,10 @@ _i1.MethodResult _etebase_collection_get_content(
     buf_size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4425,12 +4348,10 @@ _i1.MethodResult _etebase_collection_delete(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_delete(this_);
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4607,12 +4528,10 @@ _i1.MethodResult _etebase_client_set_server_url(
     serverUrl,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4715,12 +4634,10 @@ _i1.MethodResult _etebase_account_fetch_token(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_token(this_);
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4762,12 +4679,10 @@ _i1.MethodResult _etebase_account_force_server_url(
     serverUrl,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4793,12 +4708,10 @@ _i1.MethodResult _etebase_account_change_password(
     password,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4818,12 +4731,10 @@ _i1.MethodResult _etebase_account_logout(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_logout(this_);
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4874,7 +4785,7 @@ _i1.MethodResult _etebase_account_save(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[1] as _i8.TransferableTypedData?)
+      (invocation.arguments[1] as _i7.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
@@ -4911,7 +4822,7 @@ _i1.MethodResult _etebase_account_restore(
       .toNativeUtf8(allocator: arena)
       .cast<_i5.Char>();
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i8.TransferableTypedData?)
+      (invocation.arguments[2] as _i7.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKey_size = encryptionKey_buffer?.length ?? 0;
@@ -4961,12 +4872,10 @@ _i1.MethodResult _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE;
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -4989,12 +4898,10 @@ _i1.MethodResult _etebase_utils_randombytes(
     size,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(
@@ -5010,7 +4917,7 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  final content_buffer = (invocation.arguments[0] as _i8.TransferableTypedData)
+  final content_buffer = (invocation.arguments[0] as _i7.TransferableTypedData)
       .materialize()
       .asUint8List();
   final content_size = content_buffer.length;
@@ -5026,12 +4933,10 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
     buf,
   );
   if (result == -1) {
-    final errorCode = libEtebase.etebase_error_get_code();
-    final errorMessage = arena.attach(libEtebase.etebase_error_get_message());
-    return _i1.MethodResult.failure(
+    return _i6.FfiHelpers.errorResult(
+      libEtebase,
+      arena,
       invocation.id,
-      _i6.EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<_i7.Utf8>().toDartString(),
     );
   }
   return _i1.MethodResult.success(

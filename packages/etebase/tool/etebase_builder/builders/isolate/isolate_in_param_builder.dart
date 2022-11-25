@@ -148,7 +148,7 @@ class IsolateInParamBuilder {
         .statement;
 
     if (isNullable) {
-      yield IfThen.if$(bufferRef.notEqualTo(literalNull), [assignment]);
+      yield if$(bufferRef.notEqualTo(literalNull), [assignment]);
     } else {
       yield assignment;
     }

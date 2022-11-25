@@ -33,10 +33,10 @@ class IsolateBuilder {
       .toList();
 
   Method _buildHandler(List<MethodRef> methods) {
-    final caseBuilder = refer('invocation').property('method').switch$;
+    final caseBuilder = switch$(refer('invocation').property('method'));
 
     for (final method in methods) {
-      caseBuilder.addCase(refer('#${method.ffiName}'), [
+      caseBuilder.case$(refer('#${method.ffiName}'), [
         refer('_${method.ffiName}')
             .call([refer('libEtebase'), refer('invocation'), refer('arena')])
             .returned
@@ -44,7 +44,7 @@ class IsolateBuilder {
       ]);
     }
 
-    caseBuilder.addDefaultCase([
+    caseBuilder.default$([
       TypeReference((b) => b..symbol = 'ArgumentError')
           .newInstanceNamed('value', [
             refer('invocation').property('method'),
@@ -63,7 +63,7 @@ class IsolateBuilder {
           declareFinal('arena')
               .assign(Types.EtebaseArena$.newInstance(const []))
               .statement,
-          TryCatch.try$([
+          try$([
             caseBuilder,
           ]).finally$([
             refer('arena').property('releaseAll').call(const []).statement,

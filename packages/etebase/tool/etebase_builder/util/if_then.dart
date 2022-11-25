@@ -1,6 +1,8 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:code_builder/src/visitors.dart';
 
+import 'expression_extensions.dart';
+
 class _IfThenInfo {
   final Spec _if;
   final Iterable<Code> _then;
@@ -13,9 +15,6 @@ class IfThen implements Code, Spec {
   final Iterable<Code>? _else;
 
   IfThen._(this._ifThenStatements, this._else);
-
-  factory IfThen.if$(Expression condition, Iterable<Code> body) =>
-      IfThen._([_IfThenInfo(condition, body)], null);
 
   IfThen elseIf$(Expression condition, Iterable<Code> body) {
     if (_else != null) {
@@ -65,8 +64,5 @@ class IfThen implements Code, Spec {
   }
 }
 
-extension _CodeListX on Iterable<Spec> {
-  void acceptAll<R>(SpecVisitor<R> visitor, [R? context]) => forEach((element) {
-        element.accept<R>(visitor, context);
-      });
-}
+IfThen if$(Expression condition, Iterable<Code> body) =>
+    IfThen._([_IfThenInfo(condition, body)], null);

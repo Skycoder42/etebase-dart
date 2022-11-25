@@ -6,13 +6,13 @@ class SwitchCase implements Code, Spec {
   final _caseExpression = <Spec, Iterable<Spec>>{};
   Iterable<Spec>? _defaultCase;
 
-  SwitchCase.switch$(this.switchExpression);
+  SwitchCase._(this.switchExpression);
 
-  void addCase(Expression caseExpression, Iterable<Code> statements) =>
+  void case$(Expression caseExpression, Iterable<Code> statements) =>
       _caseExpression[caseExpression] = statements;
 
   // ignore: use_setters_to_change_properties
-  void addDefaultCase(Iterable<Code> statements) => _defaultCase = statements;
+  void default$(Iterable<Code> statements) => _defaultCase = statements;
 
   @override
   R accept<R>(SpecVisitor<R> visitor, [R? context]) {
@@ -45,6 +45,5 @@ class SwitchCase implements Code, Spec {
   }
 }
 
-extension ExpressionX on Expression {
-  SwitchCase get switch$ => SwitchCase.switch$(this);
-}
+SwitchCase switch$(Expression switchExpression) =>
+    SwitchCase._(switchExpression);

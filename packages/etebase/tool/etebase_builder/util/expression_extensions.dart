@@ -46,3 +46,9 @@ extension ExpressionX on Expression {
 
   Code asserted([String? message]) => _AssertStatement(this, message);
 }
+
+extension SpecIterableX on Iterable<Spec> {
+  void acceptAll<R>(SpecVisitor<R> visitor, [R? context]) => forEach((element) {
+        element.accept<R>(visitor, context);
+      });
+}

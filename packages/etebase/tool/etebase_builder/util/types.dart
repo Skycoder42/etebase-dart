@@ -103,6 +103,12 @@ abstract class Types {
       ..url = 'package:etebase/src/isolate/etebase_arena.dart',
   );
 
+  static final FfiHelpers$ = TypeReference(
+    (b) => b
+      ..symbol = 'FfiHelpers'
+      ..url = 'package:etebase/src/isolate/ffi_helpers.dart',
+  );
+
   static TypeReference list(TypeReference type) => TypeReference(
         (b) => b
           ..symbol = 'List'
