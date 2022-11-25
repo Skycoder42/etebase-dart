@@ -1,6 +1,8 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:code_builder/src/visitors.dart';
 
+const literalThis = Reference('this');
+
 class _AssertStatement implements Code, Spec {
   final Spec _expression;
   final String? _message;

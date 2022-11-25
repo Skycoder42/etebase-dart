@@ -2,10 +2,17 @@ import 'package:code_builder/code_builder.dart';
 
 import '../../parsers/class_parser.dart';
 import '../../parsers/method_parser.dart';
+import '../../util/expression_extensions.dart';
 import '../../util/types.dart';
 import 'client_method_builder.dart';
 
 class ClientClassBuilder {
+  static const _finalizerName = '_finalizer';
+  static const _finalizerRef = Reference(_finalizerName);
+  static const pointerName = '_pointer';
+  static const pointerRef = Reference(pointerName);
+  static const _destroyMethodRef = Reference('_destroy');
+
   final ClientMethodBuilder _clientMethodBuilder;
 
   const ClientClassBuilder([
@@ -23,15 +30,15 @@ class ClientClassBuilder {
         ..fields.addAll([
           Field(
             (b) => b
-              ..name = '_finalizer'
+              ..name = _finalizerName
               ..static = true
               ..modifier = FieldModifier.final$
-              ..assignment =
-                  refer('Finalizer').newInstance([refer('_destroy')]).code,
+              ..assignment = TypeReference((b) => b..symbol = 'Finalizer')
+                  .newInstance([_destroyMethodRef]).code,
           ),
           Field(
             (b) => b
-              ..name = '_pointer'
+              ..name = pointerName
               ..type = Types.pointer(
                 Types.ffi(refer(clazz.name)),
               )
@@ -54,15 +61,15 @@ class ClientClassBuilder {
           ..requiredParameters.add(
             Parameter(
               (b) => b
-                ..name = '_pointer'
+                ..name = pointerName
                 ..toThis = true,
             ),
           )
           ..body = Block(
             (b) => b.addExpression(
-              refer('_finalizer').property('attach').call(
-                [refer('this'), refer('_pointer')],
-                {'detach': refer('this')},
+              _finalizerRef.property('attach').call(
+                [literalThis, pointerRef],
+                {'detach': literalThis},
               ),
             ),
           ),
@@ -77,10 +84,10 @@ class ClientClassBuilder {
             ..body = Block(
               (b) => b
                 ..addExpression(
-                  refer('_finalizer').property('detach').call([refer('this')]),
+                  _finalizerRef.property('detach').call([literalThis]),
                 )
                 ..addExpression(
-                  refer('_destroy').call([refer('_pointer')]).awaited,
+                  _destroyMethodRef.call([pointerRef]).awaited,
                 ),
             );
 

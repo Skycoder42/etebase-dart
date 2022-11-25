@@ -20,12 +20,12 @@ class IsolateReturnBuilder {
       final returnParamRef = refer(returnParam.name);
       final returnType = returnParam.type;
 
-      yield _checkIntSuccess(resultRef);
-      if (returnType is StringTypeRef) {
+      yield checkIntSuccess(resultRef);
+      if (method.ffiName == 'etebase_utils_pretty_fingerprint') {
         // TODO assert is fingerprint
         transformedResult = transformedResult = _transformString(
           returnParamRef,
-          returnType,
+          returnType as StringTypeRef,
           // TODO check if needed - might be null terminated already, so actual
           // size is ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE - 1
           length: refer('libEtebase')
@@ -60,14 +60,13 @@ class IsolateReturnBuilder {
         transformedResult = literalNull;
       } else if (returnType is BoolTypeRef) {
         if (returnType.fromInt) {
-          yield _checkIntSuccess(resultRef);
+          yield checkIntSuccess(resultRef);
           transformedResult = _transformIntBool(resultRef, returnType);
         } else {
           transformedResult = resultRef;
         }
       } else if (returnType is IntTypeRef) {
-        yield _checkIntSuccess(resultRef);
-        // TODO handle outParams
+        yield checkIntSuccess(resultRef);
         transformedResult = returnType.asReturn ? literalNull : resultRef;
       } else if (returnType is StringTypeRef) {
         yield _checkPointerSuccess(resultRef);
@@ -80,7 +79,7 @@ class IsolateReturnBuilder {
         transformedResult =
             _transformByteArray(method, ptrResultRef, returnType);
       } else if (returnType is EnumTypeRef) {
-        yield _checkIntSuccess(resultRef);
+        yield checkIntSuccess(resultRef);
         transformedResult = _transformEnum(resultRef, returnType);
       } else if (returnType is EtebaseClassTypeRef) {
         yield _checkPointerSuccess(resultRef);
@@ -95,8 +94,18 @@ class IsolateReturnBuilder {
     yield _buildReturnStatement(transformedResult).statement;
   }
 
-  Code _checkIntSuccess(Expression result) =>
-      if$(result.equalTo(literalNum(-1)), [
+  Code buildReturnByteArray(MethodRef method, Expression listLength) =>
+      _buildReturnStatement(
+        _transformByteArray(
+          method,
+          refer('buf'),
+          method.outOrReturnType as ByteArrayTypeRef,
+          listLength: listLength,
+        ),
+      ).statement;
+
+  IfThen checkIntSuccess(Expression result) =>
+      if$(result.lessThan(literalNum(0)), [
         _buildErrorReturn().statement,
       ]);
 

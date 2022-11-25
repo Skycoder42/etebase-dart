@@ -72,17 +72,30 @@ class IsolateBuilder {
   }
 
   Method _buildImplementation(MethodRef method) => Method(
-        (b) => b
-          ..replace(_buildHandlerSignature())
-          ..requiredParameters.add(
-            Parameter(
-              (b) => b
-                ..name = 'arena'
-                ..type = Types.EtebaseArena$,
-            ),
-          )
-          ..name = '_${method.ffiName}'
-          ..body = _isolateImplementationBuilder.build(method),
+        (b) {
+          b
+            ..replace(_buildHandlerSignature())
+            ..requiredParameters.add(
+              Parameter(
+                (b) => b
+                  ..name = 'arena'
+                  ..type = Types.EtebaseArena$,
+              ),
+            )
+            ..name = '_${method.ffiName}'
+            ..body = _isolateImplementationBuilder.build(method);
+
+          if (method.needsSizeHint) {
+            b.optionalParameters.add(
+              Parameter(
+                (b) => b
+                  ..named = true
+                  ..name = 'reinvokedWithSize'
+                  ..type = Types.int$.asNullable,
+              ),
+            );
+          }
+        },
       );
 
   Method _buildHandlerSignature() => Method(

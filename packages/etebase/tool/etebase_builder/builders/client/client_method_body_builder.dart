@@ -5,6 +5,8 @@ import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
 import '../../util/types.dart';
+import 'client_class_builder.dart';
+import 'client_method_builder.dart';
 
 class ClientMethodBodyBuilder {
   const ClientMethodBodyBuilder();
@@ -21,7 +23,7 @@ class ClientMethodBodyBuilder {
         .map((param) => _mapCallParam(param, method))
         .toList();
     if (method.needsSizeHint) {
-      inParams.add(refer('sizeHint'));
+      inParams.add(ClientMethodBuilder.sizeHintRef);
     }
 
     final returnType = method.outOrReturnType;
@@ -47,6 +49,59 @@ class ClientMethodBodyBuilder {
 
     return expression.code;
   }
+
+  Expression _mapCallParam(ParameterRef param, MethodRef method) {
+    if (param.isThisParam) {
+      final ref =
+          method.isDestroy ? refer(param.name) : ClientClassBuilder.pointerRef;
+      return ref.property('address');
+    } else if (param.type is ByteArrayTypeRef) {
+      final expression = Types.TransferableTypedData$.newInstanceNamed(
+        'fromList',
+        [
+          literalList([refer(param.name)])
+        ],
+      );
+
+      if (param.isOptional) {
+        return refer(param.name)
+            .equalTo(literalNull)
+            .conditional(literalNull, expression);
+      } else {
+        return expression;
+      }
+    } else if (param.type is EtebaseClassTypeRef) {
+      return _toAddress(refer(param.name), param.type.publicType);
+    } else if (param.type is EtebaseClassListTypeRef) {
+      return refer(param.name)
+          .property('map')
+          .call([
+            Method(
+              (b) => b
+                ..requiredParameters.add(Parameter((b) => b..name = 'e'))
+                ..body = _toAddress(refer('e'), param.type.publicType).code,
+            ).closure,
+          ])
+          .property('toList')
+          .call(const []);
+    } else {
+      return refer(param.name);
+    }
+  }
+
+  Expression _toAddress(Reference reference, TypeReference publicType) =>
+      (reference.nullableProperty(
+        ClientClassBuilder.pointerName,
+        isNullable: publicType.isNullable ?? false,
+      )).property('address');
+
+  Expression _fromAddress(Reference classType, Expression address) =>
+      classType.newInstanceNamed('_', [
+        Types.pointer(null).newInstanceNamed(
+          'fromAddress',
+          [address],
+        )
+      ]);
 
   Block _buildOutListMethodBody(
     Expression expression,
@@ -92,56 +147,4 @@ class ClientMethodBodyBuilder {
                 .returned,
           ),
       );
-
-  Expression _mapCallParam(ParameterRef param, MethodRef method) {
-    if (param.isThisParam) {
-      final ref = method.isDestroy ? refer(param.name) : refer('_pointer');
-      return ref.property('address');
-    } else if (param.type is ByteArrayTypeRef) {
-      final expression = Types.TransferableTypedData$.newInstanceNamed(
-        'fromList',
-        [
-          literalList([refer(param.name)]),
-        ],
-      );
-
-      if (param.isOptional) {
-        return refer(param.name)
-            .equalTo(literalNull)
-            .conditional(literalNull, expression);
-      } else {
-        return expression;
-      }
-    } else if (param.type is EtebaseClassTypeRef) {
-      return _toAddress(refer(param.name), param.type.publicType);
-    } else if (param.type is EtebaseClassListTypeRef) {
-      return refer(param.name)
-          .property('map')
-          .call([
-            Method(
-              (b) => b
-                ..requiredParameters.add(Parameter((b) => b..name = 'e'))
-                ..body = _toAddress(refer('e'), param.type.publicType).code,
-            ).closure,
-          ])
-          .property('toList')
-          .call(const []);
-    } else {
-      return refer(param.name);
-    }
-  }
-
-  Expression _toAddress(Reference reference, TypeReference publicType) =>
-      (reference.nullableProperty(
-        '_pointer',
-        isNullable: publicType.isNullable ?? false,
-      )).property('address');
-
-  Expression _fromAddress(Reference classType, Expression address) =>
-      classType.newInstanceNamed('_', [
-        Types.pointer(null).newInstanceNamed(
-          'fromAddress',
-          [address],
-        )
-      ]);
 }

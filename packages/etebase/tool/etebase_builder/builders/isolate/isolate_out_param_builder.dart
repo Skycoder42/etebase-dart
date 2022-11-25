@@ -78,8 +78,6 @@ class IsolateOutParamBuilder {
           ),
         )
         .statement;
-
-    // TODO see https://docs.etebase.com/guides/using_items#binary-content
   }
 
   Iterable<Code> _buildOutClassList(

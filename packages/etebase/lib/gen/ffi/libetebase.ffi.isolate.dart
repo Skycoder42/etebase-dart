@@ -15,7 +15,8 @@ import 'package:etebase/src/isolate/ffi_helpers.dart' as _i6;
 import 'package:etebase/src/isolate/method_invocation.dart' as _i3;
 import 'package:etebase/src/isolate/method_result.dart' as _i1;
 import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i9;
-import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i10;
+import 'package:etebase/src/model/etebase_error_code.dart' as _i10;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i11;
 import 'package:ffi/ffi.dart' as _i8;
 import 'package:ffi/ffi.dart';
 
@@ -1334,7 +1335,7 @@ _i1.MethodResult _etebase_signed_invitation_get_access_level(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_access_level(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -1491,7 +1492,7 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
     this_,
     data,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -1580,7 +1581,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
     this_,
     data,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -1668,7 +1669,7 @@ _i1.MethodResult _etebase_member_list_response_get_data(
     this_,
     data,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2265,7 +2266,7 @@ _i1.MethodResult _etebase_item_manager_batch(
     items_size,
     fetchOptions,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2313,7 +2314,7 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
     deps_size,
     fetchOptions,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2352,7 +2353,7 @@ _i1.MethodResult _etebase_item_manager_transaction(
     items_size,
     fetchOptions,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2400,7 +2401,7 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
     deps_size,
     fetchOptions,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2566,7 +2567,7 @@ _i1.MethodResult _etebase_item_list_response_get_data(
     this_,
     data,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2669,7 +2670,7 @@ _i1.MethodResult _etebase_item_set_meta(
     this_,
     meta,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2728,7 +2729,7 @@ _i1.MethodResult _etebase_item_set_meta_raw(
     meta.cast(),
     meta_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2744,31 +2745,47 @@ _i1.MethodResult _etebase_item_set_meta_raw(
 _i1.MethodResult _etebase_item_get_meta_raw(
   _i2.LibEtebaseFFI libEtebase,
   _i3.MethodInvocation invocation,
-  _i4.EtebaseArena arena,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
+  _i4.EtebaseArena arena, {
+  int? reinvokedWithSize,
+}) {
+  assert(invocation.arguments.length == 2,
+      'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
+  final buf_size =
+      reinvokedWithSize ?? (invocation.arguments[1] as int?) ?? 1024;
   final buf = arena<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_item_get_meta_raw(
     this_,
     buf.cast(),
     buf_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
       invocation.id,
     );
+  } else if (result <= buf_size) {
+    return _i1.MethodResult.success(
+      invocation.id,
+      _i7.TransferableTypedData.fromList(
+          [buf.cast<_i5.Uint8>().asTypedList(result)]),
+    );
+  } else if (reinvokedWithSize != null) {
+    return _i1.MethodResult.failure(
+      invocation.id,
+      _i10.EtebaseErrorCode.generic,
+      'output size of etebase_item_get_meta_raw changed during invocation',
+    );
+  } else {
+    return _etebase_item_get_meta_raw(
+      libEtebase,
+      invocation,
+      arena,
+      reinvokedWithSize: result,
+    );
   }
-  return _i1.MethodResult.success(
-    invocation.id,
-    _i7.TransferableTypedData.fromList(
-        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
-  );
 }
 
 _i1.MethodResult _etebase_item_set_content(
@@ -2794,7 +2811,7 @@ _i1.MethodResult _etebase_item_set_content(
     content.cast(),
     content_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2810,31 +2827,47 @@ _i1.MethodResult _etebase_item_set_content(
 _i1.MethodResult _etebase_item_get_content(
   _i2.LibEtebaseFFI libEtebase,
   _i3.MethodInvocation invocation,
-  _i4.EtebaseArena arena,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
+  _i4.EtebaseArena arena, {
+  int? reinvokedWithSize,
+}) {
+  assert(invocation.arguments.length == 2,
+      'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
+  final buf_size =
+      reinvokedWithSize ?? (invocation.arguments[1] as int?) ?? 1024;
   final buf = arena<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_item_get_content(
     this_,
     buf.cast(),
     buf_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
       invocation.id,
     );
+  } else if (result <= buf_size) {
+    return _i1.MethodResult.success(
+      invocation.id,
+      _i7.TransferableTypedData.fromList(
+          [buf.cast<_i5.Uint8>().asTypedList(result)]),
+    );
+  } else if (reinvokedWithSize != null) {
+    return _i1.MethodResult.failure(
+      invocation.id,
+      _i10.EtebaseErrorCode.generic,
+      'output size of etebase_item_get_content changed during invocation',
+    );
+  } else {
+    return _etebase_item_get_content(
+      libEtebase,
+      invocation,
+      arena,
+      reinvokedWithSize: result,
+    );
   }
-  return _i1.MethodResult.success(
-    invocation.id,
-    _i7.TransferableTypedData.fromList(
-        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
-  );
 }
 
 _i1.MethodResult _etebase_item_delete(
@@ -2847,7 +2880,7 @@ _i1.MethodResult _etebase_item_delete(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_delete(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -2978,7 +3011,7 @@ _i1.MethodResult _etebase_fs_cache_clear_user(
   final this_ = _i5.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_clear_user(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3022,7 +3055,7 @@ _i1.MethodResult _etebase_fs_cache_save_account(
     encryptionKey.cast(),
     encryptionKey_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3095,7 +3128,7 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
     this_,
     stoken,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3151,7 +3184,7 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
     colUid,
     stoken,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3211,7 +3244,7 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
     colMgr,
     col,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3243,7 +3276,7 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
     colMgr,
     colUid,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3310,7 +3343,7 @@ _i1.MethodResult _etebase_fs_cache_item_set(
     colUid,
     item,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3346,7 +3379,7 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
     colUid,
     itemUid,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3462,7 +3495,7 @@ _i1.MethodResult _etebase_fetch_options_set_prefetch(
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final prefetch =
-      (invocation.arguments[1] as _i10.EtebasePrefetchOption).index;
+      (invocation.arguments[1] as _i11.EtebasePrefetchOption).index;
   libEtebase.etebase_fetch_options_set_prefetch(
     this_,
     prefetch,
@@ -3599,7 +3632,7 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
     this_,
     username,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3622,7 +3655,7 @@ _i1.MethodResult _etebase_collection_member_manager_leave(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_manager_leave(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3655,7 +3688,7 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
     username,
     accessLevel,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -3740,7 +3773,7 @@ _i1.MethodResult _etebase_collection_member_get_access_level(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_access_level(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4018,7 +4051,7 @@ _i1.MethodResult _etebase_collection_manager_upload(
     collection,
     fetchOptions,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4051,7 +4084,7 @@ _i1.MethodResult _etebase_collection_manager_transaction(
     collection,
     fetchOptions,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4245,7 +4278,7 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
     this_,
     data,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4295,7 +4328,7 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
     this_,
     data,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4403,7 +4436,7 @@ _i1.MethodResult _etebase_invitation_manager_accept(
     this_,
     invitation,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4431,7 +4464,7 @@ _i1.MethodResult _etebase_invitation_manager_reject(
     this_,
     invitation,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4506,7 +4539,7 @@ _i1.MethodResult _etebase_invitation_manager_invite(
     pubkey_size,
     accessLevel,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4534,7 +4567,7 @@ _i1.MethodResult _etebase_invitation_manager_disinvite(
     this_,
     invitation,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4643,7 +4676,7 @@ _i1.MethodResult _etebase_collection_set_meta(
     this_,
     meta,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4702,7 +4735,7 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
     meta.cast(),
     meta_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4718,31 +4751,47 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
 _i1.MethodResult _etebase_collection_get_meta_raw(
   _i2.LibEtebaseFFI libEtebase,
   _i3.MethodInvocation invocation,
-  _i4.EtebaseArena arena,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
+  _i4.EtebaseArena arena, {
+  int? reinvokedWithSize,
+}) {
+  assert(invocation.arguments.length == 2,
+      'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
+  final buf_size =
+      reinvokedWithSize ?? (invocation.arguments[1] as int?) ?? 1024;
   final buf = arena<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_collection_get_meta_raw(
     this_,
     buf.cast(),
     buf_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
       invocation.id,
     );
+  } else if (result <= buf_size) {
+    return _i1.MethodResult.success(
+      invocation.id,
+      _i7.TransferableTypedData.fromList(
+          [buf.cast<_i5.Uint8>().asTypedList(result)]),
+    );
+  } else if (reinvokedWithSize != null) {
+    return _i1.MethodResult.failure(
+      invocation.id,
+      _i10.EtebaseErrorCode.generic,
+      'output size of etebase_collection_get_meta_raw changed during invocation',
+    );
+  } else {
+    return _etebase_collection_get_meta_raw(
+      libEtebase,
+      invocation,
+      arena,
+      reinvokedWithSize: result,
+    );
   }
-  return _i1.MethodResult.success(
-    invocation.id,
-    _i7.TransferableTypedData.fromList(
-        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
-  );
 }
 
 _i1.MethodResult _etebase_collection_set_content(
@@ -4768,7 +4817,7 @@ _i1.MethodResult _etebase_collection_set_content(
     content.cast(),
     content_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4784,31 +4833,47 @@ _i1.MethodResult _etebase_collection_set_content(
 _i1.MethodResult _etebase_collection_get_content(
   _i2.LibEtebaseFFI libEtebase,
   _i3.MethodInvocation invocation,
-  _i4.EtebaseArena arena,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
+  _i4.EtebaseArena arena, {
+  int? reinvokedWithSize,
+}) {
+  assert(invocation.arguments.length == 2,
+      'Invocation must have exactly 2 arguments');
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final buf_size = (invocation.arguments[1] as int?) ?? 1024;
+  final buf_size =
+      reinvokedWithSize ?? (invocation.arguments[1] as int?) ?? 1024;
   final buf = arena<_i5.Uint8>(buf_size);
   final result = libEtebase.etebase_collection_get_content(
     this_,
     buf.cast(),
     buf_size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
       invocation.id,
     );
+  } else if (result <= buf_size) {
+    return _i1.MethodResult.success(
+      invocation.id,
+      _i7.TransferableTypedData.fromList(
+          [buf.cast<_i5.Uint8>().asTypedList(result)]),
+    );
+  } else if (reinvokedWithSize != null) {
+    return _i1.MethodResult.failure(
+      invocation.id,
+      _i10.EtebaseErrorCode.generic,
+      'output size of etebase_collection_get_content changed during invocation',
+    );
+  } else {
+    return _etebase_collection_get_content(
+      libEtebase,
+      invocation,
+      arena,
+      reinvokedWithSize: result,
+    );
   }
-  return _i1.MethodResult.success(
-    invocation.id,
-    _i7.TransferableTypedData.fromList(
-        [buf.cast<_i5.Uint8>().asTypedList(buf_size)]),
-  );
 }
 
 _i1.MethodResult _etebase_collection_delete(
@@ -4821,7 +4886,7 @@ _i1.MethodResult _etebase_collection_delete(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_delete(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -4975,7 +5040,7 @@ _i1.MethodResult _etebase_collection_get_access_level(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_access_level(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5050,7 +5115,7 @@ _i1.MethodResult _etebase_client_set_server_url(
     this_,
     serverUrl,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5073,7 +5138,7 @@ _i1.MethodResult _etebase_client_check_etebase_server(
   final client = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_client_check_etebase_server(client);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5177,7 +5242,7 @@ _i1.MethodResult _etebase_account_fetch_token(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_token(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5229,7 +5294,7 @@ _i1.MethodResult _etebase_account_force_server_url(
     this_,
     serverUrl,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5258,7 +5323,7 @@ _i1.MethodResult _etebase_account_change_password(
     this_,
     password,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5281,7 +5346,7 @@ _i1.MethodResult _etebase_account_logout(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_logout(this_);
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5450,7 +5515,7 @@ _i1.MethodResult _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE;
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5476,7 +5541,7 @@ _i1.MethodResult _etebase_utils_randombytes(
     buf.cast(),
     size,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,
@@ -5512,7 +5577,7 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
     content_size,
     buf,
   );
-  if (result == -1) {
+  if (result < 0) {
     return _i6.FfiHelpers.errorResult(
       libEtebase,
       arena,

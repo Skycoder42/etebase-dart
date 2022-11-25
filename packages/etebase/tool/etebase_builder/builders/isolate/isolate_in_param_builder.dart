@@ -16,11 +16,12 @@ class IsolateInParamBuilder {
   Iterable<Code> buildInParameters(MethodRef method) sync* {
     final params = method.exportedParams(withThis: true).toList();
     final paramsLength = params.length;
+    final assertLength = method.needsSizeHint ? paramsLength + 1 : paramsLength;
     final arguments = refer('invocation').property('arguments');
     yield arguments
         .property('length')
-        .equalTo(literalNum(paramsLength))
-        .asserted('Invocation must have exactly $paramsLength arguments');
+        .equalTo(literalNum(assertLength))
+        .asserted('Invocation must have exactly $assertLength arguments');
 
     for (var argumentIndex = 0; argumentIndex < paramsLength; ++argumentIndex) {
       final param = params[argumentIndex];
@@ -56,7 +57,8 @@ class IsolateInParamBuilder {
           .single;
 
       yield declareFinal('${paramName}_size')
-          .assign(
+          .assign(refer('reinvokedWithSize'))
+          .ifNullThen(
             arguments
                 .index(literalNum(paramsLength))
                 .asA(Types.int$.asNullable),

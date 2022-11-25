@@ -7,6 +7,9 @@ import '../../util/types.dart';
 import 'client_method_body_builder.dart';
 
 class ClientMethodBuilder {
+  static const _sizeHintName = 'sizeHint';
+  static const sizeHintRef = Reference(_sizeHintName);
+
   final ClientMethodBodyBuilder _clientMethodBodyBuilder;
 
   const ClientMethodBuilder([
@@ -16,7 +19,7 @@ class ClientMethodBuilder {
   Method buildMethod(MethodRef method, {bool global = false}) => Method(
         (b) {
           b
-            ..name = _findMethodName(method)
+            ..name = _getMethodName(method)
             ..static = method.isStatic || method.isDestroy
             ..type = method.isGetter ? MethodType.getter : null
             ..modifier =
@@ -33,7 +36,7 @@ class ClientMethodBuilder {
               if (method.needsSizeHint)
                 Parameter(
                   (b) => b
-                    ..name = 'sizeHint'
+                    ..name = _sizeHintName
                     ..type = Types.int$.asNullable,
                 ),
               ...method
@@ -55,7 +58,7 @@ class ClientMethodBuilder {
       type is EtebaseClassListTypeRef ||
       type is ByteArrayTypeRef;
 
-  String _findMethodName(MethodRef method) {
+  String _getMethodName(MethodRef method) {
     if (method.isNew) {
       return 'create';
     } else if (method.isDestroy) {

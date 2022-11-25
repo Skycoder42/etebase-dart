@@ -12,6 +12,7 @@ class MethodRef {
 
   final bool isNew;
   final bool isDestroy;
+  // TODO simply skip getLength methods and replace with "hasLengthGetter"
   final bool isGetLength;
   final bool isStatic;
   final bool isGetter;
