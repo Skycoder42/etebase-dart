@@ -4,15 +4,15 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/if_then.dart';
 import '../../util/types.dart';
+import 'isolate_builder.dart';
+import 'isolate_implementation_builder.dart';
+import 'isolate_out_param_builder.dart';
 
 class IsolateReturnBuilder {
-  static const _arena = Reference('arena');
-  static const _nullptrRef = Reference('nullptr', 'dart:ffi');
-
   const IsolateReturnBuilder();
 
   Iterable<Code> buildReturn(MethodRef method) sync* {
-    final resultRef = refer('result');
+    const resultRef = IsolateImplementationBuilder.resultRef;
 
     final Expression transformedResult;
     if (method.hasOutParam) {
@@ -28,7 +28,7 @@ class IsolateReturnBuilder {
           returnType as StringTypeRef,
           // TODO check if needed - might be null terminated already, so actual
           // size is ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE - 1
-          length: refer('libEtebase')
+          length: IsolateBuilder.libEtebaseRef
               .property('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE'),
         );
       } else if (returnType is ByteArrayTypeRef) {
@@ -38,7 +38,7 @@ class IsolateReturnBuilder {
           returnParamRef,
           returnType,
           listLength: method.ffiName == 'etebase_utils_randombytes'
-              ? refer('size')
+              ? IsolateOutParamBuilder.sizeRef
               : refer('${returnParam.name}_size'),
         );
       } else if (returnType is EtebaseOutListTypeRef) {
@@ -54,7 +54,8 @@ class IsolateReturnBuilder {
       }
     } else {
       final returnType = method.returnType;
-      final ptrResultRef = _arena.property('attach').call([resultRef]);
+      final ptrResultRef =
+          IsolateBuilder.arenaRef.property('attach').call([resultRef]);
 
       if (returnType is VoidTypeRef) {
         transformedResult = literalNull;
@@ -110,21 +111,21 @@ class IsolateReturnBuilder {
       ]);
 
   Code _checkPointerSuccess(Expression result) =>
-      if$(result.equalTo(_nullptrRef), [
+      if$(result.equalTo(Types.nullptr$), [
         _buildErrorReturn().statement,
       ]);
 
   Expression _buildReturnStatement(Expression result) =>
       Types.MethodResult$.newInstanceNamed(
         'success',
-        [refer('invocation').property('id'), result],
+        [IsolateBuilder.invocationRef.property('id'), result],
       ).returned;
 
   Expression _buildErrorReturn() =>
       Types.FfiHelpers$.property('errorResult').call([
-        refer('libEtebase'),
-        _arena,
-        refer('invocation').property('id'),
+        IsolateBuilder.libEtebaseRef,
+        IsolateBuilder.arenaRef,
+        IsolateBuilder.invocationRef.property('id'),
       ]).returned;
 
   Expression _transformIntBool(Reference resultRef, BoolTypeRef type) =>
@@ -157,9 +158,9 @@ class IsolateReturnBuilder {
       length = refer('retSize').property('value');
     } else if (method.ffiName.contains('pubkey')) {
       // TODO use method.hasSizeGetter ?
-      length = refer('libEtebase')
+      length = IsolateBuilder.libEtebaseRef
           .property('${method.ffiName}_size')
-          .call([refer('this_')]);
+          .call([IsolateOutParamBuilder.thisRef]);
     } else if (listLength != null) {
       length = listLength;
     } else {

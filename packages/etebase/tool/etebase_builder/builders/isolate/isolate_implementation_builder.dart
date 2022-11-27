@@ -10,7 +10,7 @@ import 'isolate_return_builder.dart';
 
 class IsolateImplementationBuilder {
   static const _resultName = 'result';
-  static const _resultRef = Reference(_resultName);
+  static const resultRef = Reference(_resultName);
 
   final IsolateInParamBuilder _isolateInParamBuilder;
   final IsolateOutParamBuilder _isolateOutParamBuilder;
@@ -58,9 +58,9 @@ class IsolateImplementationBuilder {
 
   Iterable<Code> _buildNeedsSizeInvocation(MethodRef method) sync* {
     yield _isolateReturnBuilder
-        .checkIntSuccess(_resultRef)
-        .elseIf$(_resultRef.lessOrEqualTo(refer('buf_size')), [
-      _isolateReturnBuilder.buildReturnByteArray(method, _resultRef),
+        .checkIntSuccess(resultRef)
+        .elseIf$(resultRef.lessOrEqualTo(refer('buf_size')), [
+      _isolateReturnBuilder.buildReturnByteArray(method, resultRef),
     ]).elseIf$(IsolateBuilder.reinvokedWithSizeRef.notEqualTo(literalNull), [
       Types.MethodResult$.newInstanceNamed('failure', [
         IsolateBuilder.invocationRef.property('id'),
@@ -78,7 +78,7 @@ class IsolateImplementationBuilder {
               IsolateBuilder.arenaRef
             ],
             {
-              IsolateBuilder.reinvokedWithSizeRef.symbol!: _resultRef,
+              IsolateBuilder.reinvokedWithSizeRef.symbol!: resultRef,
             },
           )
           .returned

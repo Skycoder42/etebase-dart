@@ -4,9 +4,11 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/types.dart';
+import 'isolate_builder.dart';
 
 class IsolateOutParamBuilder {
-  static const _arena = Reference('arena');
+  static const thisRef = Reference('this_');
+  static const sizeRef = Reference('size');
 
   const IsolateOutParamBuilder();
 
@@ -44,9 +46,9 @@ class IsolateOutParamBuilder {
 
   Code _buildFingerprintBuf() => declareFinal('buf')
       .assign(
-        _arena.call(
+        IsolateBuilder.arenaRef.call(
           [
-            refer('libEtebase')
+            IsolateBuilder.libEtebaseRef
                 .property('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE')
           ],
           const {},
@@ -58,7 +60,13 @@ class IsolateOutParamBuilder {
   Code _buildRetSize(MethodRef method) {
     final retSizeParam = method.parameters.singleWhere((p) => p.isRetSize);
     return declareFinal(retSizeParam.name)
-        .assign(_arena.call(const [], const {}, [Types.UnsignedLong$]))
+        .assign(
+          IsolateBuilder.arenaRef.call(
+            const [],
+            const {},
+            [Types.UnsignedLong$],
+          ),
+        )
         .cascade('value')
         .assign(literalNum(0))
         .statement;
@@ -71,8 +79,13 @@ class IsolateOutParamBuilder {
   ) sync* {
     yield declareFinal(parameter.name)
         .assign(
-          _arena.call(
-            [refer(method.needsSizeHint ? '${parameter.name}_size' : 'size')],
+          IsolateBuilder.arenaRef.call(
+            [
+              if (method.needsSizeHint)
+                refer('${parameter.name}_size')
+              else
+                sizeRef,
+            ],
             const {},
             [Types.Uint8$],
           ),
@@ -90,15 +103,19 @@ class IsolateOutParamBuilder {
     final sizeVarName = '${parameter.name}_size';
     yield declareFinal(sizeVarName)
         .assign(
-          refer('libEtebase')
+          IsolateBuilder.libEtebaseRef
               .property('${methodRef.ffiName}_length')
-              .call([refer('this_')]),
+              .call([thisRef]),
         )
         .statement;
 
     yield declareFinal(parameter.name)
         .assign(
-          _arena.call([refer(sizeVarName)], const {}, [type.ffiInnerType]),
+          IsolateBuilder.arenaRef.call(
+            [refer(sizeVarName)],
+            const {},
+            [type.ffiInnerType],
+          ),
         )
         .statement;
   }

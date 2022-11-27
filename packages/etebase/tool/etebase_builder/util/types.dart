@@ -67,6 +67,8 @@ abstract class Types {
       ..url = 'package:ffi/ffi.dart',
   );
 
+  static const nullptr$ = Reference('nullptr', 'dart:ffi');
+
   static final EtebaseCollectionAccessLevel$ = TypeReference(
     (b) => b
       ..symbol = 'EtebaseCollectionAccessLevel'

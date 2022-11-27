@@ -6,18 +6,16 @@ import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
 import '../../util/if_then.dart';
 import '../../util/types.dart';
+import 'isolate_builder.dart';
 
 class IsolateInParamBuilder {
-  static const _arena = Reference('arena');
-  static const _nullptrRef = Reference('nullptr', 'dart:ffi');
-
   const IsolateInParamBuilder();
 
   Iterable<Code> buildInParameters(MethodRef method) sync* {
     final params = method.exportedParams(withThis: true).toList();
     final paramsLength = params.length;
     final assertLength = method.needsSizeHint ? paramsLength + 1 : paramsLength;
-    final arguments = refer('invocation').property('arguments');
+    final arguments = IsolateBuilder.invocationRef.property('arguments');
     yield arguments
         .property('length')
         .equalTo(literalNum(assertLength))
@@ -57,7 +55,7 @@ class IsolateInParamBuilder {
           .single;
 
       yield declareFinal('${paramName}_size')
-          .assign(refer('reinvokedWithSize'))
+          .assign(IsolateBuilder.reinvokedWithSizeRef)
           .ifNullThen(
             arguments
                 .index(literalNum(paramsLength))
@@ -84,7 +82,13 @@ class IsolateInParamBuilder {
     Expression argument,
   ) sync* {
     yield variable
-        .assign(_arena.call(const [], const {}, [Types.Int64$]))
+        .assign(
+          IsolateBuilder.arenaRef.call(
+            const [],
+            const {},
+            [Types.Int64$],
+          ),
+        )
         .cascade('value')
         .assign(argument.property('millisecondsSinceEpoch'))
         .statement;
@@ -177,7 +181,7 @@ class IsolateInParamBuilder {
       yield declareFinal(addressVarName).assign(argument).statement;
 
       final assignment = addressVarRef.equalTo(literalNull).conditional(
-            _nullptrRef,
+            Types.nullptr$,
             parameterType.ffiType.newInstanceNamed(
               'fromAddress',
               [addressVarRef],
@@ -220,7 +224,7 @@ class IsolateInParamBuilder {
 
   Expression _stringToPointer(Expression variable) => variable
       .property('toNativeUtf8')
-      .call(const [], const {'allocator': _arena})
+      .call(const [], const {'allocator': IsolateBuilder.arenaRef})
       .property('cast')
       .call(const [], const {}, [Types.Char$]);
 
@@ -243,12 +247,18 @@ class IsolateInParamBuilder {
         )
         .statement;
 
-    final allocation = _arena.call([sizeVariable], const {}, [pointerType]);
+    final allocation = IsolateBuilder.arenaRef.call(
+      [sizeVariable],
+      const {},
+      [pointerType],
+    );
 
     if (isNullable) {
       yield variable
           .assign(
-            argument.equalTo(literalNull).conditional(_nullptrRef, allocation),
+            argument
+                .equalTo(literalNull)
+                .conditional(Types.nullptr$, allocation),
           )
           .statement;
     } else {
