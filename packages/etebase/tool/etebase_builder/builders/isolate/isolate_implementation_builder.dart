@@ -3,11 +3,15 @@ import 'package:code_builder/code_builder.dart';
 import '../../parsers/method_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/types.dart';
+import 'isolate_builder.dart';
 import 'isolate_in_param_builder.dart';
 import 'isolate_out_param_builder.dart';
 import 'isolate_return_builder.dart';
 
 class IsolateImplementationBuilder {
+  static const _resultName = 'result';
+  static const _resultRef = Reference(_resultName);
+
   final IsolateInParamBuilder _isolateInParamBuilder;
   final IsolateOutParamBuilder _isolateOutParamBuilder;
   final IsolateReturnBuilder _isolateReturnBuilder;
@@ -29,7 +33,7 @@ class IsolateImplementationBuilder {
       ]);
 
   Code _buildInvocation(MethodRef method) {
-    var expression = refer('libEtebase').property(method.ffiName);
+    var expression = IsolateBuilder.libEtebaseRef.property(method.ffiName);
 
     if (!method.isGetter) {
       expression = expression.call(
@@ -48,20 +52,18 @@ class IsolateImplementationBuilder {
     if (method.returnType is VoidTypeRef) {
       return expression.statement;
     } else {
-      return declareFinal('result').assign(expression).statement;
+      return declareFinal(_resultName).assign(expression).statement;
     }
   }
 
   Iterable<Code> _buildNeedsSizeInvocation(MethodRef method) sync* {
-    final resultRef = refer('result');
-
     yield _isolateReturnBuilder
-        .checkIntSuccess(resultRef)
-        .elseIf$(resultRef.lessOrEqualTo(refer('buf_size')), [
-      _isolateReturnBuilder.buildReturnByteArray(method, resultRef),
-    ]).elseIf$(refer('reinvokedWithSize').notEqualTo(literalNull), [
+        .checkIntSuccess(_resultRef)
+        .elseIf$(_resultRef.lessOrEqualTo(refer('buf_size')), [
+      _isolateReturnBuilder.buildReturnByteArray(method, _resultRef),
+    ]).elseIf$(IsolateBuilder.reinvokedWithSizeRef.notEqualTo(literalNull), [
       Types.MethodResult$.newInstanceNamed('failure', [
-        refer('invocation').property('id'),
+        IsolateBuilder.invocationRef.property('id'),
         Types.EtebaseErrorCode$.property('generic'),
         literalString(
           'output size of ${method.ffiName} changed during invocation',
@@ -70,8 +72,14 @@ class IsolateImplementationBuilder {
     ]).else$([
       refer('_${method.ffiName}')
           .call(
-            [refer('libEtebase'), refer('invocation'), refer('arena')],
-            {'reinvokedWithSize': resultRef},
+            [
+              IsolateBuilder.libEtebaseRef,
+              IsolateBuilder.invocationRef,
+              IsolateBuilder.arenaRef
+            ],
+            {
+              IsolateBuilder.reinvokedWithSizeRef.symbol!: _resultRef,
+            },
           )
           .returned
           .statement,

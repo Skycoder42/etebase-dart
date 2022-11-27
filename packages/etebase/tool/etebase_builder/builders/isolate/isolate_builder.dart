@@ -8,6 +8,15 @@ import '../../util/types.dart';
 import 'isolate_implementation_builder.dart';
 
 class IsolateBuilder {
+  static const _invocationName = 'invocation';
+  static const invocationRef = Reference(_invocationName);
+  static const _libEtebaseName = 'libEtebase';
+  static const libEtebaseRef = Reference(_libEtebaseName);
+  static const _arenaName = 'arena';
+  static const arenaRef = Reference(_arenaName);
+  static const _reinvokedWithSizeName = 'reinvokedWithSize';
+  static const reinvokedWithSizeRef = Reference(_reinvokedWithSizeName);
+
   final IsolateImplementationBuilder _isolateImplementationBuilder;
 
   const IsolateBuilder([
@@ -32,12 +41,12 @@ class IsolateBuilder {
       .toList();
 
   Method _buildHandler(List<MethodRef> methods) {
-    final caseBuilder = switch$(refer('invocation').property('method'));
+    final caseBuilder = switch$(invocationRef.property('method'));
 
     for (final method in methods) {
       caseBuilder.case$(refer('#${method.ffiName}'), [
         refer('_${method.ffiName}')
-            .call([refer('libEtebase'), refer('invocation'), refer('arena')])
+            .call([libEtebaseRef, invocationRef, arenaRef])
             .returned
             .statement,
       ]);
@@ -46,7 +55,7 @@ class IsolateBuilder {
     caseBuilder.default$([
       TypeReference((b) => b..symbol = 'ArgumentError')
           .newInstanceNamed('value', [
-            refer('invocation').property('method'),
+            invocationRef.property('method'),
             literalString('invocation.method'),
             literalString('Method does not exist'),
           ])
@@ -59,13 +68,13 @@ class IsolateBuilder {
         ..replace(_buildHandlerSignature())
         ..name = 'etebaseIsolateMessageHandler'
         ..body = Block.of([
-          declareFinal('arena')
+          declareFinal(_arenaName)
               .assign(Types.EtebaseArena$.newInstance(const []))
               .statement,
           try$([
             caseBuilder,
           ]).finally$([
-            refer('arena').property('releaseAll').call(const []).statement,
+            arenaRef.property('releaseAll').call(const []).statement,
           ]),
         ]),
     );
@@ -78,7 +87,7 @@ class IsolateBuilder {
             ..requiredParameters.add(
               Parameter(
                 (b) => b
-                  ..name = 'arena'
+                  ..name = _arenaName
                   ..type = Types.EtebaseArena$,
               ),
             )
@@ -90,7 +99,7 @@ class IsolateBuilder {
               Parameter(
                 (b) => b
                   ..named = true
-                  ..name = 'reinvokedWithSize'
+                  ..name = _reinvokedWithSizeName
                   ..type = Types.int$.asNullable,
               ),
             );
@@ -104,12 +113,12 @@ class IsolateBuilder {
           ..requiredParameters.addAll([
             Parameter(
               (b) => b
-                ..name = 'libEtebase'
+                ..name = _libEtebaseName
                 ..type = Types.ffi(refer('LibEtebaseFFI')),
             ),
             Parameter(
               (b) => b
-                ..name = 'invocation'
+                ..name = _invocationName
                 ..type = Types.MethodInvocation$,
             ),
           ]),
