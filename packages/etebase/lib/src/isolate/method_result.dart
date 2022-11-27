@@ -7,6 +7,9 @@ part 'method_result.freezed.dart';
 
 @freezed
 class MethodResult with _$MethodResult {
+  static MethodResult successTyped<T>(int id, T result) =>
+      MethodResult.success(id, result);
+
   const factory MethodResult.success(int id, dynamic result) = _Success;
   const factory MethodResult.failure(
     int id,

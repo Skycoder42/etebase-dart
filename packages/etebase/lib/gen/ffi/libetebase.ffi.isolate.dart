@@ -1070,7 +1070,7 @@ _i1.MethodResult _etebase_user_profile_get_pubkey(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList([
       arena
@@ -1091,7 +1091,7 @@ _i1.MethodResult _etebase_user_profile_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_user_profile_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1121,7 +1121,7 @@ _i1.MethodResult _etebase_user_new(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -1143,7 +1143,7 @@ _i1.MethodResult _etebase_user_set_username(
     this_,
     username,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1166,7 +1166,7 @@ _i1.MethodResult _etebase_user_get_username(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1188,7 +1188,7 @@ _i1.MethodResult _etebase_user_set_email(
     this_,
     email,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1211,7 +1211,7 @@ _i1.MethodResult _etebase_user_get_email(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1227,7 +1227,7 @@ _i1.MethodResult _etebase_user_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_user_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1250,7 +1250,7 @@ _i1.MethodResult _etebase_signed_invitation_clone(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -1273,7 +1273,7 @@ _i1.MethodResult _etebase_signed_invitation_get_uid(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1296,7 +1296,7 @@ _i1.MethodResult _etebase_signed_invitation_get_username(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1319,7 +1319,7 @@ _i1.MethodResult _etebase_signed_invitation_get_collection(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1342,7 +1342,7 @@ _i1.MethodResult _etebase_signed_invitation_get_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i9.EtebaseCollectionAccessLevel>(
     invocation.id,
     _i9.EtebaseCollectionAccessLevel.values[result],
   );
@@ -1365,7 +1365,7 @@ _i1.MethodResult _etebase_signed_invitation_get_from_username(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1388,7 +1388,7 @@ _i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList([
       arena.attach(result).cast<_i5.Uint8>().asTypedList(
@@ -1407,7 +1407,7 @@ _i1.MethodResult _etebase_signed_invitation_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_signed_invitation_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1430,7 +1430,7 @@ _i1.MethodResult _etebase_removed_collection_get_uid(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1446,7 +1446,7 @@ _i1.MethodResult _etebase_removed_collection_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_removed_collection_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1470,7 +1470,7 @@ _i1.MethodResult _etebase_invitation_list_response_get_iterator(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1499,7 +1499,7 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
     _i6.FfiHelpers.extractPointerList(
       data,
@@ -1519,7 +1519,7 @@ _i1.MethodResult _etebase_invitation_list_response_is_done(
   final this_ = _i5.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_invitation_list_response_is_done(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -1535,7 +1535,7 @@ _i1.MethodResult _etebase_invitation_list_response_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_invitation_list_response_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1559,7 +1559,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1588,7 +1588,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
     _i6.FfiHelpers.extractPointerList(
       data,
@@ -1608,7 +1608,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_is_done(
   final this_ = _i5.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_revisions_list_response_is_done(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -1624,7 +1624,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_item_revisions_list_response_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1647,7 +1647,7 @@ _i1.MethodResult _etebase_member_list_response_get_iterator(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1676,7 +1676,7 @@ _i1.MethodResult _etebase_member_list_response_get_data(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
     _i6.FfiHelpers.extractPointerList(
       data,
@@ -1696,7 +1696,7 @@ _i1.MethodResult _etebase_member_list_response_is_done(
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_member_list_response_is_done(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -1712,7 +1712,7 @@ _i1.MethodResult _etebase_member_list_response_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_member_list_response_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1733,7 +1733,7 @@ _i1.MethodResult _etebase_item_metadata_new(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -1755,7 +1755,7 @@ _i1.MethodResult _etebase_item_metadata_set_item_type(
     this_,
     itemType,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1778,7 +1778,7 @@ _i1.MethodResult _etebase_item_metadata_get_item_type(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1800,7 +1800,7 @@ _i1.MethodResult _etebase_item_metadata_set_name(
     this_,
     name,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1823,7 +1823,7 @@ _i1.MethodResult _etebase_item_metadata_get_name(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1844,7 +1844,7 @@ _i1.MethodResult _etebase_item_metadata_set_mtime(
     this_,
     mtime,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1867,7 +1867,7 @@ _i1.MethodResult _etebase_item_metadata_get_mtime(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<DateTime>(
     invocation.id,
     DateTime.fromMillisecondsSinceEpoch(arena.attach(result).value),
   );
@@ -1889,7 +1889,7 @@ _i1.MethodResult _etebase_item_metadata_set_description(
     this_,
     description,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1912,7 +1912,7 @@ _i1.MethodResult _etebase_item_metadata_get_description(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1934,7 +1934,7 @@ _i1.MethodResult _etebase_item_metadata_set_color(
     this_,
     color,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -1957,7 +1957,7 @@ _i1.MethodResult _etebase_item_metadata_get_color(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -1973,7 +1973,7 @@ _i1.MethodResult _etebase_item_metadata_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_item_metadata_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2007,7 +2007,7 @@ _i1.MethodResult _etebase_item_manager_fetch(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2046,7 +2046,7 @@ _i1.MethodResult _etebase_item_manager_create(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2093,7 +2093,7 @@ _i1.MethodResult _etebase_item_manager_create_raw(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2123,7 +2123,7 @@ _i1.MethodResult _etebase_item_manager_list(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2156,7 +2156,7 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2195,7 +2195,7 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2234,7 +2234,7 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2273,7 +2273,7 @@ _i1.MethodResult _etebase_item_manager_batch(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2321,7 +2321,7 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2360,7 +2360,7 @@ _i1.MethodResult _etebase_item_manager_transaction(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2408,7 +2408,7 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2444,7 +2444,7 @@ _i1.MethodResult _etebase_item_manager_cache_load(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2474,7 +2474,7 @@ _i1.MethodResult _etebase_item_manager_cache_save(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList(
         [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
@@ -2505,7 +2505,7 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList(
         [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
@@ -2522,7 +2522,7 @@ _i1.MethodResult _etebase_item_manager_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_item_manager_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2545,7 +2545,7 @@ _i1.MethodResult _etebase_item_list_response_get_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -2574,7 +2574,7 @@ _i1.MethodResult _etebase_item_list_response_get_data(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
     _i6.FfiHelpers.extractPointerList(
       data,
@@ -2594,7 +2594,7 @@ _i1.MethodResult _etebase_item_list_response_is_done(
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_list_response_is_done(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -2610,7 +2610,7 @@ _i1.MethodResult _etebase_item_list_response_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_item_list_response_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2633,7 +2633,7 @@ _i1.MethodResult _etebase_item_clone(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2649,7 +2649,7 @@ _i1.MethodResult _etebase_item_verify(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_verify(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -2677,7 +2677,7 @@ _i1.MethodResult _etebase_item_set_meta(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2700,7 +2700,7 @@ _i1.MethodResult _etebase_item_get_meta(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -2736,7 +2736,7 @@ _i1.MethodResult _etebase_item_set_meta_raw(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2767,7 +2767,7 @@ _i1.MethodResult _etebase_item_get_meta_raw(
       invocation.id,
     );
   } else if (result <= buf_size) {
-    return _i1.MethodResult.success(
+    return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
       invocation.id,
       _i7.TransferableTypedData.fromList(
           [buf.cast<_i5.Uint8>().asTypedList(result)]),
@@ -2818,7 +2818,7 @@ _i1.MethodResult _etebase_item_set_content(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2849,7 +2849,7 @@ _i1.MethodResult _etebase_item_get_content(
       invocation.id,
     );
   } else if (result <= buf_size) {
-    return _i1.MethodResult.success(
+    return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
       invocation.id,
       _i7.TransferableTypedData.fromList(
           [buf.cast<_i5.Uint8>().asTypedList(result)]),
@@ -2887,7 +2887,7 @@ _i1.MethodResult _etebase_item_delete(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2903,7 +2903,7 @@ _i1.MethodResult _etebase_item_is_deleted(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_is_deleted(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -2926,7 +2926,7 @@ _i1.MethodResult _etebase_item_get_uid(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -2949,7 +2949,7 @@ _i1.MethodResult _etebase_item_get_etag(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -2965,7 +2965,7 @@ _i1.MethodResult _etebase_item_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_item_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -2995,7 +2995,7 @@ _i1.MethodResult _etebase_fs_cache_new(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3018,7 +3018,7 @@ _i1.MethodResult _etebase_fs_cache_clear_user(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3062,7 +3062,7 @@ _i1.MethodResult _etebase_fs_cache_save_account(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3106,7 +3106,7 @@ _i1.MethodResult _etebase_fs_cache_load_account(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3135,7 +3135,7 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3158,7 +3158,7 @@ _i1.MethodResult _etebase_fs_cache_load_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -3191,7 +3191,7 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3220,7 +3220,7 @@ _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -3251,7 +3251,7 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3283,7 +3283,7 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3315,7 +3315,7 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3350,7 +3350,7 @@ _i1.MethodResult _etebase_fs_cache_item_set(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3386,7 +3386,7 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3422,7 +3422,7 @@ _i1.MethodResult _etebase_fs_cache_item_get(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3438,7 +3438,7 @@ _i1.MethodResult _etebase_fs_cache_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_fs_cache_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3459,7 +3459,7 @@ _i1.MethodResult _etebase_fetch_options_new(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3479,7 +3479,7 @@ _i1.MethodResult _etebase_fetch_options_set_limit(
     this_,
     limit,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3500,7 +3500,7 @@ _i1.MethodResult _etebase_fetch_options_set_prefetch(
     this_,
     prefetch,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3520,7 +3520,7 @@ _i1.MethodResult _etebase_fetch_options_set_with_collection(
     this_,
     withCollection,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3542,7 +3542,7 @@ _i1.MethodResult _etebase_fetch_options_set_iterator(
     this_,
     iterator,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3564,7 +3564,7 @@ _i1.MethodResult _etebase_fetch_options_set_stoken(
     this_,
     stoken,
   );
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3580,7 +3580,7 @@ _i1.MethodResult _etebase_fetch_options_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_fetch_options_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3610,7 +3610,7 @@ _i1.MethodResult _etebase_collection_member_manager_list(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3639,7 +3639,7 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3662,7 +3662,7 @@ _i1.MethodResult _etebase_collection_member_manager_leave(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3695,7 +3695,7 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3711,7 +3711,7 @@ _i1.MethodResult _etebase_collection_member_manager_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_collection_member_manager_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3734,7 +3734,7 @@ _i1.MethodResult _etebase_collection_member_clone(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3757,7 +3757,7 @@ _i1.MethodResult _etebase_collection_member_get_username(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -3780,7 +3780,7 @@ _i1.MethodResult _etebase_collection_member_get_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i9.EtebaseCollectionAccessLevel>(
     invocation.id,
     _i9.EtebaseCollectionAccessLevel.values[result],
   );
@@ -3796,7 +3796,7 @@ _i1.MethodResult _etebase_collection_member_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_collection_member_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -3830,7 +3830,7 @@ _i1.MethodResult _etebase_collection_manager_fetch(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3873,7 +3873,7 @@ _i1.MethodResult _etebase_collection_manager_create(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3924,7 +3924,7 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3952,7 +3952,7 @@ _i1.MethodResult _etebase_collection_manager_get_item_manager(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -3986,7 +3986,7 @@ _i1.MethodResult _etebase_collection_manager_list(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4025,7 +4025,7 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4058,7 +4058,7 @@ _i1.MethodResult _etebase_collection_manager_upload(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4091,7 +4091,7 @@ _i1.MethodResult _etebase_collection_manager_transaction(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4127,7 +4127,7 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4157,7 +4157,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList(
         [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
@@ -4188,7 +4188,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList(
         [arena.attach(result).cast<_i5.Uint8>().asTypedList(retSize.value)]),
@@ -4217,7 +4217,7 @@ _i1.MethodResult _etebase_collection_manager_get_member_manager(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4233,7 +4233,7 @@ _i1.MethodResult _etebase_collection_manager_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_collection_manager_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4256,7 +4256,7 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -4285,7 +4285,7 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
     _i6.FfiHelpers.extractPointerList(
       data,
@@ -4305,7 +4305,7 @@ _i1.MethodResult _etebase_collection_list_response_is_done(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_list_response_is_done(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -4335,7 +4335,7 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
     _i6.FfiHelpers.extractPointerList(
       data,
@@ -4355,7 +4355,7 @@ _i1.MethodResult _etebase_collection_list_response_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_collection_list_response_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4385,7 +4385,7 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4415,7 +4415,7 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4443,7 +4443,7 @@ _i1.MethodResult _etebase_invitation_manager_accept(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4471,7 +4471,7 @@ _i1.MethodResult _etebase_invitation_manager_reject(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4500,7 +4500,7 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4546,7 +4546,7 @@ _i1.MethodResult _etebase_invitation_manager_invite(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4574,7 +4574,7 @@ _i1.MethodResult _etebase_invitation_manager_disinvite(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4597,7 +4597,7 @@ _i1.MethodResult _etebase_invitation_manager_get_pubkey(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList([
       arena.attach(result).cast<_i5.Uint8>().asTypedList(
@@ -4616,7 +4616,7 @@ _i1.MethodResult _etebase_invitation_manager_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_invitation_manager_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4639,7 +4639,7 @@ _i1.MethodResult _etebase_collection_clone(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4655,7 +4655,7 @@ _i1.MethodResult _etebase_collection_verify(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_verify(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -4683,7 +4683,7 @@ _i1.MethodResult _etebase_collection_set_meta(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4706,7 +4706,7 @@ _i1.MethodResult _etebase_collection_get_meta(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -4742,7 +4742,7 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4773,7 +4773,7 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
       invocation.id,
     );
   } else if (result <= buf_size) {
-    return _i1.MethodResult.success(
+    return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
       invocation.id,
       _i7.TransferableTypedData.fromList(
           [buf.cast<_i5.Uint8>().asTypedList(result)]),
@@ -4824,7 +4824,7 @@ _i1.MethodResult _etebase_collection_set_content(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4855,7 +4855,7 @@ _i1.MethodResult _etebase_collection_get_content(
       invocation.id,
     );
   } else if (result <= buf_size) {
-    return _i1.MethodResult.success(
+    return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
       invocation.id,
       _i7.TransferableTypedData.fromList(
           [buf.cast<_i5.Uint8>().asTypedList(result)]),
@@ -4893,7 +4893,7 @@ _i1.MethodResult _etebase_collection_delete(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -4909,7 +4909,7 @@ _i1.MethodResult _etebase_collection_is_deleted(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_is_deleted(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
@@ -4932,7 +4932,7 @@ _i1.MethodResult _etebase_collection_get_uid(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -4955,7 +4955,7 @@ _i1.MethodResult _etebase_collection_get_etag(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -4978,7 +4978,7 @@ _i1.MethodResult _etebase_collection_get_stoken(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -5001,7 +5001,7 @@ _i1.MethodResult _etebase_collection_as_item(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5024,7 +5024,7 @@ _i1.MethodResult _etebase_collection_get_collection_type(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -5047,7 +5047,7 @@ _i1.MethodResult _etebase_collection_get_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i9.EtebaseCollectionAccessLevel>(
     invocation.id,
     _i9.EtebaseCollectionAccessLevel.values[result],
   );
@@ -5063,7 +5063,7 @@ _i1.MethodResult _etebase_collection_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_collection_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5093,7 +5093,7 @@ _i1.MethodResult _etebase_client_new(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5122,7 +5122,7 @@ _i1.MethodResult _etebase_client_set_server_url(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5145,7 +5145,7 @@ _i1.MethodResult _etebase_client_check_etebase_server(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<bool>(
     invocation.id,
     result == 0 ? false : true,
   );
@@ -5161,7 +5161,7 @@ _i1.MethodResult _etebase_client_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_client_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5194,7 +5194,7 @@ _i1.MethodResult _etebase_account_login(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5226,7 +5226,7 @@ _i1.MethodResult _etebase_account_signup(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5249,7 +5249,7 @@ _i1.MethodResult _etebase_account_fetch_token(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5272,7 +5272,7 @@ _i1.MethodResult _etebase_account_fetch_dashboard_url(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -5301,7 +5301,7 @@ _i1.MethodResult _etebase_account_force_server_url(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5330,7 +5330,7 @@ _i1.MethodResult _etebase_account_change_password(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5353,7 +5353,7 @@ _i1.MethodResult _etebase_account_logout(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5376,7 +5376,7 @@ _i1.MethodResult _etebase_account_get_collection_manager(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5399,7 +5399,7 @@ _i1.MethodResult _etebase_account_get_invitation_manager(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5440,7 +5440,7 @@ _i1.MethodResult _etebase_account_save(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );
@@ -5485,7 +5485,7 @@ _i1.MethodResult _etebase_account_restore(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result.address,
   );
@@ -5501,7 +5501,7 @@ _i1.MethodResult _etebase_account_destroy(
   final this_ = _i5.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   libEtebase.etebase_account_destroy(this_);
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
@@ -5522,7 +5522,7 @@ _i1.MethodResult _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<int>(
     invocation.id,
     result,
   );
@@ -5548,7 +5548,7 @@ _i1.MethodResult _etebase_utils_randombytes(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<_i7.TransferableTypedData>(
     invocation.id,
     _i7.TransferableTypedData.fromList(
         [buf.cast<_i5.Uint8>().asTypedList(size)]),
@@ -5584,7 +5584,7 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     buf
         .cast<_i8.Utf8>()
@@ -5607,7 +5607,7 @@ _i1.MethodResult _etebase_get_default_server_url(
       invocation.id,
     );
   }
-  return _i1.MethodResult.success(
+  return _i1.MethodResult.successTyped<String>(
     invocation.id,
     arena.attach(result).cast<_i8.Utf8>().toDartString(),
   );

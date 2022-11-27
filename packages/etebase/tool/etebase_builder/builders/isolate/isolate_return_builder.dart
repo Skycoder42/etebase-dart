@@ -92,7 +92,10 @@ class IsolateReturnBuilder {
       }
     }
 
-    yield _buildReturnStatement(transformedResult).statement;
+    yield _buildReturnStatement(
+      transformedResult,
+      method.outOrReturnType,
+    ).statement;
   }
 
   Code buildReturnByteArray(MethodRef method, Expression listLength) =>
@@ -103,6 +106,7 @@ class IsolateReturnBuilder {
           method.outOrReturnType as ByteArrayTypeRef,
           listLength: listLength,
         ),
+        method.outOrReturnType,
       ).statement;
 
   IfThen checkIntSuccess(Expression result) =>
@@ -115,10 +119,12 @@ class IsolateReturnBuilder {
         _buildErrorReturn().statement,
       ]);
 
-  Expression _buildReturnStatement(Expression result) =>
+  Expression _buildReturnStatement(Expression result, TypeRef type) =>
       Types.MethodResult$.newInstanceNamed(
-        'success',
+        'successTyped',
         [IsolateBuilder.invocationRef.property('id'), result],
+        const {},
+        [type.transferType],
       ).returned;
 
   Expression _buildErrorReturn() =>
