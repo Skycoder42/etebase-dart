@@ -45,7 +45,6 @@ class IsolateBuilder {
       .expand((clazz) => clazz.methods)
       .followedBy(etebase.utilsFunctions)
       .followedBy(etebase.functions)
-      .where((method) => !method.isGetLength)
       .toList();
 
   Method _buildHandler(List<MethodRef> methods) {

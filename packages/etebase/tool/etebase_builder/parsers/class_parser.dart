@@ -45,14 +45,16 @@ class ClassParser {
       element: clazz,
       typeAlias: typeAlias,
       name: resolvedType.name!,
-      methods: _findMembers(libEtebaseFfiMethods, resolvedType, methodPrefix)
-          .map(
-            (method) => _methodParser.parseMember(
-              method: method,
-              clazz: resolvedType,
-              typeDefs: typeDefs,
-              methodPrefix: methodPrefix,
+      methods: _methodParser
+          .parseMembers(
+            clazz: resolvedType,
+            methods: _findMembers(
+              libEtebaseFfiMethods,
+              resolvedType,
+              methodPrefix,
             ),
+            methodPrefix: methodPrefix,
+            typeDefs: typeDefs,
           )
           .toList(),
     );

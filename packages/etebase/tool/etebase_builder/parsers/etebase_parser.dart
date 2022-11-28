@@ -139,9 +139,9 @@ class EtebaseParser {
       ffiName: getter.name,
       isNew: false,
       isDestroy: false,
-      isGetLength: false,
       isStatic: false,
       isGetter: true,
+      lengthGetter: LengthGetterType.none,
       parameters: const [],
       returnType: _typeParser.parseType(
         type: getter.returnType,

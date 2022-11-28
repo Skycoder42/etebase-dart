@@ -6,16 +6,26 @@ import 'param_parser.dart';
 import 'type_parse.dart';
 import 'type_ref.dart';
 
+enum LengthGetterType {
+  none(false),
+  length(true),
+  size(true);
+
+  final bool hasLengthGetter;
+
+  // ignore: avoid_positional_boolean_parameters
+  const LengthGetterType(this.hasLengthGetter);
+}
+
 class MethodRef {
   final String name;
   final String ffiName;
 
   final bool isNew;
   final bool isDestroy;
-  // TODO simply skip getLength methods and replace with "hasLengthGetter"
-  final bool isGetLength;
   final bool isStatic;
   final bool isGetter;
+  final LengthGetterType lengthGetter;
 
   final List<ParameterRef> parameters;
   final TypeRef returnType;
@@ -27,9 +37,9 @@ class MethodRef {
     required this.ffiName,
     required this.isNew,
     required this.isDestroy,
-    required this.isGetLength,
     required this.isStatic,
     required this.isGetter,
+    required this.lengthGetter,
     required this.parameters,
     required this.returnType,
     required this.documentation,
@@ -70,11 +80,44 @@ class MethodParser {
     this._typeParser = const TypeParser(),
   ]);
 
-  MethodRef parseMember({
+  Iterable<MethodRef> parseMembers({
+    required TypeDefiningElement clazz,
+    required List<MethodElement> methods,
+    required String methodPrefix,
+    required TypedefRef typeDefs,
+  }) sync* {
+    for (var i = 0; i < methods.length; ++i) {
+      final method = methods[i];
+      final nextMethod = i < methods.length - 1 ? methods[i + 1] : null;
+
+      var lengthGetterType = LengthGetterType.none;
+      if (nextMethod != null) {
+        final lengthGetterMatch = _isGetLengthRegExp.firstMatch(
+          nextMethod.name,
+        );
+        if (lengthGetterMatch != null) {
+          ++i;
+          final suffix = lengthGetterMatch[1]!;
+          lengthGetterType = LengthGetterType.values.byName(suffix);
+        }
+      }
+
+      yield _parseMember(
+        method: method,
+        clazz: clazz,
+        methodPrefix: methodPrefix,
+        typeDefs: typeDefs,
+        lengthGetterType: lengthGetterType,
+      );
+    }
+  }
+
+  MethodRef _parseMember({
     required MethodElement method,
     required TypeDefiningElement clazz,
     required String methodPrefix,
     required TypedefRef typeDefs,
+    required LengthGetterType lengthGetterType,
   }) {
     final methodName = method.name;
 
@@ -89,9 +132,9 @@ class MethodParser {
       ffiName: methodName,
       isNew: methodName.endsWith('_new'),
       isDestroy: methodName.endsWith('_destroy'),
-      isGetLength: _isGetLengthRegExp.hasMatch(methodName),
       isStatic: !mappedParams.any((p) => p.isThisParam),
       isGetter: false,
+      lengthGetter: lengthGetterType,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,
@@ -121,9 +164,9 @@ class MethodParser {
       ffiName: method.name,
       isNew: false,
       isDestroy: false,
-      isGetLength: _isGetLengthRegExp.hasMatch(method.name),
       isStatic: forceStatic,
       isGetter: false,
+      lengthGetter: LengthGetterType.none,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,
