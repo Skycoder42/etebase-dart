@@ -43,7 +43,7 @@ class IsolateImplementationBuilder {
               refer(parameter.name).property('cast').call(const [])
             else
               refer(parameter.name),
-            if (parameter.hasLength) refer('${parameter.name}_size'),
+            if (parameter.hasLength) refer(parameter.lengthName()),
           ],
         ),
       );
@@ -57,9 +57,11 @@ class IsolateImplementationBuilder {
   }
 
   Iterable<Code> _buildNeedsSizeInvocation(MethodRef method) sync* {
+    final bufParam = method.parameters.singleWhere((p) => p.isOutBuf);
+
     yield _isolateReturnBuilder
         .checkIntSuccess(resultRef)
-        .elseIf$(resultRef.lessOrEqualTo(refer('buf_size')), [
+        .elseIf$(resultRef.lessOrEqualTo(refer(bufParam.lengthName())), [
       _isolateReturnBuilder.buildReturnByteArray(method, resultRef),
     ]).elseIf$(IsolateBuilder.reinvokedWithSizeRef.notEqualTo(literalNull), [
       Types.MethodResult$.newInstanceNamed('failure', [

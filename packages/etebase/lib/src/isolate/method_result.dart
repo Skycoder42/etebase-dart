@@ -21,7 +21,10 @@ class MethodResult with _$MethodResult {
   const MethodResult._();
 
   T unwrap<T>() => when(
-        success: (id, dynamic result) => result as T,
+        success: (id, dynamic result) {
+          assert(result is T, 'result must be of type $T');
+          return result as T;
+        },
         failure: (id, code, message) => throw EtebaseException(code, message),
         // ignore: only_throw_errors
         exception: (id, error) => throw error,

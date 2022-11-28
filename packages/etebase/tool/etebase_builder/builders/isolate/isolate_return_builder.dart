@@ -39,12 +39,12 @@ class IsolateReturnBuilder {
           returnType,
           listLength: method.ffiName == 'etebase_utils_randombytes'
               ? IsolateOutParamBuilder.sizeRef
-              : refer('${returnParam.name}_size'),
+              : refer(returnParam.lengthName()),
         );
       } else if (returnType is EtebaseOutListTypeRef) {
         transformedResult = _transformEtebaseOutList(
           returnParamRef,
-          refer('${returnParam.name}_size'),
+          refer(returnParam.lengthName(validateHasLength: false)),
           returnType,
         );
       } else {
@@ -102,7 +102,7 @@ class IsolateReturnBuilder {
       _buildReturnStatement(
         _transformByteArray(
           method,
-          refer('buf'),
+          refer('buf'), // TODO hardcoded...
           method.outOrReturnType as ByteArrayTypeRef,
           listLength: listLength,
         ),
@@ -162,10 +162,9 @@ class IsolateReturnBuilder {
     final Expression length;
     if (method.hasRetSize) {
       length = refer('retSize').property('value');
-    } else if (method.ffiName.contains('pubkey')) {
-      // TODO use method.hasSizeGetter ?
+    } else if (method.lengthGetter.hasLengthGetter) {
       length = IsolateBuilder.libEtebaseRef
-          .property('${method.ffiName}_size')
+          .property(method.ffiLengthGetterName)
           .call([IsolateOutParamBuilder.thisRef]);
     } else if (listLength != null) {
       length = listLength;

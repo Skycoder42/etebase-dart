@@ -6,6 +6,7 @@ import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
 import '../../util/if_then.dart';
 import '../../util/types.dart';
+import '../client/client_method_builder.dart';
 import 'isolate_builder.dart';
 
 class IsolateInParamBuilder {
@@ -14,12 +15,8 @@ class IsolateInParamBuilder {
   Iterable<Code> buildInParameters(MethodRef method) sync* {
     final params = method.exportedParams(withThis: true).toList();
     final paramsLength = params.length;
-    final assertLength = method.needsSizeHint ? paramsLength + 1 : paramsLength;
     final arguments = IsolateBuilder.invocationRef.property('arguments');
-    yield arguments
-        .property('length')
-        .equalTo(literalNum(assertLength))
-        .asserted('Invocation must have exactly $assertLength arguments');
+    yield* _buildAssertions(method, paramsLength, arguments, params);
 
     for (var argumentIndex = 0; argumentIndex < paramsLength; ++argumentIndex) {
       final param = params[argumentIndex];
@@ -49,12 +46,9 @@ class IsolateInParamBuilder {
     }
 
     if (method.needsSizeHint) {
-      final paramName = method.parameters
-          .where((p) => p.needsSizeHint)
-          .map((p) => p.name)
-          .single;
+      final param = method.parameters.where((p) => p.needsSizeHint).single;
 
-      yield declareFinal('${paramName}_size')
+      yield declareFinal(param.lengthName())
           .assign(IsolateBuilder.reinvokedWithSizeRef)
           .ifNullThen(
             arguments
@@ -65,6 +59,37 @@ class IsolateInParamBuilder {
             IsolateBuilder.configRef.property('defaultContentBufferSize'),
           )
           .statement;
+    }
+  }
+
+  Iterable<Code> _buildAssertions(
+    MethodRef method,
+    int paramsLength,
+    Expression arguments,
+    List<ParameterRef> params,
+  ) sync* {
+    final assertLength = method.needsSizeHint ? paramsLength + 1 : paramsLength;
+    yield arguments
+        .property('length')
+        .equalTo(literalNum(assertLength))
+        .asserted('Invocation must have exactly $assertLength arguments');
+
+    for (var i = 0; i < paramsLength; ++i) {
+      final param = params[i];
+      final transferType = param.type.transferType;
+      yield arguments.index(literalNum(i)).isA(transferType).asserted(
+            'Parameter ${param.name} must be of type '
+            '${transferType.accept(DartEmitter(useNullSafetySyntax: true))}',
+          );
+    }
+    if (method.needsSizeHint) {
+      yield arguments
+          .index(literalNum(paramsLength))
+          .isA(Types.int$.asNullable)
+          .asserted(
+            'Parameter ${ClientMethodBuilder.sizeHintRef.symbol!} '
+            'must be of type int?',
+          );
     }
   }
 
@@ -150,7 +175,7 @@ class IsolateInParamBuilder {
 
     final assignment = refer(parameter.name)
         .property('asTypedList')
-        .call([refer('${parameter.name}_size')])
+        .call([refer(parameter.lengthName())])
         .property('setAll')
         .call([literalNum(0), bufferRef])
         .statement;
@@ -237,9 +262,8 @@ class IsolateInParamBuilder {
     TypeReference pointerType,
     bool isNullable,
   ) sync* {
-    final sizeVariableName = '${parameter.name}_size';
-    final sizeVariable = refer(sizeVariableName);
-    yield declareFinal(sizeVariableName)
+    final sizeVariable = refer(parameter.lengthName());
+    yield declareFinal(parameter.lengthName())
         .assign(
           argument.nullableProperty(
             'length',

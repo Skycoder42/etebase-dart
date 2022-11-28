@@ -44,7 +44,7 @@ class IsolateOutParamBuilder {
     }
   }
 
-  Code _buildFingerprintBuf() => declareFinal('buf')
+  Code _buildFingerprintBuf() => declareFinal('buf') // TODO hardcoded...
       .assign(
         IsolateBuilder.arenaRef.call(
           [
@@ -82,7 +82,7 @@ class IsolateOutParamBuilder {
           IsolateBuilder.arenaRef.call(
             [
               if (method.needsSizeHint)
-                refer('${parameter.name}_size')
+                refer(parameter.lengthName())
               else
                 sizeRef,
             ],
@@ -98,13 +98,10 @@ class IsolateOutParamBuilder {
     ParameterRef parameter,
     EtebaseOutListTypeRef type,
   ) sync* {
-    // TODO validate method has get_length variant
-
-    final sizeVarName = '${parameter.name}_size';
-    yield declareFinal(sizeVarName)
+    yield declareFinal(parameter.lengthName(validateHasLength: false))
         .assign(
           IsolateBuilder.libEtebaseRef
-              .property('${methodRef.ffiName}_length')
+              .property(methodRef.ffiLengthGetterName)
               .call([thisRef]),
         )
         .statement;
@@ -112,7 +109,7 @@ class IsolateOutParamBuilder {
     yield declareFinal(parameter.name)
         .assign(
           IsolateBuilder.arenaRef.call(
-            [refer(sizeVarName)],
+            [refer(parameter.lengthName(validateHasLength: false))],
             const {},
             [type.ffiInnerType],
           ),

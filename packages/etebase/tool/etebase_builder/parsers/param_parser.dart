@@ -30,6 +30,16 @@ class ParameterRef {
   bool get isOptional => type.publicType.isNullable ?? false;
 
   bool get needsSizeHint => isOutBuf && hasLength;
+
+  String lengthName({bool validateHasLength = true}) {
+    if (validateHasLength && !hasLength) {
+      throw UnsupportedError(
+        'Cannot get lengthName of param $name without hasLength',
+      );
+    }
+
+    return '${name}Size';
+  }
 }
 
 class ParamParser {

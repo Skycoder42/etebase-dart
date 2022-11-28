@@ -60,6 +60,19 @@ class MethodRef {
       .where((p) => p.isOutParam)
       .map((p) => p.type)
       .singleWhere((_) => true, orElse: () => returnType);
+
+  String get ffiLengthGetterName {
+    switch (lengthGetter) {
+      case LengthGetterType.none:
+        throw UnsupportedError(
+          'Cannot get ffiLengthGetterName of method $name without lengthGetter',
+        );
+      case LengthGetterType.length:
+        return '${ffiName}_length';
+      case LengthGetterType.size:
+        return '${ffiName}_size';
+    }
+  }
 }
 
 class MethodParser {
