@@ -12,10 +12,18 @@ class IsolateBuilder {
   static const invocationRef = Reference(_invocationName);
   static const _libEtebaseName = 'libEtebase';
   static const libEtebaseRef = Reference(_libEtebaseName);
+  static const _configName = 'config';
+  static const configRef = Reference(_configName);
   static const _arenaName = 'arena';
   static const arenaRef = Reference(_arenaName);
   static const _reinvokedWithSizeName = 'reinvokedWithSize';
   static const reinvokedWithSizeRef = Reference(_reinvokedWithSizeName);
+  static const handlerParams = [
+    libEtebaseRef,
+    configRef,
+    invocationRef,
+    arenaRef
+  ];
 
   final IsolateImplementationBuilder _isolateImplementationBuilder;
 
@@ -45,10 +53,7 @@ class IsolateBuilder {
 
     for (final method in methods) {
       caseBuilder.case$(refer('#${method.ffiName}'), [
-        refer('_${method.ffiName}')
-            .call([libEtebaseRef, invocationRef, arenaRef])
-            .returned
-            .statement,
+        refer('_${method.ffiName}').call(handlerParams).returned.statement,
       ]);
     }
 
@@ -115,6 +120,11 @@ class IsolateBuilder {
               (b) => b
                 ..name = _libEtebaseName
                 ..type = Types.ffi(refer('LibEtebaseFFI')),
+            ),
+            Parameter(
+              (b) => b
+                ..name = _configName
+                ..type = Types.EtebaseConfig$,
             ),
             Parameter(
               (b) => b

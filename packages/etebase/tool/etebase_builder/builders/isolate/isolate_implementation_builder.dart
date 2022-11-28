@@ -72,14 +72,8 @@ class IsolateImplementationBuilder {
     ]).else$([
       refer('_${method.ffiName}')
           .call(
-            [
-              IsolateBuilder.libEtebaseRef,
-              IsolateBuilder.invocationRef,
-              IsolateBuilder.arenaRef
-            ],
-            {
-              IsolateBuilder.reinvokedWithSizeRef.symbol!: resultRef,
-            },
+            IsolateBuilder.handlerParams,
+            {IsolateBuilder.reinvokedWithSizeRef.symbol!: resultRef},
           )
           .returned
           .statement,

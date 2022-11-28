@@ -87,6 +87,12 @@ abstract class Types {
       ..url = 'package:etebase/src/model/etebase_error_code.dart',
   );
 
+  static final EtebaseConfig$ = TypeReference(
+    (b) => b
+      ..symbol = 'EtebaseConfig'
+      ..url = 'package:etebase/src/model/etebase_config.dart',
+  );
+
   static final MethodResult$ = TypeReference(
     (b) => b
       ..symbol = 'MethodResult'

@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'dart:isolate';
 
 import '../../gen/ffi/libetebase.ffi.dart';
-import 'etebase_isolate_config.dart';
+import '../model/etebase_config.dart';
 import 'isolate_terminated.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
@@ -12,19 +12,19 @@ typedef LoadLibetebaseFn = FutureOr<DynamicLibrary> Function();
 
 typedef MethodInvocationHandler = MethodResult Function(
   LibEtebaseFFI libEtebaseFFI,
-  EtebaseIsolateConfig isolateConfig,
+  EtebaseConfig etebaseConfig,
   MethodInvocation invocation,
 );
 
 class _EtebaseIsolateInitMessage {
   final LoadLibetebaseFn loadLibetebase;
-  final EtebaseIsolateConfig isolateConfig;
+  final EtebaseConfig etebaseConfig;
   final MethodInvocationHandler methodInvocationHandler;
   final SendPort sendPort;
 
   const _EtebaseIsolateInitMessage(
     this.loadLibetebase,
-    this.isolateConfig,
+    this.etebaseConfig,
     this.methodInvocationHandler,
     this.sendPort,
   );
@@ -80,7 +80,7 @@ class EtebaseIsolate {
 
   static Future<EtebaseIsolate> spawn({
     required LoadLibetebaseFn loadLibetebase,
-    required EtebaseIsolateConfig isolateConfig,
+    required EtebaseConfig etebaseConfig,
     required MethodInvocationHandler methodInvocationHandler,
   }) async {
     if (_instance != null) {
@@ -99,7 +99,7 @@ class EtebaseIsolate {
         _main,
         _EtebaseIsolateInitMessage(
           loadLibetebase,
-          isolateConfig,
+          etebaseConfig,
           methodInvocationHandler,
           receivePort.sendPort,
         ),
@@ -125,7 +125,7 @@ class EtebaseIsolate {
   }
 
   static Future<void> _main(_EtebaseIsolateInitMessage initMessage) async {
-    final config = initMessage.isolateConfig;
+    final config = initMessage.etebaseConfig;
     final sendPort = initMessage.sendPort;
     final receivePort = ReceivePort('$EtebaseIsolate._main');
 

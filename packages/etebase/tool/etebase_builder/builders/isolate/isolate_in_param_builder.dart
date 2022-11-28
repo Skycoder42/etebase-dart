@@ -61,7 +61,9 @@ class IsolateInParamBuilder {
                 .index(literalNum(paramsLength))
                 .asA(Types.int$.asNullable),
           )
-          .ifNullThen(literalNum(1024)) // TODO global constant/param
+          .ifNullThen(
+            IsolateBuilder.configRef.property('defaultContentBufferSize'),
+          )
           .statement;
     }
   }
