@@ -5839,7 +5839,7 @@ _i1.MethodResult _etebase_client_check_etebase_server(
   }
   return _i1.MethodResult.successTyped<bool>(
     invocation.id,
-    result == 0 ? false : true,
+    result == 0,
   );
 }
 

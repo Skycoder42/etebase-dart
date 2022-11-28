@@ -27,7 +27,7 @@ class IsolateImplementationBuilder {
         ..._isolateOutParamBuilder.buildOutParameters(method),
         _buildInvocation(method),
         if (method.needsSizeHint)
-          ..._buildNeedsSizeInvocation(method)
+          _buildNeedsSizeInvocation(method)
         else
           ..._isolateReturnBuilder.buildReturn(method),
       ]);
@@ -56,29 +56,25 @@ class IsolateImplementationBuilder {
     }
   }
 
-  Iterable<Code> _buildNeedsSizeInvocation(MethodRef method) sync* {
-    final bufParam = method.parameters.singleWhere((p) => p.isOutBuf);
-
-    yield _isolateReturnBuilder
-        .checkIntSuccess(resultRef)
-        .elseIf$(resultRef.lessOrEqualTo(refer(bufParam.lengthName())), [
-      _isolateReturnBuilder.buildReturnByteArray(method, resultRef),
-    ]).elseIf$(IsolateBuilder.reinvokedWithSizeRef.notEqualTo(literalNull), [
-      Types.MethodResult$.newInstanceNamed('failure', [
-        IsolateBuilder.invocationRef.property('id'),
-        Types.EtebaseErrorCode$.property('generic'),
-        literalString(
-          'output size of ${method.ffiName} changed during invocation',
-        ),
-      ]).returned.statement,
-    ]).else$([
-      refer('_${method.ffiName}')
-          .call(
-            IsolateBuilder.handlerParams,
-            {IsolateBuilder.reinvokedWithSizeRef.symbol!: resultRef},
-          )
-          .returned
-          .statement,
-    ]);
-  }
+  Code _buildNeedsSizeInvocation(MethodRef method) =>
+      _isolateReturnBuilder.checkIntSuccess(resultRef).elseIf$(
+          resultRef.lessOrEqualTo(refer(method.outParam.lengthName())), [
+        _isolateReturnBuilder.buildReturnByteArray(method, resultRef),
+      ]).elseIf$(IsolateBuilder.reinvokedWithSizeRef.notEqualTo(literalNull), [
+        Types.MethodResult$.newInstanceNamed('failure', [
+          IsolateBuilder.invocationRef.property('id'),
+          Types.EtebaseErrorCode$.property('generic'),
+          literalString(
+            'output size of ${method.ffiName} changed during invocation',
+          ),
+        ]).returned.statement,
+      ]).else$([
+        refer('_${method.ffiName}')
+            .call(
+              IsolateBuilder.handlerParams,
+              {IsolateBuilder.reinvokedWithSizeRef.symbol!: resultRef},
+            )
+            .returned
+            .statement,
+      ]);
 }

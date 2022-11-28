@@ -13,22 +13,19 @@ class IsolateOutParamBuilder {
   const IsolateOutParamBuilder();
 
   Iterable<Code> buildOutParameters(MethodRef method) sync* {
-    if (method.ffiName == 'etebase_utils_pretty_fingerprint') {
-      yield _buildFingerprintBuf();
-      return;
-    }
-
     if (method.hasRetSize) {
       yield _buildRetSize(method);
     }
 
     if (method.hasOutParam) {
-      final outParam = method.parameters.singleWhere((p) => p.isOutParam);
+      final outParam = method.outParam;
       final outParamType = outParam.type;
 
       if (outParam.isOutBuf) {
         if (outParamType is ByteArrayTypeRef) {
           yield* _buildOutByteArray(method, outParam, outParamType);
+        } else if (outParamType is StringTypeRef) {
+          yield* _buildOutString(method, outParam, outParamType);
         } else {
           throw UnsupportedError(
             'An out buf parameter cannot be of type $outParamType',
@@ -44,18 +41,15 @@ class IsolateOutParamBuilder {
     }
   }
 
-  Code _buildFingerprintBuf() => declareFinal('buf') // TODO hardcoded...
-      .assign(
-        IsolateBuilder.arenaRef.call(
-          [
-            IsolateBuilder.libEtebaseRef
-                .property('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE')
-          ],
-          const {},
-          [Types.Char$],
-        ),
-      )
-      .statement;
+  Expression getOutSizeRef(MethodRef method, ParameterRef param) {
+    if (method.needsSizeHint) {
+      return refer(param.lengthName());
+    } else if (method.lengthGetter != LengthGetterType.none) {
+      return IsolateBuilder.libEtebaseRef.property(method.ffiLengthGetterName);
+    } else {
+      return sizeRef;
+    }
+  }
 
   Code _buildRetSize(MethodRef method) {
     final retSizeParam = method.parameters.singleWhere((p) => p.isRetSize);
@@ -80,14 +74,25 @@ class IsolateOutParamBuilder {
     yield declareFinal(parameter.name)
         .assign(
           IsolateBuilder.arenaRef.call(
-            [
-              if (method.needsSizeHint)
-                refer(parameter.lengthName())
-              else
-                sizeRef,
-            ],
+            [getOutSizeRef(method, parameter)],
             const {},
             [Types.Uint8$],
+          ),
+        )
+        .statement;
+  }
+
+  Iterable<Code> _buildOutString(
+    MethodRef method,
+    ParameterRef parameter,
+    StringTypeRef type,
+  ) sync* {
+    yield declareFinal(parameter.name)
+        .assign(
+          IsolateBuilder.arenaRef.call(
+            [getOutSizeRef(method, parameter)],
+            const {},
+            [Types.Char$],
           ),
         )
         .statement;

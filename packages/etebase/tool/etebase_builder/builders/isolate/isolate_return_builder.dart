@@ -9,37 +9,37 @@ import 'isolate_implementation_builder.dart';
 import 'isolate_out_param_builder.dart';
 
 class IsolateReturnBuilder {
-  const IsolateReturnBuilder();
+  final IsolateOutParamBuilder _isolateOutParamBuilder;
+
+  const IsolateReturnBuilder([
+    this._isolateOutParamBuilder = const IsolateOutParamBuilder(),
+  ]);
 
   Iterable<Code> buildReturn(MethodRef method) sync* {
     const resultRef = IsolateImplementationBuilder.resultRef;
 
     final Expression transformedResult;
     if (method.hasOutParam) {
-      final returnParam = method.parameters.singleWhere((p) => p.isOutParam);
+      final returnParam = method.outParam;
       final returnParamRef = refer(returnParam.name);
       final returnType = returnParam.type;
 
       yield checkIntSuccess(resultRef);
-      if (method.ffiName == 'etebase_utils_pretty_fingerprint') {
-        // TODO assert is fingerprint
+      if (returnType is StringTypeRef) {
         transformedResult = transformedResult = _transformString(
           returnParamRef,
-          returnType as StringTypeRef,
+          returnType,
           // TODO check if needed - might be null terminated already, so actual
           // size is ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE - 1
-          length: IsolateBuilder.libEtebaseRef
-              .property('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE'),
+          length: _isolateOutParamBuilder.getOutSizeRef(method, returnParam),
         );
       } else if (returnType is ByteArrayTypeRef) {
-        // TODO so many special cases...
         transformedResult = _transformByteArray(
           method,
           returnParamRef,
           returnType,
-          listLength: method.ffiName == 'etebase_utils_randombytes'
-              ? IsolateOutParamBuilder.sizeRef
-              : refer(returnParam.lengthName()),
+          listLength:
+              _isolateOutParamBuilder.getOutSizeRef(method, returnParam),
         );
       } else if (returnType is EtebaseOutListTypeRef) {
         transformedResult = _transformEtebaseOutList(
@@ -102,7 +102,7 @@ class IsolateReturnBuilder {
       _buildReturnStatement(
         _transformByteArray(
           method,
-          refer('buf'), // TODO hardcoded...
+          refer(method.outParam.name),
           method.outOrReturnType as ByteArrayTypeRef,
           listLength: listLength,
         ),
@@ -135,7 +135,7 @@ class IsolateReturnBuilder {
       ]).returned;
 
   Expression _transformIntBool(Reference resultRef, BoolTypeRef type) =>
-      resultRef.equalTo(literalNum(0)).conditional(literalFalse, literalTrue);
+      resultRef.equalTo(literalNum(0));
 
   Expression _transformString(
     Expression result,

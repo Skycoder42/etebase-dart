@@ -9,7 +9,8 @@ import 'type_ref.dart';
 enum LengthGetterType {
   none(false),
   length(true),
-  size(true);
+  size(true),
+  constant(true);
 
   final bool hasLengthGetter;
 
@@ -56,6 +57,8 @@ class MethodRef {
       .where((param) => !param.isRetSize)
       .where((param) => !param.isOutParam);
 
+  ParameterRef get outParam => parameters.singleWhere((p) => p.isOutParam);
+
   TypeRef get outOrReturnType => parameters
       .where((p) => p.isOutParam)
       .map((p) => p.type)
@@ -65,12 +68,14 @@ class MethodRef {
     switch (lengthGetter) {
       case LengthGetterType.none:
         throw UnsupportedError(
-          'Cannot get ffiLengthGetterName of method $name without lengthGetter',
+          'Cannot get length-getter of method $ffiName without lengthGetter',
         );
       case LengthGetterType.length:
         return '${ffiName}_length';
       case LengthGetterType.size:
         return '${ffiName}_size';
+      case LengthGetterType.constant:
+        return '${ffiName}_size'.toUpperCase();
     }
   }
 }
@@ -84,6 +89,10 @@ class MethodParser {
     'etebase_signed_invitation_get_from_username': TypeRef.string(),
     'etebase_client_check_etebase_server': TypeRef.bool(fromInt: true),
   };
+
+  static final _methodsWithLengthConstants = [
+    'etebase_utils_pretty_fingerprint'
+  ];
 
   final ParamParser _paramParser;
   final TypeParser _typeParser;
@@ -179,7 +188,9 @@ class MethodParser {
       isDestroy: false,
       isStatic: forceStatic,
       isGetter: false,
-      lengthGetter: LengthGetterType.none,
+      lengthGetter: _methodsWithLengthConstants.contains(method.name)
+          ? LengthGetterType.constant
+          : LengthGetterType.none,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,
