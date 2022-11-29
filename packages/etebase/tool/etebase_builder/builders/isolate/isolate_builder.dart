@@ -72,13 +72,42 @@ class IsolateBuilder {
         ..replace(_buildHandlerSignature())
         ..name = 'etebaseIsolateMessageHandler'
         ..body = Block.of([
+          refer('log', 'dart:developer').call(
+            [literalString('Starting invocation of \$$_invocationName')],
+            {
+              'name': literalString('EtebaseIsolate'),
+              'level': literalNum(500),
+            },
+          ).statement,
           declareFinal(_arenaName)
               .assign(Types.EtebaseArena$.newInstance(const []))
               .statement,
           try$([
             caseBuilder,
-          ]).finally$([
+          ]).catch$(
+            error: refer('e'),
+            stackTrace: refer('s'),
+            body: [
+              refer('log', 'dart:developer').call(
+                [literalString('Invocation failed with error:')],
+                {
+                  'name': literalString('EtebaseIsolate'),
+                  'level': literalNum(1000),
+                  'error': refer('e'),
+                  'stackTrace': refer('s'),
+                },
+              ).statement,
+              refer('rethrow').statement,
+            ],
+          ).finally$([
             arenaRef.property('releaseAll').call(const []).statement,
+            refer('log', 'dart:developer').call(
+              [literalString('Finished invocation')],
+              {
+                'name': literalString('EtebaseIsolate'),
+                'level': literalNum(500)
+              },
+            ).statement,
           ]),
         ]),
     );

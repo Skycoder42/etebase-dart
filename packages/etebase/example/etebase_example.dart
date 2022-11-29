@@ -7,6 +7,14 @@ import 'package:etebase/gen/ffi/libetebase.ffi.client.dart';
 import 'package:etebase/src/etebase_init.dart';
 
 Future<void> main() async {
+  var ctr = 0;
+  while (true) {
+    print('### ${ctr++}');
+    await _main();
+  }
+}
+
+Future<void> _main() async {
   print('Initializing etebase');
   await Etebase.ensureInitialized(_loadLibEtebase);
   print('Etebase was initialized!');
@@ -19,7 +27,7 @@ Future<void> main() async {
   );
   print('Client is valid: ${await client.checkEtebaseServer()}');
 
-  await ProcessSignal.sigint.watch().first;
+  await Future<void>.delayed(const Duration(seconds: 10));
 
   await client.dispose();
   print('Client disposed');
@@ -28,5 +36,7 @@ Future<void> main() async {
 }
 
 DynamicLibrary _loadLibEtebase() => DynamicLibrary.open(
-      '/Library/Repos/other/rust/libetebase/target/release/libetebase.dylib',
+      Platform.isLinux
+          ? '/usr/lib/libetebase.so.0'
+          : '/Library/Repos/other/rust/libetebase/target/release/libetebase.dylib',
     );
