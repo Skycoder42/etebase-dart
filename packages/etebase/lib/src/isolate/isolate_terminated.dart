@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 class IsolateTerminated implements Exception {
   @override
   String toString() =>

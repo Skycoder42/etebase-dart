@@ -15,6 +15,7 @@ Future<void> main() async {
   print('Server-URL: $serverUrl');
   final client = await EtebaseClient.create(
     'example-client',
+    // serverUrl,
     Uri.http('localhost:3735', '/'),
   );
   print('Client is valid: ${await client.checkEtebaseServer()}');
@@ -26,11 +27,11 @@ Future<void> main() async {
   final account = await EtebaseAccount.signup(client, user, 'hello-test-123');
   print(await account.save());
 
-  await Future<void>.delayed(const Duration(seconds: 10));
-
   await account.dispose();
+  await user.dispose();
   await client.dispose();
   print('Client disposed');
+
   Etebase.terminate();
   print('Isolate terminated');
 }

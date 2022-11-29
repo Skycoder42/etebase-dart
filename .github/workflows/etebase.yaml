@@ -1,0 +1,36 @@
+name: CI/CD for etebase
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "packages/etebase/**"
+      - ".github/workflows/etebase.yaml"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "packages/etebase/**"
+      - ".github/workflows/etebase.yaml"
+
+jobs:
+  ci:
+    name: CI
+    uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
+    with:
+      workingDirectory: packages/etebase
+      buildRunner: true
+      unitTestPaths: test/unit
+  # cd:
+  #   name: CD
+  #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+  #   needs:
+  #     - ci
+  #   with:
+  #     workingDirectory: packages/etebase
+  #     buildRunner: true
+  #     tagPrefix: etebase/v
+  #   secrets:
+  #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}

@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 import 'etebase_error_code.dart';
 
 class EtebaseException implements Exception {

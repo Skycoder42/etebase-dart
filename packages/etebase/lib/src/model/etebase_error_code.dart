@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 enum EtebaseErrorCode {
   noError,
   generic,
