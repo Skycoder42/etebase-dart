@@ -13,6 +13,7 @@ abstract class TypeRef {
   factory TypeRef.int(bool asReturn) = IntTypeRef;
   factory TypeRef.returnSize() = ReturnSizeTypeRef;
   factory TypeRef.string() = StringTypeRef;
+  factory TypeRef.uri() = UriTypeRef;
   factory TypeRef.dateTime() = DateTimeTypeRef;
   factory TypeRef.stringList() = StringListTypeRef;
   factory TypeRef.byteArray({bool optional}) = ByteArrayTypeRef;
@@ -89,6 +90,17 @@ class StringTypeRef implements TypeRef {
 
   @override
   TypeReference get transferType => Types.String$;
+}
+
+class UriTypeRef implements TypeRef {
+  @override
+  TypeReference get ffiType => Types.pointer(Types.Char$);
+
+  @override
+  TypeReference get publicType => Types.Uri$;
+
+  @override
+  TypeReference get transferType => Types.Uri$;
 }
 
 class DateTimeTypeRef implements TypeRef {

@@ -26,7 +26,7 @@ class IsolateReturnBuilder {
 
       yield checkIntSuccess(resultRef);
       if (returnType is StringTypeRef) {
-        transformedResult = transformedResult = _transformString(
+        transformedResult = _transformString(
           returnParamRef,
           returnType,
           // TODO check if needed - might be null terminated already, so actual
@@ -54,9 +54,6 @@ class IsolateReturnBuilder {
       }
     } else {
       final returnType = method.returnType;
-      final ptrResultRef =
-          IsolateBuilder.arenaRef.property('attach').call([resultRef]);
-
       if (returnType is VoidTypeRef) {
         transformedResult = literalNull;
       } else if (returnType is BoolTypeRef) {
@@ -71,14 +68,16 @@ class IsolateReturnBuilder {
         transformedResult = returnType.asReturn ? literalNull : resultRef;
       } else if (returnType is StringTypeRef) {
         yield _checkPointerSuccess(resultRef);
-        transformedResult = _transformString(ptrResultRef, returnType);
+        transformedResult = _transformString(resultRef, returnType);
+      } else if (returnType is UriTypeRef) {
+        yield _checkPointerSuccess(resultRef);
+        transformedResult = _transformUrl(resultRef, returnType);
       } else if (returnType is DateTimeTypeRef) {
         yield _checkPointerSuccess(resultRef);
-        transformedResult = _transformDateTime(ptrResultRef, returnType);
+        transformedResult = _transformDateTime(resultRef, returnType);
       } else if (returnType is ByteArrayTypeRef) {
         yield _checkPointerSuccess(resultRef);
-        transformedResult =
-            _transformByteArray(method, ptrResultRef, returnType);
+        transformedResult = _transformByteArray(method, resultRef, returnType);
       } else if (returnType is EnumTypeRef) {
         yield checkIntSuccess(resultRef);
         transformedResult = _transformEnum(resultRef, returnType);
@@ -130,7 +129,6 @@ class IsolateReturnBuilder {
   Expression _buildErrorReturn() =>
       Types.FfiHelpers$.property('errorResult').call([
         IsolateBuilder.libEtebaseRef,
-        IsolateBuilder.arenaRef,
         IsolateBuilder.invocationRef.property('id'),
       ]).returned;
 
@@ -147,6 +145,12 @@ class IsolateReturnBuilder {
           .call(const [], const {}, [Types.Utf8$])
           .property('toDartString')
           .call(const [], {if (length != null) 'length': length});
+
+  Expression _transformUrl(Expression result, UriTypeRef type) =>
+      Types.Uri$.newInstanceNamed(
+        'parse',
+        [_transformString(result, StringTypeRef())],
+      );
 
   Expression _transformDateTime(Expression result, DateTimeTypeRef type) =>
       Types.DateTime$.newInstanceNamed('fromMillisecondsSinceEpoch', [

@@ -47,6 +47,11 @@ class ParamParser {
   static const _thisParamOverrides = {
     'etebase_client_check_etebase_server': {'client': true},
   };
+  static final _paramTypeMap = {
+    'access_level': TypeRef.etebaseCollectionAccessLevel(),
+    'prefetch': TypeRef.etebasePrefetchOption(),
+    'server_url': TypeRef.uri(),
+  };
 
   final TypeParser _typeParser;
 
@@ -124,22 +129,19 @@ class ParamParser {
     TypedefRef typeDefs, {
     required bool isArray,
     required bool isOptional,
-  }) {
-    if (param.name == 'access_level') {
-      _assertIsInt(param);
-      return TypeRef.etebaseCollectionAccessLevel();
-    } else if (param.name == 'prefetch') {
-      _assertIsInt(param);
-      return TypeRef.etebasePrefetchOption();
-    } else {
-      return _typeParser.parseType(
-        type: param.type,
-        typeDefs: typeDefs,
-        isArray: isArray,
-        isOptional: isOptional,
-      );
-    }
-  }
+  }) =>
+      _paramTypeMap.entries
+          .where((e) => e.key == param.name)
+          .map((e) => e.value)
+          .singleWhere(
+            (_) => true,
+            orElse: () => _typeParser.parseType(
+              type: param.type,
+              typeDefs: typeDefs,
+              isArray: isArray,
+              isOptional: isOptional,
+            ),
+          );
 
   bool _isOptional(String methodName, ParameterElement param) {
     if (param.name == 'fetch_options' || param.name == 'encryption_key') {
@@ -147,11 +149,5 @@ class ParamParser {
     }
 
     return false;
-  }
-
-  void _assertIsInt(ParameterElement param) {
-    if (!param.type.isDartCoreInt) {
-      throw UnsupportedError('${param.name} must be an int parameter');
-    }
   }
 }

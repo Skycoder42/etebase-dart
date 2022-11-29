@@ -28,6 +28,8 @@ class IsolateInParamBuilder {
 
       if (paramType is StringTypeRef) {
         yield* _buildStringParam(param, paramType, variable, argument);
+      } else if (paramType is UriTypeRef) {
+        yield* _buildUrlParam(param, paramType, variable, argument);
       } else if (paramType is DateTimeTypeRef) {
         yield* _buildDateTimeParam(param, paramType, variable, argument);
       } else if (paramType is StringListTypeRef) {
@@ -100,6 +102,17 @@ class IsolateInParamBuilder {
     Expression argument,
   ) sync* {
     yield variable.assign(_stringToPointer(argument)).statement;
+  }
+
+  Iterable<Code> _buildUrlParam(
+    ParameterRef parameter,
+    UriTypeRef parameterType,
+    Expression variable,
+    Expression argument,
+  ) sync* {
+    yield variable
+        .assign(_stringToPointer(argument.property('toString').call(const [])))
+        .statement;
   }
 
   Iterable<Code> _buildDateTimeParam(

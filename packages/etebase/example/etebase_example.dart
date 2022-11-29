@@ -7,14 +7,6 @@ import 'package:etebase/gen/ffi/libetebase.ffi.client.dart';
 import 'package:etebase/src/etebase_init.dart';
 
 Future<void> main() async {
-  var ctr = 0;
-  while (true) {
-    print('### ${ctr++}');
-    await _main();
-  }
-}
-
-Future<void> _main() async {
   print('Initializing etebase');
   await Etebase.ensureInitialized(_loadLibEtebase);
   print('Etebase was initialized!');
@@ -23,12 +15,20 @@ Future<void> _main() async {
   print('Server-URL: $serverUrl');
   final client = await EtebaseClient.create(
     'example-client',
-    serverUrl,
+    Uri.http('localhost:3735', '/'),
   );
   print('Client is valid: ${await client.checkEtebaseServer()}');
 
+  final user = await EtebaseUser.create('test', 'test@example.org');
+  print(await user.getUsername());
+  print(await user.getEmail());
+
+  final account = await EtebaseAccount.signup(client, user, 'hello-test-123');
+  print(await account.save());
+
   await Future<void>.delayed(const Duration(seconds: 10));
 
+  await account.dispose();
   await client.dispose();
   print('Client disposed');
   Etebase.terminate();

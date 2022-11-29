@@ -15,6 +15,8 @@ abstract class Types {
 
   static final String$ = TypeReference((b) => b..symbol = 'String');
 
+  static final Uri$ = TypeReference((b) => b..symbol = 'Uri');
+
   static final DateTime$ = TypeReference((b) => b..symbol = 'DateTime');
 
   static final List$ = TypeReference((b) => b..symbol = 'List');
@@ -67,6 +69,12 @@ abstract class Types {
       ..url = 'package:ffi/ffi.dart',
   );
 
+  static final Arena$ = TypeReference(
+    (b) => b
+      ..symbol = 'Arena'
+      ..url = 'package:ffi/ffi.dart',
+  );
+
   static const nullptr$ = Reference('nullptr', 'dart:ffi');
 
   static final EtebaseCollectionAccessLevel$ = TypeReference(
@@ -103,12 +111,6 @@ abstract class Types {
     (b) => b
       ..symbol = 'MethodInvocation'
       ..url = 'package:etebase/src/isolate/method_invocation.dart',
-  );
-
-  static final EtebaseArena$ = TypeReference(
-    (b) => b
-      ..symbol = 'EtebaseArena'
-      ..url = 'package:etebase/src/isolate/etebase_arena.dart',
   );
 
   static final FfiHelpers$ = TypeReference(

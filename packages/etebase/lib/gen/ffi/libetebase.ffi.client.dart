@@ -16,8 +16,8 @@ import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i6;
 import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i7;
 
 /// The URL of the main hosted server
-Future<String> etebaseGetDefaultServerUrl() =>
-    _i1.EtebaseIsolate.current.invoke<String>(
+Future<Uri> etebaseGetDefaultServerUrl() =>
+    _i1.EtebaseIsolate.current.invoke<Uri>(
       #etebase_get_default_server_url,
       const <dynamic>[],
     );
@@ -2334,7 +2334,7 @@ class EtebaseClient {
 
   static Future<EtebaseClient> create(
     String clientName,
-    String serverUrl,
+    Uri serverUrl,
   ) async =>
       EtebaseClient._(
           _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
@@ -2344,7 +2344,7 @@ class EtebaseClient {
           serverUrl,
         ],
       )));
-  Future<void> setServerUrl(String serverUrl) =>
+  Future<void> setServerUrl(Uri serverUrl) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_client_set_server_url,
         <dynamic>[
@@ -2439,8 +2439,7 @@ class EtebaseAccount {
   /// Fetch the link to the user dashboard of the account
   ///
   /// @param this_ the object handle
-  Future<String> fetchDashboardUrl() =>
-      _i1.EtebaseIsolate.current.invoke<String>(
+  Future<Uri> fetchDashboardUrl() => _i1.EtebaseIsolate.current.invoke<Uri>(
         #etebase_account_fetch_dashboard_url,
         <dynamic>[_pointer.address],
       );
@@ -2449,7 +2448,7 @@ class EtebaseAccount {
   ///
   /// @param this_ the object handle
   /// @param server_url the new server URL to be set
-  Future<void> forceServerUrl(String serverUrl) =>
+  Future<void> forceServerUrl(Uri serverUrl) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_account_force_server_url,
         <dynamic>[

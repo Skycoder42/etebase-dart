@@ -84,6 +84,7 @@ class MethodParser {
   static final _isGetLengthRegExp = RegExp('_get_.*_(length|size)');
 
   static final _returnTypeMapping = {
+    RegExp(r'.*_(get|fetch)_.*_url$'): TypeRef.uri(),
     RegExp(r'.*_pubkey$'): TypeRef.byteArray(),
     RegExp(r'.*_get_access_level$'): TypeRef.etebaseCollectionAccessLevel(),
     'etebase_signed_invitation_get_from_username': TypeRef.string(),
