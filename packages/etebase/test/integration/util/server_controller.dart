@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_asserts_with_message
+// ignore_for_file: prefer_asserts_with_message, avoid_print
 
 import 'dart:convert';
 import 'dart:io';

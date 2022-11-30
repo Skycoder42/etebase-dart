@@ -4,6 +4,11 @@ packages:
   - packages/etebase/*
 
 scripts:
+  get:
+    run: >-
+      dart pub global run melos exec -c1 --no-flutter -- dart pub get &&
+      dart pub global run melos exec -c1 --flutter -- flutter pub get
+
   pre-commit:init:
     run: >-
       bash -c "echo -e
