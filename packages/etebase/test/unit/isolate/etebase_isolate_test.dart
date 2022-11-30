@@ -1,11 +1,13 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:etebase/etebase.dart';
+// ignore: test_library_import
 import 'package:etebase/gen/ffi/libetebase.ffi.dart';
 import 'package:etebase/src/isolate/etebase_isolate.dart';
+import 'package:etebase/src/isolate/isolate_terminated.dart';
 import 'package:etebase/src/isolate/method_invocation.dart';
 import 'package:etebase/src/isolate/method_result.dart';
+import 'package:etebase/src/model/etebase_config.dart';
 import 'package:test/test.dart';
 
 abstract class Callable<R, T1, T2, T3> {

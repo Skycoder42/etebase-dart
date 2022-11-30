@@ -2,6 +2,7 @@
 
 import 'dart:ffi';
 
+// ignore: test_library_import
 import 'package:etebase/gen/ffi/libetebase.ffi.dart' show LibEtebaseFFI;
 import 'package:etebase/src/isolate/ffi_helpers.dart';
 import 'package:etebase/src/model/etebase_error_code.dart';
