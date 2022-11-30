@@ -1,11 +1,14 @@
 import 'dart:developer' as dev;
 
+import 'package:meta/meta.dart';
+
 import '../../gen/ffi/libetebase.ffi.dart';
 import '../model/etebase_config.dart';
 import 'etebase_isolate.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
 
+@internal
 class LoggingInvocationHandlerWrapper {
   final MethodInvocationHandler _methodInvocationHandler;
   final int logLevel;

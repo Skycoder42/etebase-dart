@@ -6,6 +6,7 @@ import '../model/etebase_exception.dart';
 part 'method_result.freezed.dart';
 
 @freezed
+@internal
 class MethodResult with _$MethodResult {
   static MethodResult successTyped<T>(int id, T result) =>
       MethodResult.success(id, result);

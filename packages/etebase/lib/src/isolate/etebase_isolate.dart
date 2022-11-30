@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:isolate';
 
+import 'package:meta/meta.dart';
+
 import '../../gen/ffi/libetebase.ffi.dart';
 import '../model/etebase_config.dart';
 import 'isolate_terminated.dart';
@@ -10,6 +12,7 @@ import 'method_result.dart';
 
 typedef LoadLibetebaseFn = FutureOr<DynamicLibrary> Function();
 
+@internal
 typedef MethodInvocationHandler = MethodResult Function(
   LibEtebaseFFI libEtebaseFFI,
   EtebaseConfig etebaseConfig,
@@ -30,6 +33,7 @@ class _EtebaseIsolateInitMessage {
   );
 }
 
+@internal
 class EtebaseIsolate {
   final Isolate _isolate;
   final ReceivePort _receivePort;

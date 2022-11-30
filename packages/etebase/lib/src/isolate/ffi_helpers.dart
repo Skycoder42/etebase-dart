@@ -1,11 +1,13 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:meta/meta.dart';
 
 import '../../gen/ffi/libetebase.ffi.dart' as ffi;
 import '../model/etebase_error_code.dart';
 import 'method_result.dart';
 
+@internal
 abstract class FfiHelpers {
   FfiHelpers._();
 
