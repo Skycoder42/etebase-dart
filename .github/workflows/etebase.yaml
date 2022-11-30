@@ -20,10 +20,20 @@ jobs:
     name: CI
     uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
     with:
+      platforms: '["linux", "windows", "macos"]'
       workingDirectory: packages/etebase
       buildRunner: true
-      buildRunnerArgs: --build-filter "lib/src/**"
+      buildRunnerArgs: >-
+        --delete-conflicting-outputs
+        --define etebase:etebase_client_builder=restoreMode=true
+        --define etebase:etebase_isolate_builder=restoreMode=true
       unitTestPaths: test/unit
+      integrationTestPaths: test/integration
+      integrationTestSetup: >-
+        {
+          "linux": "bash tool/integration/build_unix.sh",
+          "macos": "bash tool/integration/build_unix.sh",
+        }
   # cd:
   #   name: CD
   #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
@@ -32,7 +42,10 @@ jobs:
   #   with:
   #     workingDirectory: packages/etebase
   #     buildRunner: true
-  #     buildRunnerArgs: --build-filter "lib/src/**"
+  #     buildRunnerArgs: >-
+  #       --delete-conflicting-outputs
+  #       --define etebase:etebase_client_builder=restoreMode=true
+  #       --define etebase:etebase_isolate_builder=restoreMode=true
   #     tagPrefix: etebase/v
   #   secrets:
   #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}

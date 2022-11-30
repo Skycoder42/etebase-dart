@@ -9,7 +9,7 @@ import 'method_result.dart';
 
 @internal
 abstract class FfiHelpers {
-  FfiHelpers._();
+  FfiHelpers._(); // coverage:ignore-line
 
   static MethodResult errorResult(
     ffi.LibEtebaseFFI libEtebase,

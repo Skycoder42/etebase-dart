@@ -4,10 +4,13 @@ import 'package:source_gen/source_gen.dart';
 
 import 'builders/isolate/isolate_builder.dart';
 import 'parsers/etebase_parser.dart';
+import 'restorable_generator.dart';
 
-class EtebaseIsolateGenerator extends Generator {
+class EtebaseIsolateGenerator extends RestorableGenerator {
+  EtebaseIsolateGenerator({required super.restoreMode});
+
   @override
-  String generate(LibraryReader library, BuildStep buildStep) {
+  String generateImpl(LibraryReader library, BuildStep buildStep) {
     final etebaseRef = const EtebaseParser().parse(library);
 
     final buffer = StringBuffer();

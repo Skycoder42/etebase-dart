@@ -4,10 +4,13 @@ import 'package:source_gen/source_gen.dart';
 
 import 'builders/client/client_builder.dart';
 import 'parsers/etebase_parser.dart';
+import 'restorable_generator.dart';
 
-class EtebaseClientGenerator extends Generator {
+class EtebaseClientGenerator extends RestorableGenerator {
+  EtebaseClientGenerator({required super.restoreMode});
+
   @override
-  String generate(LibraryReader library, BuildStep buildStep) {
+  String generateImpl(LibraryReader library, BuildStep buildStep) {
     final etebaseRef = const EtebaseParser().parse(library);
 
     final buffer = StringBuffer();
