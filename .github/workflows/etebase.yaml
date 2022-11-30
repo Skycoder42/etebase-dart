@@ -22,7 +22,7 @@ jobs:
     with:
       workingDirectory: packages/etebase
       buildRunner: true
-      buildRunnerArgs: --delete-conflicting-outputs
+      buildRunnerArgs: --build-filter "lib/src/**"
       unitTestPaths: test/unit
   # cd:
   #   name: CD
@@ -32,7 +32,7 @@ jobs:
   #   with:
   #     workingDirectory: packages/etebase
   #     buildRunner: true
-  #     buildRunnerArgs: --delete-conflicting-outputs
+  #     buildRunnerArgs: --build-filter "lib/src/**"
   #     tagPrefix: etebase/v
   #   secrets:
   #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}

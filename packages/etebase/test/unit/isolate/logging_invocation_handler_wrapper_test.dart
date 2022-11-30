@@ -1,3 +1,4 @@
+// ignore: test_library_import
 import 'package:etebase/gen/ffi/libetebase.ffi.dart';
 import 'package:etebase/src/isolate/logging_invocation_handler_wrapper.dart';
 import 'package:etebase/src/isolate/method_invocation.dart';
