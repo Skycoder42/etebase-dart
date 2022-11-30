@@ -33,7 +33,7 @@ jobs:
         {
           "linux": "bash tool/integration/build_unix.sh",
           "macos": "bash tool/integration/build_unix.sh",
-          "windows": "powershell -File tool\integration\build_win.ps1"
+          "windows": "powershell -File tool\\integration\\build_win.ps1"
         }
   # cd:
   #   name: CD
