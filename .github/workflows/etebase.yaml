@@ -32,7 +32,7 @@ jobs:
       integrationTestSetup: >-
         {
           "linux": "bash tool/integration/build_unix.sh",
-          "macos": "bash tool/integration/build_unix.sh",
+          "macos": "bash tool/integration/build_unix.sh tool/integration/libetebase-macos.patch",
           "windows": "powershell -File tool\\integration\\build_win.ps1"
         }
   # cd:
