@@ -1966,13 +1966,14 @@ _i1.MethodResult _etebase_item_metadata_set_item_type(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter itemType must be of type String');
+  assert(invocation.arguments[1] is String?,
+      'Parameter itemType must be of type String?');
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
-  final itemType = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
-      .cast<_i6.Char>();
+  final itemType = (invocation.arguments[1] as String?)
+          ?.toNativeUtf8(allocator: arena)
+          .cast<_i6.Char>() ??
+      _i6.nullptr;
   libEtebase.etebase_item_metadata_set_item_type(
     this_,
     itemType,
@@ -1995,15 +1996,9 @@ _i1.MethodResult _etebase_item_metadata_get_item_type(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_item_type(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
   );
 }
 
@@ -2016,13 +2011,14 @@ _i1.MethodResult _etebase_item_metadata_set_name(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter name must be of type String');
+  assert(invocation.arguments[1] is String?,
+      'Parameter name must be of type String?');
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
-  final name = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
-      .cast<_i6.Char>();
+  final name = (invocation.arguments[1] as String?)
+          ?.toNativeUtf8(allocator: arena)
+          .cast<_i6.Char>() ??
+      _i6.nullptr;
   libEtebase.etebase_item_metadata_set_name(
     this_,
     name,
@@ -2045,15 +2041,9 @@ _i1.MethodResult _etebase_item_metadata_get_name(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_name(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
   );
 }
 
@@ -2066,12 +2056,15 @@ _i1.MethodResult _etebase_item_metadata_set_mtime(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is DateTime,
-      'Parameter mtime must be of type DateTime');
+  assert(invocation.arguments[1] is DateTime?,
+      'Parameter mtime must be of type DateTime?');
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
-  final mtime = arena<_i6.Int64>()
-    ..value = (invocation.arguments[1] as DateTime).millisecondsSinceEpoch;
+  final mtime = (invocation.arguments[1] as DateTime?) == null
+      ? _i6.nullptr
+      : (arena<_i6.Int64>()
+        ..value =
+            (invocation.arguments[1] as DateTime?)!.millisecondsSinceEpoch);
   libEtebase.etebase_item_metadata_set_mtime(
     this_,
     mtime,
@@ -2094,15 +2087,11 @@ _i1.MethodResult _etebase_item_metadata_get_mtime(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_mtime(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<DateTime>(
+  return _i1.MethodResult.successTyped<DateTime?>(
     invocation.id,
-    DateTime.fromMillisecondsSinceEpoch(result.value),
+    result == _i6.nullptr
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(result.value),
   );
 }
 
@@ -2115,13 +2104,14 @@ _i1.MethodResult _etebase_item_metadata_set_description(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter description must be of type String');
+  assert(invocation.arguments[1] is String?,
+      'Parameter description must be of type String?');
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
-  final description = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
-      .cast<_i6.Char>();
+  final description = (invocation.arguments[1] as String?)
+          ?.toNativeUtf8(allocator: arena)
+          .cast<_i6.Char>() ??
+      _i6.nullptr;
   libEtebase.etebase_item_metadata_set_description(
     this_,
     description,
@@ -2144,15 +2134,9 @@ _i1.MethodResult _etebase_item_metadata_get_description(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_description(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
   );
 }
 
@@ -2165,13 +2149,14 @@ _i1.MethodResult _etebase_item_metadata_set_color(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter color must be of type String');
+  assert(invocation.arguments[1] is String?,
+      'Parameter color must be of type String?');
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
-  final color = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
-      .cast<_i6.Char>();
+  final color = (invocation.arguments[1] as String?)
+          ?.toNativeUtf8(allocator: arena)
+          .cast<_i6.Char>() ??
+      _i6.nullptr;
   libEtebase.etebase_item_metadata_set_color(
     this_,
     color,
@@ -2194,15 +2179,9 @@ _i1.MethodResult _etebase_item_metadata_get_color(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_metadata_get_color(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
   );
 }
 

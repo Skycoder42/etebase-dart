@@ -67,13 +67,14 @@ class IsolateReturnBuilder {
         yield checkIntSuccess(resultRef);
         transformedResult = returnType.asReturn ? literalNull : resultRef;
       } else if (returnType is StringTypeRef) {
-        yield _checkPointerSuccess(resultRef);
+        if (!returnType.nullable) {
+          yield _checkPointerSuccess(resultRef);
+        }
         transformedResult = _transformString(resultRef, returnType);
       } else if (returnType is UriTypeRef) {
         yield _checkPointerSuccess(resultRef);
         transformedResult = _transformUrl(resultRef, returnType);
       } else if (returnType is DateTimeTypeRef) {
-        yield _checkPointerSuccess(resultRef);
         transformedResult = _transformDateTime(resultRef, returnType);
       } else if (returnType is ByteArrayTypeRef) {
         yield _checkPointerSuccess(resultRef);
@@ -139,12 +140,21 @@ class IsolateReturnBuilder {
     Expression result,
     StringTypeRef type, {
     Expression? length,
-  }) =>
-      result
-          .property('cast')
-          .call(const [], const {}, [Types.Utf8$])
-          .property('toDartString')
-          .call(const [], {if (length != null) 'length': length});
+  }) {
+    final castExpression = result
+        .property('cast')
+        .call(const [], const {}, [Types.Utf8$])
+        .property('toDartString')
+        .call(const [], {if (length != null) 'length': length});
+    if (type.nullable) {
+      return result.equalTo(Types.nullptr$).conditional(
+            literalNull,
+            castExpression,
+          );
+    } else {
+      return castExpression;
+    }
+  }
 
   Expression _transformUrl(Expression result, UriTypeRef type) =>
       Types.Uri$.newInstanceNamed(
@@ -153,9 +163,12 @@ class IsolateReturnBuilder {
       );
 
   Expression _transformDateTime(Expression result, DateTimeTypeRef type) =>
-      Types.DateTime$.newInstanceNamed('fromMillisecondsSinceEpoch', [
-        result.property('value'),
-      ]);
+      result.equalTo(Types.nullptr$).conditional(
+            literalNull,
+            Types.DateTime$.newInstanceNamed('fromMillisecondsSinceEpoch', [
+              result.property('value'),
+            ]),
+          );
 
   Expression _transformByteArray(
     MethodRef method,

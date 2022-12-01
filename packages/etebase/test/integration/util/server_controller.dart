@@ -5,9 +5,27 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-class ServerController {
+abstract class ServerController {
+  factory ServerController() {
+    if (Platform.isWindows) {
+      throw UnimplementedError();
+    } else {
+      return _ServerControllerUnix();
+    }
+  }
+
+  Future<Uri> start({
+    Duration waitForReadyTimeout = const Duration(minutes: 1),
+    bool autoTearDown = true,
+  });
+
+  Future<void> stop();
+}
+
+class _ServerControllerUnix implements ServerController {
   String? _containerId;
 
+  @override
   Future<Uri> start({
     Duration waitForReadyTimeout = const Duration(minutes: 1),
     bool autoTearDown = true,
@@ -39,28 +57,34 @@ class ServerController {
 
     if (waitForReadyTimeout != Duration.zero) {
       final timeout = DateTime.now().add(waitForReadyTimeout);
-      while (DateTime.now().isBefore(timeout)) {
-        try {
-          final socket = await Socket.connect(serverUri.host, serverUri.port);
-          await socket.close();
-          print(
-            'Server is ready after: '
-            '${waitForReadyTimeout - timeout.difference(DateTime.now())}',
-          );
-          break;
-        } on SocketException catch (e) {
-          if (!e.message.contains('Connection refused')) {
-            rethrow;
+      final client = HttpClient();
+      try {
+        while (DateTime.now().isBefore(timeout)) {
+          try {
+            final request = await client.getUrl(serverUri);
+            final response = await request.close();
+            if (response.statusCode == 200) {
+              print(
+                'Server is ready after: '
+                '${waitForReadyTimeout - timeout.difference(DateTime.now())}',
+              );
+              break;
+            }
+          } on HttpException {
+            // do nothing
           }
 
           await Future<void>.delayed(const Duration(seconds: 1));
         }
+      } finally {
+        client.close();
       }
     }
 
     return serverUri;
   }
 
+  @override
   Future<void> stop() async {
     assert(_containerId != null);
 
@@ -69,7 +93,10 @@ class ServerController {
     printOnFailure('STDOUT:\n${logsResult.stdout}');
     printOnFailure('STDERR:\n${logsResult.stderr}');
 
+    final sw = Stopwatch()..start();
     final stopResult = await Process.run('docker', ['stop', _containerId!]);
+    sw.stop();
+    print('Stopped server in ${sw.elapsed}');
     printOnFailure('Stop-Errors:\n${stopResult.stderr}');
     expect(stopResult.exitCode, 0);
 

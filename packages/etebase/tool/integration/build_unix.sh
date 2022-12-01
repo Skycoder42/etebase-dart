@@ -10,7 +10,7 @@ git clone https://github.com/etesync/libetebase.git -b v0.5.3 "$libetebaseDir"
 cd "$libetebaseDir"
 
 if [ -n "$PATCH_FILE" ]; then
-  git apply "$PATCH_FILE"
+  git apply "$GITHUB_WORKSPACE/$PATCH_FILE"
 fi
 
 make

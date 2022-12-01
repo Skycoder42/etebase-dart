@@ -101,7 +101,9 @@ class IsolateInParamBuilder {
     Expression variable,
     Expression argument,
   ) sync* {
-    yield variable.assign(_stringToPointer(argument)).statement;
+    yield variable
+        .assign(_stringToPointer(argument, isNullable: parameterType.nullable))
+        .statement;
   }
 
   Iterable<Code> _buildUrlParam(
@@ -123,14 +125,17 @@ class IsolateInParamBuilder {
   ) sync* {
     yield variable
         .assign(
-          IsolateBuilder.arenaRef.call(
-            const [],
-            const {},
-            [Types.Int64$],
-          ),
+          argument.equalTo(literalNull).conditional(
+                Types.nullptr$,
+                IsolateBuilder.arenaRef
+                    .call(const [], const {}, [Types.Int64$])
+                    .cascade('value')
+                    .assign(
+                      argument.nullChecked.property('millisecondsSinceEpoch'),
+                    )
+                    .parenthesized,
+              ),
         )
-        .cascade('value')
-        .assign(argument.property('millisecondsSinceEpoch'))
         .statement;
   }
 
@@ -262,11 +267,17 @@ class IsolateInParamBuilder {
     ).statement;
   }
 
-  Expression _stringToPointer(Expression variable) => variable
-      .property('toNativeUtf8')
-      .call(const [], const {'allocator': IsolateBuilder.arenaRef})
-      .property('cast')
-      .call(const [], const {}, [Types.Char$]);
+  Expression _stringToPointer(Expression variable, {bool isNullable = false}) {
+    final convertExpression = variable
+        .nullableProperty('toNativeUtf8', isNullable: isNullable)
+        .call(const [], const {'allocator': IsolateBuilder.arenaRef})
+        .property('cast')
+        .call(const [], const {}, [Types.Char$]);
+
+    return isNullable
+        ? convertExpression.ifNullThen(Types.nullptr$)
+        : convertExpression;
+  }
 
   Iterable<Code> _buildListAllocation(
     ParameterRef parameter,

@@ -13,6 +13,7 @@ class ParameterRef {
   final bool hasLength;
   final bool isRetSize;
   final bool isOutBuf;
+  final bool isOptional;
 
   final TypeRef type;
 
@@ -22,12 +23,11 @@ class ParameterRef {
     required this.hasLength,
     required this.isRetSize,
     required this.isOutBuf,
+    required this.isOptional,
     required this.type,
   });
 
   bool get isOutParam => isOutBuf || type is EtebaseOutListTypeRef;
-
-  bool get isOptional => type.publicType.isNullable ?? false;
 
   bool get needsSizeHint => isOutBuf && hasLength;
 
@@ -51,6 +51,20 @@ class ParamParser {
     'access_level': TypeRef.etebaseCollectionAccessLevel(),
     'prefetch': TypeRef.etebasePrefetchOption(),
     'server_url': TypeRef.uri(),
+  };
+  static final _optionalParams = {
+    RegExp('.*'): ['fetch_options'],
+    RegExp('etebase_(fs_cache_.*)?account.*'): ['encryption_key'],
+  };
+  static final _nullableParams = {
+    ..._optionalParams,
+    RegExp('etebase_item_metadata_.*'): [
+      'item_type',
+      'name',
+      'mtime',
+      'description',
+      'color',
+    ],
   };
 
   final TypeParser _typeParser;
@@ -77,6 +91,8 @@ class ParamParser {
       final param = parameters[i];
       final nextParam = i < parameters.length - 1 ? parameters[i + 1] : null;
       final isBufParam = param.name == 'buf';
+      final isOptional = _hasRule(_optionalParams, methodName, param);
+      final isNullable = _hasRule(_nullableParams, methodName, param);
 
       if (nextParam != null && nextParam.name == '${param.name}_size') {
         ++i; // skip the _size param
@@ -87,10 +103,11 @@ class ParamParser {
           hasLength: true,
           isRetSize: false,
           isOutBuf: isBufParam,
+          isOptional: isOptional,
           type: _typeParser.parseType(
             type: param.type,
             isArray: true,
-            isOptional: _isOptional(methodName, param),
+            isNullable: isNullable,
             typeDefs: typeDefs,
           ),
         );
@@ -102,11 +119,12 @@ class ParamParser {
           hasLength: false,
           isRetSize: param.name == 'ret_size',
           isOutBuf: isBufParam,
+          isOptional: isOptional,
           type: _parseTypeOrEnum(
             param,
             typeDefs,
             isArray: isBufParam && _isBufList(param),
-            isOptional: _isOptional(methodName, param),
+            isNullable: isNullable,
           ),
         );
       }
@@ -128,7 +146,7 @@ class ParamParser {
     ParameterElement param,
     TypedefRef typeDefs, {
     required bool isArray,
-    required bool isOptional,
+    required bool isNullable,
   }) =>
       _paramTypeMap.entries
           .where((e) => e.key == param.name)
@@ -139,13 +157,21 @@ class ParamParser {
               type: param.type,
               typeDefs: typeDefs,
               isArray: isArray,
-              isOptional: isOptional,
+              isNullable: isNullable,
             ),
           );
 
-  bool _isOptional(String methodName, ParameterElement param) {
-    if (param.name == 'fetch_options' || param.name == 'encryption_key') {
-      return true;
+  bool _hasRule(
+    Map<RegExp, List<String>> map,
+    String methodName,
+    ParameterElement param,
+  ) {
+    for (final entry in map.entries) {
+      if (entry.key.hasMatch(methodName)) {
+        if (entry.value.contains(param.name)) {
+          return true;
+        }
+      }
     }
 
     return false;

@@ -12,11 +12,11 @@ abstract class TypeRef {
   // ignore: avoid_positional_boolean_parameters
   factory TypeRef.int(bool asReturn) = IntTypeRef;
   factory TypeRef.returnSize() = ReturnSizeTypeRef;
-  factory TypeRef.string() = StringTypeRef;
+  factory TypeRef.string({bool nullable}) = StringTypeRef;
   factory TypeRef.uri() = UriTypeRef;
   factory TypeRef.dateTime() = DateTimeTypeRef;
   factory TypeRef.stringList() = StringListTypeRef;
-  factory TypeRef.byteArray({bool optional}) = ByteArrayTypeRef;
+  factory TypeRef.byteArray({bool nullable}) = ByteArrayTypeRef;
   factory TypeRef.etebaseCollectionAccessLevel() =
       EtebaseCollectionAccessLevelTypeRef;
   factory TypeRef.etebasePrefetchOption() = EtebasePrefetchOptionTypeRef;
@@ -82,14 +82,20 @@ class ReturnSizeTypeRef implements TypeRef {
 }
 
 class StringTypeRef implements TypeRef {
+  final bool nullable;
+
+  StringTypeRef({this.nullable = false});
+
   @override
   TypeReference get ffiType => Types.pointer(Types.Char$);
 
   @override
-  TypeReference get publicType => Types.String$;
+  TypeReference get publicType =>
+      nullable ? Types.String$.asNullable : Types.String$;
 
   @override
-  TypeReference get transferType => Types.String$;
+  TypeReference get transferType =>
+      nullable ? Types.String$.asNullable : Types.String$;
 }
 
 class UriTypeRef implements TypeRef {
@@ -108,10 +114,10 @@ class DateTimeTypeRef implements TypeRef {
   TypeReference get ffiType => Types.pointer(Types.Int64$);
 
   @override
-  TypeReference get publicType => Types.DateTime$;
+  TypeReference get publicType => Types.DateTime$.asNullable;
 
   @override
-  TypeReference get transferType => Types.DateTime$;
+  TypeReference get transferType => Types.DateTime$.asNullable;
 }
 
 class StringListTypeRef implements TypeRef {
@@ -126,19 +132,19 @@ class StringListTypeRef implements TypeRef {
 }
 
 class ByteArrayTypeRef implements TypeRef {
-  final bool optional;
+  final bool nullable;
 
-  ByteArrayTypeRef({this.optional = false});
+  ByteArrayTypeRef({this.nullable = false});
 
   @override
   TypeReference get ffiType => Types.pointer(Types.Void$);
 
   @override
   TypeReference get publicType =>
-      optional ? Types.Uint8List$.asNullable : Types.Uint8List$;
+      nullable ? Types.Uint8List$.asNullable : Types.Uint8List$;
 
   @override
-  TypeReference get transferType => optional
+  TypeReference get transferType => nullable
       ? Types.TransferableTypedData$.asNullable
       : Types.TransferableTypedData$;
 }

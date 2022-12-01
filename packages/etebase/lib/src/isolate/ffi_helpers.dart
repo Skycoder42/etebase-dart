@@ -20,7 +20,7 @@ abstract class FfiHelpers {
     return MethodResult.failure(
       invocationId,
       EtebaseErrorCode.values[errorCode],
-      errorMessage.cast<Utf8>().toDartString(),
+      errorMessage == nullptr ? '' : errorMessage.cast<Utf8>().toDartString(),
     );
   }
 

@@ -13,7 +13,7 @@ class TypeParser {
     required DartType type,
     bool isArray = false,
     bool asReturn = false,
-    bool isOptional = false,
+    bool isNullable = false,
     required TypedefRef typeDefs,
   }) {
     if (type.isVoid) {
@@ -27,8 +27,8 @@ class TypeParser {
     if (type.isPointer) {
       final pointerType = type.asPointer;
       return isArray
-          ? _mapPointerArrayType(pointerType, isOptional, typeDefs)
-          : _mapPointerType(pointerType, isOptional, typeDefs);
+          ? _mapPointerArrayType(pointerType, isNullable, typeDefs)
+          : _mapPointerType(pointerType, isNullable, typeDefs);
     }
 
     throw UnsupportedError('$type is missing explicit type handling');
@@ -36,7 +36,7 @@ class TypeParser {
 
   TypeRef _mapPointerType(
     DartType pointerType,
-    bool isOptional,
+    bool isNullable,
     TypedefRef typeDefs,
   ) {
     if (pointerType.isPointer) {
@@ -47,15 +47,15 @@ class TypeParser {
     if (pointerElement is ClassElement &&
         pointerElement.name.startsWith('Etebase')) {
       final resolvedElement = typeDefs.elementFor(pointerElement);
-      return TypeRef.etebaseClass(resolvedElement.name!, optional: isOptional);
+      return TypeRef.etebaseClass(resolvedElement.name!, optional: isNullable);
     }
 
     switch (pointerElement!.name) {
       case 'Char':
-        return TypeRef.string();
+        return TypeRef.string(nullable: isNullable);
       case 'UnsignedLong':
         return TypeRef.returnSize();
-      case 'Int64': // is always a date time in etebase context
+      case 'Int64': // is always a nullable date time in etebase context
         return TypeRef.dateTime();
       default:
         throw UnsupportedError(
@@ -66,12 +66,12 @@ class TypeParser {
 
   TypeRef _mapPointerArrayType(
     DartType pointerType,
-    bool isOptional,
+    bool isNullable,
     TypedefRef typeDefs,
   ) {
     final typeName = pointerType.element!.name!;
     if (typeName == 'Void') {
-      return TypeRef.byteArray(optional: isOptional);
+      return TypeRef.byteArray(nullable: isNullable);
     }
 
     if (pointerType.isPointer) {

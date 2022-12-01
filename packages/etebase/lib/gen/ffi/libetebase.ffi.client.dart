@@ -477,7 +477,7 @@ class EtebaseItemMetadata {
   ///
   /// @param this_ the object handle
   /// @param item_type the type to be set
-  Future<void> setItemType(String itemType) =>
+  Future<void> setItemType(String? itemType) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_metadata_set_item_type,
         <dynamic>[
@@ -489,7 +489,7 @@ class EtebaseItemMetadata {
   /// The item type
   ///
   /// @param this_ the object handle
-  Future<String> getItemType() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> getItemType() => _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_item_metadata_get_item_type,
         <dynamic>[_pointer.address],
       );
@@ -500,7 +500,7 @@ class EtebaseItemMetadata {
   ///
   /// @param this_ the object handle
   /// @param name the name to be set
-  Future<void> setName(String name) => _i1.EtebaseIsolate.current.invoke<void>(
+  Future<void> setName(String? name) => _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_metadata_set_name,
         <dynamic>[
           _pointer.address,
@@ -511,7 +511,7 @@ class EtebaseItemMetadata {
   /// The item name
   ///
   /// @param this_ the object handle
-  Future<String> getName() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> getName() => _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_item_metadata_get_name,
         <dynamic>[_pointer.address],
       );
@@ -520,7 +520,7 @@ class EtebaseItemMetadata {
   ///
   /// @param this_ the object handle
   /// @param mtime the modification time in milliseconds since epoch
-  Future<void> setMtime(DateTime mtime) =>
+  Future<void> setMtime(DateTime? mtime) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_metadata_set_mtime,
         <dynamic>[
@@ -532,7 +532,7 @@ class EtebaseItemMetadata {
   /// Modification time of the item
   ///
   /// @param this_ the object handle
-  Future<DateTime> getMtime() => _i1.EtebaseIsolate.current.invoke<DateTime>(
+  Future<DateTime?> getMtime() => _i1.EtebaseIsolate.current.invoke<DateTime?>(
         #etebase_item_metadata_get_mtime,
         <dynamic>[_pointer.address],
       );
@@ -541,7 +541,7 @@ class EtebaseItemMetadata {
   ///
   /// @param this_ the object handle
   /// @param description the description to be set
-  Future<void> setDescription(String description) =>
+  Future<void> setDescription(String? description) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_metadata_set_description,
         <dynamic>[
@@ -553,7 +553,8 @@ class EtebaseItemMetadata {
   /// The item description
   ///
   /// @param this_ the object handle
-  Future<String> getDescription() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> getDescription() =>
+      _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_item_metadata_get_description,
         <dynamic>[_pointer.address],
       );
@@ -562,7 +563,7 @@ class EtebaseItemMetadata {
   ///
   /// @param this_ the object handle
   /// @param color the color to be set in `#RRGGBB` or `#RRGGBBAA` format
-  Future<void> setColor(String color) =>
+  Future<void> setColor(String? color) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_metadata_set_color,
         <dynamic>[
@@ -574,7 +575,7 @@ class EtebaseItemMetadata {
   /// The item color in `#RRGGBB` or `#RRGGBBAA` format
   ///
   /// @param this_ the object handle
-  Future<String> getColor() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> getColor() => _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_item_metadata_get_color,
         <dynamic>[_pointer.address],
       );

@@ -89,6 +89,8 @@ class MethodParser {
     RegExp(r'.*_get_access_level$'): TypeRef.etebaseCollectionAccessLevel(),
     'etebase_signed_invitation_get_from_username': TypeRef.string(),
     'etebase_client_check_etebase_server': TypeRef.bool(fromInt: true),
+    RegExp(r'^etebase_item_metadata_get_(item_type|name|description|color)$'):
+        TypeRef.string(nullable: true), // TODO as nullable map?
   };
 
   static final _methodsWithLengthConstants = [

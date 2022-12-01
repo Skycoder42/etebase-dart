@@ -7,8 +7,15 @@ cd $libetebaseDir
 & make
 Copy-Item .\target\release\etebase.dll -Destination "$env:GITHUB_WORKSPACE\packages\etebase\tool\integration"
 
-# create docker image
-$etebaseDockerDir = "$env:RUNNER_TEMP\docker-etebase"
-& git clone https://github.com/victor-rds/docker-etebase.git $etebaseDockerDir
-cd $etebaseDockerDir
-docker build -f tags/base/Dockerfile -t victorrds/etesync .
+# build etebase server
+$etebaseServerDir = "$env:RUNNER_TEMP\etebase-server"
+& git clone https://github.com/etesync/server.git $etebaseServerDir
+cd $etebaseServerDir
+& python3 -m venv .venv
+.venv\Scripts\Activate.ps1
+& pip install -r requirements.txt
+
+& sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i "${BASE_DIR}/etebase_server/settings.py"
+Copy-Item .\etebase-server.ini.example -Destination .\etebase-server.ini
+& python3 ./manage.py migrate
+& python3 ./manage.py createsuperuser
