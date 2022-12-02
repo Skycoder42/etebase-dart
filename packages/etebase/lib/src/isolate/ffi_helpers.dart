@@ -19,7 +19,7 @@ abstract class FfiHelpers {
     final errorMessage = libEtebase.etebase_error_get_message();
     return MethodResult.failure(
       invocationId,
-      EtebaseErrorCode.values[errorCode],
+      EtebaseErrorCode.values[errorCode], // TODO make failsave for other codes
       errorMessage == nullptr ? '' : errorMessage.cast<Utf8>().toDartString(),
     );
   }

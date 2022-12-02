@@ -3,6 +3,8 @@
 set -ex
 
 PATCH_FILE=$1
+PREFIX=/tool/integration/libetebase
+DESTDIR=$PWD
 
 # build and install libetebase
 libetebaseDir="$RUNNER_TEMP/libetebase"
@@ -13,5 +15,5 @@ if [ -n "$PATCH_FILE" ]; then
   git apply "$GITHUB_WORKSPACE/$PATCH_FILE"
 fi
 
-make
-sudo make install
+make PREFIX=$PREFIX
+make install PREFIX=$PREFIX DESTDIR="$DESTDIR"

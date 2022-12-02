@@ -12,6 +12,8 @@ DynamicLibrary loadLibEtebase() {
           .toFilePath(),
     );
   } else {
-    return DynamicLibrary.open('/usr/lib/libetebase.so');
+    return DynamicLibrary.open(
+      'tool/integration/libetebase/lib/libetebase.so',
+    );
   }
 }
