@@ -1,3 +1,16 @@
+diff --git a/Makefile b/Makefile
+index 8b7f1af..a6a27ed 100644
+--- a/Makefile
++++ b/Makefile
+@@ -12,7 +12,7 @@ DST_PKGCONFIG_DIR = $(DST_LIBRARY_DIR)/pkgconfig
+ DST_CMAKECONFIG_DIR = $(DST_LIBRARY_DIR)/cmake/Etebase
+ DST_INCLUDE_DIR = $(DESTDIR)$(PREFIX)/include/$(PKGNAME)
+ 
+-LIBRARY_FILE = $(BUILDDIR)/$(MODE)/lib$(PKGNAME).so
++LIBRARY_FILE = $(BUILDDIR)/$(MODE)/lib$(PKGNAME).dylib
+ HEADER_FILE = $(BUILDDIR)/$(PKGNAME).h
+ PKGCONFIG_FILE = $(BUILDDIR)/$(PKGNAME).pc
+ CMAKECONFIG_FILE = EtebaseConfig.cmake
 diff --git a/build.rs b/build.rs
 index 601baab..5a1c797 100644
 --- a/build.rs

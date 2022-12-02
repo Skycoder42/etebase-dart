@@ -125,7 +125,12 @@ void main() {
         addTearDown(restoredAccount.dispose);
         await restoredAccount.fetchToken();
 
-        final encryptionKey = await EtebaseUtils.randombytes(64);
+        expect(
+          () async => account.save(await EtebaseUtils.randombytes(64)),
+          throwsA(isA<ArgumentError>()),
+        );
+
+        final encryptionKey = await EtebaseUtils.randombytes(32);
         final savedAccountEnc = await account.save(encryptionKey);
         final restoredAccountEnc = await EtebaseAccount.restore(
           client,

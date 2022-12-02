@@ -297,6 +297,26 @@ class IsolateInParamBuilder {
         )
         .statement;
 
+    // TODO generalize, as property from parser (or maybe remove?)
+    if (parameter.name == 'encryptionKey') {
+      yield if$(
+          argument
+              .notEqualTo(literalNull)
+              .and(sizeVariable.notEqualTo(literalNum(32))),
+          [
+            TypeReference((b) => b..symbol = 'ArgumentError')
+                .newInstance([
+                  literalString(
+                    'should be 32 bytes long, '
+                    'but has \$${sizeVariable.symbol} bytes',
+                  ),
+                  literalString(parameter.name)
+                ])
+                .thrown
+                .statement,
+          ]);
+    }
+
     final allocation = IsolateBuilder.arenaRef.call(
       [sizeVariable],
       const {},

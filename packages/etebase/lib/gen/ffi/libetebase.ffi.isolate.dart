@@ -3373,6 +3373,12 @@ _i1.MethodResult _etebase_fs_cache_save_account(
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
+  if (encryptionKey_buffer != null && encryptionKeySize != 32) {
+    throw ArgumentError(
+      'should be 32 bytes long, but has $encryptionKeySize bytes',
+      'encryptionKey',
+    );
+  }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
       : arena<_i6.Uint8>(encryptionKeySize);
@@ -3422,6 +3428,12 @@ _i1.MethodResult _etebase_fs_cache_load_account(
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
+  if (encryptionKey_buffer != null && encryptionKeySize != 32) {
+    throw ArgumentError(
+      'should be 32 bytes long, but has $encryptionKeySize bytes',
+      'encryptionKey',
+    );
+  }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
       : arena<_i6.Uint8>(encryptionKeySize);
@@ -6007,6 +6019,12 @@ _i1.MethodResult _etebase_account_save(
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
+  if (encryptionKey_buffer != null && encryptionKeySize != 32) {
+    throw ArgumentError(
+      'should be 32 bytes long, but has $encryptionKeySize bytes',
+      'encryptionKey',
+    );
+  }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
       : arena<_i6.Uint8>(encryptionKeySize);
@@ -6057,6 +6075,12 @@ _i1.MethodResult _etebase_account_restore(
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
+  if (encryptionKey_buffer != null && encryptionKeySize != 32) {
+    throw ArgumentError(
+      'should be 32 bytes long, but has $encryptionKeySize bytes',
+      'encryptionKey',
+    );
+  }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
       : arena<_i6.Uint8>(encryptionKeySize);
