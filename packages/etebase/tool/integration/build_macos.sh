@@ -22,7 +22,7 @@ etebaseServerDir=$RUNNER_TEMP/etebase-server
 git clone https://github.com/etesync/server.git "$etebaseServerDir"
 cd "$etebaseServerDir"
 
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i "$etebaseServerDir/etebase_server/settings.py"
 cp -a  "$etebaseServerDir/etebase-server.ini.example" "$etebaseServerDir/etebase-server.ini"
 ./manage.py migrate
