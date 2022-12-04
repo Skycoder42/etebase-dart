@@ -29,6 +29,11 @@ jobs:
         --define etebase:etebase_isolate_builder=restoreMode=true
       unitTestPaths: test/unit
       integrationTestPaths: test/integration
+      integrationTestCacheConfig: >-
+        {
+          "key": "${{ runner.os }}-libetebase",
+          "path": "tool/integration/libetebase"
+        }
       integrationTestSetup: >-
         {
           "linux": "bash tool/integration/build_linux.sh",
