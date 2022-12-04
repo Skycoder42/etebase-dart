@@ -20,7 +20,7 @@ jobs:
     name: CI
     uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
     with:
-      platforms: '["linux", "windows", "macos"]'
+      platforms: '["linux", "macos"]'
       workingDirectory: packages/etebase
       buildRunner: true
       buildRunnerArgs: >-
@@ -31,9 +31,8 @@ jobs:
       integrationTestPaths: test/integration
       integrationTestSetup: >-
         {
-          "linux": "bash tool/integration/build_unix.sh",
-          "macos": "bash tool/integration/build_unix.sh packages/etebase/tool/integration/libetebase-macos.patch",
-          "windows": "powershell -File tool\\integration\\build_win.ps1"
+          "linux": "bash tool/integration/build_linux.sh",
+          "macos": "bash tool/integration/build_macos.sh",
         }
   # cd:
   #   name: CD

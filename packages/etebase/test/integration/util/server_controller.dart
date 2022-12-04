@@ -7,10 +7,14 @@ import 'package:test/test.dart';
 
 abstract class ServerController {
   factory ServerController() {
-    if (Platform.isWindows) {
-      return _ServerControllerWindows();
+    if (Platform.isLinux) {
+      return _ServerControllerLinux();
+    } else if (Platform.isMacOS) {
+      return _ServerControllerMacos();
     } else {
-      return _ServerControllerUnix();
+      throw UnsupportedError(
+        'Platform ${Platform.operatingSystem} is not supported',
+      );
     }
   }
 
@@ -55,10 +59,10 @@ abstract class ServerController {
   }
 }
 
-class _ServerControllerUnix extends ServerController {
+class _ServerControllerLinux extends ServerController {
   String? _containerId;
 
-  _ServerControllerUnix() : super._();
+  _ServerControllerLinux() : super._();
 
   @override
   Future<Uri> start({
@@ -115,11 +119,11 @@ class _ServerControllerUnix extends ServerController {
   }
 }
 
-class _ServerControllerWindows extends ServerController {
+class _ServerControllerMacos extends ServerController {
   Process? _process;
   StringBuffer? _processLog;
 
-  _ServerControllerWindows() : super._();
+  _ServerControllerMacos() : super._();
 
   @override
   Future<Uri> start({
@@ -139,6 +143,7 @@ class _ServerControllerWindows extends ServerController {
         '--port',
         '3735'
       ],
+      workingDirectory: '${Platform.environment['RUNNER_TEMP']}/etebase-server',
     );
     if (autoTearDown) {
       addTearDown(stop);
