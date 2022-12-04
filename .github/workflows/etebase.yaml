@@ -31,7 +31,7 @@ jobs:
       integrationTestPaths: test/integration
       integrationTestCacheConfig: >-
         {
-          "key": "${{ runner.os }}-libetebase",
+          "key": "libetebase",
           "path": "tool/integration/libetebase"
         }
       integrationTestSetup: >-

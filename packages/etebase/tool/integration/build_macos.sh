@@ -17,6 +17,8 @@ fi
 make PREFIX=$PREFIX
 make install PREFIX=$PREFIX DESTDIR="$DESTDIR"
 
+find "$RUNNER_TOOL_CACHE" -maxdepth 4
+
 # build etebase server
 etebaseServerDir=$RUNNER_TEMP/etebase-server
 git clone https://github.com/etesync/server.git "$etebaseServerDir"
