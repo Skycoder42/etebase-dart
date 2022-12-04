@@ -38,7 +38,7 @@ Copy-Item .\target\release\etebase.dll -Destination $installDir
 
 # setup wsl
 Invoke-Exe wsl --set-default-version 1
-Invoke-Exe wsl install --root < $null
+Invoke-Exe wsl install --root
 Invoke-Wsl apt-get -y update
 Invoke-Wsl apt-get -y upgrade
 

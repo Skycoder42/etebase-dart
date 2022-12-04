@@ -1,8 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:test/test.dart';
-
 const _libEtebaseBasePath = 'tool/integration/libetebase/lib/';
 
 DynamicLibrary loadLibEtebase() {
@@ -20,6 +18,6 @@ DynamicLibrary loadLibEtebase() {
 
 DynamicLibrary _open(String fileName) {
   final file = File('$_libEtebaseBasePath/$fileName');
-  expect(file.existsSync(), isTrue);
+  assert(file.existsSync(), 'Dynamic library "${file.path}" does not exist');
   return DynamicLibrary.open(file.absolute.path);
 }
