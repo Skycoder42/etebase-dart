@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:test/test.dart';
 
@@ -27,6 +28,18 @@ abstract class ServerController {
 
   Future<void> stop();
 
+  Future<int> _getRandomPort() async {
+    while (true) {
+      final port = Random.secure().nextInt(9999) + 20000;
+      try {
+        final socket = await Socket.connect(InternetAddress.loopbackIPv4, port);
+        await socket.close();
+      } on SocketException {
+        return port;
+      }
+    }
+  }
+
   Future<void> _waitForReady(
     Uri serverUri,
     Duration waitForReadyTimeout,
@@ -46,7 +59,7 @@ abstract class ServerController {
               );
               break;
             }
-          } on HttpException {
+          } on SocketException {
             // do nothing
           }
 
@@ -71,9 +84,11 @@ class _ServerControllerLinux extends ServerController {
   }) async {
     assert(_containerId == null);
 
+    final port = await _getRandomPort();
+
     final result = await Process.run(
       'docker',
-      const [
+      [
         'run',
         '-d',
         '--rm',
@@ -82,7 +97,7 @@ class _ServerControllerLinux extends ServerController {
         '-e',
         'AUTO_SIGNUP=true',
         '-p',
-        '3735:3735',
+        '127.0.0.1:$port:3735',
         'victorrds/etesync',
       ],
     );
@@ -94,7 +109,7 @@ class _ServerControllerLinux extends ServerController {
       addTearDown(stop);
     }
 
-    final serverUri = Uri.http('localhost:3735', '/');
+    final serverUri = Uri.http('localhost:$port', '/');
     await _waitForReady(serverUri, waitForReadyTimeout);
     return serverUri;
   }
@@ -133,17 +148,17 @@ class _ServerControllerMacos extends ServerController {
     assert(_process == null);
     assert(_processLog == null);
 
+    final port = await _getRandomPort();
     _processLog = StringBuffer();
     _process = await Process.start(
-      'uvicorn',
+      'bash',
       [
-        'etebase_server.asgi:application',
+        'tool/integration/start_server.sh',
         '--host',
         '127.0.0.1',
         '--port',
-        '3735'
+        '$port'
       ],
-      workingDirectory: '${Platform.environment['RUNNER_TEMP']}/etebase-server',
     );
     if (autoTearDown) {
       addTearDown(stop);
@@ -152,7 +167,7 @@ class _ServerControllerMacos extends ServerController {
     _pipeLogs(_process!.stdout, 'OUT');
     _pipeLogs(_process!.stderr, 'ERR');
 
-    final serverUri = Uri.http('localhost:3735', '/');
+    final serverUri = Uri.http('localhost:$port', '/');
     await _waitForReady(serverUri, waitForReadyTimeout);
     return serverUri;
   }
@@ -175,7 +190,7 @@ class _ServerControllerMacos extends ServerController {
     expect(exitCode, 0);
   }
 
-  void _pipeLogs(Stream<List<int>> stream, String prefix) => _process!.stderr
+  void _pipeLogs(Stream<List<int>> stream, String prefix) => stream
       .transform(utf8.decoder)
       .transform(const LineSplitter())
       .map((line) => '$prefix: $line')

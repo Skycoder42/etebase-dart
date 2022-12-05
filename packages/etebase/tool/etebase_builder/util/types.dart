@@ -13,6 +13,8 @@ abstract class Types {
 
   static final int$ = TypeReference((b) => b..symbol = 'int');
 
+  static final Object$ = TypeReference((b) => b..symbol = 'Object');
+
   static final String$ = TypeReference((b) => b..symbol = 'String');
 
   static final Uri$ = TypeReference((b) => b..symbol = 'Uri');

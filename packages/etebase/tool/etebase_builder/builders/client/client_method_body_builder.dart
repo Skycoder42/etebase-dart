@@ -95,12 +95,17 @@ class ClientMethodBodyBuilder {
         isNullable: publicType.isNullable ?? false,
       )).property('address');
 
-  Expression _fromAddress(Reference classType, Expression address) =>
+  Expression _fromAddress(
+    Reference classType,
+    Expression address, {
+    bool withOwner = false,
+  }) =>
       classType.newInstanceNamed('_', [
         Types.pointer(null).newInstanceNamed(
           'fromAddress',
           [address],
-        )
+        ),
+        if (withOwner) literalThis,
       ]);
 
   Block _buildOutListMethodBody(
@@ -122,6 +127,7 @@ class ClientMethodBodyBuilder {
                       ..body = _fromAddress(
                         returnType.publicInnerType,
                         refer('a'),
+                        withOwner: true,
                       ).code,
                   ).closure
                 ])

@@ -3,6 +3,7 @@ import 'package:code_builder/code_builder.dart';
 import '../../parsers/class_parser.dart';
 import '../../parsers/method_parser.dart';
 import '../../util/expression_extensions.dart';
+import '../../util/if_then.dart';
 import '../../util/types.dart';
 import 'client_method_builder.dart';
 
@@ -11,6 +12,8 @@ class ClientClassBuilder {
   static const _finalizerRef = Reference(_finalizerName);
   static const pointerName = '_pointer';
   static const pointerRef = Reference(pointerName);
+  static const _ownerName = '_owner';
+  static const _ownedRef = Reference(_ownerName);
   static const _destroyMethodRef = Reference('_destroy');
 
   final ClientMethodBuilder _clientMethodBuilder;
@@ -44,6 +47,12 @@ class ClientClassBuilder {
               )
               ..modifier = FieldModifier.final$,
           ),
+          Field(
+            (b) => b
+              ..name = _ownerName
+              ..type = Types.Object$.asNullable
+              ..modifier = FieldModifier.final$,
+          )
         ])
         ..constructors.add(_buildConstructor())
         ..methods.addAll([
@@ -63,14 +72,19 @@ class ClientClassBuilder {
                 ..toThis = true,
             ),
           )
-          ..body = Block(
-            (b) => b.addExpression(
-              _finalizerRef.property('attach').call(
-                [literalThis, pointerRef],
-                {'detach': literalThis},
-              ),
+          ..optionalParameters.add(
+            Parameter(
+              (b) => b
+                ..name = _ownerName
+                ..toThis = true,
             ),
-          ),
+          )
+          ..body = if$(_ownedRef.equalTo(literalNull), [
+            _finalizerRef.property('attach').call(
+              [literalThis, pointerRef],
+              {'detach': literalThis},
+            ).statement,
+          ]),
       );
 
   Method _buildDispose(List<MethodRef> methods) => Method(
@@ -79,15 +93,10 @@ class ClientClassBuilder {
             ..name = 'dispose'
             ..returns = Types.future(Types.void$)
             ..modifier = MethodModifier.async
-            ..body = Block(
-              (b) => b
-                ..addExpression(
-                  _finalizerRef.property('detach').call([literalThis]),
-                )
-                ..addExpression(
-                  _destroyMethodRef.call([pointerRef]).awaited,
-                ),
-            );
+            ..body = if$(_ownedRef.equalTo(literalNull), [
+              _finalizerRef.property('detach').call([literalThis]).statement,
+              _destroyMethodRef.call([pointerRef]).awaited.statement,
+            ]);
 
           final docs = methods
               .where((m) => m.isDestroy)

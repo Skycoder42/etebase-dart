@@ -4,7 +4,7 @@
 // EtebaseClientGenerator
 // **************************************************************************
 
-// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references, prefer_relative_imports, prefer_if_elements_to_conditional_expressions
+// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references, prefer_relative_imports, prefer_if_elements_to_conditional_expressions, unused_element
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i2;
 import 'dart:isolate' as _i5;
@@ -23,17 +23,24 @@ Future<Uri> etebaseGetDefaultServerUrl() =>
     );
 
 class EtebaseUserProfile {
-  EtebaseUserProfile._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseUserProfile._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseUserProfile> _pointer;
+
+  final Object? _owner;
 
   /// The user's identity public key
   ///
@@ -57,23 +64,32 @@ class EtebaseUserProfile {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseUser {
-  EtebaseUser._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseUser._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseUser> _pointer;
+
+  final Object? _owner;
 
   /// Return a new user instance
   ///
@@ -145,23 +161,32 @@ class EtebaseUser {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseSignedInvitation {
-  EtebaseSignedInvitation._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseSignedInvitation._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseSignedInvitation> _pointer;
+
+  final Object? _owner;
 
   /// Clone the invitation object
   ///
@@ -236,23 +261,32 @@ class EtebaseSignedInvitation {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseRemovedCollection {
-  EtebaseRemovedCollection._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseRemovedCollection._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseRemovedCollection> _pointer;
+
+  final Object? _owner;
 
   /// The uid of the removed collection
   ///
@@ -272,23 +306,32 @@ class EtebaseRemovedCollection {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseInvitationListResponse {
-  EtebaseInvitationListResponse._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseInvitationListResponse._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseInvitationListResponse> _pointer;
+
+  final Object? _owner;
 
   /// Iterator for the list response
   ///
@@ -308,7 +351,10 @@ class EtebaseInvitationListResponse {
       <dynamic>[_pointer.address],
     );
     return addressList
-        .map((a) => EtebaseSignedInvitation._(_i2.Pointer.fromAddress(a)))
+        .map((a) => EtebaseSignedInvitation._(
+              _i2.Pointer.fromAddress(a),
+              this,
+            ))
         .toList();
   }
 
@@ -330,23 +376,32 @@ class EtebaseInvitationListResponse {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseItemRevisionsListResponse {
-  EtebaseItemRevisionsListResponse._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseItemRevisionsListResponse._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseItemRevisionsListResponse> _pointer;
+
+  final Object? _owner;
 
   /// Iterator for the list response
   ///
@@ -366,7 +421,10 @@ class EtebaseItemRevisionsListResponse {
       <dynamic>[_pointer.address],
     );
     return addressList
-        .map((a) => EtebaseItem._(_i2.Pointer.fromAddress(a)))
+        .map((a) => EtebaseItem._(
+              _i2.Pointer.fromAddress(a),
+              this,
+            ))
         .toList();
   }
 
@@ -388,23 +446,32 @@ class EtebaseItemRevisionsListResponse {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseMemberListResponse {
-  EtebaseMemberListResponse._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseMemberListResponse._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseMemberListResponse> _pointer;
+
+  final Object? _owner;
 
   /// Iterator for the list response
   ///
@@ -424,7 +491,10 @@ class EtebaseMemberListResponse {
       <dynamic>[_pointer.address],
     );
     return addressList
-        .map((a) => EtebaseCollectionMember._(_i2.Pointer.fromAddress(a)))
+        .map((a) => EtebaseCollectionMember._(
+              _i2.Pointer.fromAddress(a),
+              this,
+            ))
         .toList();
   }
 
@@ -446,23 +516,32 @@ class EtebaseMemberListResponse {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseItemMetadata {
-  EtebaseItemMetadata._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseItemMetadata._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseItemMetadata> _pointer;
+
+  final Object? _owner;
 
   /// Create a new metadata object
   ///
@@ -589,23 +668,32 @@ class EtebaseItemMetadata {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseItemManager {
-  EtebaseItemManager._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseItemManager._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseItemManager> _pointer;
+
+  final Object? _owner;
 
   /// Fetch a single item from the server using its UID
   ///
@@ -900,23 +988,32 @@ class EtebaseItemManager {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseItemListResponse {
-  EtebaseItemListResponse._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseItemListResponse._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseItemListResponse> _pointer;
+
+  final Object? _owner;
 
   /// Sync token for the list response
   ///
@@ -936,7 +1033,10 @@ class EtebaseItemListResponse {
       <dynamic>[_pointer.address],
     );
     return addressList
-        .map((a) => EtebaseItem._(_i2.Pointer.fromAddress(a)))
+        .map((a) => EtebaseItem._(
+              _i2.Pointer.fromAddress(a),
+              this,
+            ))
         .toList();
   }
 
@@ -958,23 +1058,32 @@ class EtebaseItemListResponse {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseItem {
-  EtebaseItem._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseItem._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseItem> _pointer;
+
+  final Object? _owner;
 
   /// Clone an item object
   ///
@@ -1122,23 +1231,32 @@ class EtebaseItem {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseFileSystemCache {
-  EtebaseFileSystemCache._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseFileSystemCache._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseFileSystemCache> _pointer;
+
+  final Object? _owner;
 
   /// Initialize a file system cache object
   ///
@@ -1392,23 +1510,32 @@ class EtebaseFileSystemCache {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseFetchOptions {
-  EtebaseFetchOptions._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseFetchOptions._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseFetchOptions> _pointer;
+
+  final Object? _owner;
 
   /// Return a new fetch options object
   ///
@@ -1492,23 +1619,32 @@ class EtebaseFetchOptions {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseCollectionMemberManager {
-  EtebaseCollectionMemberManager._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseCollectionMemberManager._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseCollectionMemberManager> _pointer;
+
+  final Object? _owner;
 
   /// List the members of a collection
   ///
@@ -1574,23 +1710,32 @@ class EtebaseCollectionMemberManager {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseCollectionMember {
-  EtebaseCollectionMember._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseCollectionMember._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseCollectionMember> _pointer;
+
+  final Object? _owner;
 
   /// Clone the object
   ///
@@ -1628,23 +1773,32 @@ class EtebaseCollectionMember {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseCollectionManager {
-  EtebaseCollectionManager._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseCollectionManager._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseCollectionManager> _pointer;
+
+  final Object? _owner;
 
   /// Fetch a single collection from the server using its UID
   ///
@@ -1889,23 +2043,32 @@ class EtebaseCollectionManager {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseCollectionListResponse {
-  EtebaseCollectionListResponse._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseCollectionListResponse._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseCollectionListResponse> _pointer;
+
+  final Object? _owner;
 
   /// Sync token for the list response
   ///
@@ -1925,7 +2088,10 @@ class EtebaseCollectionListResponse {
       <dynamic>[_pointer.address],
     );
     return addressList
-        .map((a) => EtebaseCollection._(_i2.Pointer.fromAddress(a)))
+        .map((a) => EtebaseCollection._(
+              _i2.Pointer.fromAddress(a),
+              this,
+            ))
         .toList();
   }
 
@@ -1947,7 +2113,10 @@ class EtebaseCollectionListResponse {
       <dynamic>[_pointer.address],
     );
     return addressList
-        .map((a) => EtebaseRemovedCollection._(_i2.Pointer.fromAddress(a)))
+        .map((a) => EtebaseRemovedCollection._(
+              _i2.Pointer.fromAddress(a),
+              this,
+            ))
         .toList();
   }
 
@@ -1962,23 +2131,32 @@ class EtebaseCollectionListResponse {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseCollectionInvitationManager {
-  EtebaseCollectionInvitationManager._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseCollectionInvitationManager._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseCollectionInvitationManager> _pointer;
+
+  final Object? _owner;
 
   /// List the incoming collection invitations for the account
   ///
@@ -2114,23 +2292,32 @@ class EtebaseCollectionInvitationManager {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseCollection {
-  EtebaseCollection._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseCollection._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseCollection> _pointer;
+
+  final Object? _owner;
 
   /// Clone a collection object
   ///
@@ -2315,23 +2502,32 @@ class EtebaseCollection {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseClient {
-  EtebaseClient._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseClient._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseClient> _pointer;
+
+  final Object? _owner;
 
   static Future<EtebaseClient> create(
     String clientName,
@@ -2371,23 +2567,32 @@ class EtebaseClient {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 
 class EtebaseAccount {
-  EtebaseAccount._(this._pointer) {
-    _finalizer.attach(
-      this,
-      _pointer,
-      detach: this,
-    );
+  EtebaseAccount._(
+    this._pointer, [
+    this._owner,
+  ]) {
+    if (_owner == null) {
+      _finalizer.attach(
+        this,
+        _pointer,
+        detach: this,
+      );
+    }
   }
 
   static final _finalizer = Finalizer(_destroy);
 
   final _i2.Pointer<_i3.EtebaseAccount> _pointer;
+
+  final Object? _owner;
 
   /// Login a user and return a handle to an `EtebaseAccount` object
   ///
@@ -2547,8 +2752,10 @@ class EtebaseAccount {
   ///
   /// @param this_ the object handle
   Future<void> dispose() async {
-    _finalizer.detach(this);
-    await _destroy(_pointer);
+    if (_owner == null) {
+      _finalizer.detach(this);
+      await _destroy(_pointer);
+    }
   }
 }
 

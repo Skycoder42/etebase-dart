@@ -37,5 +37,6 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'comment_references',
       'prefer_relative_imports',
       'prefer_if_elements_to_conditional_expressions',
+      'unused_element',
     ].join(', '),
   );
