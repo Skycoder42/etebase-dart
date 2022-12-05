@@ -1,13 +1,14 @@
 #!/bin/bash
 set -ex
 
+TAG=${1:-master}
 PATCH_FILE=$PWD/tool/integration/libetebase-macos.patch
 PREFIX=/tool/integration/libetebase
 DESTDIR=$PWD
 
 # build and install libetebase
 libetebaseDir=$RUNNER_TEMP/libetebase
-git clone https://github.com/etesync/libetebase.git -b v0.5.3 "$libetebaseDir"
+git clone https://github.com/etesync/libetebase.git -b "$TAG" "$libetebaseDir"
 cd "$libetebaseDir"
 
 if [ -n "$PATCH_FILE" ]; then
@@ -17,7 +18,10 @@ fi
 make PREFIX=$PREFIX
 make install PREFIX=$PREFIX DESTDIR="$DESTDIR"
 
-find "$RUNNER_TOOL_CACHE" -maxdepth 4
+# enable python 3.7
+PYTHON_DIRS=("$RUNNER_TOOL_CACHE"/Python/3.7.*/x64/bin)
+export PATH=${PYTHON_DIRS[0]}:$PATH
+which pip3
 
 # build etebase server
 etebaseServerDir=$RUNNER_TEMP/etebase-server

@@ -31,13 +31,13 @@ jobs:
       integrationTestPaths: test/integration
       integrationTestCacheConfig: >-
         {
-          "key": "libetebase",
-          "path": "tool/integration/libetebase"
+          "key": "libetebase-v0.5.3",
+          "path": "packages/etebase/tool/integration/libetebase"
         }
       integrationTestSetup: >-
         {
-          "linux": "bash tool/integration/build_linux.sh",
-          "macos": "bash tool/integration/build_macos.sh",
+          "linux": "bash tool/integration/build_linux.sh v0.5.3",
+          "macos": "bash tool/integration/build_macos.sh v0.5.3",
         }
   # cd:
   #   name: CD
