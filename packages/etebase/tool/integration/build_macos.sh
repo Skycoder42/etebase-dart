@@ -33,8 +33,12 @@ rm -rf .git
 python3 -m venv --copies .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
-sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i '' "$etebaseServerDir/etebase_server/settings.py"
-cp -a  "$etebaseServerDir/etebase-server.ini.example" "$etebaseServerDir/etebase-server.ini"
+sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i'' "etebase_server/settings.py"
+cp -a  "etebase-server.ini.example" "etebase-server.ini"
+sed "s#static_root = /path/to/static#static_root = $RUNNER_TEMP/etebase-static#g" -i'' "etebase-server.ini"
+sed "s#media_root = /path/to/media#media_root = $RUNNER_TEMP/etebase-media#g" -i'' "etebase-server.ini"
 ./manage.py migrate
 ./manage.py createsuperuser
+mkdir "$RUNNER_TEMP/etebase-static"
+mkdir "$RUNNER_TEMP/etebase-media"
 
