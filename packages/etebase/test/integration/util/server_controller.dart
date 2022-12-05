@@ -57,7 +57,7 @@ abstract class ServerController {
                 'Server is ready after: '
                 '${waitForReadyTimeout - timeout.difference(DateTime.now())}',
               );
-              break;
+              return;
             }
           } on SocketException {
             // do nothing
@@ -67,6 +67,8 @@ abstract class ServerController {
 
           await Future<void>.delayed(const Duration(seconds: 1));
         }
+
+        fail('Failed to connect to server after $waitForReadyTimeout');
       } finally {
         client.close();
       }
@@ -179,10 +181,14 @@ class _ServerControllerMacos extends ServerController {
     assert(_process != null);
     assert(_processLog != null);
 
-    expect(_process!.kill(), isTrue);
+    printOnFailure(_processLog!.toString());
+    _processLog!.clear();
+
+    final didKill = _process!.kill();
+    _processLog!.writeln('KILLED: $didKill');
 
     final exitCode = await _process!.exitCode;
-    _processLog!.write('EXIT CODE: $exitCode');
+    _processLog!.writeln('EXIT CODE: $exitCode');
 
     printOnFailure(_processLog!.toString());
 
