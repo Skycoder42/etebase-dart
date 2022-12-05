@@ -5,6 +5,8 @@ TAG=${1:-master}
 PATCH_FILE=$PWD/tool/integration/libetebase-macos.patch
 PREFIX=/tool/integration/libetebase
 DESTDIR=$PWD
+STATIC_DIR=$RUNNER_TEMP/etebase-static
+MEDIA_DIR=$RUNNER_TEMP/etebase-media
 
 # build and install libetebase
 libetebaseDir=$RUNNER_TEMP/libetebase
@@ -33,12 +35,11 @@ rm -rf .git
 python3 -m venv --copies .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
-sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i'' "etebase_server/settings.py"
+
+mkdir -p "$STATIC_DIR" "$MEDIA_DIR"
 cp -a  "etebase-server.ini.example" "etebase-server.ini"
-sed "s#static_root = /path/to/static#static_root = $RUNNER_TEMP/etebase-static#g" -i'' "etebase-server.ini"
-sed "s#media_root = /path/to/media#media_root = $RUNNER_TEMP/etebase-media#g" -i'' "etebase-server.ini"
+sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i '' "etebase_server/settings.py"
+sed -e "s#static_root = /path/to/static#static_root = $STATIC_DIR#g" -i '' "etebase-server.ini"
+sed -e "s#media_root = /path/to/media#media_root = $MEDIA_DIR#g" -i '' "etebase-server.ini"
 ./manage.py migrate
-./manage.py createsuperuser
-mkdir "$RUNNER_TEMP/etebase-static"
-mkdir "$RUNNER_TEMP/etebase-media"
 
