@@ -61,6 +61,8 @@ abstract class ServerController {
             }
           } on SocketException {
             // do nothing
+          } on HttpException {
+            // do nothing
           }
 
           await Future<void>.delayed(const Duration(seconds: 1));

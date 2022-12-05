@@ -30,7 +30,7 @@ cd "$etebaseServerDir"
 rm -rf .git
 
 # build and setup etebase server
-python3 -m venv --copies --upgrade-deps .venv
+python3 -m venv --copies .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
 sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i '' "$etebaseServerDir/etebase_server/settings.py"
