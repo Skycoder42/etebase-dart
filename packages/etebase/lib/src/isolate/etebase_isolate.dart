@@ -118,11 +118,14 @@ class EtebaseIsolate {
         receiveBroadcast,
         setupResult.unwrap<SendPort>(),
       );
+
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
+      // coverage:ignore-start
       isolate?.kill();
       receivePort?.close();
       rethrow;
+      // coverage:ignore-end
     }
   }
 

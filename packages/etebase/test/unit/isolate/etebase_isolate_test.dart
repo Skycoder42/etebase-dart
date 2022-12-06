@@ -22,6 +22,11 @@ MethodResult testInvocationHandler(
   MethodInvocation invocation,
 ) {
   sleep(const Duration(milliseconds: 500));
+
+  if (invocation.method == #test_error_method) {
+    throw Exception('test-error');
+  }
+
   return MethodResult.success(invocation.id, {
     'config': config,
     'method': invocation.method,
@@ -39,6 +44,10 @@ void main() {
       if (EtebaseIsolate.hasInstance) {
         EtebaseIsolate.current.terminate();
       }
+    });
+
+    test('current throws state error if not spawned yet', () {
+      expect(() => EtebaseIsolate.current, throwsStateError);
     });
 
     test('spawn creates new isolate', () async {
@@ -89,6 +98,19 @@ void main() {
         'method': testMethod,
         'arguments': testArguments,
       });
+    });
+
+    test('invoke rethrows captured exception if handler throws', () async {
+      final instance = await EtebaseIsolate.spawn(
+        loadLibetebase: testLoadLibetebase,
+        etebaseConfig: testConfig,
+        methodInvocationHandler: testInvocationHandler,
+      );
+
+      expect(
+        () => instance.invoke<void>(#test_error_method, const <dynamic>[]),
+        throwsException,
+      );
     });
 
     test('invoke can handle parallel messages', () async {
