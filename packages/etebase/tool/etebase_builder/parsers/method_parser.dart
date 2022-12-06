@@ -91,9 +91,10 @@ class MethodParser {
     'etebase_client_check_etebase_server': TypeRef.bool(fromInt: true),
   };
 
-  static final _nullableReturns = [
+  static final _nullableReturns = <Pattern>[
     RegExp(r'^etebase_item_metadata_get_(item_type|name|description|color)$'),
-    RegExp(r'^etebase_collection_list_response_get_stoken$'),
+    'etebase_collection_list_response_get_stoken',
+    'etebase_collection_get_stoken',
   ];
 
   static final _methodsWithLengthConstants = [
@@ -222,7 +223,9 @@ class MethodParser {
               isArray: hasRetSize,
               typeDefs: typeDefs,
               asReturn: true,
-              isNullable: _nullableReturns.any((p) => p.hasMatch(method.name)),
+              isNullable: _nullableReturns.any(
+                (p) => p.matchAsPrefix(method.name) != null,
+              ),
             ),
           );
 }

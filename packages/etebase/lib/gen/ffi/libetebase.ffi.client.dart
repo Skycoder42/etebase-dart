@@ -2461,7 +2461,7 @@ class EtebaseCollection {
   /// The sync token reflects changes to the collection properties or its items on the server
   ///
   /// @param this_ the object handle
-  Future<String> getStoken() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> getStoken() => _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_collection_get_stoken,
         <dynamic>[_pointer.address],
       );

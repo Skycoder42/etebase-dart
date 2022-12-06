@@ -5523,15 +5523,9 @@ _i1.MethodResult _etebase_collection_get_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_stoken(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
   );
 }
 

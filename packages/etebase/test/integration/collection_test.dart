@@ -92,7 +92,83 @@ void main() {
     await options.setWithCollection(true);
   });
 
-  group('manager', () {
+  group('collections', () {
+    test('can create collection', () async {
+      const testCollectionName = 'test-name';
+
+      final meta = await EtebaseItemMetadata.create();
+      addTearDown(meta.dispose);
+      await meta.setName(testCollectionName);
+      final collection = await collectionManager.create(
+        testCollectionType,
+        meta,
+        collectionTestContent1,
+      );
+      addTearDown(collection.dispose);
+
+      expect(await collection.verify(), isTrue);
+      expect(await collection.isDeleted(), isFalse);
+
+      expect(
+        await collection.getAccessLevel(),
+        EtebaseCollectionAccessLevel.admin,
+      );
+      expect(await collection.getCollectionType(), testCollectionType);
+      expect(await collection.getEtag(), isNotEmpty);
+      expect(await collection.getStoken(), isNull);
+      expect(await collection.getUid(), isNotEmpty);
+      expect(await collection.getContent(), collectionTestContent1);
+      expect(
+        await collection.getContent(collectionTestContent1.length - 10),
+        collectionTestContent1,
+      );
+      expect(
+        await collection.getContent(collectionTestContent1.length),
+        collectionTestContent1,
+      );
+      expect(
+        await collection.getContent(collectionTestContent1.length + 10),
+        collectionTestContent1,
+      );
+
+      final loadedMeta = await collection.getMeta();
+      addTearDown(loadedMeta.dispose);
+      expect(await loadedMeta.getName(), testCollectionName);
+      expect(await loadedMeta.getMtime(), isNull);
+
+      final asItem = await collection.asItem();
+      addTearDown(asItem.dispose);
+      expect(await asItem.getUid(), await collection.getUid());
+
+      final cloned = await collection.clone();
+      addTearDown(cloned.dispose);
+      expect(await cloned.getUid(), await collection.getUid());
+    });
+
+    test('can be updated and deleted', () async {
+      const testCollectionName = 'test-name';
+
+      final meta = await EtebaseItemMetadata.create();
+      addTearDown(meta.dispose);
+      await meta.setName(testCollectionName);
+      final collection = await collectionManager.create(
+        testCollectionType,
+        meta,
+        collectionTestContent1,
+      );
+      addTearDown(collection.dispose);
+
+      final loadedMeta = await collection.getMeta();
+      addTearDown(loadedMeta.dispose);
+      await loadedMeta.setMtime(DateTime.now());
+      await collection.setContent(collectionTestContent2);
+      await collection.setMeta(loadedMeta);
+
+      await collection.delete();
+    });
+  });
+
+  group('collection manager', () {
     late String colId1;
     late String colId2;
     late String colId3;
@@ -196,6 +272,27 @@ void main() {
         () => collectionManager.transaction(collection2),
         throwsEtebaseException(EtebaseErrorCode.conflict),
       );
+    });
+
+    test('can upload deleted collection', () async {
+      final collection = await collectionManager.fetch(colId3);
+      addTearDown(collection.dispose);
+
+      final meta = await collection.getMeta();
+      addTearDown(meta.dispose);
+
+      await meta.setMtime(DateTime.now());
+      await meta.setDescription('--deleted--');
+      await collection.setMeta(meta);
+      await collection.setContent(collectionTestContent1);
+      await collection.delete();
+      expect(await collection.isDeleted(), isTrue);
+
+      await collectionManager.upload(collection);
+
+      final deletedCollection = await collectionManager.fetch(colId3);
+      addTearDown(deletedCollection.dispose);
+      expect(await deletedCollection.isDeleted(), isTrue);
     });
 
     test('can save and restore collection from and to cache', () async {
