@@ -4,8 +4,7 @@ library account_test;
 
 // ignore: test_library_import
 import 'package:etebase/etebase.dart';
-import 'package:test/expect.dart';
-import 'package:test/scaffolding.dart';
+import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
 import 'util/matchers.dart';
@@ -27,16 +26,9 @@ void main() {
       addTearDown(client.dispose);
     });
 
-    group('client', () {
-      test('etebaseGetDefaultServerUrl returns correct server URL', () async {
-        final result = await etebaseGetDefaultServerUrl();
-        expect(result, Uri.https('api.etebase.com', '/'));
-      });
-
-      test('checkEtebaseServer can validate server', () async {
-        final result = await client.checkEtebaseServer();
-        expect(result, isTrue);
-      });
+    test('client checkEtebaseServer can validate server', () async {
+      final result = await client.checkEtebaseServer();
+      expect(result, isTrue);
     });
 
     group('account', () {

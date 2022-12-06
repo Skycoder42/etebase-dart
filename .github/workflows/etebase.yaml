@@ -41,6 +41,7 @@ jobs:
         {
           "linux": "bash tool/integration/build_linux.sh v0.5.3",
           "macos": "bash tool/integration/build_macos.sh v0.5.3",
+          "windows": "powershell -File tool\\integration\\build_win.ps1 v0.5.3"
         }
   # cd:
   #   name: CD
