@@ -74,10 +74,20 @@ abstract class ServerController {
       }
     }
   }
+
+  void _pipeLogs(Stream<List<int>> stream, String prefix) {
+    final sub = stream
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .map((line) => 'server-$prefix: $line')
+        .listen(printOnFailure);
+    addTearDown(sub.cancel);
+  }
 }
 
 class _ServerControllerLinux extends ServerController {
   String? _containerId;
+  Process? _logsProcess;
 
   _ServerControllerLinux() : super._();
 
@@ -87,6 +97,7 @@ class _ServerControllerLinux extends ServerController {
     bool autoTearDown = true,
   }) async {
     assert(_containerId == null);
+    assert(_logsProcess == null);
 
     final port = await _getRandomPort();
 
@@ -113,6 +124,10 @@ class _ServerControllerLinux extends ServerController {
       addTearDown(stop);
     }
 
+    _logsProcess = await Process.start('docker', ['logs', '-f', _containerId!]);
+    _pipeLogs(_logsProcess!.stdout, 'out');
+    _pipeLogs(_logsProcess!.stderr, 'err');
+
     final serverUri = Uri.http('localhost:$port', '/');
     await _waitForReady(serverUri, waitForReadyTimeout);
     return serverUri;
@@ -122,11 +137,6 @@ class _ServerControllerLinux extends ServerController {
   Future<void> stop() async {
     assert(_containerId != null);
 
-    final logsResult = await Process.run('docker', ['logs', _containerId!]);
-    expect(logsResult.exitCode, 0);
-    printOnFailure('STDOUT:\n${logsResult.stdout}');
-    printOnFailure('STDERR:\n${logsResult.stderr}');
-
     final sw = Stopwatch()..start();
     final stopResult = await Process.run('docker', ['stop', _containerId!]);
     sw.stop();
@@ -134,7 +144,11 @@ class _ServerControllerLinux extends ServerController {
     printOnFailure('Stop-Errors:\n${stopResult.stderr}');
     expect(stopResult.exitCode, 0);
 
+    _logsProcess?.kill();
+    expect(_logsProcess?.exitCode, anyOf(isNull, completion(0)));
+
     _containerId = null;
+    _logsProcess = null;
   }
 }
 
@@ -178,22 +192,13 @@ class _ServerControllerMacos extends ServerController {
     assert(_process != null);
 
     final didKill = _process!.kill();
-    print('KILLED: $didKill');
+    printOnFailure('KILLED: $didKill');
 
     final exitCode = await _process!.exitCode;
-    print('EXIT CODE: $exitCode');
+    printOnFailure('EXIT CODE: $exitCode');
 
     _process = null;
 
     expect(exitCode, 0);
-  }
-
-  void _pipeLogs(Stream<List<int>> stream, String prefix) {
-    final sub = stream
-        .transform(utf8.decoder)
-        .transform(const LineSplitter())
-        .map((line) => 'server-$prefix: $line')
-        .listen(print);
-    addTearDown(sub.cancel);
   }
 }
