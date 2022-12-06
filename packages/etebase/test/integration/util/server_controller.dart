@@ -140,7 +140,6 @@ class _ServerControllerLinux extends ServerController {
 
 class _ServerControllerMacos extends ServerController {
   Process? _process;
-  StringBuffer? _processLog;
 
   _ServerControllerMacos() : super._();
 
@@ -150,10 +149,8 @@ class _ServerControllerMacos extends ServerController {
     bool autoTearDown = true,
   }) async {
     assert(_process == null);
-    assert(_processLog == null);
 
     final port = await _getRandomPort();
-    _processLog = StringBuffer();
     _process = await Process.start(
       'bash',
       [
@@ -164,12 +161,12 @@ class _ServerControllerMacos extends ServerController {
         '$port'
       ],
     );
+    _pipeLogs(_process!.stdout, 'out');
+    _pipeLogs(_process!.stderr, 'err');
+
     if (autoTearDown) {
       addTearDown(stop);
     }
-
-    _pipeLogs(_process!.stdout, 'OUT');
-    _pipeLogs(_process!.stderr, 'ERR');
 
     final serverUri = Uri.http('localhost:$port', '/');
     await _waitForReady(serverUri, waitForReadyTimeout);
@@ -179,28 +176,24 @@ class _ServerControllerMacos extends ServerController {
   @override
   Future<void> stop() async {
     assert(_process != null);
-    assert(_processLog != null);
-
-    printOnFailure(_processLog!.toString());
-    _processLog!.clear();
 
     final didKill = _process!.kill();
-    _processLog!.writeln('KILLED: $didKill');
+    print('KILLED: $didKill');
 
     final exitCode = await _process!.exitCode;
-    _processLog!.writeln('EXIT CODE: $exitCode');
-
-    printOnFailure(_processLog!.toString());
+    print('EXIT CODE: $exitCode');
 
     _process = null;
-    _processLog = null;
 
     expect(exitCode, 0);
   }
 
-  void _pipeLogs(Stream<List<int>> stream, String prefix) => stream
-      .transform(utf8.decoder)
-      .transform(const LineSplitter())
-      .map((line) => '$prefix: $line')
-      .listen(_processLog!.writeln);
+  void _pipeLogs(Stream<List<int>> stream, String prefix) {
+    final sub = stream
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .map((line) => 'server-$prefix: $line')
+        .listen(print);
+    addTearDown(sub.cancel);
+  }
 }
