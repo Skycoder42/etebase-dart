@@ -7,15 +7,19 @@ import 'dart:math';
 import 'package:test/test.dart';
 
 abstract class ServerController {
+  static const _serverModeDocker = 'docker';
+  static const _serverModeLocal = 'local';
+
   factory ServerController() {
-    final forceDocker = Platform.environment['USE_ETEBASE_DOCKER'] == 'true';
-    if (Platform.isLinux || forceDocker) {
+    final serverMode = Platform.environment['ETEBASE_SERVER_MODE'] ??
+        (Platform.isLinux ? _serverModeDocker : _serverModeLocal);
+    if (serverMode == _serverModeDocker) {
       return _ServerControllerDocker();
-    } else if (Platform.isMacOS) {
+    } else if (serverMode == _serverModeLocal) {
       return _ServerControllerLocal();
     } else {
       throw UnsupportedError(
-        'Platform ${Platform.operatingSystem} is not supported',
+        'ETEBASE_SERVER_MODE $serverMode is not supported',
       );
     }
   }
@@ -53,10 +57,10 @@ abstract class ServerController {
           try {
             final request = await client.getUrl(serverUri);
             final response = await request.close();
+            expect(response.statusCode, 200);
             print(
               'Server is ready after: '
-              '${waitForReadyTimeout - timeout.difference(DateTime.now())} '
-              '(Status-Code: ${response.statusCode})',
+              '${waitForReadyTimeout - timeout.difference(DateTime.now())}',
             );
             return;
           } on SocketException {
@@ -80,7 +84,7 @@ abstract class ServerController {
         .transform(utf8.decoder)
         .transform(const LineSplitter())
         .map((line) => 'server-$prefix: $line')
-        .listen(printOnFailure);
+        .listen(print);
     addTearDown(sub.cancel);
   }
 }
@@ -192,10 +196,10 @@ class _ServerControllerLocal extends ServerController {
     assert(_process != null);
 
     final didKill = _process!.kill();
-    printOnFailure('KILLED: $didKill');
+    print('KILLED: $didKill');
 
     final exitCode = await _process!.exitCode;
-    printOnFailure('EXIT CODE: $exitCode');
+    print('EXIT CODE: $exitCode');
 
     _process = null;
 
