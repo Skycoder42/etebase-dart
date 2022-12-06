@@ -28,6 +28,9 @@ jobs:
         --define etebase:etebase_client_builder=restoreMode=true
         --define etebase:etebase_isolate_builder=restoreMode=true
       unitTestPaths: test/unit
+      coverageExclude: >-
+        "lib/gen/**"
+        "**/*.freezed.dart"
       integrationTestPaths: test/integration
       integrationTestCacheConfig: >-
         {

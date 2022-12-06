@@ -120,7 +120,7 @@ class _ServerControllerDocker extends ServerController {
         'victorrds/etesync',
       ],
     );
-    printOnFailure('Start-Errors:\n${result.stderr}');
+    print('Start-Errors:\n${result.stderr}');
     expect(result.exitCode, 0);
 
     _containerId = const LineSplitter().convert(result.stdout as String).last;
@@ -145,7 +145,7 @@ class _ServerControllerDocker extends ServerController {
     final stopResult = await Process.run('docker', ['stop', _containerId!]);
     sw.stop();
     print('Stopped server in ${sw.elapsed}');
-    printOnFailure('Stop-Errors:\n${stopResult.stderr}');
+    print('Stop-Errors:\n${stopResult.stderr}');
     expect(stopResult.exitCode, 0);
 
     _logsProcess?.kill();
