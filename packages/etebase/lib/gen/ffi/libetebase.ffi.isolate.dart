@@ -3943,13 +3943,14 @@ _i1.MethodResult _etebase_fetch_options_set_iterator(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter iterator must be of type String');
+  assert(invocation.arguments[1] is String?,
+      'Parameter iterator must be of type String?');
   final this_ = _i6.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
-  final iterator = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
-      .cast<_i6.Char>();
+  final iterator = (invocation.arguments[1] as String?)
+          ?.toNativeUtf8(allocator: arena)
+          .cast<_i6.Char>() ??
+      _i6.nullptr;
   libEtebase.etebase_fetch_options_set_iterator(
     this_,
     iterator,
@@ -3969,13 +3970,14 @@ _i1.MethodResult _etebase_fetch_options_set_stoken(
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter stoken must be of type String');
+  assert(invocation.arguments[1] is String?,
+      'Parameter stoken must be of type String?');
   final this_ = _i6.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
-  final stoken = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
-      .cast<_i6.Char>();
+  final stoken = (invocation.arguments[1] as String?)
+          ?.toNativeUtf8(allocator: arena)
+          .cast<_i6.Char>() ??
+      _i6.nullptr;
   libEtebase.etebase_fetch_options_set_stoken(
     this_,
     stoken,
@@ -4741,15 +4743,9 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_list_response_get_stoken(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
   );
 }
 

@@ -89,9 +89,12 @@ class MethodParser {
     RegExp(r'.*_get_access_level$'): TypeRef.etebaseCollectionAccessLevel(),
     'etebase_signed_invitation_get_from_username': TypeRef.string(),
     'etebase_client_check_etebase_server': TypeRef.bool(fromInt: true),
-    RegExp(r'^etebase_item_metadata_get_(item_type|name|description|color)$'):
-        TypeRef.string(nullable: true), // TODO as nullable map?
   };
+
+  static final _nullableReturns = [
+    RegExp(r'^etebase_item_metadata_get_(item_type|name|description|color)$'),
+    RegExp(r'^etebase_collection_list_response_get_stoken$'),
+  ];
 
   static final _methodsWithLengthConstants = [
     'etebase_utils_pretty_fingerprint'
@@ -219,6 +222,7 @@ class MethodParser {
               isArray: hasRetSize,
               typeDefs: typeDefs,
               asReturn: true,
+              isNullable: _nullableReturns.any((p) => p.hasMatch(method.name)),
             ),
           );
 }

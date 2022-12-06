@@ -6,6 +6,7 @@ import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 
 import 'util/library_loader.dart';
+import 'util/matchers.dart';
 import 'util/server_controller.dart';
 
 void main() {
@@ -70,10 +71,7 @@ void main() {
         // local test server does not have a dashboard
         expect(
           () => account.fetchDashboardUrl(),
-          throwsA(
-            isA<EtebaseException>()
-                .having((e) => e.code, 'code', EtebaseErrorCode.http),
-          ),
+          throwsEtebaseException(EtebaseErrorCode.http),
         );
 
         await account.logout();
@@ -81,10 +79,7 @@ void main() {
         // after logout this should be unauthorized
         expect(
           () => account.fetchDashboardUrl(),
-          throwsA(
-            isA<EtebaseException>()
-                .having((e) => e.code, 'code', EtebaseErrorCode.unauthorized),
-          ),
+          throwsEtebaseException(EtebaseErrorCode.unauthorized),
         );
       });
 

@@ -65,6 +65,7 @@ class ParamParser {
       'description',
       'color',
     ],
+    RegExp('etebase_fetch_options_*'): ['stoken', 'iterator'],
   };
 
   final TypeParser _typeParser;

@@ -8,10 +8,11 @@ import 'package:test/test.dart';
 
 abstract class ServerController {
   factory ServerController() {
-    if (Platform.isLinux) {
-      return _ServerControllerLinux();
+    final forceDocker = Platform.environment['USE_ETEBASE_DOCKER'] == 'true';
+    if (Platform.isLinux || forceDocker) {
+      return _ServerControllerDocker();
     } else if (Platform.isMacOS) {
-      return _ServerControllerMacos();
+      return _ServerControllerLocal();
     } else {
       throw UnsupportedError(
         'Platform ${Platform.operatingSystem} is not supported',
@@ -52,13 +53,12 @@ abstract class ServerController {
           try {
             final request = await client.getUrl(serverUri);
             final response = await request.close();
-            if (response.statusCode == 200) {
-              print(
-                'Server is ready after: '
-                '${waitForReadyTimeout - timeout.difference(DateTime.now())}',
-              );
-              return;
-            }
+            print(
+              'Server is ready after: '
+              '${waitForReadyTimeout - timeout.difference(DateTime.now())} '
+              '(Status-Code: ${response.statusCode})',
+            );
+            return;
           } on SocketException {
             // do nothing
           } on HttpException {
@@ -85,11 +85,11 @@ abstract class ServerController {
   }
 }
 
-class _ServerControllerLinux extends ServerController {
+class _ServerControllerDocker extends ServerController {
   String? _containerId;
   Process? _logsProcess;
 
-  _ServerControllerLinux() : super._();
+  _ServerControllerDocker() : super._();
 
   @override
   Future<Uri> start({
@@ -145,17 +145,17 @@ class _ServerControllerLinux extends ServerController {
     expect(stopResult.exitCode, 0);
 
     _logsProcess?.kill();
-    expect(_logsProcess?.exitCode, anyOf(isNull, completion(0)));
+    await _logsProcess?.exitCode;
 
     _containerId = null;
     _logsProcess = null;
   }
 }
 
-class _ServerControllerMacos extends ServerController {
+class _ServerControllerLocal extends ServerController {
   Process? _process;
 
-  _ServerControllerMacos() : super._();
+  _ServerControllerLocal() : super._();
 
   @override
   Future<Uri> start({

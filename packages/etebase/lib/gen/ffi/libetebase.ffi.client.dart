@@ -1588,7 +1588,7 @@ class EtebaseFetchOptions {
   ///
   /// @param this_ the object handle
   /// @param iterator the iterator to start from
-  Future<void> setIterator(String iterator) =>
+  Future<void> setIterator(String? iterator) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_fetch_options_set_iterator,
         <dynamic>[
@@ -1601,7 +1601,7 @@ class EtebaseFetchOptions {
   ///
   /// @param this_ the object handle
   /// @param stoken the sync token to set
-  Future<void> setStoken(String stoken) =>
+  Future<void> setStoken(String? stoken) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_fetch_options_set_stoken,
         <dynamic>[
@@ -2073,7 +2073,7 @@ class EtebaseCollectionListResponse {
   /// Sync token for the list response
   ///
   /// @param this_ the object handle
-  Future<String> getStoken() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> getStoken() => _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_collection_list_response_get_stoken,
         <dynamic>[_pointer.address],
       );
