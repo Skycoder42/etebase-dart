@@ -20,7 +20,7 @@ jobs:
     name: CI
     uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
     with:
-      platforms: '["linux", "macos"]'
+      platforms: '["linux", "macos", "windows"]'
       workingDirectory: packages/etebase
       buildRunner: true
       buildRunnerArgs: >-
