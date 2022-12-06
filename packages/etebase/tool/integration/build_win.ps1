@@ -1,5 +1,9 @@
 $ErrorActionPreference = "Stop"
 
+if ($env:CACHE_HIT -eq "true") {
+    exit
+}
+
 # https://stackoverflow.com/a/58184408
 function Invoke-Exe() {
     # A handy way to run a command, and automatically throw an error if the
@@ -23,13 +27,9 @@ function Invoke-Exe() {
     }
 }
 
-function Invoke-Wsl() {
-  Invoke-Exe wsl -u root $args
-}
-
 # build libetebase
 $pwd = Get-Location
-$tag = $args[0] ?? "master"
+$tag = $args[0] #?? "master"
 $libetebaseDir = "$env:RUNNER_TEMP\libetebase"
 $installDir = "$pwd\tool\integration\libetebase\lib\"
 Invoke-Exe git clone https://github.com/etesync/libetebase.git -b $tag $libetebaseDir

@@ -2,6 +2,10 @@
 #$1 libetebase version
 set -ex
 
+if [ "$CACHE_HIT" = "true" ]; then
+  exit 0
+fi
+
 TAG=${1:-master}
 PREFIX=/tool/integration/libetebase
 DESTDIR=$PWD
