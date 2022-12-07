@@ -4,7 +4,7 @@ import 'dart:io';
 // ignore: test_library_import
 import 'package:etebase/gen/ffi/libetebase.ffi.dart';
 import 'package:etebase/src/isolate/etebase_isolate.dart';
-import 'package:etebase/src/isolate/isolate_terminated.dart';
+import 'package:etebase/src/isolate/etebase_isolate_error.dart';
 import 'package:etebase/src/isolate/method_invocation.dart';
 import 'package:etebase/src/isolate/method_result.dart';
 import 'package:etebase/src/model/etebase_config.dart';
@@ -40,9 +40,9 @@ void main() {
       defaultContentBufferSize: 111,
     );
 
-    tearDown(() {
+    tearDown(() async {
       if (EtebaseIsolate.hasInstance) {
-        EtebaseIsolate.current.terminate();
+        await EtebaseIsolate.current.terminate();
       }
     });
 
@@ -165,13 +165,13 @@ void main() {
 
       expect(EtebaseIsolate.hasInstance, isTrue);
 
-      instance.terminate();
+      await instance.terminate();
 
       expect(EtebaseIsolate.hasInstance, isFalse);
 
       expect(
         () => instance.invoke<String>(#test_method, const <dynamic>[]),
-        throwsA(isA<IsolateTerminated>()),
+        throwsA(isA<EtebaseIsolateError>()),
       );
     });
   });

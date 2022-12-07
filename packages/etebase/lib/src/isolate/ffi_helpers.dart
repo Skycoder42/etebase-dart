@@ -46,6 +46,7 @@ abstract class FfiHelpers {
       );
 }
 
+@internal
 extension ArenaX on Arena {
   Pointer<T> attach<T extends NativeType>(Pointer<T> ptr) =>
       this.using(ptr, malloc.free);
