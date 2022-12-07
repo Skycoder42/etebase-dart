@@ -139,8 +139,6 @@ class EtebaseIsolate {
         onExit: exitPort.sendPort,
       );
 
-      // TODO handle early exit
-
       final setupResult = await setupResultFuture;
       assert(
         setupResult.id == _controlInitializeIsolateMessageId,

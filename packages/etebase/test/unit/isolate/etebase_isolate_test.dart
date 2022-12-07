@@ -16,6 +16,8 @@ abstract class Callable<R, T1, T2, T3> {
 
 DynamicLibrary testLoadLibetebase() => DynamicLibrary.executable();
 
+Never testAlwaysThrow() => throw Exception();
+
 MethodResult testInvocationHandler(
   LibEtebaseFFI libEtebaseFFI,
   EtebaseConfig config,
@@ -47,7 +49,10 @@ void main() {
     });
 
     test('current throws state error if not spawned yet', () {
-      expect(() => EtebaseIsolate.current, throwsStateError);
+      expect(
+        () => EtebaseIsolate.current,
+        throwsA(isA<EtebaseIsolateError>()),
+      );
     });
 
     test('spawn creates new isolate', () async {
@@ -76,6 +81,21 @@ void main() {
       );
 
       expect(instance2, same(instance1));
+    });
+
+    test('spawn throws if creation of isolate fails', () async {
+      expect(EtebaseIsolate.hasInstance, isFalse);
+
+      await expectLater(
+        () => EtebaseIsolate.spawn(
+          loadLibetebase: testAlwaysThrow,
+          etebaseConfig: testConfig,
+          methodInvocationHandler: testInvocationHandler,
+        ),
+        throwsException,
+      );
+
+      expect(EtebaseIsolate.hasInstance, isFalse);
     });
 
     test('invoke sends call to message handler and waits for result', () async {
@@ -165,9 +185,24 @@ void main() {
 
       expect(EtebaseIsolate.hasInstance, isTrue);
 
-      await instance.terminate();
+      await instance.terminate(timeout: Duration.zero);
 
       expect(EtebaseIsolate.hasInstance, isFalse);
+
+      expect(
+        () => instance.invoke<String>(#test_method, const <dynamic>[]),
+        throwsA(isA<EtebaseIsolateError>()),
+      );
+    });
+
+    test('invoke throws if already been terminated', () async {
+      final instance = await EtebaseIsolate.spawn(
+        loadLibetebase: testLoadLibetebase,
+        etebaseConfig: testConfig,
+        methodInvocationHandler: testInvocationHandler,
+      );
+
+      await instance.terminate(timeout: Duration.zero);
 
       expect(
         () => instance.invoke<String>(#test_method, const <dynamic>[]),
