@@ -1,14 +1,13 @@
 // ignore_for_file: avoid_print
 
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:etebase/gen/ffi/libetebase.ffi.client.dart';
 import 'package:etebase/src/etebase_init.dart';
 
+import '../test/integration/util/library_loader.dart';
+
 Future<void> main() async {
   print('Initializing etebase');
-  await Etebase.ensureInitialized(_loadLibEtebase);
+  await Etebase.ensureInitialized(loadLibEtebase);
   print('Etebase was initialized!');
 
   final serverUrl = await etebaseGetDefaultServerUrl();
@@ -35,9 +34,3 @@ Future<void> main() async {
   Etebase.terminate();
   print('Isolate terminated');
 }
-
-DynamicLibrary _loadLibEtebase() => DynamicLibrary.open(
-      Platform.isLinux
-          ? '/usr/lib/libetebase.so.0'
-          : '/Library/Repos/other/rust/libetebase/target/release/libetebase.dylib',
-    );

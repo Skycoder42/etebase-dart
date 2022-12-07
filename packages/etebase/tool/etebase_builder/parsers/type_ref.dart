@@ -12,8 +12,8 @@ abstract class TypeRef {
   // ignore: avoid_positional_boolean_parameters
   factory TypeRef.int(bool asReturn) = IntTypeRef;
   factory TypeRef.returnSize() = ReturnSizeTypeRef;
-  factory TypeRef.string({bool nullable}) = StringTypeRef;
-  factory TypeRef.uri() = UriTypeRef;
+  factory TypeRef.string({bool nullable, bool mutable}) = StringTypeRef;
+  factory TypeRef.uri({bool mutable}) = UriTypeRef;
   factory TypeRef.dateTime() = DateTimeTypeRef;
   factory TypeRef.stringList() = StringListTypeRef;
   factory TypeRef.byteArray({bool nullable}) = ByteArrayTypeRef;
@@ -83,8 +83,9 @@ class ReturnSizeTypeRef implements TypeRef {
 
 class StringTypeRef implements TypeRef {
   final bool nullable;
+  final bool mutable;
 
-  StringTypeRef({this.nullable = false});
+  StringTypeRef({this.nullable = false, this.mutable = false});
 
   @override
   TypeReference get ffiType => Types.pointer(Types.Char$);
@@ -99,6 +100,10 @@ class StringTypeRef implements TypeRef {
 }
 
 class UriTypeRef implements TypeRef {
+  final bool mutable;
+
+  UriTypeRef({this.mutable = false});
+
   @override
   TypeReference get ffiType => Types.pointer(Types.Char$);
 

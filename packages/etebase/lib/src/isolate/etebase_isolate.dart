@@ -107,6 +107,8 @@ class EtebaseIsolate {
         ),
         debugName: '$EtebaseIsolate',
         errorsAreFatal: true,
+        //onError: // TODO,
+        //onExit: // TODO,
       );
 
       final setupResult = await setupResultFuture;

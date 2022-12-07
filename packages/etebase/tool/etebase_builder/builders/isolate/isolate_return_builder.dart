@@ -141,7 +141,10 @@ class IsolateReturnBuilder {
     StringTypeRef type, {
     Expression? length,
   }) {
-    final castExpression = result
+    final resultExpression = type.mutable
+        ? IsolateBuilder.arenaRef.property('attach').call([result])
+        : result;
+    final castExpression = resultExpression
         .property('cast')
         .call(const [], const {}, [Types.Utf8$])
         .property('toDartString')
@@ -156,11 +159,15 @@ class IsolateReturnBuilder {
     }
   }
 
-  Expression _transformUrl(Expression result, UriTypeRef type) =>
-      Types.Uri$.newInstanceNamed(
-        'parse',
-        [_transformString(result, StringTypeRef())],
-      );
+  Expression _transformUrl(Expression result, UriTypeRef type) {
+    final resultExpression = type.mutable
+        ? IsolateBuilder.arenaRef.property('attach').call([result])
+        : result;
+    return Types.Uri$.newInstanceNamed(
+      'parse',
+      [_transformString(resultExpression, StringTypeRef())],
+    );
+  }
 
   Expression _transformDateTime(Expression result, DateTimeTypeRef type) =>
       result.equalTo(Types.nullptr$).conditional(
@@ -177,8 +184,11 @@ class IsolateReturnBuilder {
     Expression? listLength,
   }) {
     final Expression length;
+    var resultExpression = result;
     if (method.hasRetSize) {
       length = refer('retSize').property('value');
+      resultExpression =
+          IsolateBuilder.arenaRef.property('attach').call([result]);
     } else if (method.lengthGetter.hasLengthGetter) {
       length = IsolateBuilder.libEtebaseRef
           .property(method.ffiLengthGetterName)
@@ -193,7 +203,7 @@ class IsolateReturnBuilder {
 
     return Types.TransferableTypedData$.newInstanceNamed('fromList', [
       literalList([
-        result
+        resultExpression
             .property('cast')
             .call(const [], const {}, [Types.Uint8$])
             .property('asTypedList')

@@ -2761,7 +2761,7 @@ _i1.MethodResult _etebase_item_manager_cache_save(
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
     _i8.TransferableTypedData.fromList(
-        [result.cast<_i6.Uint8>().asTypedList(retSize.value)]),
+        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -2794,7 +2794,7 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
     _i8.TransferableTypedData.fromList(
-        [result.cast<_i6.Uint8>().asTypedList(retSize.value)]),
+        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -3513,7 +3513,7 @@ _i1.MethodResult _etebase_fs_cache_load_stoken(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    arena.attach(result).cast<_i5.Utf8>().toDartString(),
   );
 }
 
@@ -3583,7 +3583,7 @@ _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    arena.attach(result).cast<_i5.Utf8>().toDartString(),
   );
 }
 
@@ -4645,7 +4645,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
     _i8.TransferableTypedData.fromList(
-        [result.cast<_i6.Uint8>().asTypedList(retSize.value)]),
+        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -4679,7 +4679,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
     _i8.TransferableTypedData.fromList(
-        [result.cast<_i6.Uint8>().asTypedList(retSize.value)]),
+        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
   );
 }
 
@@ -5573,7 +5573,7 @@ _i1.MethodResult _etebase_collection_get_collection_type(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    arena.attach(result).cast<_i5.Utf8>().toDartString(),
   );
 }
 
@@ -5850,7 +5850,7 @@ _i1.MethodResult _etebase_account_fetch_dashboard_url(
   }
   return _i1.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(result.cast<_i5.Utf8>().toDartString()),
+    Uri.parse(arena.attach(result).cast<_i5.Utf8>().toDartString()),
   );
 }
 
@@ -6037,7 +6037,7 @@ _i1.MethodResult _etebase_account_save(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    arena.attach(result).cast<_i5.Utf8>().toDartString(),
   );
 }
 

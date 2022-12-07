@@ -14,6 +14,7 @@ class TypeParser {
     bool isArray = false,
     bool asReturn = false,
     bool isNullable = false,
+    bool isMutable = false,
     required TypedefRef typeDefs,
   }) {
     if (type.isVoid) {
@@ -28,7 +29,7 @@ class TypeParser {
       final pointerType = type.asPointer;
       return isArray
           ? _mapPointerArrayType(pointerType, isNullable, typeDefs)
-          : _mapPointerType(pointerType, isNullable, typeDefs);
+          : _mapPointerType(pointerType, isNullable, isMutable, typeDefs);
     }
 
     throw UnsupportedError('$type is missing explicit type handling');
@@ -37,6 +38,7 @@ class TypeParser {
   TypeRef _mapPointerType(
     DartType pointerType,
     bool isNullable,
+    bool isMutable,
     TypedefRef typeDefs,
   ) {
     if (pointerType.isPointer) {
@@ -52,7 +54,7 @@ class TypeParser {
 
     switch (pointerElement!.name) {
       case 'Char':
-        return TypeRef.string(nullable: isNullable);
+        return TypeRef.string(nullable: isNullable, mutable: isMutable);
       case 'UnsignedLong':
         return TypeRef.returnSize();
       case 'Int64': // is always a nullable date time in etebase context

@@ -84,17 +84,26 @@ class MethodParser {
   static final _isGetLengthRegExp = RegExp('_get_.*_(length|size)');
 
   static final _returnTypeMapping = {
-    RegExp(r'.*_(get|fetch)_.*_url$'): TypeRef.uri(),
+    RegExp(r'.*_get_.*_url$'): TypeRef.uri(),
     RegExp(r'.*_pubkey$'): TypeRef.byteArray(),
     RegExp(r'.*_get_access_level$'): TypeRef.etebaseCollectionAccessLevel(),
     'etebase_signed_invitation_get_from_username': TypeRef.string(),
     'etebase_client_check_etebase_server': TypeRef.bool(fromInt: true),
+    'etebase_account_fetch_dashboard_url': TypeRef.uri(mutable: true),
   };
 
   static final _nullableReturns = <Pattern>[
     RegExp(r'^etebase_item_metadata_get_(item_type|name|description|color)$'),
     'etebase_collection_list_response_get_stoken',
     'etebase_collection_get_stoken',
+  ];
+
+  static final _mutableReturns = <Pattern>[
+    'etebase_fs_cache_load_stoken',
+    'etebase_fs_cache_collection_load_stoken',
+    'etebase_collection_get_collection_type',
+    // 'etebase_account_fetch_dashboard_url', // see _returnTypeMapping
+    'etebase_account_save',
   ];
 
   static final _methodsWithLengthConstants = [
@@ -224,6 +233,9 @@ class MethodParser {
               typeDefs: typeDefs,
               asReturn: true,
               isNullable: _nullableReturns.any(
+                (p) => p.matchAsPrefix(method.name) != null,
+              ),
+              isMutable: _mutableReturns.any(
                 (p) => p.matchAsPrefix(method.name) != null,
               ),
             ),
