@@ -220,7 +220,7 @@ void main() {
 
       expect(await listResponse.isDone(), isTrue);
       expect(await listResponse.getStoken(), allOf(isNotNull, isNotEmpty));
-      expect(await listResponse.getRemovedMemberships(), allOf(isEmpty));
+      expect(await listResponse.getRemovedMemberships(), isEmpty);
 
       final collections = await listResponse.getData();
       expect(collections, hasLength(2));
@@ -238,6 +238,17 @@ void main() {
       final meta2 = await collection2.getMeta();
       addTearDown(meta2.dispose);
       expect(await meta2.getName(), 'create-collection-test-2');
+
+      final fetchOptions = await EtebaseFetchOptions.create();
+      addTearDown(fetchOptions.dispose);
+      await fetchOptions.setStoken(await listResponse.getStoken());
+      final changedResponse = await collectionManager.list(
+        testCollectionType,
+        fetchOptions,
+      );
+      addTearDown(changedResponse.dispose);
+
+      expect(await changedResponse.getData(), isEmpty);
     });
 
     test('can list multiple collections', () async {
