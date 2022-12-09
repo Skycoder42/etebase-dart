@@ -1346,7 +1346,7 @@ class EtebaseFileSystemCache {
   /// Load the collection list sync token from cache
   ///
   /// @param this_ the object handle
-  Future<String> loadStoken() => _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> loadStoken() => _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_fs_cache_load_stoken,
         <dynamic>[_pointer.address],
       );
@@ -1373,8 +1373,8 @@ class EtebaseFileSystemCache {
   ///
   /// @param this_ the object handle
   /// @param col_uid the UID of the collection
-  Future<String> collectionLoadStoken(String colUid) =>
-      _i1.EtebaseIsolate.current.invoke<String>(
+  Future<String?> collectionLoadStoken(String colUid) =>
+      _i1.EtebaseIsolate.current.invoke<String?>(
         #etebase_fs_cache_collection_load_stoken,
         <dynamic>[
           _pointer.address,
@@ -2761,12 +2761,6 @@ class EtebaseAccount {
 
 abstract class EtebaseUtils {
   EtebaseUtils._();
-
-  Future<int> get prettyFingerprintSize =>
-      _i1.EtebaseIsolate.current.invoke<int>(
-        #ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE,
-        const <dynamic>[],
-      );
 
   /// Return a buffer filled with cryptographically random bytes
   ///

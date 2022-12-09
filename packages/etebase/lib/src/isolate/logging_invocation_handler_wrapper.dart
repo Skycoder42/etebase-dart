@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 import '../../gen/ffi/libetebase.ffi.dart';
 import '../model/etebase_config.dart';
 import 'etebase_isolate.dart';
+import 'etebase_pool.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
 
@@ -20,6 +21,7 @@ class LoggingInvocationHandlerWrapper {
 
   MethodResult call(
     LibEtebaseFFI libEtebaseFFI,
+    EtebasePool pool,
     EtebaseConfig etebaseConfig,
     MethodInvocation invocation,
   ) {
@@ -27,6 +29,7 @@ class LoggingInvocationHandlerWrapper {
     try {
       return _methodInvocationHandler(
         libEtebaseFFI,
+        pool,
         etebaseConfig,
         invocation,
       )..when(

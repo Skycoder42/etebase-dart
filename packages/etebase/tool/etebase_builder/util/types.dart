@@ -115,6 +115,12 @@ abstract class Types {
       ..url = 'package:etebase/src/isolate/method_invocation.dart',
   );
 
+  static final EtebasePool$ = TypeReference(
+    (b) => b
+      ..symbol = 'EtebasePool'
+      ..url = 'package:etebase/src/isolate/etebase_pool.dart',
+  );
+
   static final FfiHelpers$ = TypeReference(
     (b) => b
       ..symbol = 'FfiHelpers'

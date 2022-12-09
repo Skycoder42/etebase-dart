@@ -55,7 +55,7 @@ class IsolateOutParamBuilder {
     final retSizeParam = method.parameters.singleWhere((p) => p.isRetSize);
     return declareFinal(retSizeParam.name)
         .assign(
-          IsolateBuilder.arenaRef.call(
+          IsolateBuilder.poolRef.call(
             const [],
             const {},
             [Types.UnsignedLong$],
@@ -73,7 +73,7 @@ class IsolateOutParamBuilder {
   ) sync* {
     yield declareFinal(parameter.name)
         .assign(
-          IsolateBuilder.arenaRef.call(
+          IsolateBuilder.poolRef.call(
             [getOutSizeRef(method, parameter)],
             const {},
             [Types.Uint8$],
@@ -89,7 +89,7 @@ class IsolateOutParamBuilder {
   ) sync* {
     yield declareFinal(parameter.name)
         .assign(
-          IsolateBuilder.arenaRef.call(
+          IsolateBuilder.poolRef.call(
             [getOutSizeRef(method, parameter)],
             const {},
             [Types.Char$],
@@ -113,7 +113,7 @@ class IsolateOutParamBuilder {
 
     yield declareFinal(parameter.name)
         .assign(
-          IsolateBuilder.arenaRef.call(
+          IsolateBuilder.poolRef.call(
             [refer(parameter.lengthName(validateHasLength: false))],
             const {},
             [type.ffiInnerType],

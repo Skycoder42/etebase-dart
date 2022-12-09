@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../util/dart_type_extensions.dart';
+import 'class_parser.dart';
 import 'etebase_parser.dart';
 
 import 'type_ref.dart';
@@ -49,7 +50,12 @@ class TypeParser {
     if (pointerElement is ClassElement &&
         pointerElement.name.startsWith('Etebase')) {
       final resolvedElement = typeDefs.elementFor(pointerElement);
-      return TypeRef.etebaseClass(resolvedElement.name!, optional: isNullable);
+      final className = resolvedElement.name!;
+      return TypeRef.etebaseClass(
+        className,
+        optional: isNullable,
+        memberPrefix: ClassParser.memberPrefixMap[className],
+      );
     }
 
     switch (pointerElement!.name) {

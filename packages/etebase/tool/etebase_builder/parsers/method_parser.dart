@@ -25,7 +25,6 @@ class MethodRef {
   final bool isNew;
   final bool isDestroy;
   final bool isStatic;
-  final bool isGetter;
   final LengthGetterType lengthGetter;
 
   final List<ParameterRef> parameters;
@@ -39,7 +38,6 @@ class MethodRef {
     required this.isNew,
     required this.isDestroy,
     required this.isStatic,
-    required this.isGetter,
     required this.lengthGetter,
     required this.parameters,
     required this.returnType,
@@ -96,6 +94,8 @@ class MethodParser {
     RegExp(r'^etebase_item_metadata_get_(item_type|name|description|color)$'),
     'etebase_collection_list_response_get_stoken',
     'etebase_collection_get_stoken',
+    'etebase_fs_cache_load_stoken',
+    'etebase_fs_cache_collection_load_stoken',
   ];
 
   static final _mutableReturns = <Pattern>[
@@ -171,7 +171,6 @@ class MethodParser {
       isNew: methodName.endsWith('_new'),
       isDestroy: methodName.endsWith('_destroy'),
       isStatic: !mappedParams.any((p) => p.isThisParam),
-      isGetter: false,
       lengthGetter: lengthGetterType,
       parameters: mappedParams,
       returnType: _mapReturnType(
@@ -203,7 +202,6 @@ class MethodParser {
       isNew: false,
       isDestroy: false,
       isStatic: forceStatic,
-      isGetter: false,
       lengthGetter: _methodsWithLengthConstants.contains(method.name)
           ? LengthGetterType.constant
           : LengthGetterType.none,

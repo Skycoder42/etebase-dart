@@ -1,4 +1,5 @@
 import 'package:code_builder/code_builder.dart';
+import 'package:source_helper/source_helper.dart';
 
 import '../../parsers/method_parser.dart';
 import '../../parsers/type_ref.dart';
@@ -29,9 +30,8 @@ class IsolateReturnBuilder {
         transformedResult = _transformString(
           returnParamRef,
           returnType,
-          // TODO check if needed - might be null terminated already, so actual
-          // size is ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE - 1
-          length: _isolateOutParamBuilder.getOutSizeRef(method, returnParam),
+          // TODO workaround until https://github.com/etesync/libetebase/issues/7 is fixed
+          length: literalNum(2 + (3 * 9) + (5 * 12)),
         );
       } else if (returnType is ByteArrayTypeRef) {
         transformedResult = _transformByteArray(
@@ -142,7 +142,7 @@ class IsolateReturnBuilder {
     Expression? length,
   }) {
     final resultExpression = type.mutable
-        ? IsolateBuilder.arenaRef.property('attach').call([result])
+        ? IsolateBuilder.poolRef.property('attachScoped').call([result])
         : result;
     final castExpression = resultExpression
         .property('cast')
@@ -161,7 +161,7 @@ class IsolateReturnBuilder {
 
   Expression _transformUrl(Expression result, UriTypeRef type) {
     final resultExpression = type.mutable
-        ? IsolateBuilder.arenaRef.property('attach').call([result])
+        ? IsolateBuilder.poolRef.property('attachScoped').call([result])
         : result;
     return Types.Uri$.newInstanceNamed(
       'parse',
@@ -188,7 +188,7 @@ class IsolateReturnBuilder {
     if (method.hasRetSize) {
       length = refer('retSize').property('value');
       resultExpression =
-          IsolateBuilder.arenaRef.property('attach').call([result]);
+          IsolateBuilder.poolRef.property('attachScoped').call([result]);
     } else if (method.lengthGetter.hasLengthGetter) {
       length = IsolateBuilder.libEtebaseRef
           .property(method.ffiLengthGetterName)
@@ -218,8 +218,13 @@ class IsolateReturnBuilder {
   Expression _transformEtebaseClass(
     Expression result,
     EtebaseClassTypeRef type,
-  ) =>
-      result.property('address');
+  ) {
+    final memberPrefix = type.memberPrefix ?? type.name.snake;
+    return IsolateBuilder.poolRef.property('attachGlobal').call([
+      result,
+      IsolateBuilder.libEtebaseRef.property('${memberPrefix}_destroy'),
+    ]).property('address');
+  }
 
   Expression _transformEtebaseOutList(
     Expression result,

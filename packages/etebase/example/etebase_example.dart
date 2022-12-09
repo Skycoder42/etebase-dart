@@ -27,11 +27,6 @@ Future<void> main() async {
 
     final account = await EtebaseAccount.signup(client, user, 'hello-test-123');
     print(await account.save());
-
-    await account.dispose();
-    await user.dispose();
-    await client.dispose();
-    print('Client disposed');
   } finally {
     await Etebase.terminate();
     print('Isolate terminated');

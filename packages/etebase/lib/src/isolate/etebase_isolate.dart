@@ -5,6 +5,7 @@ import 'dart:isolate';
 import '../../gen/ffi/libetebase.ffi.dart';
 import '../model/etebase_config.dart';
 import 'etebase_isolate_error.dart';
+import 'etebase_pool.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
 
@@ -12,6 +13,7 @@ typedef LoadLibetebaseFn = FutureOr<DynamicLibrary> Function();
 
 typedef MethodInvocationHandler = MethodResult Function(
   LibEtebaseFFI libEtebaseFFI,
+  EtebasePool pool,
   EtebaseConfig etebaseConfig,
   MethodInvocation invocation,
 );
@@ -168,6 +170,7 @@ class EtebaseIsolate {
     final config = initMessage.etebaseConfig;
     final sendPort = initMessage.sendPort;
     final receivePort = ReceivePort('$EtebaseIsolate._main');
+    final pool = EtebasePool();
 
     try {
       final dyLib = await initMessage.loadLibetebase();
@@ -194,6 +197,7 @@ class EtebaseIsolate {
         try {
           final result = initMessage.methodInvocationHandler(
             libEtebase,
+            pool,
             config,
             invocation,
           );
@@ -216,6 +220,7 @@ class EtebaseIsolate {
       rethrow;
     } finally {
       receivePort.close();
+      pool.releaseAll();
     }
   }
 }

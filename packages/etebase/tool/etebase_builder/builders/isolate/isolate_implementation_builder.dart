@@ -34,21 +34,24 @@ class IsolateImplementationBuilder {
 
   Code _buildInvocation(MethodRef method) {
     var expression = IsolateBuilder.libEtebaseRef.property(method.ffiName);
+    final expandedParams = method.parameters.expand(
+      (parameter) => [
+        if (parameter.type is ByteArrayTypeRef)
+          refer(parameter.name).property('cast').call(const [])
+        else
+          refer(parameter.name),
+        if (parameter.hasLength) refer(parameter.lengthName()),
+      ],
+    );
 
-    if (!method.isGetter) {
-      expression = expression.call(
-        method.parameters.expand(
-          (parameter) => [
-            if (parameter.type is ByteArrayTypeRef)
-              refer(parameter.name).property('cast').call(const [])
-            else
-              refer(parameter.name),
-            if (parameter.hasLength) refer(parameter.lengthName()),
-          ],
-        ),
-      );
+    if (method.isDestroy) {
+      return IsolateBuilder.poolRef
+          .property('freeGlobal')
+          .call(expandedParams)
+          .statement;
     }
 
+    expression = expression.call(expandedParams);
     if (method.returnType is VoidTypeRef) {
       return expression.statement;
     } else {

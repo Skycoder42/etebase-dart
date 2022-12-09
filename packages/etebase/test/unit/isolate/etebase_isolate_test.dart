@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:etebase/gen/ffi/libetebase.ffi.dart';
 import 'package:etebase/src/isolate/etebase_isolate.dart';
 import 'package:etebase/src/isolate/etebase_isolate_error.dart';
+import 'package:etebase/src/isolate/etebase_pool.dart';
 import 'package:etebase/src/isolate/method_invocation.dart';
 import 'package:etebase/src/isolate/method_result.dart';
 import 'package:etebase/src/model/etebase_config.dart';
@@ -20,6 +21,7 @@ Never testAlwaysThrow() => throw Exception();
 
 MethodResult testInvocationHandler(
   LibEtebaseFFI libEtebaseFFI,
+  EtebasePool pool,
   EtebaseConfig config,
   MethodInvocation invocation,
 ) {

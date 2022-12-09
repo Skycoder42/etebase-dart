@@ -21,7 +21,6 @@ class ClientMethodBuilder {
           b
             ..name = _getMethodName(method)
             ..static = method.isStatic || method.isDestroy
-            ..type = method.isGetter ? MethodType.getter : null
             ..modifier =
                 _isAsync(method.outOrReturnType) ? MethodModifier.async : null
             ..returns = Types.future(_buildReturnType(method))

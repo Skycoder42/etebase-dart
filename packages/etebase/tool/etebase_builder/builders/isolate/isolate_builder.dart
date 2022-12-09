@@ -14,15 +14,15 @@ class IsolateBuilder {
   static const libEtebaseRef = Reference(_libEtebaseName);
   static const _configName = 'config';
   static const configRef = Reference(_configName);
-  static const _arenaName = 'arena';
-  static const arenaRef = Reference(_arenaName);
+  static const _poolName = 'pool';
+  static const poolRef = Reference(_poolName);
   static const _reinvokedWithSizeName = 'reinvokedWithSize';
   static const reinvokedWithSizeRef = Reference(_reinvokedWithSizeName);
   static const handlerParams = [
     libEtebaseRef,
+    poolRef,
     configRef,
     invocationRef,
-    arenaRef
   ];
 
   final IsolateImplementationBuilder _isolateImplementationBuilder;
@@ -71,15 +71,10 @@ class IsolateBuilder {
       (b) => b
         ..replace(_buildHandlerSignature())
         ..name = 'etebaseIsolateMessageHandler'
-        ..body = Block.of([
-          declareFinal(_arenaName)
-              .assign(Types.Arena$.newInstance(const []))
-              .statement,
-          try$([
-            caseBuilder,
-          ]).finally$([
-            arenaRef.property('releaseAll').call(const []).statement,
-          ]),
+        ..body = try$([
+          caseBuilder,
+        ]).finally$([
+          poolRef.property('releaseScope').call(const []).statement,
         ]),
     );
   }
@@ -88,13 +83,6 @@ class IsolateBuilder {
         (b) {
           b
             ..replace(_buildHandlerSignature())
-            ..requiredParameters.add(
-              Parameter(
-                (b) => b
-                  ..name = _arenaName
-                  ..type = Types.Arena$,
-              ),
-            )
             ..name = '_${method.ffiName}'
             ..body = _isolateImplementationBuilder.build(method);
 
@@ -119,6 +107,11 @@ class IsolateBuilder {
               (b) => b
                 ..name = _libEtebaseName
                 ..type = Types.ffi(refer('LibEtebaseFFI')),
+            ),
+            Parameter(
+              (b) => b
+                ..name = _poolName
+                ..type = Types.EtebasePool$,
             ),
             Parameter(
               (b) => b

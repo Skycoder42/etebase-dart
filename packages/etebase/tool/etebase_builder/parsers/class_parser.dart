@@ -23,7 +23,7 @@ class ClassRef {
 }
 
 class ClassParser {
-  static const _memberPrefixMap = {
+  static const memberPrefixMap = {
     'EtebaseFileSystemCache': 'etebase_fs_cache',
     'EtebaseCollectionInvitationManager': 'etebase_invitation_manager',
   };
@@ -62,7 +62,7 @@ class ClassParser {
 
   String _prefixFor(TypeDefiningElement clazz) {
     final className = clazz.name!;
-    return _memberPrefixMap[className] ?? className.snake;
+    return memberPrefixMap[className] ?? className.snake;
   }
 
   List<MethodElement> _findMembers(

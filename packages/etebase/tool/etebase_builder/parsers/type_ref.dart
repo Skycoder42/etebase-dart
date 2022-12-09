@@ -20,8 +20,11 @@ abstract class TypeRef {
   factory TypeRef.etebaseCollectionAccessLevel() =
       EtebaseCollectionAccessLevelTypeRef;
   factory TypeRef.etebasePrefetchOption() = EtebasePrefetchOptionTypeRef;
-  factory TypeRef.etebaseClass(String name, {bool optional}) =
-      EtebaseClassTypeRef;
+  factory TypeRef.etebaseClass(
+    String name, {
+    bool optional,
+    String? memberPrefix,
+  }) = EtebaseClassTypeRef;
   factory TypeRef.etebaseClassList(String name) = EtebaseClassListTypeRef;
   factory TypeRef.etebaseOutList(String name) = EtebaseOutListTypeRef;
 }
@@ -173,8 +176,9 @@ class EtebasePrefetchOptionTypeRef extends EnumTypeRef {
 class EtebaseClassTypeRef implements TypeRef {
   final String name;
   final bool optional;
+  final String? memberPrefix;
 
-  EtebaseClassTypeRef(this.name, {this.optional = false});
+  EtebaseClassTypeRef(this.name, {this.optional = false, this.memberPrefix});
 
   @override
   TypeReference get ffiType => Types.pointer(Types.ffi(refer(name)));

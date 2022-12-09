@@ -31,6 +31,11 @@ void main() {
       expect(result, isTrue);
     });
 
+    test('can change server URL', () async {
+      await client.setServerUrl(await etebaseGetDefaultServerUrl());
+      expect(await client.checkEtebaseServer(), isTrue);
+    });
+
     group('account', () {
       const testUsername = 'test-user';
       const testEmail = 'test.user@example.com';
@@ -113,6 +118,9 @@ void main() {
         );
         addTearDown(restoredAccount.dispose);
         await restoredAccount.fetchToken();
+
+        await restoredAccount
+            .forceServerUrl(await etebaseGetDefaultServerUrl());
 
         expect(
           () async => account.save(await EtebaseUtils.randombytes(64)),

@@ -127,7 +127,7 @@ class IsolateInParamBuilder {
         .assign(
           argument.equalTo(literalNull).conditional(
                 Types.nullptr$,
-                IsolateBuilder.arenaRef
+                IsolateBuilder.poolRef
                     .call(const [], const {}, [Types.Int64$])
                     .cascade('value')
                     .assign(
@@ -270,7 +270,7 @@ class IsolateInParamBuilder {
   Expression _stringToPointer(Expression variable, {bool isNullable = false}) {
     final convertExpression = variable
         .nullableProperty('toNativeUtf8', isNullable: isNullable)
-        .call(const [], const {'allocator': IsolateBuilder.arenaRef})
+        .call(const [], const {'allocator': IsolateBuilder.poolRef})
         .property('cast')
         .call(const [], const {}, [Types.Char$]);
 
@@ -317,7 +317,7 @@ class IsolateInParamBuilder {
           ]);
     }
 
-    final allocation = IsolateBuilder.arenaRef.call(
+    final allocation = IsolateBuilder.poolRef.call(
       [sizeVariable],
       const {},
       [pointerType],

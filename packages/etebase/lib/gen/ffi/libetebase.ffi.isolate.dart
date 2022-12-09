@@ -10,1206 +10,1200 @@ import 'dart:ffi' as _i6;
 import 'dart:isolate' as _i8;
 
 import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i2;
+import 'package:etebase/src/isolate/etebase_pool.dart' as _i3;
 import 'package:etebase/src/isolate/ffi_helpers.dart' as _i7;
-import 'package:etebase/src/isolate/method_invocation.dart' as _i4;
+import 'package:etebase/src/isolate/method_invocation.dart' as _i5;
 import 'package:etebase/src/isolate/method_result.dart' as _i1;
-import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i9;
-import 'package:etebase/src/model/etebase_config.dart' as _i3;
-import 'package:etebase/src/model/etebase_error_code.dart' as _i10;
-import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i11;
-import 'package:ffi/ffi.dart' as _i5;
+import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i10;
+import 'package:etebase/src/model/etebase_config.dart' as _i4;
+import 'package:etebase/src/model/etebase_error_code.dart' as _i11;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i12;
+import 'package:ffi/ffi.dart' as _i9;
 import 'package:ffi/ffi.dart';
 
 _i1.MethodResult etebaseIsolateMessageHandler(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
-  final arena = _i5.Arena();
   try {
     switch (invocation.method) {
       case #etebase_user_profile_get_pubkey:
         return _etebase_user_profile_get_pubkey(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_profile_destroy:
         return _etebase_user_profile_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_new:
         return _etebase_user_new(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_set_username:
         return _etebase_user_set_username(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_get_username:
         return _etebase_user_get_username(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_set_email:
         return _etebase_user_set_email(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_get_email:
         return _etebase_user_get_email(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_user_destroy:
         return _etebase_user_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_clone:
         return _etebase_signed_invitation_clone(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_get_uid:
         return _etebase_signed_invitation_get_uid(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_get_username:
         return _etebase_signed_invitation_get_username(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_get_collection:
         return _etebase_signed_invitation_get_collection(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_get_access_level:
         return _etebase_signed_invitation_get_access_level(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_get_from_username:
         return _etebase_signed_invitation_get_from_username(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_get_from_pubkey:
         return _etebase_signed_invitation_get_from_pubkey(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_signed_invitation_destroy:
         return _etebase_signed_invitation_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_removed_collection_get_uid:
         return _etebase_removed_collection_get_uid(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_removed_collection_destroy:
         return _etebase_removed_collection_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_list_response_get_iterator:
         return _etebase_invitation_list_response_get_iterator(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_list_response_get_data:
         return _etebase_invitation_list_response_get_data(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_list_response_is_done:
         return _etebase_invitation_list_response_is_done(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_list_response_destroy:
         return _etebase_invitation_list_response_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_revisions_list_response_get_iterator:
         return _etebase_item_revisions_list_response_get_iterator(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_revisions_list_response_get_data:
         return _etebase_item_revisions_list_response_get_data(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_revisions_list_response_is_done:
         return _etebase_item_revisions_list_response_is_done(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_revisions_list_response_destroy:
         return _etebase_item_revisions_list_response_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_member_list_response_get_iterator:
         return _etebase_member_list_response_get_iterator(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_member_list_response_get_data:
         return _etebase_member_list_response_get_data(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_member_list_response_is_done:
         return _etebase_member_list_response_is_done(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_member_list_response_destroy:
         return _etebase_member_list_response_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_new:
         return _etebase_item_metadata_new(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_set_item_type:
         return _etebase_item_metadata_set_item_type(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_get_item_type:
         return _etebase_item_metadata_get_item_type(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_set_name:
         return _etebase_item_metadata_set_name(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_get_name:
         return _etebase_item_metadata_get_name(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_set_mtime:
         return _etebase_item_metadata_set_mtime(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_get_mtime:
         return _etebase_item_metadata_get_mtime(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_set_description:
         return _etebase_item_metadata_set_description(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_get_description:
         return _etebase_item_metadata_get_description(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_set_color:
         return _etebase_item_metadata_set_color(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_get_color:
         return _etebase_item_metadata_get_color(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_metadata_destroy:
         return _etebase_item_metadata_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_fetch:
         return _etebase_item_manager_fetch(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_create:
         return _etebase_item_manager_create(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_create_raw:
         return _etebase_item_manager_create_raw(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_list:
         return _etebase_item_manager_list(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_item_revisions:
         return _etebase_item_manager_item_revisions(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_fetch_updates:
         return _etebase_item_manager_fetch_updates(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_fetch_multi:
         return _etebase_item_manager_fetch_multi(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_batch:
         return _etebase_item_manager_batch(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_batch_deps:
         return _etebase_item_manager_batch_deps(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_transaction:
         return _etebase_item_manager_transaction(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_transaction_deps:
         return _etebase_item_manager_transaction_deps(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_cache_load:
         return _etebase_item_manager_cache_load(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_cache_save:
         return _etebase_item_manager_cache_save(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_cache_save_with_content:
         return _etebase_item_manager_cache_save_with_content(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_manager_destroy:
         return _etebase_item_manager_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_list_response_get_stoken:
         return _etebase_item_list_response_get_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_list_response_get_data:
         return _etebase_item_list_response_get_data(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_list_response_is_done:
         return _etebase_item_list_response_is_done(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_list_response_destroy:
         return _etebase_item_list_response_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_clone:
         return _etebase_item_clone(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_verify:
         return _etebase_item_verify(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_set_meta:
         return _etebase_item_set_meta(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_get_meta:
         return _etebase_item_get_meta(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_set_meta_raw:
         return _etebase_item_set_meta_raw(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_get_meta_raw:
         return _etebase_item_get_meta_raw(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_set_content:
         return _etebase_item_set_content(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_get_content:
         return _etebase_item_get_content(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_delete:
         return _etebase_item_delete(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_is_deleted:
         return _etebase_item_is_deleted(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_get_uid:
         return _etebase_item_get_uid(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_get_etag:
         return _etebase_item_get_etag(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_item_destroy:
         return _etebase_item_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_new:
         return _etebase_fs_cache_new(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_clear_user:
         return _etebase_fs_cache_clear_user(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_save_account:
         return _etebase_fs_cache_save_account(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_load_account:
         return _etebase_fs_cache_load_account(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_save_stoken:
         return _etebase_fs_cache_save_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_load_stoken:
         return _etebase_fs_cache_load_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_collection_save_stoken:
         return _etebase_fs_cache_collection_save_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_collection_load_stoken:
         return _etebase_fs_cache_collection_load_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_collection_set:
         return _etebase_fs_cache_collection_set(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_collection_unset:
         return _etebase_fs_cache_collection_unset(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_collection_get:
         return _etebase_fs_cache_collection_get(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_item_set:
         return _etebase_fs_cache_item_set(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_item_unset:
         return _etebase_fs_cache_item_unset(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_item_get:
         return _etebase_fs_cache_item_get(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fs_cache_destroy:
         return _etebase_fs_cache_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_new:
         return _etebase_fetch_options_new(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_set_limit:
         return _etebase_fetch_options_set_limit(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_set_prefetch:
         return _etebase_fetch_options_set_prefetch(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_set_with_collection:
         return _etebase_fetch_options_set_with_collection(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_set_iterator:
         return _etebase_fetch_options_set_iterator(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_set_stoken:
         return _etebase_fetch_options_set_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_fetch_options_destroy:
         return _etebase_fetch_options_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_manager_list:
         return _etebase_collection_member_manager_list(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_manager_remove:
         return _etebase_collection_member_manager_remove(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_manager_leave:
         return _etebase_collection_member_manager_leave(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_manager_modify_access_level:
         return _etebase_collection_member_manager_modify_access_level(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_manager_destroy:
         return _etebase_collection_member_manager_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_clone:
         return _etebase_collection_member_clone(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_get_username:
         return _etebase_collection_member_get_username(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_get_access_level:
         return _etebase_collection_member_get_access_level(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_member_destroy:
         return _etebase_collection_member_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_fetch:
         return _etebase_collection_manager_fetch(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_create:
         return _etebase_collection_manager_create(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_create_raw:
         return _etebase_collection_manager_create_raw(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_get_item_manager:
         return _etebase_collection_manager_get_item_manager(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_list:
         return _etebase_collection_manager_list(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_list_multi:
         return _etebase_collection_manager_list_multi(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_upload:
         return _etebase_collection_manager_upload(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_transaction:
         return _etebase_collection_manager_transaction(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_cache_load:
         return _etebase_collection_manager_cache_load(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_cache_save:
         return _etebase_collection_manager_cache_save(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_cache_save_with_content:
         return _etebase_collection_manager_cache_save_with_content(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_get_member_manager:
         return _etebase_collection_manager_get_member_manager(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_manager_destroy:
         return _etebase_collection_manager_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_list_response_get_stoken:
         return _etebase_collection_list_response_get_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_list_response_get_data:
         return _etebase_collection_list_response_get_data(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_list_response_is_done:
         return _etebase_collection_list_response_is_done(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_list_response_get_removed_memberships:
         return _etebase_collection_list_response_get_removed_memberships(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_list_response_destroy:
         return _etebase_collection_list_response_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_list_incoming:
         return _etebase_invitation_manager_list_incoming(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_list_outgoing:
         return _etebase_invitation_manager_list_outgoing(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_accept:
         return _etebase_invitation_manager_accept(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_reject:
         return _etebase_invitation_manager_reject(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_fetch_user_profile:
         return _etebase_invitation_manager_fetch_user_profile(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_invite:
         return _etebase_invitation_manager_invite(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_disinvite:
         return _etebase_invitation_manager_disinvite(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_get_pubkey:
         return _etebase_invitation_manager_get_pubkey(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_invitation_manager_destroy:
         return _etebase_invitation_manager_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_clone:
         return _etebase_collection_clone(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_verify:
         return _etebase_collection_verify(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_set_meta:
         return _etebase_collection_set_meta(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_meta:
         return _etebase_collection_get_meta(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_set_meta_raw:
         return _etebase_collection_set_meta_raw(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_meta_raw:
         return _etebase_collection_get_meta_raw(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_set_content:
         return _etebase_collection_set_content(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_content:
         return _etebase_collection_get_content(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_delete:
         return _etebase_collection_delete(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_is_deleted:
         return _etebase_collection_is_deleted(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_uid:
         return _etebase_collection_get_uid(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_etag:
         return _etebase_collection_get_etag(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_stoken:
         return _etebase_collection_get_stoken(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_as_item:
         return _etebase_collection_as_item(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_collection_type:
         return _etebase_collection_get_collection_type(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_get_access_level:
         return _etebase_collection_get_access_level(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_collection_destroy:
         return _etebase_collection_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_client_new:
         return _etebase_client_new(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_client_set_server_url:
         return _etebase_client_set_server_url(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_client_check_etebase_server:
         return _etebase_client_check_etebase_server(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_client_destroy:
         return _etebase_client_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_login:
         return _etebase_account_login(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_signup:
         return _etebase_account_signup(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_fetch_token:
         return _etebase_account_fetch_token(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_fetch_dashboard_url:
         return _etebase_account_fetch_dashboard_url(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_force_server_url:
         return _etebase_account_force_server_url(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_change_password:
         return _etebase_account_change_password(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_logout:
         return _etebase_account_logout(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_get_collection_manager:
         return _etebase_account_get_collection_manager(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_get_invitation_manager:
         return _etebase_account_get_invitation_manager(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_save:
         return _etebase_account_save(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_restore:
         return _etebase_account_restore(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_account_destroy:
         return _etebase_account_destroy(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
-        );
-      case #ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE:
-        return _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
-          libEtebase,
-          config,
-          invocation,
-          arena,
         );
       case #etebase_utils_randombytes:
         return _etebase_utils_randombytes(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_utils_pretty_fingerprint:
         return _etebase_utils_pretty_fingerprint(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       case #etebase_get_default_server_url:
         return _etebase_get_default_server_url(
           libEtebase,
+          pool,
           config,
           invocation,
-          arena,
         );
       default:
         throw ArgumentError.value(
@@ -1219,15 +1213,15 @@ _i1.MethodResult etebaseIsolateMessageHandler(
         );
     }
   } finally {
-    arena.releaseAll();
+    pool.releaseScope();
   }
 }
 
 _i1.MethodResult _etebase_user_profile_get_pubkey(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1253,16 +1247,16 @@ _i1.MethodResult _etebase_user_profile_get_pubkey(
 
 _i1.MethodResult _etebase_user_profile_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_user_profile_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1271,9 +1265,9 @@ _i1.MethodResult _etebase_user_profile_destroy(
 
 _i1.MethodResult _etebase_user_new(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -1282,10 +1276,10 @@ _i1.MethodResult _etebase_user_new(
   assert(invocation.arguments[1] is String,
       'Parameter email must be of type String');
   final username = (invocation.arguments[0] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final email = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_user_new(
     username,
@@ -1299,15 +1293,20 @@ _i1.MethodResult _etebase_user_new(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_user_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_user_set_username(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -1317,7 +1316,7 @@ _i1.MethodResult _etebase_user_set_username(
   final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   libEtebase.etebase_user_set_username(
     this_,
@@ -1331,9 +1330,9 @@ _i1.MethodResult _etebase_user_set_username(
 
 _i1.MethodResult _etebase_user_get_username(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1349,15 +1348,15 @@ _i1.MethodResult _etebase_user_get_username(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_user_set_email(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -1367,7 +1366,7 @@ _i1.MethodResult _etebase_user_set_email(
   final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
   final email = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   libEtebase.etebase_user_set_email(
     this_,
@@ -1381,9 +1380,9 @@ _i1.MethodResult _etebase_user_set_email(
 
 _i1.MethodResult _etebase_user_get_email(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1399,22 +1398,22 @@ _i1.MethodResult _etebase_user_get_email(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_user_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_user_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1423,9 +1422,9 @@ _i1.MethodResult _etebase_user_destroy(
 
 _i1.MethodResult _etebase_signed_invitation_clone(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1441,15 +1440,20 @@ _i1.MethodResult _etebase_signed_invitation_clone(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_signed_invitation_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_signed_invitation_get_uid(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1465,15 +1469,15 @@ _i1.MethodResult _etebase_signed_invitation_get_uid(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_signed_invitation_get_username(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1489,15 +1493,15 @@ _i1.MethodResult _etebase_signed_invitation_get_username(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_signed_invitation_get_collection(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1513,15 +1517,15 @@ _i1.MethodResult _etebase_signed_invitation_get_collection(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_signed_invitation_get_access_level(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1535,17 +1539,17 @@ _i1.MethodResult _etebase_signed_invitation_get_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i9.EtebaseCollectionAccessLevel>(
+  return _i1.MethodResult.successTyped<_i10.EtebaseCollectionAccessLevel>(
     invocation.id,
-    _i9.EtebaseCollectionAccessLevel.values[result],
+    _i10.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
 _i1.MethodResult _etebase_signed_invitation_get_from_username(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1561,15 +1565,15 @@ _i1.MethodResult _etebase_signed_invitation_get_from_username(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1594,16 +1598,16 @@ _i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
 
 _i1.MethodResult _etebase_signed_invitation_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_signed_invitation_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1612,9 +1616,9 @@ _i1.MethodResult _etebase_signed_invitation_destroy(
 
 _i1.MethodResult _etebase_removed_collection_get_uid(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1630,22 +1634,22 @@ _i1.MethodResult _etebase_removed_collection_get_uid(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_removed_collection_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_removed_collection_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1654,9 +1658,9 @@ _i1.MethodResult _etebase_removed_collection_destroy(
 
 _i1.MethodResult _etebase_invitation_list_response_get_iterator(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1673,15 +1677,15 @@ _i1.MethodResult _etebase_invitation_list_response_get_iterator(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_invitation_list_response_get_data(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1690,7 +1694,7 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_invitation_list_response_get_data_length(this_);
-  final data = arena<_i6.Pointer<_i2.EtebaseSignedInvitation>>(dataSize);
+  final data = pool<_i6.Pointer<_i2.EtebaseSignedInvitation>>(dataSize);
   final result = libEtebase.etebase_invitation_list_response_get_data(
     this_,
     data,
@@ -1713,9 +1717,9 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
 
 _i1.MethodResult _etebase_invitation_list_response_is_done(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1731,16 +1735,16 @@ _i1.MethodResult _etebase_invitation_list_response_is_done(
 
 _i1.MethodResult _etebase_invitation_list_response_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_invitation_list_response_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1749,9 +1753,9 @@ _i1.MethodResult _etebase_invitation_list_response_destroy(
 
 _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1768,15 +1772,15 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_revisions_list_response_get_data(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1785,7 +1789,7 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_item_revisions_list_response_get_data_length(this_);
-  final data = arena<_i6.Pointer<_i2.EtebaseItem>>(dataSize);
+  final data = pool<_i6.Pointer<_i2.EtebaseItem>>(dataSize);
   final result = libEtebase.etebase_item_revisions_list_response_get_data(
     this_,
     data,
@@ -1808,9 +1812,9 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
 
 _i1.MethodResult _etebase_item_revisions_list_response_is_done(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1826,16 +1830,16 @@ _i1.MethodResult _etebase_item_revisions_list_response_is_done(
 
 _i1.MethodResult _etebase_item_revisions_list_response_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_item_revisions_list_response_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1844,9 +1848,9 @@ _i1.MethodResult _etebase_item_revisions_list_response_destroy(
 
 _i1.MethodResult _etebase_member_list_response_get_iterator(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1862,15 +1866,15 @@ _i1.MethodResult _etebase_member_list_response_get_iterator(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_member_list_response_get_data(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1879,7 +1883,7 @@ _i1.MethodResult _etebase_member_list_response_get_data(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_member_list_response_get_data_length(this_);
-  final data = arena<_i6.Pointer<_i2.EtebaseCollectionMember>>(dataSize);
+  final data = pool<_i6.Pointer<_i2.EtebaseCollectionMember>>(dataSize);
   final result = libEtebase.etebase_member_list_response_get_data(
     this_,
     data,
@@ -1902,9 +1906,9 @@ _i1.MethodResult _etebase_member_list_response_get_data(
 
 _i1.MethodResult _etebase_member_list_response_is_done(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1920,16 +1924,16 @@ _i1.MethodResult _etebase_member_list_response_is_done(
 
 _i1.MethodResult _etebase_member_list_response_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_member_list_response_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -1938,9 +1942,9 @@ _i1.MethodResult _etebase_member_list_response_destroy(
 
 _i1.MethodResult _etebase_item_metadata_new(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
@@ -1953,15 +1957,20 @@ _i1.MethodResult _etebase_item_metadata_new(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_metadata_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_metadata_set_item_type(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -1971,7 +1980,7 @@ _i1.MethodResult _etebase_item_metadata_set_item_type(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final itemType = (invocation.arguments[1] as String?)
-          ?.toNativeUtf8(allocator: arena)
+          ?.toNativeUtf8(allocator: pool)
           .cast<_i6.Char>() ??
       _i6.nullptr;
   libEtebase.etebase_item_metadata_set_item_type(
@@ -1986,9 +1995,9 @@ _i1.MethodResult _etebase_item_metadata_set_item_type(
 
 _i1.MethodResult _etebase_item_metadata_get_item_type(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -1998,15 +2007,15 @@ _i1.MethodResult _etebase_item_metadata_get_item_type(
   final result = libEtebase.etebase_item_metadata_get_item_type(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_metadata_set_name(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2016,7 +2025,7 @@ _i1.MethodResult _etebase_item_metadata_set_name(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final name = (invocation.arguments[1] as String?)
-          ?.toNativeUtf8(allocator: arena)
+          ?.toNativeUtf8(allocator: pool)
           .cast<_i6.Char>() ??
       _i6.nullptr;
   libEtebase.etebase_item_metadata_set_name(
@@ -2031,9 +2040,9 @@ _i1.MethodResult _etebase_item_metadata_set_name(
 
 _i1.MethodResult _etebase_item_metadata_get_name(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2043,15 +2052,15 @@ _i1.MethodResult _etebase_item_metadata_get_name(
   final result = libEtebase.etebase_item_metadata_get_name(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_metadata_set_mtime(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2062,7 +2071,7 @@ _i1.MethodResult _etebase_item_metadata_set_mtime(
       (invocation.arguments[0] as int));
   final mtime = (invocation.arguments[1] as DateTime?) == null
       ? _i6.nullptr
-      : (arena<_i6.Int64>()
+      : (pool<_i6.Int64>()
         ..value =
             (invocation.arguments[1] as DateTime?)!.millisecondsSinceEpoch);
   libEtebase.etebase_item_metadata_set_mtime(
@@ -2077,9 +2086,9 @@ _i1.MethodResult _etebase_item_metadata_set_mtime(
 
 _i1.MethodResult _etebase_item_metadata_get_mtime(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2097,9 +2106,9 @@ _i1.MethodResult _etebase_item_metadata_get_mtime(
 
 _i1.MethodResult _etebase_item_metadata_set_description(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2109,7 +2118,7 @@ _i1.MethodResult _etebase_item_metadata_set_description(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final description = (invocation.arguments[1] as String?)
-          ?.toNativeUtf8(allocator: arena)
+          ?.toNativeUtf8(allocator: pool)
           .cast<_i6.Char>() ??
       _i6.nullptr;
   libEtebase.etebase_item_metadata_set_description(
@@ -2124,9 +2133,9 @@ _i1.MethodResult _etebase_item_metadata_set_description(
 
 _i1.MethodResult _etebase_item_metadata_get_description(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2136,15 +2145,15 @@ _i1.MethodResult _etebase_item_metadata_get_description(
   final result = libEtebase.etebase_item_metadata_get_description(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_metadata_set_color(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2154,7 +2163,7 @@ _i1.MethodResult _etebase_item_metadata_set_color(
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
   final color = (invocation.arguments[1] as String?)
-          ?.toNativeUtf8(allocator: arena)
+          ?.toNativeUtf8(allocator: pool)
           .cast<_i6.Char>() ??
       _i6.nullptr;
   libEtebase.etebase_item_metadata_set_color(
@@ -2169,9 +2178,9 @@ _i1.MethodResult _etebase_item_metadata_set_color(
 
 _i1.MethodResult _etebase_item_metadata_get_color(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2181,22 +2190,22 @@ _i1.MethodResult _etebase_item_metadata_get_color(
   final result = libEtebase.etebase_item_metadata_get_color(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_metadata_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_item_metadata_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -2205,9 +2214,9 @@ _i1.MethodResult _etebase_item_metadata_destroy(
 
 _i1.MethodResult _etebase_item_manager_fetch(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2219,7 +2228,7 @@ _i1.MethodResult _etebase_item_manager_fetch(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemUid = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
@@ -2238,15 +2247,20 @@ _i1.MethodResult _etebase_item_manager_fetch(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_create(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2262,7 +2276,7 @@ _i1.MethodResult _etebase_item_manager_create(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -2281,15 +2295,20 @@ _i1.MethodResult _etebase_item_manager_create(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_create_raw(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2304,7 +2323,7 @@ _i1.MethodResult _etebase_item_manager_create_raw(
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = arena<_i6.Uint8>(metaSize);
+  final meta = pool<_i6.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
@@ -2313,7 +2332,7 @@ _i1.MethodResult _etebase_item_manager_create_raw(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -2333,15 +2352,20 @@ _i1.MethodResult _etebase_item_manager_create_raw(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_list(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2366,15 +2390,20 @@ _i1.MethodResult _etebase_item_manager_list(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_item_revisions(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2403,15 +2432,20 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_revisions_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_fetch_updates(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2423,7 +2457,7 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = arena<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
+  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
   _i7.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
@@ -2447,15 +2481,20 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_fetch_multi(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2467,11 +2506,11 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<String>).length;
-  final items = arena<_i6.Pointer<_i6.Char>>(itemsSize);
+  final items = pool<_i6.Pointer<_i6.Char>>(itemsSize);
   _i7.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<String>),
-    (s) => s.toNativeUtf8(allocator: arena).cast<_i6.Char>(),
+    (s) => s.toNativeUtf8(allocator: pool).cast<_i6.Char>(),
   );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
@@ -2491,15 +2530,20 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_batch(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2511,7 +2555,7 @@ _i1.MethodResult _etebase_item_manager_batch(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = arena<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
+  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
   _i7.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
@@ -2541,9 +2585,9 @@ _i1.MethodResult _etebase_item_manager_batch(
 
 _i1.MethodResult _etebase_item_manager_batch_deps(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -2557,14 +2601,14 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = arena<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
+  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
   _i7.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
   );
   final depsSize = (invocation.arguments[2] as List<int>).length;
-  final deps = arena<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
+  final deps = pool<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
   _i7.FfiHelpers.assignPointerList(
     deps,
     (invocation.arguments[2] as List<int>),
@@ -2596,9 +2640,9 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
 
 _i1.MethodResult _etebase_item_manager_transaction(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -2610,7 +2654,7 @@ _i1.MethodResult _etebase_item_manager_transaction(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = arena<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
+  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
   _i7.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
@@ -2640,9 +2684,9 @@ _i1.MethodResult _etebase_item_manager_transaction(
 
 _i1.MethodResult _etebase_item_manager_transaction_deps(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -2656,14 +2700,14 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = arena<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
+  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
   _i7.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
   );
   final depsSize = (invocation.arguments[2] as List<int>).length;
-  final deps = arena<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
+  final deps = pool<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
   _i7.FfiHelpers.assignPointerList(
     deps,
     (invocation.arguments[2] as List<int>),
@@ -2695,9 +2739,9 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
 
 _i1.MethodResult _etebase_item_manager_cache_load(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2710,7 +2754,7 @@ _i1.MethodResult _etebase_item_manager_cache_load(
       .materialize()
       .asUint8List();
   final cachedSize = cached_buffer.length;
-  final cached = arena<_i6.Uint8>(cachedSize);
+  final cached = pool<_i6.Uint8>(cachedSize);
   cached.asTypedList(cachedSize).setAll(
         0,
         cached_buffer,
@@ -2728,15 +2772,20 @@ _i1.MethodResult _etebase_item_manager_cache_load(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_manager_cache_save(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2746,7 +2795,7 @@ _i1.MethodResult _etebase_item_manager_cache_save(
       (invocation.arguments[0] as int));
   final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = arena<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i6.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_item_manager_cache_save(
     this_,
     item,
@@ -2760,16 +2809,17 @@ _i1.MethodResult _etebase_item_manager_cache_save(
   }
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
-    _i8.TransferableTypedData.fromList(
-        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
+    _i8.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    ]),
   );
 }
 
 _i1.MethodResult _etebase_item_manager_cache_save_with_content(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2779,7 +2829,7 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
       (invocation.arguments[0] as int));
   final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = arena<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i6.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_item_manager_cache_save_with_content(
     this_,
     item,
@@ -2793,23 +2843,24 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
   }
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
-    _i8.TransferableTypedData.fromList(
-        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
+    _i8.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    ]),
   );
 }
 
 _i1.MethodResult _etebase_item_manager_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_item_manager_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -2818,9 +2869,9 @@ _i1.MethodResult _etebase_item_manager_destroy(
 
 _i1.MethodResult _etebase_item_list_response_get_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2836,15 +2887,15 @@ _i1.MethodResult _etebase_item_list_response_get_stoken(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_list_response_get_data(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2852,7 +2903,7 @@ _i1.MethodResult _etebase_item_list_response_get_data(
   final this_ = _i6.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize = libEtebase.etebase_item_list_response_get_data_length(this_);
-  final data = arena<_i6.Pointer<_i2.EtebaseItem>>(dataSize);
+  final data = pool<_i6.Pointer<_i2.EtebaseItem>>(dataSize);
   final result = libEtebase.etebase_item_list_response_get_data(
     this_,
     data,
@@ -2875,9 +2926,9 @@ _i1.MethodResult _etebase_item_list_response_get_data(
 
 _i1.MethodResult _etebase_item_list_response_is_done(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2893,16 +2944,16 @@ _i1.MethodResult _etebase_item_list_response_is_done(
 
 _i1.MethodResult _etebase_item_list_response_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_item_list_response_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -2911,9 +2962,9 @@ _i1.MethodResult _etebase_item_list_response_destroy(
 
 _i1.MethodResult _etebase_item_clone(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2929,15 +2980,20 @@ _i1.MethodResult _etebase_item_clone(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_verify(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -2953,9 +3009,9 @@ _i1.MethodResult _etebase_item_verify(
 
 _i1.MethodResult _etebase_item_set_meta(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2983,9 +3039,9 @@ _i1.MethodResult _etebase_item_set_meta(
 
 _i1.MethodResult _etebase_item_get_meta(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3001,15 +3057,20 @@ _i1.MethodResult _etebase_item_get_meta(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_metadata_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_item_set_meta_raw(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3022,7 +3083,7 @@ _i1.MethodResult _etebase_item_set_meta_raw(
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = arena<_i6.Uint8>(metaSize);
+  final meta = pool<_i6.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
@@ -3046,9 +3107,9 @@ _i1.MethodResult _etebase_item_set_meta_raw(
 
 _i1.MethodResult _etebase_item_get_meta_raw(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena, {
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -3061,7 +3122,7 @@ _i1.MethodResult _etebase_item_get_meta_raw(
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = arena<_i6.Uint8>(bufSize);
+  final buf = pool<_i6.Uint8>(bufSize);
   final result = libEtebase.etebase_item_get_meta_raw(
     this_,
     buf.cast(),
@@ -3081,15 +3142,15 @@ _i1.MethodResult _etebase_item_get_meta_raw(
   } else if (reinvokedWithSize != null) {
     return _i1.MethodResult.failure(
       invocation.id,
-      _i10.EtebaseErrorCode.generic,
+      _i11.EtebaseErrorCode.generic,
       'output size of etebase_item_get_meta_raw changed during invocation',
     );
   } else {
     return _etebase_item_get_meta_raw(
       libEtebase,
+      pool,
       config,
       invocation,
-      arena,
       reinvokedWithSize: result,
     );
   }
@@ -3097,9 +3158,9 @@ _i1.MethodResult _etebase_item_get_meta_raw(
 
 _i1.MethodResult _etebase_item_set_content(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3112,7 +3173,7 @@ _i1.MethodResult _etebase_item_set_content(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -3136,9 +3197,9 @@ _i1.MethodResult _etebase_item_set_content(
 
 _i1.MethodResult _etebase_item_get_content(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena, {
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -3151,7 +3212,7 @@ _i1.MethodResult _etebase_item_get_content(
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = arena<_i6.Uint8>(bufSize);
+  final buf = pool<_i6.Uint8>(bufSize);
   final result = libEtebase.etebase_item_get_content(
     this_,
     buf.cast(),
@@ -3171,15 +3232,15 @@ _i1.MethodResult _etebase_item_get_content(
   } else if (reinvokedWithSize != null) {
     return _i1.MethodResult.failure(
       invocation.id,
-      _i10.EtebaseErrorCode.generic,
+      _i11.EtebaseErrorCode.generic,
       'output size of etebase_item_get_content changed during invocation',
     );
   } else {
     return _etebase_item_get_content(
       libEtebase,
+      pool,
       config,
       invocation,
-      arena,
       reinvokedWithSize: result,
     );
   }
@@ -3187,9 +3248,9 @@ _i1.MethodResult _etebase_item_get_content(
 
 _i1.MethodResult _etebase_item_delete(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3211,9 +3272,9 @@ _i1.MethodResult _etebase_item_delete(
 
 _i1.MethodResult _etebase_item_is_deleted(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3229,9 +3290,9 @@ _i1.MethodResult _etebase_item_is_deleted(
 
 _i1.MethodResult _etebase_item_get_uid(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3247,15 +3308,15 @@ _i1.MethodResult _etebase_item_get_uid(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_get_etag(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3271,22 +3332,22 @@ _i1.MethodResult _etebase_item_get_etag(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_item_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_item_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -3295,9 +3356,9 @@ _i1.MethodResult _etebase_item_destroy(
 
 _i1.MethodResult _etebase_fs_cache_new(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3306,10 +3367,10 @@ _i1.MethodResult _etebase_fs_cache_new(
   assert(invocation.arguments[1] is String,
       'Parameter username must be of type String');
   final path = (invocation.arguments[0] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_new(
     path,
@@ -3323,15 +3384,20 @@ _i1.MethodResult _etebase_fs_cache_new(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_fs_cache_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_fs_cache_clear_user(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3353,9 +3419,9 @@ _i1.MethodResult _etebase_fs_cache_clear_user(
 
 _i1.MethodResult _etebase_fs_cache_save_account(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3381,7 +3447,7 @@ _i1.MethodResult _etebase_fs_cache_save_account(
   }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
-      : arena<_i6.Uint8>(encryptionKeySize);
+      : pool<_i6.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -3408,9 +3474,9 @@ _i1.MethodResult _etebase_fs_cache_save_account(
 
 _i1.MethodResult _etebase_fs_cache_load_account(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3436,7 +3502,7 @@ _i1.MethodResult _etebase_fs_cache_load_account(
   }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
-      : arena<_i6.Uint8>(encryptionKeySize);
+      : pool<_i6.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -3457,15 +3523,20 @@ _i1.MethodResult _etebase_fs_cache_load_account(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_account_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_fs_cache_save_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3475,7 +3546,7 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final stoken = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_save_stoken(
     this_,
@@ -3495,9 +3566,9 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
 
 _i1.MethodResult _etebase_fs_cache_load_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -3505,23 +3576,19 @@ _i1.MethodResult _etebase_fs_cache_load_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_load_stoken(this_);
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    arena.attach(result).cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr
+        ? null
+        : pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3533,10 +3600,10 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final colUid = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final stoken = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_collection_save_stoken(
     this_,
@@ -3557,9 +3624,9 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
 
 _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3569,29 +3636,25 @@ _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final colUid = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_collection_load_stoken(
     this_,
     colUid,
   );
-  if (result == _i6.nullptr) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
+  return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    arena.attach(result).cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr
+        ? null
+        : pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_fs_cache_collection_set(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3624,9 +3687,9 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
 
 _i1.MethodResult _etebase_fs_cache_collection_unset(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3640,7 +3703,7 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
   final colMgr = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_collection_unset(
     this_,
@@ -3661,9 +3724,9 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
 
 _i1.MethodResult _etebase_fs_cache_collection_get(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3677,7 +3740,7 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
   final colMgr = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_collection_get(
     this_,
@@ -3692,15 +3755,20 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_fs_cache_item_set(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -3715,7 +3783,7 @@ _i1.MethodResult _etebase_fs_cache_item_set(
   final itemMgr = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
       (invocation.arguments[3] as int));
@@ -3739,9 +3807,9 @@ _i1.MethodResult _etebase_fs_cache_item_set(
 
 _i1.MethodResult _etebase_fs_cache_item_unset(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -3757,10 +3825,10 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
   final itemMgr = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final itemUid = (invocation.arguments[3] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_item_unset(
     this_,
@@ -3782,9 +3850,9 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
 
 _i1.MethodResult _etebase_fs_cache_item_get(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -3800,10 +3868,10 @@ _i1.MethodResult _etebase_fs_cache_item_get(
   final itemMgr = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final itemUid = (invocation.arguments[3] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_fs_cache_item_get(
     this_,
@@ -3819,22 +3887,27 @@ _i1.MethodResult _etebase_fs_cache_item_get(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_fs_cache_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_fs_cache_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -3843,9 +3916,9 @@ _i1.MethodResult _etebase_fs_cache_destroy(
 
 _i1.MethodResult _etebase_fetch_options_new(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
@@ -3858,15 +3931,20 @@ _i1.MethodResult _etebase_fetch_options_new(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_fetch_options_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_fetch_options_set_limit(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3887,19 +3965,19 @@ _i1.MethodResult _etebase_fetch_options_set_limit(
 
 _i1.MethodResult _etebase_fetch_options_set_prefetch(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i11.EtebasePrefetchOption,
+  assert(invocation.arguments[1] is _i12.EtebasePrefetchOption,
       'Parameter prefetch must be of type EtebasePrefetchOption');
   final this_ = _i6.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final prefetch =
-      (invocation.arguments[1] as _i11.EtebasePrefetchOption).index;
+      (invocation.arguments[1] as _i12.EtebasePrefetchOption).index;
   libEtebase.etebase_fetch_options_set_prefetch(
     this_,
     prefetch,
@@ -3912,9 +3990,9 @@ _i1.MethodResult _etebase_fetch_options_set_prefetch(
 
 _i1.MethodResult _etebase_fetch_options_set_with_collection(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3936,9 +4014,9 @@ _i1.MethodResult _etebase_fetch_options_set_with_collection(
 
 _i1.MethodResult _etebase_fetch_options_set_iterator(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3948,7 +4026,7 @@ _i1.MethodResult _etebase_fetch_options_set_iterator(
   final this_ = _i6.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final iterator = (invocation.arguments[1] as String?)
-          ?.toNativeUtf8(allocator: arena)
+          ?.toNativeUtf8(allocator: pool)
           .cast<_i6.Char>() ??
       _i6.nullptr;
   libEtebase.etebase_fetch_options_set_iterator(
@@ -3963,9 +4041,9 @@ _i1.MethodResult _etebase_fetch_options_set_iterator(
 
 _i1.MethodResult _etebase_fetch_options_set_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -3975,7 +4053,7 @@ _i1.MethodResult _etebase_fetch_options_set_stoken(
   final this_ = _i6.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
   final stoken = (invocation.arguments[1] as String?)
-          ?.toNativeUtf8(allocator: arena)
+          ?.toNativeUtf8(allocator: pool)
           .cast<_i6.Char>() ??
       _i6.nullptr;
   libEtebase.etebase_fetch_options_set_stoken(
@@ -3990,16 +4068,16 @@ _i1.MethodResult _etebase_fetch_options_set_stoken(
 
 _i1.MethodResult _etebase_fetch_options_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseFetchOptions>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_fetch_options_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -4008,9 +4086,9 @@ _i1.MethodResult _etebase_fetch_options_destroy(
 
 _i1.MethodResult _etebase_collection_member_manager_list(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4035,15 +4113,20 @@ _i1.MethodResult _etebase_collection_member_manager_list(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_member_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_member_manager_remove(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4053,7 +4136,7 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_collection_member_manager_remove(
     this_,
@@ -4073,9 +4156,9 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
 
 _i1.MethodResult _etebase_collection_member_manager_leave(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4097,24 +4180,24 @@ _i1.MethodResult _etebase_collection_member_manager_leave(
 
 _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter username must be of type String');
-  assert(invocation.arguments[2] is _i9.EtebaseCollectionAccessLevel,
+  assert(invocation.arguments[2] is _i10.EtebaseCollectionAccessLevel,
       'Parameter accessLevel must be of type EtebaseCollectionAccessLevel');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final accessLevel =
-      (invocation.arguments[2] as _i9.EtebaseCollectionAccessLevel).index;
+      (invocation.arguments[2] as _i10.EtebaseCollectionAccessLevel).index;
   final result =
       libEtebase.etebase_collection_member_manager_modify_access_level(
     this_,
@@ -4135,16 +4218,16 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
 
 _i1.MethodResult _etebase_collection_member_manager_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_collection_member_manager_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -4153,9 +4236,9 @@ _i1.MethodResult _etebase_collection_member_manager_destroy(
 
 _i1.MethodResult _etebase_collection_member_clone(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4171,15 +4254,20 @@ _i1.MethodResult _etebase_collection_member_clone(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_member_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_member_get_username(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4195,15 +4283,15 @@ _i1.MethodResult _etebase_collection_member_get_username(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_collection_member_get_access_level(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4217,24 +4305,24 @@ _i1.MethodResult _etebase_collection_member_get_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i9.EtebaseCollectionAccessLevel>(
+  return _i1.MethodResult.successTyped<_i10.EtebaseCollectionAccessLevel>(
     invocation.id,
-    _i9.EtebaseCollectionAccessLevel.values[result],
+    _i10.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
 _i1.MethodResult _etebase_collection_member_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_collection_member_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -4243,9 +4331,9 @@ _i1.MethodResult _etebase_collection_member_destroy(
 
 _i1.MethodResult _etebase_collection_manager_fetch(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -4257,7 +4345,7 @@ _i1.MethodResult _etebase_collection_manager_fetch(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final colUid = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
@@ -4276,15 +4364,20 @@ _i1.MethodResult _etebase_collection_manager_fetch(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_create(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -4297,7 +4390,7 @@ _i1.MethodResult _etebase_collection_manager_create(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionType = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final meta = _i6.Pointer<_i2.EtebaseItemMetadata>.fromAddress(
       (invocation.arguments[2] as int));
@@ -4305,7 +4398,7 @@ _i1.MethodResult _etebase_collection_manager_create(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -4325,15 +4418,20 @@ _i1.MethodResult _etebase_collection_manager_create(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_create_raw(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -4347,13 +4445,13 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionType = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final meta_buffer = (invocation.arguments[2] as _i8.TransferableTypedData)
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = arena<_i6.Uint8>(metaSize);
+  final meta = pool<_i6.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
@@ -4362,7 +4460,7 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -4383,15 +4481,20 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_get_item_manager(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4413,15 +4516,20 @@ _i1.MethodResult _etebase_collection_manager_get_item_manager(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_manager_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_list(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -4433,7 +4541,7 @@ _i1.MethodResult _etebase_collection_manager_list(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionType = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
@@ -4452,15 +4560,20 @@ _i1.MethodResult _etebase_collection_manager_list(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_list_multi(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -4472,11 +4585,11 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionTypesSize = (invocation.arguments[1] as List<String>).length;
-  final collectionTypes = arena<_i6.Pointer<_i6.Char>>(collectionTypesSize);
+  final collectionTypes = pool<_i6.Pointer<_i6.Char>>(collectionTypesSize);
   _i7.FfiHelpers.assignPointerList(
     collectionTypes,
     (invocation.arguments[1] as List<String>),
-    (s) => s.toNativeUtf8(allocator: arena).cast<_i6.Char>(),
+    (s) => s.toNativeUtf8(allocator: pool).cast<_i6.Char>(),
   );
   final fetchOptions_address = (invocation.arguments[2] as int?);
   final fetchOptions = fetchOptions_address == null
@@ -4496,15 +4609,20 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_upload(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -4540,9 +4658,9 @@ _i1.MethodResult _etebase_collection_manager_upload(
 
 _i1.MethodResult _etebase_collection_manager_transaction(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -4578,9 +4696,9 @@ _i1.MethodResult _etebase_collection_manager_transaction(
 
 _i1.MethodResult _etebase_collection_manager_cache_load(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4593,7 +4711,7 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
       .materialize()
       .asUint8List();
   final cachedSize = cached_buffer.length;
-  final cached = arena<_i6.Uint8>(cachedSize);
+  final cached = pool<_i6.Uint8>(cachedSize);
   cached.asTypedList(cachedSize).setAll(
         0,
         cached_buffer,
@@ -4611,15 +4729,20 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_cache_save(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4630,7 +4753,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
       (invocation.arguments[0] as int));
   final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = arena<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i6.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_collection_manager_cache_save(
     this_,
     collection,
@@ -4644,16 +4767,17 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
   }
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
-    _i8.TransferableTypedData.fromList(
-        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
+    _i8.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    ]),
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4664,7 +4788,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
       (invocation.arguments[0] as int));
   final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = arena<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i6.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_collection_manager_cache_save_with_content(
     this_,
     collection,
@@ -4678,16 +4802,17 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
   }
   return _i1.MethodResult.successTyped<_i8.TransferableTypedData>(
     invocation.id,
-    _i8.TransferableTypedData.fromList(
-        [arena.attach(result).cast<_i6.Uint8>().asTypedList(retSize.value)]),
+    _i8.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    ]),
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_get_member_manager(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4709,22 +4834,27 @@ _i1.MethodResult _etebase_collection_manager_get_member_manager(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_member_manager_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_manager_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_collection_manager_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -4733,9 +4863,9 @@ _i1.MethodResult _etebase_collection_manager_destroy(
 
 _i1.MethodResult _etebase_collection_list_response_get_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4745,15 +4875,15 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
   final result = libEtebase.etebase_collection_list_response_get_stoken(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_collection_list_response_get_data(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4762,7 +4892,7 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_collection_list_response_get_data_length(this_);
-  final data = arena<_i6.Pointer<_i2.EtebaseCollection>>(dataSize);
+  final data = pool<_i6.Pointer<_i2.EtebaseCollection>>(dataSize);
   final result = libEtebase.etebase_collection_list_response_get_data(
     this_,
     data,
@@ -4785,9 +4915,9 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
 
 _i1.MethodResult _etebase_collection_list_response_is_done(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4803,9 +4933,9 @@ _i1.MethodResult _etebase_collection_list_response_is_done(
 
 _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -4814,7 +4944,7 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
       (invocation.arguments[0] as int));
   final dataSize = libEtebase
       .etebase_collection_list_response_get_removed_memberships_length(this_);
-  final data = arena<_i6.Pointer<_i2.EtebaseRemovedCollection>>(dataSize);
+  final data = pool<_i6.Pointer<_i2.EtebaseRemovedCollection>>(dataSize);
   final result =
       libEtebase.etebase_collection_list_response_get_removed_memberships(
     this_,
@@ -4838,16 +4968,16 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
 
 _i1.MethodResult _etebase_collection_list_response_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_collection_list_response_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -4856,9 +4986,9 @@ _i1.MethodResult _etebase_collection_list_response_destroy(
 
 _i1.MethodResult _etebase_invitation_manager_list_incoming(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4883,15 +5013,20 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_invitation_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_invitation_manager_list_outgoing(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4916,15 +5051,20 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_invitation_list_response_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_invitation_manager_accept(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4953,9 +5093,9 @@ _i1.MethodResult _etebase_invitation_manager_accept(
 
 _i1.MethodResult _etebase_invitation_manager_reject(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4984,9 +5124,9 @@ _i1.MethodResult _etebase_invitation_manager_reject(
 
 _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -4996,7 +5136,7 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
   final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_invitation_manager_fetch_user_profile(
     this_,
@@ -5010,15 +5150,20 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_user_profile_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_invitation_manager_invite(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 5,
       'Invocation must have exactly 5 arguments');
@@ -5029,26 +5174,26 @@ _i1.MethodResult _etebase_invitation_manager_invite(
       'Parameter username must be of type String');
   assert(invocation.arguments[3] is _i8.TransferableTypedData,
       'Parameter pubkey must be of type TransferableTypedData');
-  assert(invocation.arguments[4] is _i9.EtebaseCollectionAccessLevel,
+  assert(invocation.arguments[4] is _i10.EtebaseCollectionAccessLevel,
       'Parameter accessLevel must be of type EtebaseCollectionAccessLevel');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
   final username = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final pubkey_buffer = (invocation.arguments[3] as _i8.TransferableTypedData)
       .materialize()
       .asUint8List();
   final pubkeySize = pubkey_buffer.length;
-  final pubkey = arena<_i6.Uint8>(pubkeySize);
+  final pubkey = pool<_i6.Uint8>(pubkeySize);
   pubkey.asTypedList(pubkeySize).setAll(
         0,
         pubkey_buffer,
       );
   final accessLevel =
-      (invocation.arguments[4] as _i9.EtebaseCollectionAccessLevel).index;
+      (invocation.arguments[4] as _i10.EtebaseCollectionAccessLevel).index;
   final result = libEtebase.etebase_invitation_manager_invite(
     this_,
     collection,
@@ -5071,9 +5216,9 @@ _i1.MethodResult _etebase_invitation_manager_invite(
 
 _i1.MethodResult _etebase_invitation_manager_disinvite(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5102,9 +5247,9 @@ _i1.MethodResult _etebase_invitation_manager_disinvite(
 
 _i1.MethodResult _etebase_invitation_manager_get_pubkey(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5129,16 +5274,16 @@ _i1.MethodResult _etebase_invitation_manager_get_pubkey(
 
 _i1.MethodResult _etebase_invitation_manager_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_invitation_manager_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -5147,9 +5292,9 @@ _i1.MethodResult _etebase_invitation_manager_destroy(
 
 _i1.MethodResult _etebase_collection_clone(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5165,15 +5310,20 @@ _i1.MethodResult _etebase_collection_clone(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_verify(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5189,9 +5339,9 @@ _i1.MethodResult _etebase_collection_verify(
 
 _i1.MethodResult _etebase_collection_set_meta(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5219,9 +5369,9 @@ _i1.MethodResult _etebase_collection_set_meta(
 
 _i1.MethodResult _etebase_collection_get_meta(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5237,15 +5387,20 @@ _i1.MethodResult _etebase_collection_get_meta(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_metadata_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_set_meta_raw(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5258,7 +5413,7 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = arena<_i6.Uint8>(metaSize);
+  final meta = pool<_i6.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
@@ -5282,9 +5437,9 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
 
 _i1.MethodResult _etebase_collection_get_meta_raw(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena, {
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -5297,7 +5452,7 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = arena<_i6.Uint8>(bufSize);
+  final buf = pool<_i6.Uint8>(bufSize);
   final result = libEtebase.etebase_collection_get_meta_raw(
     this_,
     buf.cast(),
@@ -5317,15 +5472,15 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
   } else if (reinvokedWithSize != null) {
     return _i1.MethodResult.failure(
       invocation.id,
-      _i10.EtebaseErrorCode.generic,
+      _i11.EtebaseErrorCode.generic,
       'output size of etebase_collection_get_meta_raw changed during invocation',
     );
   } else {
     return _etebase_collection_get_meta_raw(
       libEtebase,
+      pool,
       config,
       invocation,
-      arena,
       reinvokedWithSize: result,
     );
   }
@@ -5333,9 +5488,9 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
 
 _i1.MethodResult _etebase_collection_set_content(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5348,7 +5503,7 @@ _i1.MethodResult _etebase_collection_set_content(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -5372,9 +5527,9 @@ _i1.MethodResult _etebase_collection_set_content(
 
 _i1.MethodResult _etebase_collection_get_content(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena, {
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -5387,7 +5542,7 @@ _i1.MethodResult _etebase_collection_get_content(
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = arena<_i6.Uint8>(bufSize);
+  final buf = pool<_i6.Uint8>(bufSize);
   final result = libEtebase.etebase_collection_get_content(
     this_,
     buf.cast(),
@@ -5407,15 +5562,15 @@ _i1.MethodResult _etebase_collection_get_content(
   } else if (reinvokedWithSize != null) {
     return _i1.MethodResult.failure(
       invocation.id,
-      _i10.EtebaseErrorCode.generic,
+      _i11.EtebaseErrorCode.generic,
       'output size of etebase_collection_get_content changed during invocation',
     );
   } else {
     return _etebase_collection_get_content(
       libEtebase,
+      pool,
       config,
       invocation,
-      arena,
       reinvokedWithSize: result,
     );
   }
@@ -5423,9 +5578,9 @@ _i1.MethodResult _etebase_collection_get_content(
 
 _i1.MethodResult _etebase_collection_delete(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5447,9 +5602,9 @@ _i1.MethodResult _etebase_collection_delete(
 
 _i1.MethodResult _etebase_collection_is_deleted(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5465,9 +5620,9 @@ _i1.MethodResult _etebase_collection_is_deleted(
 
 _i1.MethodResult _etebase_collection_get_uid(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5483,15 +5638,15 @@ _i1.MethodResult _etebase_collection_get_uid(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_collection_get_etag(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5507,15 +5662,15 @@ _i1.MethodResult _etebase_collection_get_etag(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i5.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_collection_get_stoken(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5525,15 +5680,15 @@ _i1.MethodResult _etebase_collection_get_stoken(
   final result = libEtebase.etebase_collection_get_stoken(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i5.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_collection_as_item(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5549,15 +5704,20 @@ _i1.MethodResult _etebase_collection_as_item(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_item_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_collection_get_collection_type(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5573,15 +5733,15 @@ _i1.MethodResult _etebase_collection_get_collection_type(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    arena.attach(result).cast<_i5.Utf8>().toDartString(),
+    pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_collection_get_access_level(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5595,24 +5755,24 @@ _i1.MethodResult _etebase_collection_get_access_level(
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i9.EtebaseCollectionAccessLevel>(
+  return _i1.MethodResult.successTyped<_i10.EtebaseCollectionAccessLevel>(
     invocation.id,
-    _i9.EtebaseCollectionAccessLevel.values[result],
+    _i10.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
 _i1.MethodResult _etebase_collection_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_collection_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -5621,9 +5781,9 @@ _i1.MethodResult _etebase_collection_destroy(
 
 _i1.MethodResult _etebase_client_new(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5632,11 +5792,11 @@ _i1.MethodResult _etebase_client_new(
   assert(invocation.arguments[1] is Uri,
       'Parameter serverUrl must be of type Uri');
   final clientName = (invocation.arguments[0] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final serverUrl = (invocation.arguments[1] as Uri)
       .toString()
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_client_new(
     clientName,
@@ -5650,15 +5810,20 @@ _i1.MethodResult _etebase_client_new(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_client_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_client_set_server_url(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5669,7 +5834,7 @@ _i1.MethodResult _etebase_client_set_server_url(
       (invocation.arguments[0] as int));
   final serverUrl = (invocation.arguments[1] as Uri)
       .toString()
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_client_set_server_url(
     this_,
@@ -5689,9 +5854,9 @@ _i1.MethodResult _etebase_client_set_server_url(
 
 _i1.MethodResult _etebase_client_check_etebase_server(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5714,16 +5879,16 @@ _i1.MethodResult _etebase_client_check_etebase_server(
 
 _i1.MethodResult _etebase_client_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_client_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
@@ -5732,9 +5897,9 @@ _i1.MethodResult _etebase_client_destroy(
 
 _i1.MethodResult _etebase_account_login(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -5747,10 +5912,10 @@ _i1.MethodResult _etebase_account_login(
   final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final password = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_account_login(
     client,
@@ -5765,15 +5930,20 @@ _i1.MethodResult _etebase_account_login(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_account_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_account_signup(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -5787,7 +5957,7 @@ _i1.MethodResult _etebase_account_signup(
   final user = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
       (invocation.arguments[1] as int));
   final password = (invocation.arguments[2] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_account_signup(
     client,
@@ -5802,15 +5972,20 @@ _i1.MethodResult _etebase_account_signup(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_account_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_account_fetch_token(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5832,9 +6007,9 @@ _i1.MethodResult _etebase_account_fetch_token(
 
 _i1.MethodResult _etebase_account_fetch_dashboard_url(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5850,15 +6025,15 @@ _i1.MethodResult _etebase_account_fetch_dashboard_url(
   }
   return _i1.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(arena.attach(result).cast<_i5.Utf8>().toDartString()),
+    Uri.parse(pool.attachScoped(result).cast<_i9.Utf8>().toDartString()),
   );
 }
 
 _i1.MethodResult _etebase_account_force_server_url(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5869,7 +6044,7 @@ _i1.MethodResult _etebase_account_force_server_url(
       (invocation.arguments[0] as int));
   final serverUrl = (invocation.arguments[1] as Uri)
       .toString()
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_account_force_server_url(
     this_,
@@ -5889,9 +6064,9 @@ _i1.MethodResult _etebase_account_force_server_url(
 
 _i1.MethodResult _etebase_account_change_password(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5901,7 +6076,7 @@ _i1.MethodResult _etebase_account_change_password(
   final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final password = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final result = libEtebase.etebase_account_change_password(
     this_,
@@ -5921,9 +6096,9 @@ _i1.MethodResult _etebase_account_change_password(
 
 _i1.MethodResult _etebase_account_logout(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5945,9 +6120,9 @@ _i1.MethodResult _etebase_account_logout(
 
 _i1.MethodResult _etebase_account_get_collection_manager(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5963,15 +6138,20 @@ _i1.MethodResult _etebase_account_get_collection_manager(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_collection_manager_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_account_get_invitation_manager(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -5987,15 +6167,20 @@ _i1.MethodResult _etebase_account_get_invitation_manager(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_invitation_manager_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_account_save(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -6017,7 +6202,7 @@ _i1.MethodResult _etebase_account_save(
   }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
-      : arena<_i6.Uint8>(encryptionKeySize);
+      : pool<_i6.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -6037,15 +6222,15 @@ _i1.MethodResult _etebase_account_save(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    arena.attach(result).cast<_i5.Utf8>().toDartString(),
+    pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
 _i1.MethodResult _etebase_account_restore(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -6058,7 +6243,7 @@ _i1.MethodResult _etebase_account_restore(
   final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final accountDataStored = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: arena)
+      .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
   final encryptionKey_buffer =
       (invocation.arguments[2] as _i8.TransferableTypedData?)
@@ -6073,7 +6258,7 @@ _i1.MethodResult _etebase_account_restore(
   }
   final encryptionKey = encryptionKey_buffer == null
       ? _i6.nullptr
-      : arena<_i6.Uint8>(encryptionKeySize);
+      : pool<_i6.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -6094,60 +6279,44 @@ _i1.MethodResult _etebase_account_restore(
   }
   return _i1.MethodResult.successTyped<int>(
     invocation.id,
-    result.address,
+    pool
+        .attachGlobal(
+          result,
+          libEtebase.etebase_account_destroy,
+        )
+        .address,
   );
 }
 
 _i1.MethodResult _etebase_account_destroy(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
-  libEtebase.etebase_account_destroy(this_);
+  pool.freeGlobal(this_);
   return _i1.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
-) {
-  assert(invocation.arguments.length == 0,
-      'Invocation must have exactly 0 arguments');
-  final result = libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE;
-  if (result < 0) {
-    return _i7.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<int>(
-    invocation.id,
-    result,
-  );
-}
-
 _i1.MethodResult _etebase_utils_randombytes(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter size must be of type int');
   final size = (invocation.arguments[0] as int);
-  final buf = arena<_i6.Uint8>(size);
+  final buf = pool<_i6.Uint8>(size);
   final result = libEtebase.etebase_utils_randombytes(
     buf.cast(),
     size,
@@ -6167,9 +6336,9 @@ _i1.MethodResult _etebase_utils_randombytes(
 
 _i1.MethodResult _etebase_utils_pretty_fingerprint(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
@@ -6179,12 +6348,12 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = arena<_i6.Uint8>(contentSize);
+  final content = pool<_i6.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
       );
-  final buf = arena<_i6.Char>(libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE);
+  final buf = pool<_i6.Char>(libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE);
   final result = libEtebase.etebase_utils_pretty_fingerprint(
     content.cast(),
     contentSize,
@@ -6198,17 +6367,15 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    buf
-        .cast<_i5.Utf8>()
-        .toDartString(length: libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE),
+    buf.cast<_i9.Utf8>().toDartString(length: 89),
   );
 }
 
 _i1.MethodResult _etebase_get_default_server_url(
   _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebaseConfig config,
-  _i4.MethodInvocation invocation,
-  _i5.Arena arena,
+  _i3.EtebasePool pool,
+  _i4.EtebaseConfig config,
+  _i5.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
@@ -6221,6 +6388,6 @@ _i1.MethodResult _etebase_get_default_server_url(
   }
   return _i1.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(result.cast<_i5.Utf8>().toDartString()),
+    Uri.parse(result.cast<_i9.Utf8>().toDartString()),
   );
 }

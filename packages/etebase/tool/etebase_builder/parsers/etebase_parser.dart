@@ -1,10 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
-import '../util/string_extensions.dart';
 import 'class_parser.dart';
 import 'method_parser.dart';
-import 'type_parse.dart';
 
 class TypedefRef {
   final List<TypeAliasElement> _typeAliases;
@@ -46,12 +44,10 @@ class EtebaseParser {
 
   final ClassParser _classParser;
   final MethodParser _methodParser;
-  final TypeParser _typeParser;
 
   const EtebaseParser([
     this._classParser = const ClassParser(),
     this._methodParser = const MethodParser(),
-    this._typeParser = const TypeParser(),
   ]);
 
   EtebaseRef parse(LibraryReader library) {
@@ -104,10 +100,6 @@ class EtebaseParser {
     List<MethodElement> libEtebaseFfiMethods,
     TypedefRef typeDefs,
   ) {
-    final getters = libEtebaseFfi.accessors
-        .where((accessor) => accessor.isPublic && accessor.isGetter)
-        .map((getter) => _parseGetter(getter, typeDefs));
-
     final utilsMethods = libEtebaseFfiMethods
         .where((method) => method.name.startsWith(_etebaseUtilsPrefix))
         .toList()
@@ -123,31 +115,6 @@ class EtebaseParser {
               ),
             );
 
-    return getters.followedBy(methods).toList();
-  }
-
-  MethodRef _parseGetter(
-    PropertyAccessorElement getter,
-    TypedefRef typeDefs,
-  ) {
-    if (!getter.name.startsWith('ETEBASE_UTILS_')) {
-      throw UnsupportedError('Can only parse utils getters');
-    }
-
-    return MethodRef(
-      name: getter.name.toLowerCase().substring(14).snakeToDart(),
-      ffiName: getter.name,
-      isNew: false,
-      isDestroy: false,
-      isStatic: false,
-      isGetter: true,
-      lengthGetter: LengthGetterType.none,
-      parameters: const [],
-      returnType: _typeParser.parseType(
-        type: getter.returnType,
-        typeDefs: typeDefs,
-      ),
-      documentation: getter.documentationComment,
-    );
+    return methods.toList();
   }
 }
