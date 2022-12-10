@@ -9,6 +9,7 @@ import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
+import 'util/matchers.dart';
 import 'util/server_controller.dart';
 
 void main() {
@@ -84,38 +85,58 @@ void main() {
     addTearDown(response2.dispose);
   });
 
-  // test('can cache and restore collection stoken', () async {
-  //   final collectionManager = await account.getCollectionManager();
-  //   addTearDown(collectionManager.dispose);
+  test('can cache and restore collection stoken', () async {
+    final testCollectionData = Uint8List.fromList(List.filled(10, 10));
 
-  //   final meta = await EtebaseItemMetadata.create();
-  //   addTearDown(meta.dispose);
-  //   var collection = await collectionManager.create(
-  //     testCollectionType,
-  //     meta,
-  //     Uint8List.fromList(List.filled(10, 10)),
-  //   );
-  //   addTearDown(collection.dispose);
-  //   await collectionManager.upload(collection);
-  //   final collectionId = await collection.getUid();
+    final collectionManager = await account.getCollectionManager();
+    addTearDown(collectionManager.dispose);
 
-  //   final itemManager = await collectionManager.getItemManager(collection);
-  //   addTearDown(itemManager.dispose);
-  //   final item = await itemManager.create(meta, Uint8List(0));
-  //   addTearDown(item.dispose);
-  //   await itemManager.batch([item]);
+    final meta = await EtebaseItemMetadata.create();
+    addTearDown(meta.dispose);
+    var collection = await collectionManager.create(
+      testCollectionType,
+      meta,
+      testCollectionData,
+    );
+    addTearDown(collection.dispose);
+    await collectionManager.upload(collection);
+    final collectionId = await collection.getUid();
 
-  //   collection = await collectionManager.fetch(collectionId);
-  //   addTearDown(collection.dispose);
+    final itemManager = await collectionManager.getItemManager(collection);
+    addTearDown(itemManager.dispose);
+    final item = await itemManager.create(meta, Uint8List(0));
+    addTearDown(item.dispose);
+    await itemManager.batch([item]);
 
-  //   expect(await cache.collectionLoadStoken(collectionId), isNull);
+    collection = await collectionManager.fetch(collectionId);
+    addTearDown(collection.dispose);
 
-  //   await cache.collectionSaveStoken(
-  //     collectionId,
-  //     (await collection.getStoken())!,
-  //   );
-  //   final restoredToken = await cache.collectionLoadStoken(collectionId);
+    await expectLater(
+      () => cache.collectionGet(collectionManager, collectionId),
+      throwsEtebaseException(EtebaseErrorCode.urlParse),
+    );
+    await cache.collectionSet(collectionManager, collection);
+    final restoredCollection = await cache.collectionGet(
+      collectionManager,
+      collectionId,
+    );
+    expect(await restoredCollection.getUid(), collectionId);
+    expect(await restoredCollection.getContent(), testCollectionData);
 
-  //   expect(restoredToken, await collection.getStoken());
-  // });
+    expect(await cache.collectionLoadStoken(collectionId), isNull);
+    await cache.collectionSaveStoken(
+      collectionId,
+      (await collection.getStoken())!,
+    );
+    final restoredToken = await cache.collectionLoadStoken(collectionId);
+
+    expect(restoredToken, await collection.getStoken());
+
+    await cache.collectionUnset(collectionManager, collectionId);
+    await expectLater(
+      () => cache.collectionGet(collectionManager, collectionId),
+      throwsEtebaseException(EtebaseErrorCode.urlParse),
+    );
+    expect(await cache.collectionLoadStoken(collectionId), isNull);
+  });
 }
