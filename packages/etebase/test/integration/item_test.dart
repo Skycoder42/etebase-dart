@@ -10,7 +10,6 @@ import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
 import 'util/matchers.dart';
-import 'util/server_controller.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.item_test';
@@ -22,7 +21,6 @@ void main() {
   const testItemTypeA = 'type-a';
   const testItemTypeB = 'type-b';
 
-  late final Uri serverUri;
   late final EtebaseItemManager itemManager;
 
   late String itemId1;
@@ -31,18 +29,12 @@ void main() {
 
   setUpAll(() async {
     await Etebase.ensureInitialized(loadLibEtebase);
-    serverUri = await ServerController().start();
 
     final client = await EtebaseClient.create('item-test', serverUri);
     addTearDown(client.dispose);
 
-    final user = await EtebaseUser.create(
-      'item-test-user',
-      'item@test.com',
-    );
-    final account = await EtebaseAccount.signup(client, user, 'password');
+    final account = await createAccount(client, 'item-test-user');
     addTearDown(account.dispose);
-    await user.dispose();
 
     final collectionManager = await account.getCollectionManager();
     addTearDown(collectionManager.dispose);

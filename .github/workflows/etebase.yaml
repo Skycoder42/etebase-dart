@@ -31,7 +31,7 @@ jobs:
       coverageExclude: >-
         "lib/gen/**"
         "**/*.freezed.dart"
-      integrationTestPaths: test/integration
+      integrationTestPaths: -j1 test/integration
       integrationTestCacheConfig: >-
         {
           "key": "libetebase-v0.5.3",
@@ -39,9 +39,9 @@ jobs:
         }
       integrationTestSetup: >-
         {
-          "linux": "bash tool/integration/build_linux.sh v0.5.3",
-          "macos": "bash tool/integration/build_macos.sh v0.5.3",
-          "windows": "powershell -File tool\\integration\\build_win.ps1 v0.5.3"
+          "linux": "bash tool/integration/setup_linux.sh v0.5.3",
+          "macos": "bash tool/integration/setup_macos.sh v0.5.3",
+          "windows": "powershell -File tool\\integration\\setup_win.ps1 v0.5.3"
         }
   # cd:
   #   name: CD

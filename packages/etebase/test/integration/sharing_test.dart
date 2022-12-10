@@ -9,14 +9,11 @@ import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
 import 'util/matchers.dart';
-import 'util/server_controller.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.sharing_test';
-  const userName1 = 'sharing-test-user-1';
-  const userName2 = 'sharing-test-user-2';
-
-  late final Uri serverUri;
+  final userName1 = generateUsername('sharing-test-user-1');
+  final userName2 = generateUsername('sharing-test-user-2');
 
   late final EtebaseCollectionManager collectionManager1;
   late final EtebaseCollectionInvitationManager invitationManager1;
@@ -26,7 +23,6 @@ void main() {
 
   setUpAll(() async {
     await Etebase.ensureInitialized(loadLibEtebase);
-    serverUri = await ServerController().start();
 
     final client = await EtebaseClient.create('sharing-test', serverUri);
     addTearDown(client.dispose);

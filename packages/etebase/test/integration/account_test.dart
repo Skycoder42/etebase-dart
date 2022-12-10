@@ -8,14 +8,10 @@ import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
 import 'util/matchers.dart';
-import 'util/server_controller.dart';
 
 void main() {
-  late final Uri serverUri;
-
   setUpAll(() async {
     await Etebase.ensureInitialized(loadLibEtebase);
-    serverUri = await ServerController().start();
   });
 
   group('etebase client and account tests', () {
@@ -37,8 +33,8 @@ void main() {
     });
 
     group('account', () {
-      const testUsername = 'test-user';
-      const testEmail = 'test.user@example.com';
+      final testUsername = generateUsername('test-user-1');
+      final testEmail = '$testUsername@example.com';
       const testPassword = 'hello-test-1';
 
       test('can create and update user', () async {
@@ -48,8 +44,8 @@ void main() {
         expect(await user.getUsername(), testUsername);
         expect(await user.getEmail(), testEmail);
 
-        const testUsername2 = 'test-user-2';
-        const testEmail2 = 'test.user.2@example.com';
+        final testUsername2 = generateUsername('test-user-2');
+        final testEmail2 = '$testUsername@example.com';
         await user.setUsername(testUsername2);
         await user.setEmail(testEmail2);
 

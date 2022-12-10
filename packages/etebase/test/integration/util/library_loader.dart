@@ -1,7 +1,33 @@
 import 'dart:ffi';
 import 'dart:io';
 
+// ignore: test_library_import
+import 'package:etebase/etebase.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid_util.dart';
+
 const _libEtebaseBasePath = 'tool/integration/libetebase/lib/';
+
+const _uuid = Uuid(
+  options: <String, dynamic>{
+    'grng': UuidUtil.cryptoRNG,
+  },
+);
+
+final serverUri = Uri.http('localhost:3735', '/');
+
+String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
+
+Future<EtebaseAccount> createAccount(
+  EtebaseClient client,
+  String userNamePrefix,
+) async {
+  final userName = generateUsername(userNamePrefix);
+  final user = await EtebaseUser.create(userName, '$userName@test.com');
+  final account = await EtebaseAccount.signup(client, user, _uuid.v4());
+  await user.dispose();
+  return account;
+}
 
 DynamicLibrary loadLibEtebase() {
   final libraryPathOverride = Platform.environment['LIBETEBASE_PATH'];

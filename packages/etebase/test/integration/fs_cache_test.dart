@@ -10,27 +10,24 @@ import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
 import 'util/matchers.dart';
-import 'util/server_controller.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.fs_cache_test';
 
-  late final Uri serverUri;
   late final EtebaseClient client;
   late final EtebaseAccount account;
   late final EtebaseFileSystemCache cache;
 
   setUpAll(() async {
     await Etebase.ensureInitialized(loadLibEtebase);
-    serverUri = await ServerController().start();
 
     client = await EtebaseClient.create('fs-cache-test', serverUri);
     addTearDown(client.dispose);
 
-    const username = 'fs-cache-test-user';
+    final username = generateUsername('fs-cache-test-user');
     final user = await EtebaseUser.create(
       username,
-      'fs.cache@test.com',
+      '$username@test.com',
     );
     account = await EtebaseAccount.signup(client, user, 'password');
     addTearDown(account.dispose);

@@ -3,19 +3,24 @@ set -ex
 
 STATIC_DIR="$RUNNER_TEMP/etebase-static"
 MEDIA_DIR="$RUNNER_TEMP/etebase-media"
-DATABASE_FILE="$RUNNER_TEMP/database.sql"
 
 TAG=${1:-master}
 PATCH_FILE=$PWD/tool/integration/libetebase-macos.patch
 PREFIX=/tool/integration/libetebase
 DESTDIR=$PWD
 
+function startServer {
+  ./manage.py migrate
+  nohup uvicorn etebase_server.asgi:application --host 127.0.0.1 --port 3735 &
+}
+
 # re-initialize server if restored from cache
 mkdir -p "$STATIC_DIR" "$MEDIA_DIR"
 if [ "$CACHE_HIT" = "true" ]; then
+  # reactivate venv and start server
   cd "$DESTDIR/$PREFIX/server"
   source .venv/bin/activate
-  ./manage.py migrate
+  startServer
   exit 0
 fi
 
@@ -52,6 +57,6 @@ sed -e '/ETEBASE_CREATE_USER_FUNC/s/^#*/#/g' -i '' "etebase_server/settings.py"
 sed -e "s#static_root = /path/to/static#static_root = $STATIC_DIR#g" -i '' "etebase-server.ini"
 sed -e "s#media_root = /path/to/media#media_root = $MEDIA_DIR#g" -i '' "etebase-server.ini"
 sed -e "s#allowed_host1 = example.com#allowed_host1 = *#g" -i '' "etebase-server.ini"
-sed -e "s#name = db.sqlite3#name = $DATABASE_FILE#g" -i '' "etebase-server.ini"
-./manage.py migrate
 
+# start the server
+startServer
