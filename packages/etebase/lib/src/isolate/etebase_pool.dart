@@ -3,8 +3,10 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:meta/meta.dart';
 
+@internal
 typedef DestroyMethod<T extends NativeType> = void Function(Pointer<T> pointer);
 
+@internal
 class EtebasePool implements Allocator {
   final Allocator _alloc;
 
