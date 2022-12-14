@@ -77,8 +77,6 @@ abstract class Types {
       ..url = 'package:ffi/ffi.dart',
   );
 
-  static const nullptr$ = Reference('nullptr', 'dart:ffi');
-
   static final EtebaseCollectionAccessLevel$ = TypeReference(
     (b) => b
       ..symbol = 'EtebaseCollectionAccessLevel'
@@ -127,6 +125,10 @@ abstract class Types {
       ..url = 'package:etebase/src/isolate/ffi_helpers.dart',
   );
 
+  static const nullptr$ = Reference('nullptr', 'dart:ffi');
+
+  static const freezed$ = Reference('freezed');
+
   static TypeReference list(TypeReference type) => TypeReference(
         (b) => b
           ..symbol = 'List'
@@ -154,6 +156,12 @@ abstract class Types {
         (b) => b
           ..replace(type.type as TypeReference)
           ..url = 'package:etebase/gen/ffi/libetebase.ffi.dart',
+      );
+
+  static TypeReference client(Reference type) => TypeReference(
+        (b) => b
+          ..replace(type.type as TypeReference)
+          ..url = 'package:etebase/gen/ffi/libetebase.ffi.client.dart',
       );
 }
 

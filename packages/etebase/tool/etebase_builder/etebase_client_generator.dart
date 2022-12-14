@@ -21,7 +21,9 @@ class EtebaseClientGenerator extends RestorableGenerator {
       useNullSafetySyntax: true,
     );
 
-    const ClientBuilder().build(etebaseRef).accept(emitter, buffer);
+    const ClientBuilder()
+        .build(etebaseRef, buildStep.allowedOutputs.single)
+        .accept(emitter, buffer);
 
     return buffer.toString();
   }

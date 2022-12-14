@@ -43,7 +43,7 @@ class ClientMethodBodyBuilder {
       return _buildOutListMethodBody(expression, returnType);
     } else if (returnType is ByteArrayTypeRef) {
       return _buildByteArrayMethodBody(expression, returnType);
-    } else if (returnType is EtebaseClassTypeRef) {
+    } else if (returnType is EtebaseClassTypeRef && !returnType.dataClass) {
       expression = _fromAddress(returnType.publicType, expression.awaited);
     }
 
@@ -51,11 +51,13 @@ class ClientMethodBodyBuilder {
   }
 
   Expression _mapCallParam(ParameterRef param, MethodRef method) {
+    final paramType = param.type;
+
     if (param.isThisParam) {
       final ref =
           method.isDestroy ? refer(param.name) : ClientClassBuilder.pointerRef;
       return ref.property('address');
-    } else if (param.type is ByteArrayTypeRef) {
+    } else if (paramType is ByteArrayTypeRef) {
       final expression = Types.TransferableTypedData$.newInstanceNamed(
         'fromList',
         [
@@ -70,16 +72,18 @@ class ClientMethodBodyBuilder {
       } else {
         return expression;
       }
-    } else if (param.type is EtebaseClassTypeRef) {
-      return _toAddress(refer(param.name), param.type.publicType);
-    } else if (param.type is EtebaseClassListTypeRef) {
+    } else if (paramType is EtebaseClassTypeRef) {
+      return paramType.dataClass
+          ? refer(param.name)
+          : _toAddress(refer(param.name), paramType.publicType);
+    } else if (paramType is EtebaseClassListTypeRef) {
       return refer(param.name)
           .property('map')
           .call([
             Method(
               (b) => b
                 ..requiredParameters.add(Parameter((b) => b..name = 'e'))
-                ..body = _toAddress(refer('e'), param.type.publicType).code,
+                ..body = _toAddress(refer('e'), paramType.publicType).code,
             ).closure,
           ])
           .property('toList')

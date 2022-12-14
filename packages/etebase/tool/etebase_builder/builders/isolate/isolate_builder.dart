@@ -5,6 +5,7 @@ import '../../parsers/method_parser.dart';
 import '../../util/switch_case.dart';
 import '../../util/try_catch.dart';
 import '../../util/types.dart';
+import 'isolate_converter_builder.dart';
 import 'isolate_implementation_builder.dart';
 
 class IsolateBuilder {
@@ -25,9 +26,11 @@ class IsolateBuilder {
     invocationRef,
   ];
 
+  final IsolateConverterBuilder _isolateConverterBuilder;
   final IsolateImplementationBuilder _isolateImplementationBuilder;
 
   const IsolateBuilder([
+    this._isolateConverterBuilder = const IsolateConverterBuilder(),
     this._isolateImplementationBuilder = const IsolateImplementationBuilder(),
   ]);
 
@@ -37,11 +40,17 @@ class IsolateBuilder {
       (b) => b
         ..directives.add(Directive.import('package:ffi/ffi.dart'))
         ..body.add(_buildHandler(methods))
+        ..body.addAll(
+          etebase.classes
+              .where((clazz) => clazz.isDataClass)
+              .expand(_isolateConverterBuilder.buildConverterMethods),
+        )
         ..body.addAll(methods.map(_buildImplementation)),
     );
   }
 
   List<MethodRef> _allMethods(EtebaseRef etebase) => etebase.classes
+      .where((clazz) => !clazz.isDataClass)
       .expand((clazz) => clazz.methods)
       .followedBy(etebase.utilsFunctions)
       .followedBy(etebase.functions)

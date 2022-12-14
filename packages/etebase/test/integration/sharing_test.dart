@@ -70,11 +70,9 @@ void main() {
 
   test('can invite others to a collection', () async {
     // create collection
-    final meta = await EtebaseItemMetadata.create();
-    addTearDown(meta.dispose);
     final collection = await collectionManager1.create(
       testCollectionType,
-      meta,
+      const EtebaseItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -163,11 +161,9 @@ void main() {
 
   test('invitations can be canceled and rejected', () async {
     // create collection
-    final meta = await EtebaseItemMetadata.create();
-    addTearDown(meta.dispose);
     final collection = await collectionManager1.create(
       testCollectionType,
-      meta,
+      const EtebaseItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -241,11 +237,9 @@ void main() {
 
   test('can leave shared collection', () async {
     // create and share collection
-    final meta = await EtebaseItemMetadata.create();
-    addTearDown(meta.dispose);
     final collection = await collectionManager1.create(
       testCollectionType,
-      meta,
+      const EtebaseItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -285,11 +279,9 @@ void main() {
 
   test('can manage members of collection', () async {
     // create and share collection
-    final meta = await EtebaseItemMetadata.create();
-    addTearDown(meta.dispose);
     final collection = await collectionManager1.create(
       testCollectionType,
-      meta,
+      const EtebaseItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);

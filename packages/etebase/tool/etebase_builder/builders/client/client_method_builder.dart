@@ -53,7 +53,7 @@ class ClientMethodBuilder {
       );
 
   bool _isAsync(TypeRef type) =>
-      type is EtebaseClassTypeRef ||
+      (type is EtebaseClassTypeRef && !type.dataClass) ||
       type is EtebaseClassListTypeRef ||
       type is ByteArrayTypeRef;
 

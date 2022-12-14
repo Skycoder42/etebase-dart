@@ -54,6 +54,7 @@ class TypeParser {
       return TypeRef.etebaseClass(
         className,
         optional: isNullable,
+        dataClass: ClassParser.dataClasses.contains(className),
         memberPrefix: ClassParser.memberPrefixMap[className],
       );
     }

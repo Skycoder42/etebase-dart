@@ -39,5 +39,8 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'prefer_is_empty',
       'constant_identifier_names',
       'avoid_bool_literals_in_conditional_expressions',
+      'prefer_const_constructors',
+      'unused_element',
+      'unused_local_variable',
     ].join(', '),
   );

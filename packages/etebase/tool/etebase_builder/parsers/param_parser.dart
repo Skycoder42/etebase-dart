@@ -56,17 +56,6 @@ class ParamParser {
     RegExp('.*'): ['fetch_options'],
     RegExp('etebase_(fs_cache_.*)?account.*'): ['encryption_key'],
   };
-  static final _nullableParams = {
-    ..._optionalParams,
-    RegExp('etebase_item_metadata_.*'): [
-      'item_type',
-      'name',
-      'mtime',
-      'description',
-      'color',
-    ],
-    RegExp('etebase_fetch_options_*'): ['stoken', 'iterator'],
-  };
 
   final TypeParser _typeParser;
 
@@ -93,7 +82,6 @@ class ParamParser {
       final nextParam = i < parameters.length - 1 ? parameters[i + 1] : null;
       final isBufParam = param.name == 'buf';
       final isOptional = _hasRule(_optionalParams, methodName, param);
-      final isNullable = _hasRule(_nullableParams, methodName, param);
 
       if (nextParam != null && nextParam.name == '${param.name}_size') {
         ++i; // skip the _size param
@@ -108,7 +96,7 @@ class ParamParser {
           type: _typeParser.parseType(
             type: param.type,
             isArray: true,
-            isNullable: isNullable,
+            isNullable: isOptional,
             typeDefs: typeDefs,
           ),
         );
@@ -125,7 +113,7 @@ class ParamParser {
             param,
             typeDefs,
             isArray: isBufParam && _isBufList(param),
-            isNullable: isNullable,
+            isNullable: isOptional,
           ),
         );
       }

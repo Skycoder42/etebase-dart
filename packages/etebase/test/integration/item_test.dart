@@ -39,11 +39,9 @@ void main() {
     final collectionManager = await account.getCollectionManager();
     addTearDown(collectionManager.dispose);
 
-    final collectionMeta = await EtebaseItemMetadata.create();
-    addTearDown(collectionMeta.dispose);
     final collection = await collectionManager.create(
       testCollectionType,
-      collectionMeta,
+      const EtebaseItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -57,11 +55,10 @@ void main() {
     test('can create item', () async {
       const testItemName = 'test-name';
 
-      final meta = await EtebaseItemMetadata.create();
-      addTearDown(meta.dispose);
-      await meta.setName(testItemName);
-
-      final item = await itemManager.create(meta, testItemContent1);
+      final item = await itemManager.create(
+        const EtebaseItemMetadata(name: testItemName),
+        testItemContent1,
+      );
       addTearDown(item.dispose);
 
       expect(await item.verify(), isTrue);
@@ -84,9 +81,8 @@ void main() {
       );
 
       final loadedMeta = await item.getMeta();
-      addTearDown(loadedMeta.dispose);
-      expect(await loadedMeta.getName(), testItemName);
-      expect(await loadedMeta.getDescription(), isNull);
+      expect(loadedMeta.name, testItemName);
+      expect(loadedMeta.description, isNull);
 
       final cloned = await item.clone();
       addTearDown(cloned.dispose);
@@ -96,17 +92,19 @@ void main() {
     test('can be updated and deleted', () async {
       const testItemName = 'test-name';
 
-      final meta = await EtebaseItemMetadata.create();
-      addTearDown(meta.dispose);
-      await meta.setName(testItemName);
-      final item = await itemManager.create(meta, testItemContent1);
+      final item = await itemManager.create(
+        const EtebaseItemMetadata(name: testItemName),
+        testItemContent1,
+      );
       addTearDown(item.dispose);
 
       final loadedMeta = await item.getMeta();
-      addTearDown(loadedMeta.dispose);
-      await loadedMeta.setMtime(DateTime.now());
       await item.setContent(Uint8List(0));
-      await item.setMeta(loadedMeta);
+      await item.setMeta(
+        loadedMeta.copyWith(
+          mtime: DateTime.now(),
+        ),
+      );
 
       await item.delete();
     });
@@ -114,25 +112,27 @@ void main() {
 
   group('item manager', () {
     test('can create items', () async {
-      final meta1 = await EtebaseItemMetadata.create();
-      addTearDown(meta1.dispose);
-      await meta1.setName(testItemName);
-      await meta1.setItemType(testItemTypeA);
-      final item1 = await itemManager.create(meta1, testItemContent1);
+      final item1 = await itemManager.create(
+        const EtebaseItemMetadata(
+          name: testItemName,
+          itemType: testItemTypeA,
+        ),
+        testItemContent1,
+      );
       addTearDown(item1.dispose);
       itemId1 = await item1.getUid();
 
-      final meta2 = await EtebaseItemMetadata.create();
-      addTearDown(meta2.dispose);
-      await meta2.setItemType(testItemTypeA);
-      final item2 = await itemManager.create(meta2, testItemContent2);
+      final item2 = await itemManager.create(
+        const EtebaseItemMetadata(itemType: testItemTypeA),
+        testItemContent2,
+      );
       addTearDown(item2.dispose);
       itemId2 = await item2.getUid();
 
-      final meta3 = await EtebaseItemMetadata.create();
-      addTearDown(meta3.dispose);
-      await meta3.setItemType(testItemTypeB);
-      final item3 = await itemManager.create(meta3, Uint8List(0));
+      final item3 = await itemManager.create(
+        const EtebaseItemMetadata(itemType: testItemTypeB),
+        Uint8List(0),
+      );
       addTearDown(item3.dispose);
       itemId3 = await item3.getUid();
 
@@ -154,14 +154,14 @@ void main() {
       expect(await items[2].getUid(), itemId3);
 
       final meta1 = await items[0].getMeta();
-      addTearDown(meta1.dispose);
-      expect(await meta1.getItemType(), testItemTypeA);
-      expect(await meta1.getName(), testItemName);
+      expect(meta1.itemType, testItemTypeA);
+      expect(meta1.name, testItemName);
 
-      final fetchOptions = await EtebaseFetchOptions.create();
-      addTearDown(fetchOptions.dispose);
-      await fetchOptions.setStoken(await listResponse.getStoken());
-      final changedResponse = await itemManager.list(fetchOptions);
+      final changedResponse = await itemManager.list(
+        EtebaseFetchOptions(
+          stoken: await listResponse.getStoken(),
+        ),
+      );
       addTearDown(changedResponse.dispose);
       expect(await changedResponse.getData(), isEmpty);
 
@@ -220,17 +220,13 @@ void main() {
 
       await item2.setContent(testItemContent1);
       final meta3 = await item3.getMeta();
-      addTearDown(meta3.dispose);
-      await meta3.setMtime(DateTime.now());
-      await item3.setMeta(meta3);
+      await item3.setMeta(meta3.copyWith(mtime: DateTime.now()));
 
       await itemManager.batchDeps([item2], [item1]);
       await itemManager.transactionDeps([item3], [item1]);
 
       final meta1 = await item1.getMeta();
-      addTearDown(meta1.dispose);
-      await meta1.setMtime(DateTime.now());
-      await item1.setMeta(meta1);
+      await item1.setMeta(meta1.copyWith(mtime: DateTime.now()));
       await item1.setContent(Uint8List.fromList(utf8.encode('TEST!')));
 
       expect(
@@ -248,11 +244,13 @@ void main() {
       addTearDown(item.dispose);
 
       final meta = await item.getMeta();
-      addTearDown(meta.dispose);
 
-      await meta.setMtime(DateTime.now());
-      await meta.setDescription('--deleted--');
-      await item.setMeta(meta);
+      await item.setMeta(
+        meta.copyWith(
+          mtime: DateTime.now(),
+          description: '--deleted--',
+        ),
+      );
       await item.delete();
       expect(await item.isDeleted(), isTrue);
 
@@ -274,8 +272,7 @@ void main() {
       expect(await restored.getUid(), itemId2);
       expect(await restored.getContent(), testItemContent1);
       final meta = await restored.getMeta();
-      addTearDown(meta.dispose);
-      expect(await meta.getItemType(), testItemTypeA);
+      expect(meta.itemType, testItemTypeA);
 
       final savedWithContent = await itemManager.cacheSaveWithContent(
         item,
@@ -288,8 +285,7 @@ void main() {
       expect(await restoredWithContent.getUid(), itemId2);
       expect(await restoredWithContent.getContent(), testItemContent1);
       final metaWithContent = await restoredWithContent.getMeta();
-      addTearDown(metaWithContent.dispose);
-      expect(await metaWithContent.getItemType(), testItemTypeA);
+      expect(metaWithContent.itemType, testItemTypeA);
     });
   });
 
@@ -311,12 +307,11 @@ void main() {
       expect(await item1.getUid(), itemId1);
       expect(await item1.getEtag(), isNotEmpty);
       final meta = await revisions[0].getMeta();
-      addTearDown(meta.dispose);
-      expect(await meta.getItemType(), testItemTypeA);
-      expect(await meta.getName(), testItemName);
-      expect(await meta.getDescription(), isNull);
-      expect(await meta.getColor(), isNull);
-      expect(await meta.getMtime(), isNull);
+      expect(meta.itemType, testItemTypeA);
+      expect(meta.name, testItemName);
+      expect(meta.description, isNull);
+      expect(meta.color, isNull);
+      expect(meta.mtime, isNull);
     });
   });
 }

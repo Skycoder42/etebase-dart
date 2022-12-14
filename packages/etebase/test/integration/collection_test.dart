@@ -40,63 +40,68 @@ void main() {
     final testMTime = DateTime(2022, 10, 11, 12, 13, 15, 678);
     const testColor = '#AABBCC';
 
-    final collectionMeta = await EtebaseItemMetadata.create();
-    addTearDown(collectionMeta.dispose);
+    final testCollection = await collectionManager.create(
+      '$testCollectionType-meta',
+      const EtebaseItemMetadata(),
+      Uint8List(0),
+    );
 
-    expect(await collectionMeta.getItemType(), isNull);
-    expect(await collectionMeta.getName(), isNull);
-    expect(await collectionMeta.getDescription(), isNull);
-    expect(await collectionMeta.getMtime(), isNull);
-    expect(await collectionMeta.getColor(), isNull);
+    final collectionMeta = await testCollection.getMeta();
+    expect(collectionMeta.itemType, isNull);
+    expect(collectionMeta.name, isNull);
+    expect(collectionMeta.description, isNull);
+    expect(collectionMeta.mtime, isNull);
+    expect(collectionMeta.color, isNull);
 
-    await collectionMeta.setItemType(testItemType);
-    await collectionMeta.setName(testName);
-    await collectionMeta.setDescription(testDescription);
-    await collectionMeta.setMtime(testMTime);
-    await collectionMeta.setColor(testColor);
+    await testCollection.setMeta(
+      collectionMeta.copyWith(
+        itemType: testItemType,
+        name: testName,
+        description: testDescription,
+        mtime: testMTime,
+        color: testColor,
+      ),
+    );
 
-    expect(await collectionMeta.getItemType(), testItemType);
-    expect(await collectionMeta.getName(), testName);
-    expect(await collectionMeta.getDescription(), testDescription);
-    expect(await collectionMeta.getMtime(), testMTime);
-    expect(await collectionMeta.getColor(), testColor);
+    final collectionMeta2 = await testCollection.getMeta();
+    expect(collectionMeta2.itemType, testItemType);
+    expect(collectionMeta2.name, testName);
+    expect(collectionMeta2.description, testDescription);
+    expect(collectionMeta2.mtime, testMTime);
+    expect(collectionMeta2.color, testColor);
 
-    await collectionMeta.setItemType(null);
-    await collectionMeta.setName(null);
-    await collectionMeta.setDescription(null);
-    await collectionMeta.setMtime(null);
-    await collectionMeta.setColor(null);
+    await testCollection.setMeta(const EtebaseItemMetadata());
 
-    expect(await collectionMeta.getItemType(), isNull);
-    expect(await collectionMeta.getName(), isNull);
-    expect(await collectionMeta.getDescription(), isNull);
-    expect(await collectionMeta.getMtime(), isNull);
-    expect(await collectionMeta.getColor(), isNull);
+    final collectionMeta3 = await testCollection.getMeta();
+    expect(collectionMeta3.itemType, isNull);
+    expect(collectionMeta3.name, isNull);
+    expect(collectionMeta3.description, isNull);
+    expect(collectionMeta3.mtime, isNull);
+    expect(collectionMeta3.color, isNull);
   });
 
   test('fetch options can be created', () async {
-    final options = await EtebaseFetchOptions.create();
-    addTearDown(options.dispose);
+    const options = EtebaseFetchOptions(
+      iterator: 'iterator',
+      limit: 100,
+      prefetch: EtebasePrefetchOption.optionMedium,
+      stoken: 'stoken',
+      withCollection: true,
+    );
 
-    await options.setIterator('iterator');
-    await options.setIterator(null);
-    await options.setLimit(100);
-    await options.setPrefetch(EtebasePrefetchOption.optionMedium);
-    await options.setStoken('stoken');
-    await options.setStoken(null);
-    await options.setWithCollection(true);
+    expect(
+      () => collectionManager.list('$testCollectionType-fetch', options),
+      throwsEtebaseException(EtebaseErrorCode.http),
+    );
   });
 
   group('collections', () {
     test('can create collection', () async {
       const testCollectionName = 'test-name';
 
-      final meta = await EtebaseItemMetadata.create();
-      addTearDown(meta.dispose);
-      await meta.setName(testCollectionName);
       final collection = await collectionManager.create(
         testCollectionType,
-        meta,
+        const EtebaseItemMetadata(name: testCollectionName),
         collectionTestContent1,
       );
       addTearDown(collection.dispose);
@@ -127,9 +132,8 @@ void main() {
       );
 
       final loadedMeta = await collection.getMeta();
-      addTearDown(loadedMeta.dispose);
-      expect(await loadedMeta.getName(), testCollectionName);
-      expect(await loadedMeta.getMtime(), isNull);
+      expect(loadedMeta.name, testCollectionName);
+      expect(loadedMeta.mtime, isNull);
 
       final asItem = await collection.asItem();
       addTearDown(asItem.dispose);
@@ -143,21 +147,20 @@ void main() {
     test('can be updated and deleted', () async {
       const testCollectionName = 'test-name';
 
-      final meta = await EtebaseItemMetadata.create();
-      addTearDown(meta.dispose);
-      await meta.setName(testCollectionName);
       final collection = await collectionManager.create(
         testCollectionType,
-        meta,
+        const EtebaseItemMetadata(name: testCollectionName),
         collectionTestContent1,
       );
       addTearDown(collection.dispose);
 
       final loadedMeta = await collection.getMeta();
-      addTearDown(loadedMeta.dispose);
-      await loadedMeta.setMtime(DateTime.now());
       await collection.setContent(collectionTestContent2);
-      await collection.setMeta(loadedMeta);
+      await collection.setMeta(
+        loadedMeta.copyWith(
+          mtime: DateTime.now(),
+        ),
+      );
 
       await collection.delete();
     });
@@ -169,36 +172,30 @@ void main() {
     late String colId3;
 
     test('can create and upload collections', () async {
-      final meta1 = await EtebaseItemMetadata.create();
-      addTearDown(meta1.dispose);
-      await meta1.setName('create-collection-test-1');
       final collection1 = await collectionManager.create(
         testCollectionType,
-        meta1,
+        const EtebaseItemMetadata(name: 'create-collection-test-1'),
         collectionTestContent1,
       );
       addTearDown(collection1.dispose);
       colId1 = await collection1.getUid();
       await collectionManager.upload(collection1);
 
-      final meta2 = await EtebaseItemMetadata.create();
-      addTearDown(meta2.dispose);
-      await meta2.setName('create-collection-test-2');
-      await meta2.setMtime(DateTime(2000));
       final collection2 = await collectionManager.create(
         testCollectionType,
-        meta2,
+        EtebaseItemMetadata(
+          name: 'create-collection-test-2',
+          mtime: DateTime(2000),
+        ),
         collectionTestContent2,
       );
       addTearDown(collection2.dispose);
       colId2 = await collection2.getUid();
       await collectionManager.upload(collection2);
 
-      final meta3 = await EtebaseItemMetadata.create();
-      addTearDown(meta3.dispose);
       final collection3 = await collectionManager.create(
         '$testCollectionType-other',
-        meta3,
+        const EtebaseItemMetadata(),
         Uint8List(0),
       );
       addTearDown(collection3.dispose);
@@ -221,22 +218,19 @@ void main() {
       expect(await collection1.getCollectionType(), testCollectionType);
       expect(await collection1.getUid(), colId1);
       final meta1 = await collection1.getMeta();
-      addTearDown(meta1.dispose);
-      expect(await meta1.getName(), 'create-collection-test-1');
+      expect(meta1.name, 'create-collection-test-1');
 
       final collection2 = collections[1];
       expect(await collection2.getCollectionType(), testCollectionType);
       expect(await collection2.getUid(), colId2);
       final meta2 = await collection2.getMeta();
-      addTearDown(meta2.dispose);
-      expect(await meta2.getName(), 'create-collection-test-2');
+      expect(meta2.name, 'create-collection-test-2');
 
-      final fetchOptions = await EtebaseFetchOptions.create();
-      addTearDown(fetchOptions.dispose);
-      await fetchOptions.setStoken(await listResponse.getStoken());
       final changedResponse = await collectionManager.list(
         testCollectionType,
-        fetchOptions,
+        EtebaseFetchOptions(
+          stoken: await listResponse.getStoken(),
+        ),
       );
       addTearDown(changedResponse.dispose);
 
@@ -285,11 +279,13 @@ void main() {
       addTearDown(collection.dispose);
 
       final meta = await collection.getMeta();
-      addTearDown(meta.dispose);
 
-      await meta.setMtime(DateTime.now());
-      await meta.setDescription('--deleted--');
-      await collection.setMeta(meta);
+      await collection.setMeta(
+        meta.copyWith(
+          mtime: DateTime.now(),
+          description: '--deleted--',
+        ),
+      );
       await collection.setContent(collectionTestContent1);
       await collection.delete();
       expect(await collection.isDeleted(), isTrue);
@@ -312,8 +308,7 @@ void main() {
       expect(await restored.getUid(), colId2);
       expect(await restored.getContent(), collectionTestContent2);
       final meta = await restored.getMeta();
-      addTearDown(meta.dispose);
-      expect(await meta.getName(), 'create-collection-test-2');
+      expect(meta.name, 'create-collection-test-2');
 
       final savedWithContent = await collectionManager.cacheSaveWithContent(
         collection,
@@ -326,8 +321,7 @@ void main() {
       expect(await restoredWithContent.getUid(), colId2);
       expect(await restoredWithContent.getContent(), collectionTestContent2);
       final metaWithContent = await restoredWithContent.getMeta();
-      addTearDown(metaWithContent.dispose);
-      expect(await metaWithContent.getName(), 'create-collection-test-2');
+      expect(metaWithContent.name, 'create-collection-test-2');
     });
   });
 }

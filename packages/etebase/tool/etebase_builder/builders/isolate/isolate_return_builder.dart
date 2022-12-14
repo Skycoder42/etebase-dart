@@ -4,6 +4,7 @@ import 'package:source_helper/source_helper.dart';
 import '../../parsers/method_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/if_then.dart';
+import '../../util/string_extensions.dart';
 import '../../util/types.dart';
 import 'isolate_builder.dart';
 import 'isolate_implementation_builder.dart';
@@ -16,9 +17,20 @@ class IsolateReturnBuilder {
     this._isolateOutParamBuilder = const IsolateOutParamBuilder(),
   ]);
 
-  Iterable<Code> buildReturn(MethodRef method) sync* {
-    const resultRef = IsolateImplementationBuilder.resultRef;
+  Iterable<Code> buildReturn(MethodRef method) => buildReturnConversion(
+        method,
+        IsolateImplementationBuilder.resultRef,
+        (returnValue) => _buildReturnStatement(
+          returnValue,
+          method.outOrReturnType,
+        ),
+      );
 
+  Iterable<Code> buildReturnConversion(
+    MethodRef method,
+    Expression resultRef,
+    Code Function(Expression returnValue) buildReturnStatement,
+  ) sync* {
     final Expression transformedResult;
     if (method.hasOutParam) {
       final returnParam = method.outParam;
@@ -92,10 +104,7 @@ class IsolateReturnBuilder {
       }
     }
 
-    yield _buildReturnStatement(
-      transformedResult,
-      method.outOrReturnType,
-    ).statement;
+    yield buildReturnStatement(transformedResult);
   }
 
   Code buildReturnByteArray(MethodRef method, Expression listLength) =>
@@ -107,7 +116,7 @@ class IsolateReturnBuilder {
           listLength: listLength,
         ),
         method.outOrReturnType,
-      ).statement;
+      );
 
   IfThen checkIntSuccess(Expression result) =>
       if$(result.lessThan(literalNum(0)), [
@@ -119,13 +128,13 @@ class IsolateReturnBuilder {
         _buildErrorReturn().statement,
       ]);
 
-  Expression _buildReturnStatement(Expression result, TypeRef type) =>
+  Code _buildReturnStatement(Expression result, TypeRef type) =>
       Types.MethodResult$.newInstanceNamed(
         'successTyped',
         [IsolateBuilder.invocationRef.property('id'), result],
         const {},
-        [type.transferType],
-      ).returned;
+        [_castType(type)],
+      ).returned.statement;
 
   Expression _buildErrorReturn() =>
       Types.FfiHelpers$.property('errorResult').call([
@@ -133,7 +142,12 @@ class IsolateReturnBuilder {
         IsolateBuilder.invocationRef.property('id'),
       ]).returned;
 
-  Expression _transformIntBool(Reference resultRef, BoolTypeRef type) =>
+  TypeReference _castType(TypeRef typeRef) =>
+      typeRef is EtebaseClassTypeRef && typeRef.dataClass
+          ? Types.client(typeRef.transferType)
+          : typeRef.transferType;
+
+  Expression _transformIntBool(Expression resultRef, BoolTypeRef type) =>
       resultRef.equalTo(literalNum(0));
 
   Expression _transformString(
@@ -219,11 +233,19 @@ class IsolateReturnBuilder {
     Expression result,
     EtebaseClassTypeRef type,
   ) {
-    final memberPrefix = type.memberPrefix ?? type.name.snake;
-    return IsolateBuilder.poolRef.property('attachGlobal').call([
-      result,
-      IsolateBuilder.libEtebaseRef.property('${memberPrefix}_destroy'),
-    ]).property('address');
+    if (type.dataClass) {
+      return refer('_${type.name.lowerFirstChar()}FromNative').call([
+        IsolateBuilder.libEtebaseRef,
+        IsolateBuilder.poolRef,
+        result,
+      ]);
+    } else {
+      final memberPrefix = type.memberPrefix ?? type.name.snake;
+      return IsolateBuilder.poolRef.property('attachGlobal').call([
+        result,
+        IsolateBuilder.libEtebaseRef.property('${memberPrefix}_destroy'),
+      ]).property('address');
+    }
   }
 
   Expression _transformEtebaseOutList(

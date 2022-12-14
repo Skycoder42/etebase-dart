@@ -10,12 +10,15 @@ class ClassRef {
 
   final String name;
 
+  final bool isDataClass;
+
   final List<MethodRef> methods;
 
   const ClassRef({
     required this.element,
     required this.typeAlias,
     required this.name,
+    required this.isDataClass,
     required this.methods,
   });
 
@@ -23,6 +26,11 @@ class ClassRef {
 }
 
 class ClassParser {
+  static const dataClasses = [
+    'EtebaseItemMetadata',
+    'EtebaseFetchOptions',
+  ];
+
   static const memberPrefixMap = {
     'EtebaseFileSystemCache': 'etebase_fs_cache',
     'EtebaseCollectionInvitationManager': 'etebase_invitation_manager',
@@ -45,6 +53,7 @@ class ClassParser {
       element: clazz,
       typeAlias: typeAlias,
       name: resolvedType.name!,
+      isDataClass: dataClasses.contains(resolvedType.name),
       methods: _methodParser
           .parseMembers(
             clazz: resolvedType,

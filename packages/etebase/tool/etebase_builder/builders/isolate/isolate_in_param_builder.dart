@@ -5,6 +5,7 @@ import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
 import '../../util/if_then.dart';
+import '../../util/string_extensions.dart';
 import '../../util/types.dart';
 import '../client/client_method_builder.dart';
 import 'isolate_builder.dart';
@@ -20,31 +21,9 @@ class IsolateInParamBuilder {
 
     for (var argumentIndex = 0; argumentIndex < paramsLength; ++argumentIndex) {
       final param = params[argumentIndex];
-      final paramType = param.type;
-      final variable = declareFinal(param.name);
-      final argument = arguments
-          .index(literalNum(argumentIndex))
-          .asA(param.type.transferType);
-
-      if (paramType is StringTypeRef) {
-        yield* _buildStringParam(param, paramType, variable, argument);
-      } else if (paramType is UriTypeRef) {
-        yield* _buildUrlParam(param, paramType, variable, argument);
-      } else if (paramType is DateTimeTypeRef) {
-        yield* _buildDateTimeParam(param, paramType, variable, argument);
-      } else if (paramType is StringListTypeRef) {
-        yield* _buildStringListParam(param, paramType, variable, argument);
-      } else if (paramType is ByteArrayTypeRef) {
-        yield* _buildByteArrayParam(param, paramType, variable, argument);
-      } else if (paramType is EnumTypeRef) {
-        yield* _buildEnumParam(param, paramType, variable, argument);
-      } else if (paramType is EtebaseClassTypeRef) {
-        yield* _buildClassParam(param, paramType, variable, argument);
-      } else if (paramType is EtebaseClassListTypeRef) {
-        yield* _buildClassListParam(param, paramType, variable, argument);
-      } else {
-        yield variable.assign(argument).statement;
-      }
+      final argument =
+          arguments.index(literalNum(argumentIndex)).asA(_castType(param.type));
+      yield* buildInParameter(param, argument);
     }
 
     if (method.needsSizeHint) {
@@ -64,6 +43,39 @@ class IsolateInParamBuilder {
     }
   }
 
+  Iterable<Code> buildInParameter(
+    ParameterRef param,
+    Expression argument,
+  ) sync* {
+    final paramType = param.type;
+    final variable = declareFinal(param.name);
+
+    if (paramType is StringTypeRef) {
+      yield* _buildStringParam(param, paramType, variable, argument);
+    } else if (paramType is UriTypeRef) {
+      yield* _buildUrlParam(param, paramType, variable, argument);
+    } else if (paramType is DateTimeTypeRef) {
+      yield* _buildDateTimeParam(param, paramType, variable, argument);
+    } else if (paramType is StringListTypeRef) {
+      yield* _buildStringListParam(param, paramType, variable, argument);
+    } else if (paramType is ByteArrayTypeRef) {
+      yield* _buildByteArrayParam(param, paramType, variable, argument);
+    } else if (paramType is EnumTypeRef) {
+      yield* _buildEnumParam(param, paramType, variable, argument);
+    } else if (paramType is EtebaseClassTypeRef) {
+      yield* _buildClassParam(param, paramType, variable, argument);
+    } else if (paramType is EtebaseClassListTypeRef) {
+      yield* _buildClassListParam(param, paramType, variable, argument);
+    } else {
+      yield variable.assign(argument).statement;
+    }
+  }
+
+  TypeReference _castType(TypeRef typeRef) =>
+      typeRef is EtebaseClassTypeRef && typeRef.dataClass
+          ? Types.client(typeRef.transferType)
+          : typeRef.transferType;
+
   Iterable<Code> _buildAssertions(
     MethodRef method,
     int paramsLength,
@@ -78,7 +90,7 @@ class IsolateInParamBuilder {
 
     for (var i = 0; i < paramsLength; ++i) {
       final param = params[i];
-      final transferType = param.type.transferType;
+      final transferType = _castType(param.type);
       yield arguments.index(literalNum(i)).isA(transferType).asserted(
             'Parameter ${param.name} must be of type '
             '${transferType.accept(DartEmitter(useNullSafetySyntax: true))}',
@@ -125,16 +137,10 @@ class IsolateInParamBuilder {
   ) sync* {
     yield variable
         .assign(
-          argument.equalTo(literalNull).conditional(
-                Types.nullptr$,
-                IsolateBuilder.poolRef
-                    .call(const [], const {}, [Types.Int64$])
-                    .cascade('value')
-                    .assign(
-                      argument.nullChecked.property('millisecondsSinceEpoch'),
-                    )
-                    .parenthesized,
-              ),
+          IsolateBuilder.poolRef
+              .call(const [], const {}, [Types.Int64$])
+              .cascade('value')
+              .assign(argument.property('millisecondsSinceEpoch')),
         )
         .statement;
   }
@@ -220,7 +226,17 @@ class IsolateInParamBuilder {
     Expression variable,
     Expression argument,
   ) sync* {
-    if (parameterType.optional) {
+    if (parameterType.dataClass) {
+      yield variable
+          .assign(
+            refer('_${parameterType.name.lowerFirstChar()}ToNative').call([
+              IsolateBuilder.libEtebaseRef,
+              IsolateBuilder.poolRef,
+              argument
+            ]),
+          )
+          .statement;
+    } else if (parameterType.optional) {
       final addressVarName = '${parameter.name}_address';
       final addressVarRef = refer(addressVarName);
       yield declareFinal(addressVarName).assign(argument).statement;

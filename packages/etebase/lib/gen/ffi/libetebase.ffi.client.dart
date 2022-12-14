@@ -6,14 +6,17 @@
 
 // ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references, prefer_relative_imports, prefer_if_elements_to_conditional_expressions, unused_element
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:ffi' as _i2;
-import 'dart:isolate' as _i5;
-import 'dart:typed_data' as _i4;
+import 'dart:ffi' as _i3;
+import 'dart:isolate' as _i6;
+import 'dart:typed_data' as _i5;
 
-import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i3;
+import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i4;
 import 'package:etebase/src/isolate/etebase_isolate.dart' as _i1;
-import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i6;
-import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i7;
+import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i7;
+import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i2;
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'libetebase.ffi.client.freezed.dart';
 
 /// The URL of the main hosted server
 Future<Uri> etebaseGetDefaultServerUrl() =>
@@ -21,6 +24,77 @@ Future<Uri> etebaseGetDefaultServerUrl() =>
       #etebase_get_default_server_url,
       const <dynamic>[],
     );
+
+@freezed
+class EtebaseItemMetadata with _$EtebaseItemMetadata {
+  /// Create a new metadata object
+  ///
+  /// Should be destroyed with `etebase_item_metadata_destroy`
+  const factory EtebaseItemMetadata({
+    /// The item color in `#RRGGBB` or `#RRGGBBAA` format
+    ///
+    /// @param this_ the object handle
+    String? color,
+
+    /// The item description
+    ///
+    /// @param this_ the object handle
+    String? description,
+
+    /// Modification time of the item
+    ///
+    /// @param this_ the object handle
+    DateTime? mtime,
+
+    /// The item name
+    ///
+    /// @param this_ the object handle
+    String? name,
+
+    /// The item type
+    ///
+    /// @param this_ the object handle
+    String? itemType,
+  }) = _EtebaseItemMetadata;
+}
+
+@freezed
+class EtebaseFetchOptions with _$EtebaseFetchOptions {
+  /// Return a new fetch options object
+  ///
+  /// Should be destroyed with `etebase_fetch_options_destroy`
+  const factory EtebaseFetchOptions({
+    /// The sync token to fetch with
+    ///
+    /// @param this_ the object handle
+    /// @param stoken the sync token to set
+    String? stoken,
+
+    /// The current iterator to start from (when iterating lists)
+    ///
+    /// @param this_ the object handle
+    /// @param iterator the iterator to start from
+    String? iterator,
+
+    /// Toggle fetching the collection's item
+    ///
+    /// @param this_ the object handle
+    /// @param with_collection set whether to fetch the collection's item
+    bool? withCollection,
+
+    /// How much data to prefetech
+    ///
+    /// @param this_ the object handle
+    /// @param prefetch the prefetch option to set
+    _i2.EtebasePrefetchOption? prefetch,
+
+    /// Limit the amount of items returned
+    ///
+    /// @param this_ the object handle
+    /// @param limit the limit to set
+    int? limit,
+  }) = _EtebaseFetchOptions;
+}
 
 class EtebaseUserProfile {
   EtebaseUserProfile._(
@@ -38,23 +112,23 @@ class EtebaseUserProfile {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseUserProfile> _pointer;
+  final _i3.Pointer<_i4.EtebaseUserProfile> _pointer;
 
   final Object? _owner;
 
   /// The user's identity public key
   ///
   /// This is used for identifying the user and safely sending them data (such as \ref invitations EtebaseSignedInvitation).
-  Future<_i4.Uint8List> getPubkey() async {
+  Future<_i5.Uint8List> getPubkey() async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_user_profile_get_pubkey,
       <dynamic>[_pointer.address],
     );
     return data.materialize().asUint8List();
   }
 
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseUserProfile> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseUserProfile> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_user_profile_destroy,
         <dynamic>[this_.address],
@@ -87,7 +161,7 @@ class EtebaseUser {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseUser> _pointer;
+  final _i3.Pointer<_i4.EtebaseUser> _pointer;
 
   final Object? _owner;
 
@@ -102,7 +176,7 @@ class EtebaseUser {
     String email,
   ) async =>
       EtebaseUser._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_user_new,
         <dynamic>[
           username,
@@ -151,7 +225,7 @@ class EtebaseUser {
         #etebase_user_get_email,
         <dynamic>[_pointer.address],
       );
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseUser> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseUser> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_user_destroy,
         <dynamic>[this_.address],
@@ -184,7 +258,7 @@ class EtebaseSignedInvitation {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseSignedInvitation> _pointer;
+  final _i3.Pointer<_i4.EtebaseSignedInvitation> _pointer;
 
   final Object? _owner;
 
@@ -192,7 +266,7 @@ class EtebaseSignedInvitation {
   ///
   /// @param this_ the object handle
   Future<EtebaseSignedInvitation> clone() async => EtebaseSignedInvitation._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_signed_invitation_clone,
         <dynamic>[_pointer.address],
       )));
@@ -224,8 +298,8 @@ class EtebaseSignedInvitation {
   /// The access level offered in this invitation
   ///
   /// @param this_ the object handle
-  Future<_i6.EtebaseCollectionAccessLevel> getAccessLevel() =>
-      _i1.EtebaseIsolate.current.invoke<_i6.EtebaseCollectionAccessLevel>(
+  Future<_i7.EtebaseCollectionAccessLevel> getAccessLevel() =>
+      _i1.EtebaseIsolate.current.invoke<_i7.EtebaseCollectionAccessLevel>(
         #etebase_signed_invitation_get_access_level,
         <dynamic>[_pointer.address],
       );
@@ -241,9 +315,9 @@ class EtebaseSignedInvitation {
   /// The public key of the inviting user
   ///
   /// @param this_ the object handle
-  Future<_i4.Uint8List> getFromPubkey() async {
+  Future<_i5.Uint8List> getFromPubkey() async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_signed_invitation_get_from_pubkey,
       <dynamic>[_pointer.address],
     );
@@ -251,7 +325,7 @@ class EtebaseSignedInvitation {
   }
 
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseSignedInvitation> this_) =>
+          _i3.Pointer<_i4.EtebaseSignedInvitation> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_signed_invitation_destroy,
         <dynamic>[this_.address],
@@ -284,7 +358,7 @@ class EtebaseRemovedCollection {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseRemovedCollection> _pointer;
+  final _i3.Pointer<_i4.EtebaseRemovedCollection> _pointer;
 
   final Object? _owner;
 
@@ -296,7 +370,7 @@ class EtebaseRemovedCollection {
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseRemovedCollection> this_) =>
+          _i3.Pointer<_i4.EtebaseRemovedCollection> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_removed_collection_destroy,
         <dynamic>[this_.address],
@@ -329,7 +403,7 @@ class EtebaseInvitationListResponse {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseInvitationListResponse> _pointer;
+  final _i3.Pointer<_i4.EtebaseInvitationListResponse> _pointer;
 
   final Object? _owner;
 
@@ -352,7 +426,7 @@ class EtebaseInvitationListResponse {
     );
     return addressList
         .map((a) => EtebaseSignedInvitation._(
-              _i2.Pointer.fromAddress(a),
+              _i3.Pointer.fromAddress(a),
               this,
             ))
         .toList();
@@ -366,7 +440,7 @@ class EtebaseInvitationListResponse {
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseInvitationListResponse> this_) =>
+          _i3.Pointer<_i4.EtebaseInvitationListResponse> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_invitation_list_response_destroy,
         <dynamic>[this_.address],
@@ -399,7 +473,7 @@ class EtebaseItemRevisionsListResponse {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseItemRevisionsListResponse> _pointer;
+  final _i3.Pointer<_i4.EtebaseItemRevisionsListResponse> _pointer;
 
   final Object? _owner;
 
@@ -422,7 +496,7 @@ class EtebaseItemRevisionsListResponse {
     );
     return addressList
         .map((a) => EtebaseItem._(
-              _i2.Pointer.fromAddress(a),
+              _i3.Pointer.fromAddress(a),
               this,
             ))
         .toList();
@@ -436,7 +510,7 @@ class EtebaseItemRevisionsListResponse {
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseItemRevisionsListResponse> this_) =>
+          _i3.Pointer<_i4.EtebaseItemRevisionsListResponse> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_revisions_list_response_destroy,
         <dynamic>[this_.address],
@@ -469,7 +543,7 @@ class EtebaseMemberListResponse {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseMemberListResponse> _pointer;
+  final _i3.Pointer<_i4.EtebaseMemberListResponse> _pointer;
 
   final Object? _owner;
 
@@ -492,7 +566,7 @@ class EtebaseMemberListResponse {
     );
     return addressList
         .map((a) => EtebaseCollectionMember._(
-              _i2.Pointer.fromAddress(a),
+              _i3.Pointer.fromAddress(a),
               this,
             ))
         .toList();
@@ -506,161 +580,9 @@ class EtebaseMemberListResponse {
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseMemberListResponse> this_) =>
+          _i3.Pointer<_i4.EtebaseMemberListResponse> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_member_list_response_destroy,
-        <dynamic>[this_.address],
-      );
-
-  /// Destroy the object
-  ///
-  /// @param this_ the object handle
-  Future<void> dispose() async {
-    if (_owner == null) {
-      _finalizer.detach(this);
-      await _destroy(_pointer);
-    }
-  }
-}
-
-class EtebaseItemMetadata {
-  EtebaseItemMetadata._(
-    this._pointer, [
-    this._owner,
-  ]) {
-    if (_owner == null) {
-      _finalizer.attach(
-        this,
-        _pointer,
-        detach: this,
-      );
-    }
-  }
-
-  static final _finalizer = Finalizer(_destroy);
-
-  final _i2.Pointer<_i3.EtebaseItemMetadata> _pointer;
-
-  final Object? _owner;
-
-  /// Create a new metadata object
-  ///
-  /// Should be destroyed with `etebase_item_metadata_destroy`
-  static Future<EtebaseItemMetadata> create() async => EtebaseItemMetadata._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
-        #etebase_item_metadata_new,
-        const <dynamic>[],
-      )));
-
-  /// Set the item type
-  ///
-  /// @param this_ the object handle
-  /// @param item_type the type to be set
-  Future<void> setItemType(String? itemType) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_item_metadata_set_item_type,
-        <dynamic>[
-          _pointer.address,
-          itemType,
-        ],
-      );
-
-  /// The item type
-  ///
-  /// @param this_ the object handle
-  Future<String?> getItemType() => _i1.EtebaseIsolate.current.invoke<String?>(
-        #etebase_item_metadata_get_item_type,
-        <dynamic>[_pointer.address],
-      );
-
-  /// Set the item name
-  ///
-  /// For example, you can set it to "Secret Note" or "todo.txt"
-  ///
-  /// @param this_ the object handle
-  /// @param name the name to be set
-  Future<void> setName(String? name) => _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_item_metadata_set_name,
-        <dynamic>[
-          _pointer.address,
-          name,
-        ],
-      );
-
-  /// The item name
-  ///
-  /// @param this_ the object handle
-  Future<String?> getName() => _i1.EtebaseIsolate.current.invoke<String?>(
-        #etebase_item_metadata_get_name,
-        <dynamic>[_pointer.address],
-      );
-
-  /// Set the modification time of the item
-  ///
-  /// @param this_ the object handle
-  /// @param mtime the modification time in milliseconds since epoch
-  Future<void> setMtime(DateTime? mtime) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_item_metadata_set_mtime,
-        <dynamic>[
-          _pointer.address,
-          mtime,
-        ],
-      );
-
-  /// Modification time of the item
-  ///
-  /// @param this_ the object handle
-  Future<DateTime?> getMtime() => _i1.EtebaseIsolate.current.invoke<DateTime?>(
-        #etebase_item_metadata_get_mtime,
-        <dynamic>[_pointer.address],
-      );
-
-  /// Set a description for the item
-  ///
-  /// @param this_ the object handle
-  /// @param description the description to be set
-  Future<void> setDescription(String? description) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_item_metadata_set_description,
-        <dynamic>[
-          _pointer.address,
-          description,
-        ],
-      );
-
-  /// The item description
-  ///
-  /// @param this_ the object handle
-  Future<String?> getDescription() =>
-      _i1.EtebaseIsolate.current.invoke<String?>(
-        #etebase_item_metadata_get_description,
-        <dynamic>[_pointer.address],
-      );
-
-  /// Set a color for the item
-  ///
-  /// @param this_ the object handle
-  /// @param color the color to be set in `#RRGGBB` or `#RRGGBBAA` format
-  Future<void> setColor(String? color) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_item_metadata_set_color,
-        <dynamic>[
-          _pointer.address,
-          color,
-        ],
-      );
-
-  /// The item color in `#RRGGBB` or `#RRGGBBAA` format
-  ///
-  /// @param this_ the object handle
-  Future<String?> getColor() => _i1.EtebaseIsolate.current.invoke<String?>(
-        #etebase_item_metadata_get_color,
-        <dynamic>[_pointer.address],
-      );
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseItemMetadata> this_) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_item_metadata_destroy,
         <dynamic>[this_.address],
       );
 
@@ -691,7 +613,7 @@ class EtebaseItemManager {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseItemManager> _pointer;
+  final _i3.Pointer<_i4.EtebaseItemManager> _pointer;
 
   final Object? _owner;
 
@@ -705,12 +627,12 @@ class EtebaseItemManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_fetch,
         <dynamic>[
           _pointer.address,
           itemUid,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -724,15 +646,15 @@ class EtebaseItemManager {
   /// @param content_size the content size
   Future<EtebaseItem> create(
     EtebaseItemMetadata meta,
-    _i4.Uint8List content,
+    _i5.Uint8List content,
   ) async =>
       EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_create,
         <dynamic>[
           _pointer.address,
-          meta._pointer.address,
-          _i5.TransferableTypedData.fromList([content]),
+          meta,
+          _i6.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -749,16 +671,16 @@ class EtebaseItemManager {
   /// @param content the item's content as a byte array
   /// @param content_size the content size
   Future<EtebaseItem> createRaw(
-    _i4.Uint8List meta,
-    _i4.Uint8List content,
+    _i5.Uint8List meta,
+    _i5.Uint8List content,
   ) async =>
       EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_create_raw,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([meta]),
-          _i5.TransferableTypedData.fromList([content]),
+          _i6.TransferableTypedData.fromList([meta]),
+          _i6.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -769,11 +691,11 @@ class EtebaseItemManager {
   Future<EtebaseItemListResponse> list(
           [EtebaseFetchOptions? fetchOptions]) async =>
       EtebaseItemListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_list,
         <dynamic>[
           _pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -787,12 +709,12 @@ class EtebaseItemManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseItemRevisionsListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_item_revisions,
         <dynamic>[
           _pointer.address,
           item._pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -807,12 +729,12 @@ class EtebaseItemManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseItemListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_fetch_updates,
         <dynamic>[
           _pointer.address,
           items.map((e) => e._pointer.address).toList(),
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -829,12 +751,12 @@ class EtebaseItemManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseItemListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_fetch_multi,
         <dynamic>[
           _pointer.address,
           items,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -853,7 +775,7 @@ class EtebaseItemManager {
         <dynamic>[
           _pointer.address,
           items.map((e) => e._pointer.address).toList(),
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       );
 
@@ -878,7 +800,7 @@ class EtebaseItemManager {
           _pointer.address,
           items.map((e) => e._pointer.address).toList(),
           deps.map((e) => e._pointer.address).toList(),
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       );
 
@@ -899,7 +821,7 @@ class EtebaseItemManager {
         <dynamic>[
           _pointer.address,
           items.map((e) => e._pointer.address).toList(),
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       );
 
@@ -922,7 +844,7 @@ class EtebaseItemManager {
           _pointer.address,
           items.map((e) => e._pointer.address).toList(),
           deps.map((e) => e._pointer.address).toList(),
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       );
 
@@ -931,12 +853,12 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param cached the byte buffer holding the cached item obtained using [cache_save]
   /// @param cached_size size of the buffer
-  Future<EtebaseItem> cacheLoad(_i4.Uint8List cached) async => EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+  Future<EtebaseItem> cacheLoad(_i5.Uint8List cached) async => EtebaseItem._(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_manager_cache_load,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([cached]),
+          _i6.TransferableTypedData.fromList([cached]),
         ],
       )));
 
@@ -947,9 +869,9 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSave(EtebaseItem item) async {
+  Future<_i5.Uint8List> cacheSave(EtebaseItem item) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_item_manager_cache_save,
       <dynamic>[
         _pointer.address,
@@ -966,9 +888,9 @@ class EtebaseItemManager {
   /// @param this_ the object handle
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSaveWithContent(EtebaseItem item) async {
+  Future<_i5.Uint8List> cacheSaveWithContent(EtebaseItem item) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_item_manager_cache_save_with_content,
       <dynamic>[
         _pointer.address,
@@ -978,7 +900,7 @@ class EtebaseItemManager {
     return data.materialize().asUint8List();
   }
 
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseItemManager> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseItemManager> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_manager_destroy,
         <dynamic>[this_.address],
@@ -1011,7 +933,7 @@ class EtebaseItemListResponse {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseItemListResponse> _pointer;
+  final _i3.Pointer<_i4.EtebaseItemListResponse> _pointer;
 
   final Object? _owner;
 
@@ -1034,7 +956,7 @@ class EtebaseItemListResponse {
     );
     return addressList
         .map((a) => EtebaseItem._(
-              _i2.Pointer.fromAddress(a),
+              _i3.Pointer.fromAddress(a),
               this,
             ))
         .toList();
@@ -1048,7 +970,7 @@ class EtebaseItemListResponse {
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseItemListResponse> this_) =>
+          _i3.Pointer<_i4.EtebaseItemListResponse> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_list_response_destroy,
         <dynamic>[this_.address],
@@ -1081,7 +1003,7 @@ class EtebaseItem {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseItem> _pointer;
+  final _i3.Pointer<_i4.EtebaseItem> _pointer;
 
   final Object? _owner;
 
@@ -1089,7 +1011,7 @@ class EtebaseItem {
   ///
   /// @param this_ the object handle
   Future<EtebaseItem> clone() async => EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_item_clone,
         <dynamic>[_pointer.address],
       )));
@@ -1113,30 +1035,30 @@ class EtebaseItem {
         #etebase_item_set_meta,
         <dynamic>[
           _pointer.address,
-          meta._pointer.address,
+          meta,
         ],
       );
 
   /// Return the metadata of the item
   ///
   /// @param this_ the object handle
-  Future<EtebaseItemMetadata> getMeta() async => EtebaseItemMetadata._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+  Future<EtebaseItemMetadata> getMeta() =>
+      _i1.EtebaseIsolate.current.invoke<EtebaseItemMetadata>(
         #etebase_item_get_meta,
         <dynamic>[_pointer.address],
-      )));
+      );
 
   /// Set metadata for the item object from a byte array
   ///
   /// @param this_ the object handle
   /// @param meta the metadata for the item. This needs to be a valid `EtebaseItemMetadata`-like struct encoded using `msgpack`.
   /// @param meta_size the metadata size
-  Future<void> setMetaRaw(_i4.Uint8List meta) =>
+  Future<void> setMetaRaw(_i5.Uint8List meta) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_set_meta_raw,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([meta]),
+          _i6.TransferableTypedData.fromList([meta]),
         ],
       );
 
@@ -1145,9 +1067,9 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getMetaRaw([int? sizeHint]) async {
+  Future<_i5.Uint8List> getMetaRaw([int? sizeHint]) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_item_get_meta_raw,
       <dynamic>[
         _pointer.address,
@@ -1162,12 +1084,12 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param content the content of the item as a byte array
   /// @param content_size the content size
-  Future<void> setContent(_i4.Uint8List content) =>
+  Future<void> setContent(_i5.Uint8List content) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_set_content,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([content]),
+          _i6.TransferableTypedData.fromList([content]),
         ],
       );
 
@@ -1176,9 +1098,9 @@ class EtebaseItem {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getContent([int? sizeHint]) async {
+  Future<_i5.Uint8List> getContent([int? sizeHint]) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_item_get_content,
       <dynamic>[
         _pointer.address,
@@ -1221,7 +1143,7 @@ class EtebaseItem {
         #etebase_item_get_etag,
         <dynamic>[_pointer.address],
       );
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseItem> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseItem> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_item_destroy,
         <dynamic>[this_.address],
@@ -1254,7 +1176,7 @@ class EtebaseFileSystemCache {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseFileSystemCache> _pointer;
+  final _i3.Pointer<_i4.EtebaseFileSystemCache> _pointer;
 
   final Object? _owner;
 
@@ -1269,7 +1191,7 @@ class EtebaseFileSystemCache {
     String username,
   ) async =>
       EtebaseFileSystemCache._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_fs_cache_new,
         <dynamic>[
           path,
@@ -1295,7 +1217,7 @@ class EtebaseFileSystemCache {
   /// @param encryption_key_size the size of the encryption_key
   Future<void> saveAccount(
     EtebaseAccount etebase, [
-    _i4.Uint8List? encryptionKey,
+    _i5.Uint8List? encryptionKey,
   ]) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_fs_cache_save_account,
@@ -1304,7 +1226,7 @@ class EtebaseFileSystemCache {
           etebase._pointer.address,
           encryptionKey == null
               ? null
-              : _i5.TransferableTypedData.fromList([encryptionKey]),
+              : _i6.TransferableTypedData.fromList([encryptionKey]),
         ],
       );
 
@@ -1316,17 +1238,17 @@ class EtebaseFileSystemCache {
   /// @param encryption_key_size the size of the encryption_key
   Future<EtebaseAccount> loadAccount(
     EtebaseClient client, [
-    _i4.Uint8List? encryptionKey,
+    _i5.Uint8List? encryptionKey,
   ]) async =>
       EtebaseAccount._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_fs_cache_load_account,
         <dynamic>[
           _pointer.address,
           client._pointer.address,
           encryptionKey == null
               ? null
-              : _i5.TransferableTypedData.fromList([encryptionKey]),
+              : _i6.TransferableTypedData.fromList([encryptionKey]),
         ],
       )));
 
@@ -1428,7 +1350,7 @@ class EtebaseFileSystemCache {
     String colUid,
   ) async =>
       EtebaseCollection._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_fs_cache_collection_get,
         <dynamic>[
           _pointer.address,
@@ -1491,7 +1413,7 @@ class EtebaseFileSystemCache {
     String itemUid,
   ) async =>
       EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_fs_cache_item_get,
         <dynamic>[
           _pointer.address,
@@ -1500,118 +1422,9 @@ class EtebaseFileSystemCache {
           itemUid,
         ],
       )));
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseFileSystemCache> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseFileSystemCache> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_fs_cache_destroy,
-        <dynamic>[this_.address],
-      );
-
-  /// Destroy the object
-  ///
-  /// @param this_ the object handle
-  Future<void> dispose() async {
-    if (_owner == null) {
-      _finalizer.detach(this);
-      await _destroy(_pointer);
-    }
-  }
-}
-
-class EtebaseFetchOptions {
-  EtebaseFetchOptions._(
-    this._pointer, [
-    this._owner,
-  ]) {
-    if (_owner == null) {
-      _finalizer.attach(
-        this,
-        _pointer,
-        detach: this,
-      );
-    }
-  }
-
-  static final _finalizer = Finalizer(_destroy);
-
-  final _i2.Pointer<_i3.EtebaseFetchOptions> _pointer;
-
-  final Object? _owner;
-
-  /// Return a new fetch options object
-  ///
-  /// Should be destroyed with `etebase_fetch_options_destroy`
-  static Future<EtebaseFetchOptions> create() async => EtebaseFetchOptions._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
-        #etebase_fetch_options_new,
-        const <dynamic>[],
-      )));
-
-  /// Limit the amount of items returned
-  ///
-  /// @param this_ the object handle
-  /// @param limit the limit to set
-  Future<void> setLimit(int limit) => _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_fetch_options_set_limit,
-        <dynamic>[
-          _pointer.address,
-          limit,
-        ],
-      );
-
-  /// How much data to prefetech
-  ///
-  /// @param this_ the object handle
-  /// @param prefetch the prefetch option to set
-  Future<void> setPrefetch(_i7.EtebasePrefetchOption prefetch) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_fetch_options_set_prefetch,
-        <dynamic>[
-          _pointer.address,
-          prefetch,
-        ],
-      );
-
-  /// Toggle fetching the collection's item
-  ///
-  /// @param this_ the object handle
-  /// @param with_collection set whether to fetch the collection's item
-  Future<void> setWithCollection(bool withCollection) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_fetch_options_set_with_collection,
-        <dynamic>[
-          _pointer.address,
-          withCollection,
-        ],
-      );
-
-  /// The current iterator to start from (when iterating lists)
-  ///
-  /// @param this_ the object handle
-  /// @param iterator the iterator to start from
-  Future<void> setIterator(String? iterator) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_fetch_options_set_iterator,
-        <dynamic>[
-          _pointer.address,
-          iterator,
-        ],
-      );
-
-  /// The sync token to fetch with
-  ///
-  /// @param this_ the object handle
-  /// @param stoken the sync token to set
-  Future<void> setStoken(String? stoken) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_fetch_options_set_stoken,
-        <dynamic>[
-          _pointer.address,
-          stoken,
-        ],
-      );
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseFetchOptions> this_) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_fetch_options_destroy,
         <dynamic>[this_.address],
       );
 
@@ -1642,7 +1455,7 @@ class EtebaseCollectionMemberManager {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseCollectionMemberManager> _pointer;
+  final _i3.Pointer<_i4.EtebaseCollectionMemberManager> _pointer;
 
   final Object? _owner;
 
@@ -1653,11 +1466,11 @@ class EtebaseCollectionMemberManager {
   Future<EtebaseMemberListResponse> list(
           [EtebaseFetchOptions? fetchOptions]) async =>
       EtebaseMemberListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_member_manager_list,
         <dynamic>[
           _pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -1689,7 +1502,7 @@ class EtebaseCollectionMemberManager {
   /// @param access_level the new `EtebaseCollectionAccessLevel`
   Future<void> modifyAccessLevel(
     String username,
-    _i6.EtebaseCollectionAccessLevel accessLevel,
+    _i7.EtebaseCollectionAccessLevel accessLevel,
   ) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_member_manager_modify_access_level,
@@ -1700,7 +1513,7 @@ class EtebaseCollectionMemberManager {
         ],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseCollectionMemberManager> this_) =>
+          _i3.Pointer<_i4.EtebaseCollectionMemberManager> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_member_manager_destroy,
         <dynamic>[this_.address],
@@ -1733,7 +1546,7 @@ class EtebaseCollectionMember {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseCollectionMember> _pointer;
+  final _i3.Pointer<_i4.EtebaseCollectionMember> _pointer;
 
   final Object? _owner;
 
@@ -1741,7 +1554,7 @@ class EtebaseCollectionMember {
   ///
   /// @param this_ the object handle
   Future<EtebaseCollectionMember> clone() async => EtebaseCollectionMember._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_member_clone,
         <dynamic>[_pointer.address],
       )));
@@ -1757,13 +1570,13 @@ class EtebaseCollectionMember {
   /// The access_level of the member
   ///
   /// @param this_ the object handle
-  Future<_i6.EtebaseCollectionAccessLevel> getAccessLevel() =>
-      _i1.EtebaseIsolate.current.invoke<_i6.EtebaseCollectionAccessLevel>(
+  Future<_i7.EtebaseCollectionAccessLevel> getAccessLevel() =>
+      _i1.EtebaseIsolate.current.invoke<_i7.EtebaseCollectionAccessLevel>(
         #etebase_collection_member_get_access_level,
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseCollectionMember> this_) =>
+          _i3.Pointer<_i4.EtebaseCollectionMember> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_member_destroy,
         <dynamic>[this_.address],
@@ -1796,7 +1609,7 @@ class EtebaseCollectionManager {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseCollectionManager> _pointer;
+  final _i3.Pointer<_i4.EtebaseCollectionManager> _pointer;
 
   final Object? _owner;
 
@@ -1810,12 +1623,12 @@ class EtebaseCollectionManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseCollection._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_fetch,
         <dynamic>[
           _pointer.address,
           colUid,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -1831,16 +1644,16 @@ class EtebaseCollectionManager {
   Future<EtebaseCollection> create(
     String collectionType,
     EtebaseItemMetadata meta,
-    _i4.Uint8List content,
+    _i5.Uint8List content,
   ) async =>
       EtebaseCollection._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_create,
         <dynamic>[
           _pointer.address,
           collectionType,
-          meta._pointer.address,
-          _i5.TransferableTypedData.fromList([content]),
+          meta,
+          _i6.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -1859,17 +1672,17 @@ class EtebaseCollectionManager {
   /// @param content_size the content size
   Future<EtebaseCollection> createRaw(
     String collectionType,
-    _i4.Uint8List meta,
-    _i4.Uint8List content,
+    _i5.Uint8List meta,
+    _i5.Uint8List content,
   ) async =>
       EtebaseCollection._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_create_raw,
         <dynamic>[
           _pointer.address,
           collectionType,
-          _i5.TransferableTypedData.fromList([meta]),
-          _i5.TransferableTypedData.fromList([content]),
+          _i6.TransferableTypedData.fromList([meta]),
+          _i6.TransferableTypedData.fromList([content]),
         ],
       )));
 
@@ -1879,7 +1692,7 @@ class EtebaseCollectionManager {
   /// @param col the collection for which the item manager is required
   Future<EtebaseItemManager> getItemManager(EtebaseCollection col) async =>
       EtebaseItemManager._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_get_item_manager,
         <dynamic>[
           _pointer.address,
@@ -1897,12 +1710,12 @@ class EtebaseCollectionManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseCollectionListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_list,
         <dynamic>[
           _pointer.address,
           collectionType,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -1917,12 +1730,12 @@ class EtebaseCollectionManager {
     EtebaseFetchOptions? fetchOptions,
   ]) async =>
       EtebaseCollectionListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_list_multi,
         <dynamic>[
           _pointer.address,
           collectionTypes,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -1940,7 +1753,7 @@ class EtebaseCollectionManager {
         <dynamic>[
           _pointer.address,
           collection._pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       );
 
@@ -1960,7 +1773,7 @@ class EtebaseCollectionManager {
         <dynamic>[
           _pointer.address,
           collection._pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       );
 
@@ -1969,13 +1782,13 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param cached the byte buffer holding the cached collection obtained using [cache_save]
   /// @param cached_size size of the buffer
-  Future<EtebaseCollection> cacheLoad(_i4.Uint8List cached) async =>
+  Future<EtebaseCollection> cacheLoad(_i5.Uint8List cached) async =>
       EtebaseCollection._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_cache_load,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([cached]),
+          _i6.TransferableTypedData.fromList([cached]),
         ],
       )));
 
@@ -1986,9 +1799,9 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSave(EtebaseCollection collection) async {
+  Future<_i5.Uint8List> cacheSave(EtebaseCollection collection) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_collection_manager_cache_save,
       <dynamic>[
         _pointer.address,
@@ -2005,10 +1818,10 @@ class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Future<_i4.Uint8List> cacheSaveWithContent(
+  Future<_i5.Uint8List> cacheSaveWithContent(
       EtebaseCollection collection) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_collection_manager_cache_save_with_content,
       <dynamic>[
         _pointer.address,
@@ -2025,7 +1838,7 @@ class EtebaseCollectionManager {
   Future<EtebaseCollectionMemberManager> getMemberManager(
           EtebaseCollection col) async =>
       EtebaseCollectionMemberManager._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_manager_get_member_manager,
         <dynamic>[
           _pointer.address,
@@ -2033,7 +1846,7 @@ class EtebaseCollectionManager {
         ],
       )));
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseCollectionManager> this_) =>
+          _i3.Pointer<_i4.EtebaseCollectionManager> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_manager_destroy,
         <dynamic>[this_.address],
@@ -2066,7 +1879,7 @@ class EtebaseCollectionListResponse {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseCollectionListResponse> _pointer;
+  final _i3.Pointer<_i4.EtebaseCollectionListResponse> _pointer;
 
   final Object? _owner;
 
@@ -2089,7 +1902,7 @@ class EtebaseCollectionListResponse {
     );
     return addressList
         .map((a) => EtebaseCollection._(
-              _i2.Pointer.fromAddress(a),
+              _i3.Pointer.fromAddress(a),
               this,
             ))
         .toList();
@@ -2114,14 +1927,14 @@ class EtebaseCollectionListResponse {
     );
     return addressList
         .map((a) => EtebaseRemovedCollection._(
-              _i2.Pointer.fromAddress(a),
+              _i3.Pointer.fromAddress(a),
               this,
             ))
         .toList();
   }
 
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseCollectionListResponse> this_) =>
+          _i3.Pointer<_i4.EtebaseCollectionListResponse> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_list_response_destroy,
         <dynamic>[this_.address],
@@ -2154,7 +1967,7 @@ class EtebaseCollectionInvitationManager {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseCollectionInvitationManager> _pointer;
+  final _i3.Pointer<_i4.EtebaseCollectionInvitationManager> _pointer;
 
   final Object? _owner;
 
@@ -2165,11 +1978,11 @@ class EtebaseCollectionInvitationManager {
   Future<EtebaseInvitationListResponse> listIncoming(
           [EtebaseFetchOptions? fetchOptions]) async =>
       EtebaseInvitationListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_invitation_manager_list_incoming,
         <dynamic>[
           _pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -2180,11 +1993,11 @@ class EtebaseCollectionInvitationManager {
   Future<EtebaseInvitationListResponse> listOutgoing(
           [EtebaseFetchOptions? fetchOptions]) async =>
       EtebaseInvitationListResponse._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_invitation_manager_list_outgoing,
         <dynamic>[
           _pointer.address,
-          fetchOptions?._pointer.address,
+          fetchOptions,
         ],
       )));
 
@@ -2220,7 +2033,7 @@ class EtebaseCollectionInvitationManager {
   /// @param username the username of the user to fetch
   Future<EtebaseUserProfile> fetchUserProfile(String username) async =>
       EtebaseUserProfile._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_invitation_manager_fetch_user_profile,
         <dynamic>[
           _pointer.address,
@@ -2239,8 +2052,8 @@ class EtebaseCollectionInvitationManager {
   Future<void> invite(
     EtebaseCollection collection,
     String username,
-    _i4.Uint8List pubkey,
-    _i6.EtebaseCollectionAccessLevel accessLevel,
+    _i5.Uint8List pubkey,
+    _i7.EtebaseCollectionAccessLevel accessLevel,
   ) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_invitation_manager_invite,
@@ -2248,7 +2061,7 @@ class EtebaseCollectionInvitationManager {
           _pointer.address,
           collection._pointer.address,
           username,
-          _i5.TransferableTypedData.fromList([pubkey]),
+          _i6.TransferableTypedData.fromList([pubkey]),
           accessLevel,
         ],
       );
@@ -2272,9 +2085,9 @@ class EtebaseCollectionInvitationManager {
   /// Can be pretty printed with `etebase_utils_pretty_fingerprint`.
   ///
   /// @param this_ the object handle
-  Future<_i4.Uint8List> getPubkey() async {
+  Future<_i5.Uint8List> getPubkey() async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_invitation_manager_get_pubkey,
       <dynamic>[_pointer.address],
     );
@@ -2282,7 +2095,7 @@ class EtebaseCollectionInvitationManager {
   }
 
   static Future<void> _destroy(
-          _i2.Pointer<_i3.EtebaseCollectionInvitationManager> this_) =>
+          _i3.Pointer<_i4.EtebaseCollectionInvitationManager> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_invitation_manager_destroy,
         <dynamic>[this_.address],
@@ -2315,7 +2128,7 @@ class EtebaseCollection {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseCollection> _pointer;
+  final _i3.Pointer<_i4.EtebaseCollection> _pointer;
 
   final Object? _owner;
 
@@ -2323,7 +2136,7 @@ class EtebaseCollection {
   ///
   /// @param this_ the object handle
   Future<EtebaseCollection> clone() async => EtebaseCollection._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_clone,
         <dynamic>[_pointer.address],
       )));
@@ -2347,30 +2160,30 @@ class EtebaseCollection {
         #etebase_collection_set_meta,
         <dynamic>[
           _pointer.address,
-          meta._pointer.address,
+          meta,
         ],
       );
 
   /// Return the metadata of the collection
   ///
   /// @param this_ the object handle
-  Future<EtebaseItemMetadata> getMeta() async => EtebaseItemMetadata._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+  Future<EtebaseItemMetadata> getMeta() =>
+      _i1.EtebaseIsolate.current.invoke<EtebaseItemMetadata>(
         #etebase_collection_get_meta,
         <dynamic>[_pointer.address],
-      )));
+      );
 
   /// Set metadata for the collection object from a byte array
   ///
   /// @param this_ the object handle
   /// @param meta the metadata for the collection. This needs to be a valid `EtebaseItemMetadata`-like struct encoded using `msgpack`.
   /// @param meta_size the metadata size
-  Future<void> setMetaRaw(_i4.Uint8List meta) =>
+  Future<void> setMetaRaw(_i5.Uint8List meta) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_set_meta_raw,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([meta]),
+          _i6.TransferableTypedData.fromList([meta]),
         ],
       );
 
@@ -2379,9 +2192,9 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getMetaRaw([int? sizeHint]) async {
+  Future<_i5.Uint8List> getMetaRaw([int? sizeHint]) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_collection_get_meta_raw,
       <dynamic>[
         _pointer.address,
@@ -2396,12 +2209,12 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param content the content of the collection as a byte array
   /// @param content_size the content size
-  Future<void> setContent(_i4.Uint8List content) =>
+  Future<void> setContent(_i5.Uint8List content) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_set_content,
         <dynamic>[
           _pointer.address,
-          _i5.TransferableTypedData.fromList([content]),
+          _i6.TransferableTypedData.fromList([content]),
         ],
       );
 
@@ -2410,9 +2223,9 @@ class EtebaseCollection {
   /// @param this_ the object handle
   /// @param[out] buf the output byte buffer
   /// @param buf_size the maximum number of bytes to be written to buf
-  Future<_i4.Uint8List> getContent([int? sizeHint]) async {
+  Future<_i5.Uint8List> getContent([int? sizeHint]) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_collection_get_content,
       <dynamic>[
         _pointer.address,
@@ -2470,7 +2283,7 @@ class EtebaseCollection {
   ///
   /// @param this_ the object handle
   Future<EtebaseItem> asItem() async => EtebaseItem._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_collection_as_item,
         <dynamic>[_pointer.address],
       )));
@@ -2487,12 +2300,12 @@ class EtebaseCollection {
   /// Return the access level of the collection for the current user
   ///
   /// @param this_ the object handle
-  Future<_i6.EtebaseCollectionAccessLevel> getAccessLevel() =>
-      _i1.EtebaseIsolate.current.invoke<_i6.EtebaseCollectionAccessLevel>(
+  Future<_i7.EtebaseCollectionAccessLevel> getAccessLevel() =>
+      _i1.EtebaseIsolate.current.invoke<_i7.EtebaseCollectionAccessLevel>(
         #etebase_collection_get_access_level,
         <dynamic>[_pointer.address],
       );
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseCollection> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseCollection> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_collection_destroy,
         <dynamic>[this_.address],
@@ -2525,7 +2338,7 @@ class EtebaseClient {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseClient> _pointer;
+  final _i3.Pointer<_i4.EtebaseClient> _pointer;
 
   final Object? _owner;
 
@@ -2534,7 +2347,7 @@ class EtebaseClient {
     Uri serverUrl,
   ) async =>
       EtebaseClient._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_client_new,
         <dynamic>[
           clientName,
@@ -2557,7 +2370,7 @@ class EtebaseClient {
         #etebase_client_check_etebase_server,
         <dynamic>[_pointer.address],
       );
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseClient> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseClient> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_client_destroy,
         <dynamic>[this_.address],
@@ -2590,7 +2403,7 @@ class EtebaseAccount {
 
   static final _finalizer = Finalizer(_destroy);
 
-  final _i2.Pointer<_i3.EtebaseAccount> _pointer;
+  final _i3.Pointer<_i4.EtebaseAccount> _pointer;
 
   final Object? _owner;
 
@@ -2605,7 +2418,7 @@ class EtebaseAccount {
     String password,
   ) async =>
       EtebaseAccount._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_account_login,
         <dynamic>[
           client._pointer.address,
@@ -2625,7 +2438,7 @@ class EtebaseAccount {
     String password,
   ) async =>
       EtebaseAccount._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_account_signup,
         <dynamic>[
           client._pointer.address,
@@ -2689,7 +2502,7 @@ class EtebaseAccount {
   /// @param this_ the object handle
   Future<EtebaseCollectionManager> getCollectionManager() async =>
       EtebaseCollectionManager._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_account_get_collection_manager,
         <dynamic>[_pointer.address],
       )));
@@ -2699,7 +2512,7 @@ class EtebaseAccount {
   /// @param this_ the object handle
   Future<EtebaseCollectionInvitationManager> getInvitationManager() async =>
       EtebaseCollectionInvitationManager._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_account_get_invitation_manager,
         <dynamic>[_pointer.address],
       )));
@@ -2709,14 +2522,14 @@ class EtebaseAccount {
   /// @param this_ the object handle
   /// @param encryption_key used to encrypt the returned account string to enhance security
   /// @param encryption_key_size size of the encryption_key
-  Future<String> save([_i4.Uint8List? encryptionKey]) =>
+  Future<String> save([_i5.Uint8List? encryptionKey]) =>
       _i1.EtebaseIsolate.current.invoke<String>(
         #etebase_account_save,
         <dynamic>[
           _pointer.address,
           encryptionKey == null
               ? null
-              : _i5.TransferableTypedData.fromList([encryptionKey]),
+              : _i6.TransferableTypedData.fromList([encryptionKey]),
         ],
       );
 
@@ -2729,20 +2542,20 @@ class EtebaseAccount {
   static Future<EtebaseAccount> restore(
     EtebaseClient client,
     String accountDataStored, [
-    _i4.Uint8List? encryptionKey,
+    _i5.Uint8List? encryptionKey,
   ]) async =>
       EtebaseAccount._(
-          _i2.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
+          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
         #etebase_account_restore,
         <dynamic>[
           client._pointer.address,
           accountDataStored,
           encryptionKey == null
               ? null
-              : _i5.TransferableTypedData.fromList([encryptionKey]),
+              : _i6.TransferableTypedData.fromList([encryptionKey]),
         ],
       )));
-  static Future<void> _destroy(_i2.Pointer<_i3.EtebaseAccount> this_) =>
+  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseAccount> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_account_destroy,
         <dynamic>[this_.address],
@@ -2766,9 +2579,9 @@ abstract class EtebaseUtils {
   ///
   /// @param[out] buf the output byte buffer
   /// @param size the size of the returned buffer
-  static Future<_i4.Uint8List> randombytes(int size) async {
+  static Future<_i5.Uint8List> randombytes(int size) async {
     final data =
-        await _i1.EtebaseIsolate.current.invoke<_i5.TransferableTypedData>(
+        await _i1.EtebaseIsolate.current.invoke<_i6.TransferableTypedData>(
       #etebase_utils_randombytes,
       <dynamic>[size],
     );
@@ -2787,11 +2600,11 @@ abstract class EtebaseUtils {
   /// @param content the content to create a fingerprint for
   /// @param content_size the size of the content buffer
   /// @param[out] buf the output byte buffer
-  static Future<String> prettyFingerprint(_i4.Uint8List content) =>
+  static Future<String> prettyFingerprint(_i5.Uint8List content) =>
       _i1.EtebaseIsolate.current.invoke<String>(
         #etebase_utils_pretty_fingerprint,
         <dynamic>[
-          _i5.TransferableTypedData.fromList([content])
+          _i6.TransferableTypedData.fromList([content])
         ],
       );
 }

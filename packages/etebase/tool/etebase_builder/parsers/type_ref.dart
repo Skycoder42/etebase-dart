@@ -23,6 +23,7 @@ abstract class TypeRef {
   factory TypeRef.etebaseClass(
     String name, {
     bool optional,
+    bool dataClass,
     String? memberPrefix,
   }) = EtebaseClassTypeRef;
   factory TypeRef.etebaseClassList(String name) = EtebaseClassListTypeRef;
@@ -122,10 +123,10 @@ class DateTimeTypeRef implements TypeRef {
   TypeReference get ffiType => Types.pointer(Types.Int64$);
 
   @override
-  TypeReference get publicType => Types.DateTime$.asNullable;
+  TypeReference get publicType => Types.DateTime$;
 
   @override
-  TypeReference get transferType => Types.DateTime$.asNullable;
+  TypeReference get transferType => Types.DateTime$;
 }
 
 class StringListTypeRef implements TypeRef {
@@ -176,9 +177,15 @@ class EtebasePrefetchOptionTypeRef extends EnumTypeRef {
 class EtebaseClassTypeRef implements TypeRef {
   final String name;
   final bool optional;
+  final bool dataClass;
   final String? memberPrefix;
 
-  EtebaseClassTypeRef(this.name, {this.optional = false, this.memberPrefix});
+  EtebaseClassTypeRef(
+    this.name, {
+    this.optional = false,
+    this.dataClass = false,
+    this.memberPrefix,
+  });
 
   @override
   TypeReference get ffiType => Types.pointer(Types.ffi(refer(name)));
@@ -192,7 +199,7 @@ class EtebaseClassTypeRef implements TypeRef {
 
   @override
   TypeReference get transferType =>
-      optional ? Types.int$.asNullable : Types.int$;
+      dataClass ? publicType : (optional ? Types.int$.asNullable : Types.int$);
 }
 
 class EtebaseClassListTypeRef implements TypeRef {

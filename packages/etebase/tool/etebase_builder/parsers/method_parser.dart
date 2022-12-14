@@ -18,6 +18,18 @@ enum LengthGetterType {
   const LengthGetterType(this.hasLengthGetter);
 }
 
+enum MethodKind {
+  method(null),
+  getter('get'),
+  setter('set');
+
+  final String? _infix;
+
+  const MethodKind(this._infix);
+
+  RegExp? get matcher => _infix == null ? null : RegExp('^.+_${_infix}_(.+)\$');
+}
+
 class MethodRef {
   final String name;
   final String ffiName;
@@ -26,6 +38,7 @@ class MethodRef {
   final bool isDestroy;
   final bool isStatic;
   final LengthGetterType lengthGetter;
+  final MethodKind methodKind;
 
   final List<ParameterRef> parameters;
   final TypeRef returnType;
@@ -39,6 +52,7 @@ class MethodRef {
     required this.isDestroy,
     required this.isStatic,
     required this.lengthGetter,
+    required this.methodKind,
     required this.parameters,
     required this.returnType,
     required this.documentation,
@@ -75,6 +89,15 @@ class MethodRef {
       case LengthGetterType.constant:
         return '${ffiName}_size'.toUpperCase();
     }
+  }
+
+  String get accessorName {
+    final matcher = methodKind.matcher;
+    if (matcher == null) {
+      throw StateError('Normal methods are not accessors');
+    }
+
+    return matcher.firstMatch(ffiName)![1]!.snakeToDart();
   }
 }
 
@@ -172,6 +195,7 @@ class MethodParser {
       isDestroy: methodName.endsWith('_destroy'),
       isStatic: !mappedParams.any((p) => p.isThisParam),
       lengthGetter: lengthGetterType,
+      methodKind: _findMethodKind(method, methodPrefix),
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,
@@ -205,6 +229,7 @@ class MethodParser {
       lengthGetter: _methodsWithLengthConstants.contains(method.name)
           ? LengthGetterType.constant
           : LengthGetterType.none,
+      methodKind: MethodKind.method,
       parameters: mappedParams,
       returnType: _mapReturnType(
         method,
@@ -238,4 +263,21 @@ class MethodParser {
               ),
             ),
           );
+
+  MethodKind _findMethodKind(MethodElement method, String methodPrefix) {
+    final getterSetterRegExp = RegExp('^${methodPrefix}_(get|set)_.+?\$');
+    final match = getterSetterRegExp.firstMatch(method.name);
+    if (match == null) {
+      return MethodKind.method;
+    }
+
+    switch (match[1]!) {
+      case 'get':
+        return MethodKind.getter;
+      case 'set':
+        return MethodKind.setter;
+      default:
+        throw StateError('Unreachable code reached');
+    }
+  }
 }

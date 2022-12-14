@@ -56,11 +56,9 @@ void main() {
     final collectionManager = await account.getCollectionManager();
     addTearDown(collectionManager.dispose);
 
-    final meta = await EtebaseItemMetadata.create();
-    addTearDown(meta.dispose);
     final collection = await collectionManager.create(
       testCollectionType,
-      meta,
+      const EtebaseItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -75,21 +73,20 @@ void main() {
 
     expect(restoredToken, await response.getStoken());
 
-    final options = await EtebaseFetchOptions.create();
-    addTearDown(options.dispose);
-    await options.setStoken(restoredToken);
-    final response2 = await collectionManager.list(testCollectionType, options);
+    final response2 = await collectionManager.list(
+      testCollectionType,
+      EtebaseFetchOptions(stoken: restoredToken),
+    );
     addTearDown(response2.dispose);
   });
 
-  test('can cache and restore collection stoken', () async {
+  test('can cache and restore collection and stoken', () async {
     final testCollectionData = Uint8List.fromList(List.filled(10, 10));
 
     final collectionManager = await account.getCollectionManager();
     addTearDown(collectionManager.dispose);
 
-    final meta = await EtebaseItemMetadata.create();
-    addTearDown(meta.dispose);
+    const meta = EtebaseItemMetadata();
     var collection = await collectionManager.create(
       testCollectionType,
       meta,
@@ -135,5 +132,60 @@ void main() {
       throwsEtebaseException(EtebaseErrorCode.urlParse),
     );
     expect(await cache.collectionLoadStoken(collectionId), isNull);
+  });
+
+  test('can cache and restore items', () async {
+    final collectionManager = await account.getCollectionManager();
+    addTearDown(collectionManager.dispose);
+
+    final collection = await collectionManager.create(
+      testCollectionType,
+      const EtebaseItemMetadata(),
+      Uint8List(0),
+    );
+    addTearDown(collection.dispose);
+    await collectionManager.upload(collection);
+    final collectionId = await collection.getUid();
+    await cache.collectionSet(collectionManager, collection);
+
+    final itemManager = await collectionManager.getItemManager(collection);
+    addTearDown(itemManager.dispose);
+
+    const itemMeta = EtebaseItemMetadata(color: 'AABBCC');
+    final itemContent = Uint8List.fromList(List.filled(42, 42));
+    final item = await itemManager.create(
+      itemMeta,
+      itemContent,
+    );
+    addTearDown(item.dispose);
+    await itemManager.batch([item]);
+    final itemId = await item.getUid();
+
+    await expectLater(
+      () => cache.itemGet(itemManager, collectionId, itemId),
+      throwsEtebaseException(EtebaseErrorCode.urlParse),
+    );
+
+    await cache.itemSet(itemManager, collectionId, item);
+
+    final restoredItem = await cache.itemGet(itemManager, collectionId, itemId);
+    expect(await restoredItem.getUid(), itemId);
+    expect(await restoredItem.getMeta(), itemMeta);
+    expect(await restoredItem.getContent(), itemContent);
+    expect(await restoredItem.getEtag(), await item.getEtag());
+
+    await cache.itemUnset(itemManager, collectionId, itemId);
+    await expectLater(
+      () => cache.itemGet(itemManager, collectionId, itemId),
+      throwsEtebaseException(EtebaseErrorCode.urlParse),
+    );
+  });
+
+  test('can clear cache data', () async {
+    await cache.clearUser();
+    await expectLater(
+      () => cache.loadAccount(client),
+      throwsEtebaseException(EtebaseErrorCode.urlParse),
+    );
   });
 }
