@@ -1,6 +1,6 @@
 import 'package:synchronized/synchronized.dart';
 
-import '../gen/ffi/libetebase.ffi.isolate.dart';
+import 'gen/ffi/libetebase.ffi.isolate.dart';
 import 'isolate/etebase_isolate.dart';
 import 'isolate/logging_invocation_handler_wrapper.dart';
 import 'model/etebase_config.dart';

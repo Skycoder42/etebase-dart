@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:meta/meta.dart';
 
-import '../../gen/ffi/libetebase.ffi.dart';
+import '../gen/ffi/libetebase.ffi.dart';
 import '../model/etebase_config.dart';
 import 'etebase_isolate.dart';
 import 'etebase_pool.dart';

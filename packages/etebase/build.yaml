@@ -18,8 +18,8 @@ targets:
       etebase:etebase_client_builder:
         enabled: true
         generate_for:
-          - lib/gen/ffi/libetebase.ffi.dart
+          - lib/src/gen/ffi/libetebase.ffi.dart
       etebase:etebase_isolate_builder:
         enabled: true
         generate_for:
-          - lib/gen/ffi/libetebase.ffi.dart
+          - lib/src/gen/ffi/libetebase.ffi.dart

@@ -30,7 +30,7 @@ dev_dependencies:
   uuid: ^3.0.7
 
 ffigen:
-  output: lib/gen/ffi/libetebase.ffi.dart
+  output: lib/src/gen/ffi/libetebase.ffi.dart
   name: LibEtebaseFFI
   description: Bindings for libetebase
   headers:

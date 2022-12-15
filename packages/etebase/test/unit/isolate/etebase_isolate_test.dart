@@ -1,8 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
-// ignore: test_library_import
-import 'package:etebase/gen/ffi/libetebase.ffi.dart';
+import 'package:etebase/src/gen/ffi/libetebase.ffi.dart';
 import 'package:etebase/src/isolate/etebase_isolate.dart';
 import 'package:etebase/src/isolate/etebase_isolate_error.dart';
 import 'package:etebase/src/isolate/etebase_pool.dart';

@@ -4,7 +4,7 @@ import 'dart:isolate';
 
 import 'package:meta/meta.dart';
 
-import '../../gen/ffi/libetebase.ffi.dart';
+import '../gen/ffi/libetebase.ffi.dart';
 import '../model/etebase_config.dart';
 import 'etebase_isolate_error.dart';
 import 'etebase_pool.dart';

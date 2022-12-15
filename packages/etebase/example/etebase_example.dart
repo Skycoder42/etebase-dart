@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
-import 'package:etebase/gen/ffi/libetebase.ffi.client.dart';
 import 'package:etebase/src/etebase_init.dart';
+import 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart';
 
 import '../test/integration/util/library_loader.dart';
 

@@ -155,13 +155,13 @@ abstract class Types {
   static TypeReference ffi(Reference type) => TypeReference(
         (b) => b
           ..replace(type.type as TypeReference)
-          ..url = 'package:etebase/gen/ffi/libetebase.ffi.dart',
+          ..url = 'package:etebase/src/gen/ffi/libetebase.ffi.dart',
       );
 
   static TypeReference client(Reference type) => TypeReference(
         (b) => b
           ..replace(type.type as TypeReference)
-          ..url = 'package:etebase/gen/ffi/libetebase.ffi.client.dart',
+          ..url = 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart',
       );
 }
 

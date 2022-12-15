@@ -10,7 +10,7 @@ import 'dart:ffi' as _i3;
 import 'dart:isolate' as _i6;
 import 'dart:typed_data' as _i5;
 
-import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i4;
+import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' as _i4;
 import 'package:etebase/src/isolate/etebase_isolate.dart' as _i1;
 import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i7;
 import 'package:etebase/src/model/etebase_prefetch_option.dart' as _i2;

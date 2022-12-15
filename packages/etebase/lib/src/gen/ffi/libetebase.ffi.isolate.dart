@@ -9,8 +9,8 @@
 import 'dart:ffi' as _i6;
 import 'dart:isolate' as _i10;
 
-import 'package:etebase/gen/ffi/libetebase.ffi.client.dart' as _i7;
-import 'package:etebase/gen/ffi/libetebase.ffi.dart' as _i2;
+import 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart' as _i7;
+import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' as _i2;
 import 'package:etebase/src/isolate/etebase_pool.dart' as _i3;
 import 'package:etebase/src/isolate/ffi_helpers.dart' as _i9;
 import 'package:etebase/src/isolate/method_invocation.dart' as _i5;

@@ -1,5 +1,4 @@
-// ignore: test_library_import
-import 'package:etebase/gen/ffi/libetebase.ffi.dart' hide EtebaseErrorCode;
+import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' hide EtebaseErrorCode;
 import 'package:etebase/src/isolate/etebase_pool.dart';
 import 'package:etebase/src/isolate/logging_invocation_handler_wrapper.dart';
 import 'package:etebase/src/isolate/method_invocation.dart';
