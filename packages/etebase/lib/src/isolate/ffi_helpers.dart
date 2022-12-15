@@ -7,10 +7,12 @@ import '../../gen/ffi/libetebase.ffi.dart' as ffi;
 import '../model/etebase_error_code.dart';
 import 'method_result.dart';
 
+/// @nodoc
 @internal
 abstract class FfiHelpers {
   FfiHelpers._(); // coverage:ignore-line
 
+  /// @nodoc
   static MethodResult errorResult(
     ffi.LibEtebaseFFI libEtebase,
     int invocationId,
@@ -24,6 +26,7 @@ abstract class FfiHelpers {
     );
   }
 
+  /// @nodoc
   static void assignPointerList<TPtr extends NativeType, TData>(
     Pointer<Pointer<TPtr>> pointerList,
     List<TData> dataList,
@@ -34,6 +37,7 @@ abstract class FfiHelpers {
     }
   }
 
+  /// @nodoc
   static List<TData> extractPointerList<TPtr extends NativeType, TData>(
     Pointer<Pointer<TPtr>> pointerList,
     int pointerListLength,
@@ -44,13 +48,4 @@ abstract class FfiHelpers {
         (index) => mapper(pointerList[index]),
         growable: false,
       );
-}
-
-@internal
-extension ArenaX on Arena {
-  Pointer<T> attach<T extends NativeType>(
-    Pointer<T> ptr, {
-    @visibleForTesting Allocator alloc = malloc,
-  }) =>
-      this.using(ptr, alloc.free);
 }

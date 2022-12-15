@@ -54,7 +54,8 @@ class ClientDataClassBuilder {
               }
             },
           ),
-        ),
+        )
+        ..docs.add('/// The dart binding of the ${clazz.name} rust class\n'),
     );
   }
 

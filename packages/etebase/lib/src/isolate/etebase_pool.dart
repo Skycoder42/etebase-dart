@@ -3,9 +3,11 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:meta/meta.dart';
 
+/// @nodoc
 @internal
 typedef DestroyMethod<T extends NativeType> = void Function(Pointer<T> pointer);
 
+/// @nodoc
 @internal
 class EtebasePool implements Allocator {
   final Allocator _alloc;
@@ -13,8 +15,10 @@ class EtebasePool implements Allocator {
   final _scopedPointers = <Pointer, Function>{};
   final _globalPointers = <Pointer, Function>{};
 
+  /// @nodoc
   EtebasePool([this._alloc = calloc]);
 
+  /// @nodoc
   Pointer<T> attachScoped<T extends NativeType>(
     Pointer<T> ptr, [
     DestroyMethod<T>? destroy,
@@ -23,6 +27,7 @@ class EtebasePool implements Allocator {
     return ptr;
   }
 
+  /// @nodoc
   Pointer<T> attachGlobal<T extends NativeType>(
     Pointer<T> ptr, [
     DestroyMethod<T>? destroy,
@@ -31,14 +36,18 @@ class EtebasePool implements Allocator {
     return ptr;
   }
 
+  /// @nodoc
   void freeScoped<T extends NativeType>(Pointer<T> pointer) =>
       _freePointer(_scopedPointers, pointer);
 
+  /// @nodoc
   void freeGlobal<T extends NativeType>(Pointer<T> pointer) =>
       _freePointer(_globalPointers, pointer);
 
+  /// @nodoc
   void releaseScope() => _releasePointers(_scopedPointers);
 
+  /// @nodoc
   void releaseAll() {
     _releasePointers(_scopedPointers);
     _releasePointers(_globalPointers);

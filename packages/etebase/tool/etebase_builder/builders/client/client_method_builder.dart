@@ -10,6 +10,11 @@ class ClientMethodBuilder {
   static const _sizeHintName = 'sizeHint';
   static const sizeHintRef = Reference(_sizeHintName);
 
+  static const _docsMap = {
+    'etebase_client_new': '/// Creates a new etebase client.\n',
+    'etebase_client_set_server_url': '/// Sets the server URL of the client.\n',
+  };
+
   final ClientMethodBodyBuilder _clientMethodBodyBuilder;
 
   const ClientMethodBuilder([
@@ -45,7 +50,7 @@ class ClientMethodBuilder {
             ])
             ..body = _clientMethodBodyBuilder.buildBody(method);
 
-          final docComment = method.documentation;
+          final docComment = method.documentation ?? _docsMap[method.ffiName];
           if (docComment != null && !method.isDestroy) {
             b.docs.add('\n$docComment');
           }

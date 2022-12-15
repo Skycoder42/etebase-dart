@@ -4,7 +4,7 @@
 // EtebaseIsolateGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names, avoid_bool_literals_in_conditional_expressions, prefer_const_constructors, unused_element, unused_local_variable
+// ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names, avoid_bool_literals_in_conditional_expressions, prefer_const_constructors, unused_element, unused_local_variable, public_member_api_docs
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i6;
 import 'dart:isolate' as _i10;

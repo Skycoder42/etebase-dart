@@ -58,7 +58,8 @@ class ClientClassBuilder {
         ..methods.addAll([
           ...clazz.methods.map(_clientMethodBuilder.buildMethod),
           _buildDispose(clazz.methods),
-        ]),
+        ])
+        ..docs.add('/// The dart binding of the ${clazz.name} rust class\n'),
     );
   }
 

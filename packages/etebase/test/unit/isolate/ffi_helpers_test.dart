@@ -88,27 +88,4 @@ void main() {
       expect(result, List.generate(listLength, (index) => index));
     });
   });
-
-  group('ArenaX', () {
-    final mockAllocator = MockAllocator();
-
-    setUp(() {
-      reset(mockAllocator);
-    });
-
-    test('attach frees the given pointer when arena is released', () {
-      final sut = Arena(mockAllocator);
-
-      final testPtr = Pointer<Int16>.fromAddress(1);
-      final usedPointer = sut.attach(testPtr, alloc: mockAllocator);
-
-      expect(usedPointer, same(testPtr));
-
-      verifyNever(() => mockAllocator.free(any()));
-
-      sut.releaseAll();
-
-      verify(() => mockAllocator.free(usedPointer));
-    });
-  });
 }

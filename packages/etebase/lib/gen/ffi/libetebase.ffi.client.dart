@@ -25,6 +25,8 @@ Future<Uri> etebaseGetDefaultServerUrl() =>
       const <dynamic>[],
     );
 
+/// The dart binding of the EtebaseItemMetadata rust class
+
 @freezed
 class EtebaseItemMetadata with _$EtebaseItemMetadata {
   /// Create a new metadata object
@@ -57,6 +59,8 @@ class EtebaseItemMetadata with _$EtebaseItemMetadata {
     String? itemType,
   }) = _EtebaseItemMetadata;
 }
+
+/// The dart binding of the EtebaseFetchOptions rust class
 
 @freezed
 class EtebaseFetchOptions with _$EtebaseFetchOptions {
@@ -95,6 +99,8 @@ class EtebaseFetchOptions with _$EtebaseFetchOptions {
     int? limit,
   }) = _EtebaseFetchOptions;
 }
+
+/// The dart binding of the EtebaseUserProfile rust class
 
 class EtebaseUserProfile {
   EtebaseUserProfile._(
@@ -144,6 +150,8 @@ class EtebaseUserProfile {
     }
   }
 }
+
+/// The dart binding of the EtebaseUser rust class
 
 class EtebaseUser {
   EtebaseUser._(
@@ -241,6 +249,8 @@ class EtebaseUser {
     }
   }
 }
+
+/// The dart binding of the EtebaseSignedInvitation rust class
 
 class EtebaseSignedInvitation {
   EtebaseSignedInvitation._(
@@ -342,6 +352,8 @@ class EtebaseSignedInvitation {
   }
 }
 
+/// The dart binding of the EtebaseRemovedCollection rust class
+
 class EtebaseRemovedCollection {
   EtebaseRemovedCollection._(
     this._pointer, [
@@ -386,6 +398,8 @@ class EtebaseRemovedCollection {
     }
   }
 }
+
+/// The dart binding of the EtebaseInvitationListResponse rust class
 
 class EtebaseInvitationListResponse {
   EtebaseInvitationListResponse._(
@@ -457,6 +471,8 @@ class EtebaseInvitationListResponse {
   }
 }
 
+/// The dart binding of the EtebaseItemRevisionsListResponse rust class
+
 class EtebaseItemRevisionsListResponse {
   EtebaseItemRevisionsListResponse._(
     this._pointer, [
@@ -527,6 +543,8 @@ class EtebaseItemRevisionsListResponse {
   }
 }
 
+/// The dart binding of the EtebaseMemberListResponse rust class
+
 class EtebaseMemberListResponse {
   EtebaseMemberListResponse._(
     this._pointer, [
@@ -596,6 +614,8 @@ class EtebaseMemberListResponse {
     }
   }
 }
+
+/// The dart binding of the EtebaseItemManager rust class
 
 class EtebaseItemManager {
   EtebaseItemManager._(
@@ -917,6 +937,8 @@ class EtebaseItemManager {
   }
 }
 
+/// The dart binding of the EtebaseItemListResponse rust class
+
 class EtebaseItemListResponse {
   EtebaseItemListResponse._(
     this._pointer, [
@@ -986,6 +1008,8 @@ class EtebaseItemListResponse {
     }
   }
 }
+
+/// The dart binding of the EtebaseItem rust class
 
 class EtebaseItem {
   EtebaseItem._(
@@ -1159,6 +1183,8 @@ class EtebaseItem {
     }
   }
 }
+
+/// The dart binding of the EtebaseFileSystemCache rust class
 
 class EtebaseFileSystemCache {
   EtebaseFileSystemCache._(
@@ -1439,6 +1465,8 @@ class EtebaseFileSystemCache {
   }
 }
 
+/// The dart binding of the EtebaseCollectionMemberManager rust class
+
 class EtebaseCollectionMemberManager {
   EtebaseCollectionMemberManager._(
     this._pointer, [
@@ -1530,6 +1558,8 @@ class EtebaseCollectionMemberManager {
   }
 }
 
+/// The dart binding of the EtebaseCollectionMember rust class
+
 class EtebaseCollectionMember {
   EtebaseCollectionMember._(
     this._pointer, [
@@ -1592,6 +1622,8 @@ class EtebaseCollectionMember {
     }
   }
 }
+
+/// The dart binding of the EtebaseCollectionManager rust class
 
 class EtebaseCollectionManager {
   EtebaseCollectionManager._(
@@ -1863,6 +1895,8 @@ class EtebaseCollectionManager {
   }
 }
 
+/// The dart binding of the EtebaseCollectionListResponse rust class
+
 class EtebaseCollectionListResponse {
   EtebaseCollectionListResponse._(
     this._pointer, [
@@ -1950,6 +1984,8 @@ class EtebaseCollectionListResponse {
     }
   }
 }
+
+/// The dart binding of the EtebaseCollectionInvitationManager rust class
 
 class EtebaseCollectionInvitationManager {
   EtebaseCollectionInvitationManager._(
@@ -2111,6 +2147,8 @@ class EtebaseCollectionInvitationManager {
     }
   }
 }
+
+/// The dart binding of the EtebaseCollection rust class
 
 class EtebaseCollection {
   EtebaseCollection._(
@@ -2322,6 +2360,8 @@ class EtebaseCollection {
   }
 }
 
+/// The dart binding of the EtebaseClient rust class
+
 class EtebaseClient {
   EtebaseClient._(
     this._pointer, [
@@ -2342,6 +2382,8 @@ class EtebaseClient {
 
   final Object? _owner;
 
+  /// Creates a new etebase client.
+
   static Future<EtebaseClient> create(
     String clientName,
     Uri serverUrl,
@@ -2354,6 +2396,9 @@ class EtebaseClient {
           serverUrl,
         ],
       )));
+
+  /// Sets the server URL of the client.
+
   Future<void> setServerUrl(Uri serverUrl) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_client_set_server_url,
@@ -2386,6 +2431,8 @@ class EtebaseClient {
     }
   }
 }
+
+/// The dart binding of the EtebaseAccount rust class
 
 class EtebaseAccount {
   EtebaseAccount._(
@@ -2571,6 +2618,8 @@ class EtebaseAccount {
     }
   }
 }
+
+/// The dart binding of the EtebaseUtils rust class
 
 abstract class EtebaseUtils {
   EtebaseUtils._();

@@ -42,5 +42,6 @@ void _writeIgnoreComment(StringBuffer buffer) => buffer
       'prefer_const_constructors',
       'unused_element',
       'unused_local_variable',
+      'public_member_api_docs'
     ].join(', '),
   );

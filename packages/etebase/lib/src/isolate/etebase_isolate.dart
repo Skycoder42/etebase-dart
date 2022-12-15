@@ -11,8 +11,10 @@ import 'etebase_pool.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
 
+/// Typedef for a function that loads the `libetebase.[so|dylib|dll]`.
 typedef LoadLibetebaseFn = FutureOr<DynamicLibrary> Function();
 
+/// @nodoc
 @internal
 typedef MethodInvocationHandler = MethodResult Function(
   LibEtebaseFFI libEtebaseFFI,
@@ -35,6 +37,7 @@ class _EtebaseIsolateInitMessage {
   );
 }
 
+/// @nodoc
 @internal
 class EtebaseIsolate {
   static const _controlInitializeIsolateMessageId = -1;
@@ -62,6 +65,7 @@ class EtebaseIsolate {
     _terminatedAndDisposed = _exitPort.first.whenComplete(_dispose);
   }
 
+  /// @nodoc
   Future<T> invoke<T>(Symbol method, List<dynamic> arguments) {
     final id = _invocationCounter++;
     final result = _receiveBroadcast.firstWhere(
@@ -74,6 +78,7 @@ class EtebaseIsolate {
     return result.then((r) => r.unwrap<T>());
   }
 
+  /// @nodoc
   Future<void> terminate({
     Duration timeout = const Duration(seconds: 30),
   }) {
@@ -104,8 +109,10 @@ class EtebaseIsolate {
 
   static EtebaseIsolate? _instance;
 
+  /// @nodoc
   static bool get hasInstance => _instance != null;
 
+  /// @nodoc
   static EtebaseIsolate get current {
     if (_instance == null) {
       throw EtebaseIsolateError.notInitialized();
@@ -113,6 +120,7 @@ class EtebaseIsolate {
     return _instance!;
   }
 
+  /// @nodoc
   static Future<EtebaseIsolate> spawn({
     required LoadLibetebaseFn loadLibetebase,
     required EtebaseConfig etebaseConfig,

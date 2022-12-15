@@ -9,16 +9,21 @@ import 'etebase_pool.dart';
 import 'method_invocation.dart';
 import 'method_result.dart';
 
+/// @nodoc
 @internal
 class LoggingInvocationHandlerWrapper {
   final MethodInvocationHandler _methodInvocationHandler;
+
+  /// @nodoc
   final int logLevel;
 
+  /// @nodoc
   const LoggingInvocationHandlerWrapper(
     this._methodInvocationHandler, {
     this.logLevel = 500,
   });
 
+  /// @nodoc
   MethodResult call(
     LibEtebaseFFI libEtebaseFFI,
     EtebasePool pool,
