@@ -21,7 +21,7 @@ dev_dependencies:
   code_builder: ^4.3.0
   dart_pre_commit: ^4.0.0
   dart_test_tools: ^4.6.0
-  ffigen: ^7.2.2
+  ffigen: ^7.2.3
   freezed: ^2.3.2
   mocktail: ^0.3.0
   source_gen: ^1.2.6

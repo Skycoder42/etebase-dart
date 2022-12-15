@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build/build.dart';
@@ -16,8 +17,7 @@ abstract class RestorableGenerator extends Generator {
   @nonVirtual
   Future<String?> generate(LibraryReader library, BuildStep buildStep) async {
     if (restoreMode) {
-      await _restore(buildStep);
-      return null;
+      return _restore(buildStep);
     } else {
       return generateImpl(library, buildStep);
     }
@@ -26,7 +26,7 @@ abstract class RestorableGenerator extends Generator {
   @protected
   String generateImpl(LibraryReader library, BuildStep buildStep);
 
-  Future<void> _restore(BuildStep buildStep) async {
+  Future<String> _restore(BuildStep buildStep) async {
     final outPath = buildStep.allowedOutputs.single.path;
     print('Restoring $outPath from git');
 
@@ -38,6 +38,18 @@ abstract class RestorableGenerator extends Generator {
       throw Exception(
         'git restore $outPath failed with exit code: ${result.exitCode}',
       );
+    }
+
+    final file = File(outPath);
+    try {
+      return await file
+          .openRead()
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .skipWhile((line) => !line.startsWith('// ignore_for_file:'))
+          .join('\n');
+    } finally {
+      await file.delete();
     }
   }
 }
