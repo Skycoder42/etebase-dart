@@ -3,8 +3,8 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:meta/meta.dart';
 
+import '../../etebase.dart';
 import '../gen/ffi/libetebase.ffi.dart' as ffi;
-import '../model/etebase_error_code.dart';
 import 'method_result.dart';
 
 /// @nodoc
@@ -21,6 +21,16 @@ abstract class FfiHelpers {
     final errorMessage = libEtebase.etebase_error_get_message();
     return MethodResult.failure(
       invocationId,
+      EtebaseErrorCode.values[errorCode], // TODO make failsave for other codes
+      errorMessage == nullptr ? '' : errorMessage.cast<Utf8>().toDartString(),
+    );
+  }
+
+  /// @nodoc
+  static Never throwError(ffi.LibEtebaseFFI libEtebase) {
+    final errorCode = libEtebase.etebase_error_get_code();
+    final errorMessage = libEtebase.etebase_error_get_message();
+    throw EtebaseException(
       EtebaseErrorCode.values[errorCode], // TODO make failsave for other codes
       errorMessage == nullptr ? '' : errorMessage.cast<Utf8>().toDartString(),
     );

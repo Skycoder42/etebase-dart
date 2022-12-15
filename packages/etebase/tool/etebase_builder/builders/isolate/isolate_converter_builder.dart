@@ -58,20 +58,26 @@ class IsolateConverterBuilder {
     ]);
 
     final createMethod = clazz.methods.singleWhere((m) => m.isNew);
+    final createMethodParamNames =
+        createMethod.parameters.map((p) => p.name).toList();
     final destroyMethod = clazz.methods.singleWhere((m) => m.isDestroy);
+
+    yield* _buildConstructorParams(clazz, createMethod);
     yield declareFinal(_instanceName)
         .assign(
           IsolateBuilder.poolRef.property('attachScoped').call([
             IsolateBuilder.libEtebaseRef
                 .property(createMethod.ffiName)
-                .call([]),
+                .call(createMethodParamNames.map(refer)),
             IsolateBuilder.libEtebaseRef.property(destroyMethod.ffiName),
           ]),
         )
         .statement;
 
     final setters = clazz.methods.where(
-      (method) => method.methodKind == MethodKind.setter,
+      (method) =>
+          method.methodKind == MethodKind.setter &&
+          !createMethodParamNames.contains(method.accessorName),
     );
     for (final setter in setters) {
       final member = _dataRef.property(setter.accessorName);
@@ -87,6 +93,18 @@ class IsolateConverterBuilder {
     }
 
     yield _instanceRef.returned.statement;
+  }
+
+  Iterable<Code> _buildConstructorParams(
+    ClassRef clazz,
+    MethodRef constructor,
+  ) sync* {
+    for (final param in constructor.parameters) {
+      yield* _isolateInParamBuilder.buildInParameter(
+        param,
+        _dataRef.property(param.name),
+      );
+    }
   }
 
   Method _buildFromNative(ClassRef clazz) => Method(
@@ -141,6 +159,7 @@ class IsolateConverterBuilder {
         refer(rawValueName),
         (returnValue) =>
             declareFinal(getter.accessorName).assign(returnValue).statement,
+        thrown: true,
       );
     }
 

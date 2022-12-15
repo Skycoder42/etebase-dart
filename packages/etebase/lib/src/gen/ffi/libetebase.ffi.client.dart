@@ -25,6 +25,29 @@ Future<Uri> etebaseGetDefaultServerUrl() =>
       const <dynamic>[],
     );
 
+/// The dart binding of the EtebaseUser rust class
+
+@freezed
+class EtebaseUser with _$EtebaseUser {
+  /// Return a new user instance
+  ///
+  /// Should be destroyed with `etebase_user_destroy`
+  ///
+  /// @param username the user's username
+  /// @param email the user's email
+  const factory EtebaseUser({
+    /// Get the username
+    ///
+    /// @param this_ the object handle
+    required String username,
+
+    /// Get the email address
+    ///
+    /// @param this_ the object handle
+    required String email,
+  }) = _EtebaseUser;
+}
+
 /// The dart binding of the EtebaseItemMetadata rust class
 
 @freezed
@@ -137,105 +160,6 @@ class EtebaseUserProfile {
   static Future<void> _destroy(_i3.Pointer<_i4.EtebaseUserProfile> this_) =>
       _i1.EtebaseIsolate.current.invoke<void>(
         #etebase_user_profile_destroy,
-        <dynamic>[this_.address],
-      );
-
-  /// Destroy the object
-  ///
-  /// @param this_ the object handle
-  Future<void> dispose() async {
-    if (_owner == null) {
-      _finalizer.detach(this);
-      await _destroy(_pointer);
-    }
-  }
-}
-
-/// The dart binding of the EtebaseUser rust class
-
-class EtebaseUser {
-  EtebaseUser._(
-    this._pointer, [
-    this._owner,
-  ]) {
-    if (_owner == null) {
-      _finalizer.attach(
-        this,
-        _pointer,
-        detach: this,
-      );
-    }
-  }
-
-  static final _finalizer = Finalizer(_destroy);
-
-  final _i3.Pointer<_i4.EtebaseUser> _pointer;
-
-  final Object? _owner;
-
-  /// Return a new user instance
-  ///
-  /// Should be destroyed with `etebase_user_destroy`
-  ///
-  /// @param username the user's username
-  /// @param email the user's email
-  static Future<EtebaseUser> create(
-    String username,
-    String email,
-  ) async =>
-      EtebaseUser._(
-          _i3.Pointer.fromAddress(await _i1.EtebaseIsolate.current.invoke<int>(
-        #etebase_user_new,
-        <dynamic>[
-          username,
-          email,
-        ],
-      )));
-
-  /// Set the username
-  ///
-  /// @param this_ the object handle
-  /// @param username the user's username
-  Future<void> setUsername(String username) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_user_set_username,
-        <dynamic>[
-          _pointer.address,
-          username,
-        ],
-      );
-
-  /// Get the username
-  ///
-  /// @param this_ the object handle
-  Future<String> getUsername() => _i1.EtebaseIsolate.current.invoke<String>(
-        #etebase_user_get_username,
-        <dynamic>[_pointer.address],
-      );
-
-  /// Set the email address
-  ///
-  /// @param this_ the object handle
-  /// @param email the user's email address
-  Future<void> setEmail(String email) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_user_set_email,
-        <dynamic>[
-          _pointer.address,
-          email,
-        ],
-      );
-
-  /// Get the email address
-  ///
-  /// @param this_ the object handle
-  Future<String> getEmail() => _i1.EtebaseIsolate.current.invoke<String>(
-        #etebase_user_get_email,
-        <dynamic>[_pointer.address],
-      );
-  static Future<void> _destroy(_i3.Pointer<_i4.EtebaseUser> this_) =>
-      _i1.EtebaseIsolate.current.invoke<void>(
-        #etebase_user_destroy,
         <dynamic>[this_.address],
       );
 
@@ -2489,7 +2413,7 @@ class EtebaseAccount {
         #etebase_account_signup,
         <dynamic>[
           client._pointer.address,
-          user._pointer.address,
+          user,
           password,
         ],
       )));

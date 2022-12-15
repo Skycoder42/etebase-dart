@@ -12,13 +12,13 @@ import 'dart:isolate' as _i10;
 import 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart' as _i7;
 import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' as _i2;
 import 'package:etebase/src/isolate/etebase_pool.dart' as _i3;
-import 'package:etebase/src/isolate/ffi_helpers.dart' as _i9;
+import 'package:etebase/src/isolate/ffi_helpers.dart' as _i8;
 import 'package:etebase/src/isolate/method_invocation.dart' as _i5;
 import 'package:etebase/src/isolate/method_result.dart' as _i1;
 import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i11;
 import 'package:etebase/src/model/etebase_config.dart' as _i4;
 import 'package:etebase/src/model/etebase_error_code.dart' as _i12;
-import 'package:ffi/ffi.dart' as _i8;
+import 'package:ffi/ffi.dart' as _i9;
 import 'package:ffi/ffi.dart';
 
 _i1.MethodResult etebaseIsolateMessageHandler(
@@ -38,48 +38,6 @@ _i1.MethodResult etebaseIsolateMessageHandler(
         );
       case #etebase_user_profile_destroy:
         return _etebase_user_profile_destroy(
-          libEtebase,
-          pool,
-          config,
-          invocation,
-        );
-      case #etebase_user_new:
-        return _etebase_user_new(
-          libEtebase,
-          pool,
-          config,
-          invocation,
-        );
-      case #etebase_user_set_username:
-        return _etebase_user_set_username(
-          libEtebase,
-          pool,
-          config,
-          invocation,
-        );
-      case #etebase_user_get_username:
-        return _etebase_user_get_username(
-          libEtebase,
-          pool,
-          config,
-          invocation,
-        );
-      case #etebase_user_set_email:
-        return _etebase_user_set_email(
-          libEtebase,
-          pool,
-          config,
-          invocation,
-        );
-      case #etebase_user_get_email:
-        return _etebase_user_get_email(
-          libEtebase,
-          pool,
-          config,
-          invocation,
-        );
-      case #etebase_user_destroy:
-        return _etebase_user_destroy(
           libEtebase,
           pool,
           config,
@@ -1084,6 +1042,51 @@ _i1.MethodResult etebaseIsolateMessageHandler(
   }
 }
 
+_i6.Pointer<_i2.EtebaseUser> _etebaseUserToNative(
+  _i2.LibEtebaseFFI libEtebase,
+  _i3.EtebasePool pool,
+  _i7.EtebaseUser? data,
+) {
+  if (data == null) {
+    return _i6.nullptr;
+  }
+  final username = data.username.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+  final email = data.email.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+  final instance = pool.attachScoped(
+    libEtebase.etebase_user_new(
+      username,
+      email,
+    ),
+    libEtebase.etebase_user_destroy,
+  );
+  return instance;
+}
+
+_i7.EtebaseUser _etebaseUserFromNative(
+  _i2.LibEtebaseFFI libEtebase,
+  _i3.EtebasePool pool,
+  _i6.Pointer<_i2.EtebaseUser> data,
+) {
+  final instance = pool.attachScoped(
+    data,
+    libEtebase.etebase_user_destroy,
+  );
+  final usernameRaw = libEtebase.etebase_user_get_username(instance);
+  if (usernameRaw == _i6.nullptr) {
+    _i8.FfiHelpers.throwError(libEtebase);
+  }
+  final username = usernameRaw.cast<_i9.Utf8>().toDartString();
+  final emailRaw = libEtebase.etebase_user_get_email(instance);
+  if (emailRaw == _i6.nullptr) {
+    _i8.FfiHelpers.throwError(libEtebase);
+  }
+  final email = emailRaw.cast<_i9.Utf8>().toDartString();
+  return _i7.EtebaseUser(
+    username: username,
+    email: email,
+  );
+}
+
 _i6.Pointer<_i2.EtebaseItemMetadata> _etebaseItemMetadataToNative(
   _i2.LibEtebaseFFI libEtebase,
   _i3.EtebasePool pool,
@@ -1148,10 +1151,10 @@ _i7.EtebaseItemMetadata _etebaseItemMetadataFromNative(
   final itemTypeRaw = libEtebase.etebase_item_metadata_get_item_type(instance);
   final itemType = itemTypeRaw == _i6.nullptr
       ? null
-      : itemTypeRaw.cast<_i8.Utf8>().toDartString();
+      : itemTypeRaw.cast<_i9.Utf8>().toDartString();
   final nameRaw = libEtebase.etebase_item_metadata_get_name(instance);
   final name =
-      nameRaw == _i6.nullptr ? null : nameRaw.cast<_i8.Utf8>().toDartString();
+      nameRaw == _i6.nullptr ? null : nameRaw.cast<_i9.Utf8>().toDartString();
   final mtimeRaw = libEtebase.etebase_item_metadata_get_mtime(instance);
   final mtime = mtimeRaw == _i6.nullptr
       ? null
@@ -1160,10 +1163,10 @@ _i7.EtebaseItemMetadata _etebaseItemMetadataFromNative(
       libEtebase.etebase_item_metadata_get_description(instance);
   final description = descriptionRaw == _i6.nullptr
       ? null
-      : descriptionRaw.cast<_i8.Utf8>().toDartString();
+      : descriptionRaw.cast<_i9.Utf8>().toDartString();
   final colorRaw = libEtebase.etebase_item_metadata_get_color(instance);
   final color =
-      colorRaw == _i6.nullptr ? null : colorRaw.cast<_i8.Utf8>().toDartString();
+      colorRaw == _i6.nullptr ? null : colorRaw.cast<_i9.Utf8>().toDartString();
   return _i7.EtebaseItemMetadata(
     itemType: itemType,
     name: name,
@@ -1249,7 +1252,7 @@ _i1.MethodResult _etebase_user_profile_get_pubkey(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_user_profile_get_pubkey(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -1282,163 +1285,6 @@ _i1.MethodResult _etebase_user_profile_destroy(
   );
 }
 
-_i1.MethodResult _etebase_user_new(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
-) {
-  assert(invocation.arguments.length == 2,
-      'Invocation must have exactly 2 arguments');
-  assert(invocation.arguments[0] is String,
-      'Parameter username must be of type String');
-  assert(invocation.arguments[1] is String,
-      'Parameter email must be of type String');
-  final username = (invocation.arguments[0] as String)
-      .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  final email = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  final result = libEtebase.etebase_user_new(
-    username,
-    email,
-  );
-  if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<int>(
-    invocation.id,
-    pool
-        .attachGlobal(
-          result,
-          libEtebase.etebase_user_destroy,
-        )
-        .address,
-  );
-}
-
-_i1.MethodResult _etebase_user_set_username(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
-) {
-  assert(invocation.arguments.length == 2,
-      'Invocation must have exactly 2 arguments');
-  assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter username must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
-      (invocation.arguments[0] as int));
-  final username = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  libEtebase.etebase_user_set_username(
-    this_,
-    username,
-  );
-  return _i1.MethodResult.successTyped<void>(
-    invocation.id,
-    null,
-  );
-}
-
-_i1.MethodResult _etebase_user_get_username(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
-  assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
-      (invocation.arguments[0] as int));
-  final result = libEtebase.etebase_user_get_username(this_);
-  if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
-    invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
-  );
-}
-
-_i1.MethodResult _etebase_user_set_email(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
-) {
-  assert(invocation.arguments.length == 2,
-      'Invocation must have exactly 2 arguments');
-  assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is String,
-      'Parameter email must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
-      (invocation.arguments[0] as int));
-  final email = (invocation.arguments[1] as String)
-      .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  libEtebase.etebase_user_set_email(
-    this_,
-    email,
-  );
-  return _i1.MethodResult.successTyped<void>(
-    invocation.id,
-    null,
-  );
-}
-
-_i1.MethodResult _etebase_user_get_email(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
-  assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
-      (invocation.arguments[0] as int));
-  final result = libEtebase.etebase_user_get_email(this_);
-  if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
-      libEtebase,
-      invocation.id,
-    );
-  }
-  return _i1.MethodResult.successTyped<String>(
-    invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
-  );
-}
-
-_i1.MethodResult _etebase_user_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
-) {
-  assert(invocation.arguments.length == 1,
-      'Invocation must have exactly 1 arguments');
-  assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
-      (invocation.arguments[0] as int));
-  pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
-    invocation.id,
-    null,
-  );
-}
-
 _i1.MethodResult _etebase_signed_invitation_clone(
   _i2.LibEtebaseFFI libEtebase,
   _i3.EtebasePool pool,
@@ -1452,7 +1298,7 @@ _i1.MethodResult _etebase_signed_invitation_clone(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_clone(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -1481,14 +1327,14 @@ _i1.MethodResult _etebase_signed_invitation_get_uid(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_uid(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1505,14 +1351,14 @@ _i1.MethodResult _etebase_signed_invitation_get_username(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_username(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1529,14 +1375,14 @@ _i1.MethodResult _etebase_signed_invitation_get_collection(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_collection(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1553,7 +1399,7 @@ _i1.MethodResult _etebase_signed_invitation_get_access_level(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_access_level(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -1577,14 +1423,14 @@ _i1.MethodResult _etebase_signed_invitation_get_from_username(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_from_username(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1601,7 +1447,7 @@ _i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_from_pubkey(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -1646,14 +1492,14 @@ _i1.MethodResult _etebase_removed_collection_get_uid(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_removed_collection_get_uid(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1689,14 +1535,14 @@ _i1.MethodResult _etebase_invitation_list_response_get_iterator(
   final result =
       libEtebase.etebase_invitation_list_response_get_iterator(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1719,14 +1565,14 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
     data,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i9.FfiHelpers.extractPointerList(
+    _i8.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -1784,14 +1630,14 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
   final result =
       libEtebase.etebase_item_revisions_list_response_get_iterator(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1814,14 +1660,14 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
     data,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i9.FfiHelpers.extractPointerList(
+    _i8.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -1878,14 +1724,14 @@ _i1.MethodResult _etebase_member_list_response_get_iterator(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_member_list_response_get_iterator(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -1908,14 +1754,14 @@ _i1.MethodResult _etebase_member_list_response_get_data(
     data,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i9.FfiHelpers.extractPointerList(
+    _i8.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -1988,7 +1834,7 @@ _i1.MethodResult _etebase_item_manager_fetch(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2040,7 +1886,7 @@ _i1.MethodResult _etebase_item_manager_create(
     contentSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2097,7 +1943,7 @@ _i1.MethodResult _etebase_item_manager_create_raw(
     contentSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2136,7 +1982,7 @@ _i1.MethodResult _etebase_item_manager_list(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2179,7 +2025,7 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2212,7 +2058,7 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
   final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
@@ -2229,7 +2075,7 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2262,7 +2108,7 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<String>).length;
   final items = pool<_i6.Pointer<_i6.Char>>(itemsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<String>),
     (s) => s.toNativeUtf8(allocator: pool).cast<_i6.Char>(),
@@ -2279,7 +2125,7 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2312,7 +2158,7 @@ _i1.MethodResult _etebase_item_manager_batch(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
   final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
@@ -2329,7 +2175,7 @@ _i1.MethodResult _etebase_item_manager_batch(
     fetchOptions,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2359,14 +2205,14 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
   final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
   );
   final depsSize = (invocation.arguments[2] as List<int>).length;
   final deps = pool<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     deps,
     (invocation.arguments[2] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
@@ -2385,7 +2231,7 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
     fetchOptions,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2413,7 +2259,7 @@ _i1.MethodResult _etebase_item_manager_transaction(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
   final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
@@ -2430,7 +2276,7 @@ _i1.MethodResult _etebase_item_manager_transaction(
     fetchOptions,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2460,14 +2306,14 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
   final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
   );
   final depsSize = (invocation.arguments[2] as List<int>).length;
   final deps = pool<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     deps,
     (invocation.arguments[2] as List<int>),
     _i6.Pointer<_i2.EtebaseItem>.fromAddress,
@@ -2486,7 +2332,7 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
     fetchOptions,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2525,7 +2371,7 @@ _i1.MethodResult _etebase_item_manager_cache_load(
     cachedSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2562,7 +2408,7 @@ _i1.MethodResult _etebase_item_manager_cache_save(
     retSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2596,7 +2442,7 @@ _i1.MethodResult _etebase_item_manager_cache_save_with_content(
     retSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2640,14 +2486,14 @@ _i1.MethodResult _etebase_item_list_response_get_stoken(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_list_response_get_stoken(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -2669,14 +2515,14 @@ _i1.MethodResult _etebase_item_list_response_get_data(
     data,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i9.FfiHelpers.extractPointerList(
+    _i8.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -2733,7 +2579,7 @@ _i1.MethodResult _etebase_item_clone(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_clone(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2790,7 +2636,7 @@ _i1.MethodResult _etebase_item_set_meta(
     meta,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2814,7 +2660,7 @@ _i1.MethodResult _etebase_item_get_meta(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_meta(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2857,7 +2703,7 @@ _i1.MethodResult _etebase_item_set_meta_raw(
     metaSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2892,7 +2738,7 @@ _i1.MethodResult _etebase_item_get_meta_raw(
     bufSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2947,7 +2793,7 @@ _i1.MethodResult _etebase_item_set_content(
     contentSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -2982,7 +2828,7 @@ _i1.MethodResult _etebase_item_get_content(
     bufSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3022,7 +2868,7 @@ _i1.MethodResult _etebase_item_delete(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_delete(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3064,14 +2910,14 @@ _i1.MethodResult _etebase_item_get_uid(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_uid(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -3088,14 +2934,14 @@ _i1.MethodResult _etebase_item_get_etag(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_etag(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -3140,7 +2986,7 @@ _i1.MethodResult _etebase_fs_cache_new(
     username,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3169,7 +3015,7 @@ _i1.MethodResult _etebase_fs_cache_clear_user(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_clear_user(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3224,7 +3070,7 @@ _i1.MethodResult _etebase_fs_cache_save_account(
     encryptionKeySize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3279,7 +3125,7 @@ _i1.MethodResult _etebase_fs_cache_load_account(
     encryptionKeySize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3316,7 +3162,7 @@ _i1.MethodResult _etebase_fs_cache_save_stoken(
     stoken,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3343,7 +3189,7 @@ _i1.MethodResult _etebase_fs_cache_load_stoken(
     invocation.id,
     result == _i6.nullptr
         ? null
-        : pool.attachScoped(result).cast<_i8.Utf8>().toDartString(),
+        : pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -3374,7 +3220,7 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
     stoken,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3409,7 +3255,7 @@ _i1.MethodResult _etebase_fs_cache_collection_load_stoken(
     invocation.id,
     result == _i6.nullptr
         ? null
-        : pool.attachScoped(result).cast<_i8.Utf8>().toDartString(),
+        : pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -3437,7 +3283,7 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
     col,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3474,7 +3320,7 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
     colUid,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3511,7 +3357,7 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
     colUid,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3557,7 +3403,7 @@ _i1.MethodResult _etebase_fs_cache_item_set(
     item,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3600,7 +3446,7 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
     itemUid,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3643,7 +3489,7 @@ _i1.MethodResult _etebase_fs_cache_item_get(
     itemUid,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3700,7 +3546,7 @@ _i1.MethodResult _etebase_collection_member_manager_list(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3737,7 +3583,7 @@ _i1.MethodResult _etebase_collection_member_manager_remove(
     username,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3761,7 +3607,7 @@ _i1.MethodResult _etebase_collection_member_manager_leave(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_manager_leave(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3799,7 +3645,7 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
     accessLevel,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3841,7 +3687,7 @@ _i1.MethodResult _etebase_collection_member_clone(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_clone(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3870,14 +3716,14 @@ _i1.MethodResult _etebase_collection_member_get_username(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_username(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -3894,7 +3740,7 @@ _i1.MethodResult _etebase_collection_member_get_access_level(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_access_level(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -3952,7 +3798,7 @@ _i1.MethodResult _etebase_collection_manager_fetch(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4010,7 +3856,7 @@ _i1.MethodResult _etebase_collection_manager_create(
     contentSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4073,7 +3919,7 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
     contentSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4108,7 +3954,7 @@ _i1.MethodResult _etebase_collection_manager_get_item_manager(
     col,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4153,7 +3999,7 @@ _i1.MethodResult _etebase_collection_manager_list(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4186,7 +4032,7 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
       (invocation.arguments[0] as int));
   final collectionTypesSize = (invocation.arguments[1] as List<String>).length;
   final collectionTypes = pool<_i6.Pointer<_i6.Char>>(collectionTypesSize);
-  _i9.FfiHelpers.assignPointerList(
+  _i8.FfiHelpers.assignPointerList(
     collectionTypes,
     (invocation.arguments[1] as List<String>),
     (s) => s.toNativeUtf8(allocator: pool).cast<_i6.Char>(),
@@ -4203,7 +4049,7 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4247,7 +4093,7 @@ _i1.MethodResult _etebase_collection_manager_upload(
     fetchOptions,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4286,7 +4132,7 @@ _i1.MethodResult _etebase_collection_manager_transaction(
     fetchOptions,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4325,7 +4171,7 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
     cachedSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4363,7 +4209,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save(
     retSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4398,7 +4244,7 @@ _i1.MethodResult _etebase_collection_manager_cache_save_with_content(
     retSize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4430,7 +4276,7 @@ _i1.MethodResult _etebase_collection_manager_get_member_manager(
     col,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4478,7 +4324,7 @@ _i1.MethodResult _etebase_collection_list_response_get_stoken(
   final result = libEtebase.etebase_collection_list_response_get_stoken(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i8.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -4501,14 +4347,14 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
     data,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i9.FfiHelpers.extractPointerList(
+    _i8.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -4554,14 +4400,14 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
     data,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i9.FfiHelpers.extractPointerList(
+    _i8.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -4610,7 +4456,7 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4649,7 +4495,7 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
     fetchOptions,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4685,7 +4531,7 @@ _i1.MethodResult _etebase_invitation_manager_accept(
     invitation,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4716,7 +4562,7 @@ _i1.MethodResult _etebase_invitation_manager_reject(
     invitation,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4748,7 +4594,7 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
     username,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4808,7 +4654,7 @@ _i1.MethodResult _etebase_invitation_manager_invite(
     accessLevel,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4839,7 +4685,7 @@ _i1.MethodResult _etebase_invitation_manager_disinvite(
     invitation,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4863,7 +4709,7 @@ _i1.MethodResult _etebase_invitation_manager_get_pubkey(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_invitation_manager_get_pubkey(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4908,7 +4754,7 @@ _i1.MethodResult _etebase_collection_clone(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_clone(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4965,7 +4811,7 @@ _i1.MethodResult _etebase_collection_set_meta(
     meta,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -4989,7 +4835,7 @@ _i1.MethodResult _etebase_collection_get_meta(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_meta(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5032,7 +4878,7 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
     metaSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5067,7 +4913,7 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
     bufSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5122,7 +4968,7 @@ _i1.MethodResult _etebase_collection_set_content(
     contentSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5157,7 +5003,7 @@ _i1.MethodResult _etebase_collection_get_content(
     bufSize,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5197,7 +5043,7 @@ _i1.MethodResult _etebase_collection_delete(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_delete(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5239,14 +5085,14 @@ _i1.MethodResult _etebase_collection_get_uid(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_uid(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -5263,14 +5109,14 @@ _i1.MethodResult _etebase_collection_get_etag(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_etag(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i8.Utf8>().toDartString(),
+    result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -5288,7 +5134,7 @@ _i1.MethodResult _etebase_collection_get_stoken(
   final result = libEtebase.etebase_collection_get_stoken(this_);
   return _i1.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i8.Utf8>().toDartString(),
+    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -5305,7 +5151,7 @@ _i1.MethodResult _etebase_collection_as_item(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_as_item(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5334,14 +5180,14 @@ _i1.MethodResult _etebase_collection_get_collection_type(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_collection_type(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    pool.attachScoped(result).cast<_i8.Utf8>().toDartString(),
+    pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -5358,7 +5204,7 @@ _i1.MethodResult _etebase_collection_get_access_level(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_access_level(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5411,7 +5257,7 @@ _i1.MethodResult _etebase_client_new(
     serverUrl,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5449,7 +5295,7 @@ _i1.MethodResult _etebase_client_set_server_url(
     serverUrl,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5474,7 +5320,7 @@ _i1.MethodResult _etebase_client_check_etebase_server(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_client_check_etebase_server(client);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5531,7 +5377,7 @@ _i1.MethodResult _etebase_account_login(
     password,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5557,13 +5403,17 @@ _i1.MethodResult _etebase_account_signup(
       'Invocation must have exactly 3 arguments');
   assert(
       invocation.arguments[0] is int, 'Parameter client must be of type int');
-  assert(invocation.arguments[1] is int, 'Parameter user must be of type int');
+  assert(invocation.arguments[1] is _i7.EtebaseUser,
+      'Parameter user must be of type EtebaseUser');
   assert(invocation.arguments[2] is String,
       'Parameter password must be of type String');
   final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
-  final user = _i6.Pointer<_i2.EtebaseUser>.fromAddress(
-      (invocation.arguments[1] as int));
+  final user = _etebaseUserToNative(
+    libEtebase,
+    pool,
+    (invocation.arguments[1] as _i7.EtebaseUser),
+  );
   final password = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
       .cast<_i6.Char>();
@@ -5573,7 +5423,7 @@ _i1.MethodResult _etebase_account_signup(
     password,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5602,7 +5452,7 @@ _i1.MethodResult _etebase_account_fetch_token(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_token(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5626,14 +5476,14 @@ _i1.MethodResult _etebase_account_fetch_dashboard_url(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_dashboard_url(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(pool.attachScoped(result).cast<_i8.Utf8>().toDartString()),
+    Uri.parse(pool.attachScoped(result).cast<_i9.Utf8>().toDartString()),
   );
 }
 
@@ -5659,7 +5509,7 @@ _i1.MethodResult _etebase_account_force_server_url(
     serverUrl,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5691,7 +5541,7 @@ _i1.MethodResult _etebase_account_change_password(
     password,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5715,7 +5565,7 @@ _i1.MethodResult _etebase_account_logout(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_logout(this_);
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5739,7 +5589,7 @@ _i1.MethodResult _etebase_account_get_collection_manager(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_get_collection_manager(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5768,7 +5618,7 @@ _i1.MethodResult _etebase_account_get_invitation_manager(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_get_invitation_manager(this_);
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5823,14 +5673,14 @@ _i1.MethodResult _etebase_account_save(
     encryptionKeySize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    pool.attachScoped(result).cast<_i8.Utf8>().toDartString(),
+    pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
   );
 }
 
@@ -5880,7 +5730,7 @@ _i1.MethodResult _etebase_account_restore(
     encryptionKeySize,
   );
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5930,7 +5780,7 @@ _i1.MethodResult _etebase_utils_randombytes(
     size,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
@@ -5968,14 +5818,14 @@ _i1.MethodResult _etebase_utils_pretty_fingerprint(
     buf,
   );
   if (result < 0) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<String>(
     invocation.id,
-    buf.cast<_i8.Utf8>().toDartString(length: 89),
+    buf.cast<_i9.Utf8>().toDartString(length: 89),
   );
 }
 
@@ -5989,13 +5839,13 @@ _i1.MethodResult _etebase_get_default_server_url(
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.etebase_get_default_server_url();
   if (result == _i6.nullptr) {
-    return _i9.FfiHelpers.errorResult(
+    return _i8.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
   return _i1.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(result.cast<_i8.Utf8>().toDartString()),
+    Uri.parse(result.cast<_i9.Utf8>().toDartString()),
   );
 }

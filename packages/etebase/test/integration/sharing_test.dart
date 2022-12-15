@@ -27,20 +27,30 @@ void main() {
     final client = await EtebaseClient.create('sharing-test', serverUri);
     addTearDown(client.dispose);
 
-    final user1 = await EtebaseUser.create(userName1, 'sharing1@test.com');
-    final account1 = await EtebaseAccount.signup(client, user1, 'password');
+    final account1 = await EtebaseAccount.signup(
+      client,
+      EtebaseUser(
+        username: userName1,
+        email: 'sharing1@test.com',
+      ),
+      'password',
+    );
     addTearDown(account1.dispose);
-    await user1.dispose();
 
     collectionManager1 = await account1.getCollectionManager();
     addTearDown(collectionManager1.dispose);
     invitationManager1 = await account1.getInvitationManager();
     addTearDown(invitationManager1.dispose);
 
-    final user2 = await EtebaseUser.create(userName2, 'sharing2@test.com');
-    final account2 = await EtebaseAccount.signup(client, user2, 'password');
+    final account2 = await EtebaseAccount.signup(
+      client,
+      EtebaseUser(
+        username: userName2,
+        email: 'sharing2@test.com',
+      ),
+      'password',
+    );
     addTearDown(account2.dispose);
-    await user2.dispose();
 
     collectionManager2 = await account2.getCollectionManager();
     addTearDown(collectionManager2.dispose);

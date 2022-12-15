@@ -5,6 +5,7 @@ import 'dart:ffi';
 import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' show LibEtebaseFFI;
 import 'package:etebase/src/isolate/ffi_helpers.dart';
 import 'package:etebase/src/model/etebase_error_code.dart';
+import 'package:etebase/src/model/etebase_exception.dart';
 import 'package:ffi/ffi.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -44,6 +45,29 @@ void main() {
           expect(message, testMessage);
         },
         orElse: () => fail('$result is not of type MethodResult.failure'),
+      );
+
+      verify(() => mockLibEtebaseFFI.etebase_error_get_code());
+      verify(() => mockLibEtebaseFFI.etebase_error_get_message());
+      verifyNoMoreInteractions(mockLibEtebaseFFI);
+    });
+
+    test('throwError throws exception with code and message', () {
+      const testCode = EtebaseErrorCode.encryption;
+      const testMessage = 'This is an error';
+
+      when(() => mockLibEtebaseFFI.etebase_error_get_code())
+          .thenReturn(testCode.index);
+      when(() => mockLibEtebaseFFI.etebase_error_get_message())
+          .thenReturn(testMessage.toNativeUtf8(allocator: arena).cast());
+
+      expect(
+        () => FfiHelpers.throwError(mockLibEtebaseFFI),
+        throwsA(
+          isA<EtebaseException>()
+              .having((e) => e.code, 'code', testCode)
+              .having((e) => e.message, 'message', testMessage),
+        ),
       );
 
       verify(() => mockLibEtebaseFFI.etebase_error_get_code());

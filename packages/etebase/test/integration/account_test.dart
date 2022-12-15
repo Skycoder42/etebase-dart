@@ -37,30 +37,15 @@ void main() {
       final testEmail = '$testUsername@example.com';
       const testPassword = 'hello-test-1';
 
-      test('can create and update user', () async {
-        final user = await EtebaseUser.create(testUsername, testEmail);
-        addTearDown(user.dispose);
-
-        expect(await user.getUsername(), testUsername);
-        expect(await user.getEmail(), testEmail);
-
-        final testUsername2 = generateUsername('test-user-2');
-        final testEmail2 = '$testUsername@example.com';
-        await user.setUsername(testUsername2);
-        await user.setEmail(testEmail2);
-
-        expect(await user.getUsername(), testUsername2);
-        expect(await user.getEmail(), testEmail2);
-      });
-
       test('can create new account', () async {
-        final user = await EtebaseUser.create(
-          testUsername,
-          testEmail,
+        final account = await EtebaseAccount.signup(
+          client,
+          EtebaseUser(
+            username: testUsername,
+            email: testEmail,
+          ),
+          testPassword,
         );
-        addTearDown(user.dispose);
-
-        final account = await EtebaseAccount.signup(client, user, testPassword);
         addTearDown(account.dispose);
 
         // local test server does not have a dashboard

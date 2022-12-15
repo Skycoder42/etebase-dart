@@ -25,13 +25,15 @@ void main() {
     addTearDown(client.dispose);
 
     final username = generateUsername('fs-cache-test-user');
-    final user = await EtebaseUser.create(
-      username,
-      '$username@test.com',
+    account = await EtebaseAccount.signup(
+      client,
+      EtebaseUser(
+        username: username,
+        email: '$username@test.com',
+      ),
+      'password',
     );
-    account = await EtebaseAccount.signup(client, user, 'password');
     addTearDown(account.dispose);
-    await user.dispose();
 
     final cacheDir = await Directory.systemTemp.createTemp();
     addTearDown(() => cacheDir.delete(recursive: true));

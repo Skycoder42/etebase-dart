@@ -10,9 +10,15 @@ import '../../util/types.dart';
 class _DataClassMember {
   final String name;
   final TypeRef type;
+  final bool required;
   final String? docs;
 
-  const _DataClassMember(this.name, this.type, this.docs);
+  const _DataClassMember({
+    required this.name,
+    required this.type,
+    required this.required,
+    required this.docs,
+  });
 
   @override
   int get hashCode => name.hashCode;
@@ -48,7 +54,7 @@ class ClientDataClassBuilder {
                 ..constant = true
                 ..factory = true
                 ..redirect = refer('_${clazz.name}')
-                ..optionalParameters.addAll(mapMembers(clazz));
+                ..optionalParameters.addAll(_mapMembers(clazz));
               if (constructorDocs != null) {
                 b.docs.add(constructorDocs);
               }
@@ -59,19 +65,35 @@ class ClientDataClassBuilder {
     );
   }
 
-  Iterable<Parameter> mapMembers(ClassRef clazz) sync* {
-    final members = clazz.methods.reversed // sort ascending again
+  Iterable<Parameter> _mapMembers(ClassRef clazz) sync* {
+    final constructorParams = clazz.methods
+        .singleWhere((m) => m.isNew)
+        .parameters
+        .where((p) => !p.isThisParam)
+        .map(
+          (p) => _DataClassMember(
+            name: p.name,
+            type: p.type,
+            required: true,
+            docs: null,
+          ),
+        );
+    final methods = clazz.methods.reversed // sort ascending again
         .where((m) => !m.isNew && !m.isDestroy)
-        .map(_mapMember)
-        .toSet();
+        .map(_mapMember);
+
+    final members = _mergeMembers(methods.followedBy(constructorParams));
 
     for (final member in members) {
       yield Parameter(
         (b) {
           b
             ..name = member.name
-            ..type = member.type.publicType.asNullable
-            ..named = true;
+            ..type = member.required
+                ? member.type.publicType
+                : member.type.publicType.asNullable
+            ..named = true
+            ..required = member.required;
           if (member.docs != null) {
             b.docs.add(member.docs!);
           }
@@ -84,15 +106,17 @@ class ClientDataClassBuilder {
     switch (method.methodKind) {
       case MethodKind.getter:
         return _DataClassMember(
-          method.accessorName,
-          _mapGetterType(method),
-          method.documentation,
+          name: method.accessorName,
+          type: _mapGetterType(method),
+          required: false,
+          docs: method.documentation,
         );
       case MethodKind.setter:
         return _DataClassMember(
-          method.accessorName,
-          _mapSetterType(method),
-          method.documentation,
+          name: method.accessorName,
+          type: _mapSetterType(method),
+          required: false,
+          docs: method.documentation,
         );
       case MethodKind.method:
         throw StateError('Unreachable code reached');
@@ -110,5 +134,25 @@ class ClientDataClassBuilder {
   TypeRef _mapSetterType(MethodRef method) {
     final param = method.parameters.singleWhere((p) => !p.isThisParam);
     return param.type;
+  }
+
+  Set<_DataClassMember> _mergeMembers(Iterable<_DataClassMember> members) {
+    final mergedMembers = <_DataClassMember>{};
+    for (final member in members) {
+      final added = mergedMembers.add(member);
+      if (!added) {
+        final existingMember = mergedMembers.singleWhere((m) => m == member);
+        final mergedMember = _DataClassMember(
+          name: existingMember.name,
+          type: existingMember.type,
+          required: existingMember.required || member.required,
+          docs: existingMember.docs ?? member.docs,
+        );
+        mergedMembers
+          ..remove(existingMember)
+          ..add(mergedMember);
+      }
+    }
+    return mergedMembers;
   }
 }

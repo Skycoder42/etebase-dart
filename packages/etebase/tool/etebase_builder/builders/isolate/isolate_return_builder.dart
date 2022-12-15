@@ -29,15 +29,16 @@ class IsolateReturnBuilder {
   Iterable<Code> buildReturnConversion(
     MethodRef method,
     Expression resultRef,
-    Code Function(Expression returnValue) buildReturnStatement,
-  ) sync* {
+    Code Function(Expression returnValue) buildReturnStatement, {
+    bool thrown = false,
+  }) sync* {
     final Expression transformedResult;
     if (method.hasOutParam) {
       final returnParam = method.outParam;
       final returnParamRef = refer(returnParam.name);
       final returnType = returnParam.type;
 
-      yield checkIntSuccess(resultRef);
+      yield checkIntSuccess(resultRef, thrown: thrown);
       if (returnType is StringTypeRef) {
         transformedResult = _transformString(
           returnParamRef,
@@ -70,32 +71,32 @@ class IsolateReturnBuilder {
         transformedResult = literalNull;
       } else if (returnType is BoolTypeRef) {
         if (returnType.fromInt) {
-          yield checkIntSuccess(resultRef);
+          yield checkIntSuccess(resultRef, thrown: thrown);
           transformedResult = _transformIntBool(resultRef, returnType);
         } else {
           transformedResult = resultRef;
         }
       } else if (returnType is IntTypeRef) {
-        yield checkIntSuccess(resultRef);
+        yield checkIntSuccess(resultRef, thrown: thrown);
         transformedResult = returnType.asReturn ? literalNull : resultRef;
       } else if (returnType is StringTypeRef) {
         if (!returnType.nullable) {
-          yield _checkPointerSuccess(resultRef);
+          yield _checkPointerSuccess(resultRef, thrown: thrown);
         }
         transformedResult = _transformString(resultRef, returnType);
       } else if (returnType is UriTypeRef) {
-        yield _checkPointerSuccess(resultRef);
+        yield _checkPointerSuccess(resultRef, thrown: thrown);
         transformedResult = _transformUrl(resultRef, returnType);
       } else if (returnType is DateTimeTypeRef) {
         transformedResult = _transformDateTime(resultRef, returnType);
       } else if (returnType is ByteArrayTypeRef) {
-        yield _checkPointerSuccess(resultRef);
+        yield _checkPointerSuccess(resultRef, thrown: thrown);
         transformedResult = _transformByteArray(method, resultRef, returnType);
       } else if (returnType is EnumTypeRef) {
-        yield checkIntSuccess(resultRef);
+        yield checkIntSuccess(resultRef, thrown: thrown);
         transformedResult = _transformEnum(resultRef, returnType);
       } else if (returnType is EtebaseClassTypeRef) {
-        yield _checkPointerSuccess(resultRef);
+        yield _checkPointerSuccess(resultRef, thrown: thrown);
         transformedResult = _transformEtebaseClass(resultRef, returnType);
       } else {
         throw UnsupportedError(
@@ -118,14 +119,26 @@ class IsolateReturnBuilder {
         method.outOrReturnType,
       );
 
-  IfThen checkIntSuccess(Expression result) =>
+  IfThen checkIntSuccess(
+    Expression result, {
+    bool thrown = false,
+  }) =>
       if$(result.lessThan(literalNum(0)), [
-        _buildErrorReturn().statement,
+        if (thrown)
+          _buildErrorThrow().statement
+        else
+          _buildErrorReturn().statement
       ]);
 
-  Code _checkPointerSuccess(Expression result) =>
+  Code _checkPointerSuccess(
+    Expression result, {
+    bool thrown = false,
+  }) =>
       if$(result.equalTo(Types.nullptr$), [
-        _buildErrorReturn().statement,
+        if (thrown)
+          _buildErrorThrow().statement
+        else
+          _buildErrorReturn().statement
       ]);
 
   Code _buildReturnStatement(Expression result, TypeRef type) =>
@@ -141,6 +154,11 @@ class IsolateReturnBuilder {
         IsolateBuilder.libEtebaseRef,
         IsolateBuilder.invocationRef.property('id'),
       ]).returned;
+
+  Expression _buildErrorThrow() =>
+      Types.FfiHelpers$.property('throwError').call([
+        IsolateBuilder.libEtebaseRef,
+      ]);
 
   TypeReference _castType(TypeRef typeRef) =>
       typeRef is EtebaseClassTypeRef && typeRef.dataClass

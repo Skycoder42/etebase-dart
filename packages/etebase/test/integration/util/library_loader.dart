@@ -23,9 +23,8 @@ Future<EtebaseAccount> createAccount(
   String userNamePrefix,
 ) async {
   final userName = generateUsername(userNamePrefix);
-  final user = await EtebaseUser.create(userName, '$userName@test.com');
+  final user = EtebaseUser(username: userName, email: '$userName@test.com');
   final account = await EtebaseAccount.signup(client, user, _uuid.v4());
-  await user.dispose();
   return account;
 }
 

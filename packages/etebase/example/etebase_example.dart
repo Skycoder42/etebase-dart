@@ -21,11 +21,14 @@ Future<void> main() async {
     );
     print('Client is valid: ${await client.checkEtebaseServer()}');
 
-    final user = await EtebaseUser.create('test', 'test@example.org');
-    print(await user.getUsername());
-    print(await user.getEmail());
-
-    final account = await EtebaseAccount.signup(client, user, 'hello-test-123');
+    final account = await EtebaseAccount.signup(
+      client,
+      const EtebaseUser(
+        username: 'test',
+        email: 'test@example.org',
+      ),
+      'hello-test-123',
+    );
     print(await account.save());
   } finally {
     await Etebase.terminate();

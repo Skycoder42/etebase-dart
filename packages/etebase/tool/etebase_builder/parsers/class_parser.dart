@@ -27,6 +27,7 @@ class ClassRef {
 
 class ClassParser {
   static const dataClasses = [
+    'EtebaseUser',
     'EtebaseItemMetadata',
     'EtebaseFetchOptions',
   ];
