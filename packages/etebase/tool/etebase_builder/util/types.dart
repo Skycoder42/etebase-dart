@@ -127,6 +127,8 @@ abstract class Types {
 
   static const nullptr$ = Reference('nullptr', 'dart:ffi');
 
+  static const internal$ = Reference('internal', 'package:meta/meta.dart');
+
   static const freezed$ = Reference('freezed');
 
   static TypeReference list(TypeReference type) => TypeReference(

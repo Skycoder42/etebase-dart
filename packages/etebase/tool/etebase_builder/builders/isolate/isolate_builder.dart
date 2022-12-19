@@ -80,6 +80,7 @@ class IsolateBuilder {
       (b) => b
         ..replace(_buildHandlerSignature())
         ..name = 'etebaseIsolateMessageHandler'
+        ..annotations.add(Types.internal$)
         ..body = try$([
           caseBuilder,
         ]).finally$([

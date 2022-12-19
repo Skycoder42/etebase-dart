@@ -1,8 +1,7 @@
 name: etebase
-description: A starting point for Dart libraries or applications.
+description: Dart client library for etebase using FFI bindings with libetebase
 version: 1.0.0
-# homepage: https://www.example.com
-publish_to: none
+homepage: https://github.com/Skycoder42/etebase-dart
 
 environment:
   sdk: ">=2.18.4 <3.0.0"

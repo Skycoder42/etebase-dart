@@ -6,26 +6,28 @@
 
 // ignore_for_file: non_constant_identifier_names, require_trailing_commas, unnecessary_parenthesis, prefer_relative_imports, lines_longer_than_80_chars, prefer_is_empty, constant_identifier_names, avoid_bool_literals_in_conditional_expressions, prefer_const_constructors, unused_element, unused_local_variable, public_member_api_docs
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:ffi' as _i6;
-import 'dart:isolate' as _i10;
+import 'dart:ffi' as _i7;
+import 'dart:isolate' as _i11;
 
-import 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart' as _i7;
-import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' as _i2;
-import 'package:etebase/src/isolate/etebase_pool.dart' as _i3;
-import 'package:etebase/src/isolate/ffi_helpers.dart' as _i8;
-import 'package:etebase/src/isolate/method_invocation.dart' as _i5;
-import 'package:etebase/src/isolate/method_result.dart' as _i1;
-import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i11;
-import 'package:etebase/src/model/etebase_config.dart' as _i4;
-import 'package:etebase/src/model/etebase_error_code.dart' as _i12;
-import 'package:ffi/ffi.dart' as _i9;
+import 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart' as _i8;
+import 'package:etebase/src/gen/ffi/libetebase.ffi.dart' as _i3;
+import 'package:etebase/src/isolate/etebase_pool.dart' as _i4;
+import 'package:etebase/src/isolate/ffi_helpers.dart' as _i9;
+import 'package:etebase/src/isolate/method_invocation.dart' as _i6;
+import 'package:etebase/src/isolate/method_result.dart' as _i2;
+import 'package:etebase/src/model/etebase_collection_access_level.dart' as _i12;
+import 'package:etebase/src/model/etebase_config.dart' as _i5;
+import 'package:etebase/src/model/etebase_error_code.dart' as _i13;
+import 'package:ffi/ffi.dart' as _i10;
 import 'package:ffi/ffi.dart';
+import 'package:meta/meta.dart' as _i1;
 
-_i1.MethodResult etebaseIsolateMessageHandler(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+@_i1.internal
+_i2.MethodResult etebaseIsolateMessageHandler(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   try {
     switch (invocation.method) {
@@ -1042,16 +1044,16 @@ _i1.MethodResult etebaseIsolateMessageHandler(
   }
 }
 
-_i6.Pointer<_i2.EtebaseUser> _etebaseUserToNative(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i7.EtebaseUser? data,
+_i7.Pointer<_i3.EtebaseUser> _etebaseUserToNative(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i8.EtebaseUser? data,
 ) {
   if (data == null) {
-    return _i6.nullptr;
+    return _i7.nullptr;
   }
-  final username = data.username.toNativeUtf8(allocator: pool).cast<_i6.Char>();
-  final email = data.email.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+  final username = data.username.toNativeUtf8(allocator: pool).cast<_i7.Char>();
+  final email = data.email.toNativeUtf8(allocator: pool).cast<_i7.Char>();
   final instance = pool.attachScoped(
     libEtebase.etebase_user_new(
       username,
@@ -1062,38 +1064,38 @@ _i6.Pointer<_i2.EtebaseUser> _etebaseUserToNative(
   return instance;
 }
 
-_i7.EtebaseUser _etebaseUserFromNative(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i6.Pointer<_i2.EtebaseUser> data,
+_i8.EtebaseUser _etebaseUserFromNative(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i7.Pointer<_i3.EtebaseUser> data,
 ) {
   final instance = pool.attachScoped(
     data,
     libEtebase.etebase_user_destroy,
   );
   final usernameRaw = libEtebase.etebase_user_get_username(instance);
-  if (usernameRaw == _i6.nullptr) {
-    _i8.FfiHelpers.throwError(libEtebase);
+  if (usernameRaw == _i7.nullptr) {
+    _i9.FfiHelpers.throwError(libEtebase);
   }
-  final username = usernameRaw.cast<_i9.Utf8>().toDartString();
+  final username = usernameRaw.cast<_i10.Utf8>().toDartString();
   final emailRaw = libEtebase.etebase_user_get_email(instance);
-  if (emailRaw == _i6.nullptr) {
-    _i8.FfiHelpers.throwError(libEtebase);
+  if (emailRaw == _i7.nullptr) {
+    _i9.FfiHelpers.throwError(libEtebase);
   }
-  final email = emailRaw.cast<_i9.Utf8>().toDartString();
-  return _i7.EtebaseUser(
+  final email = emailRaw.cast<_i10.Utf8>().toDartString();
+  return _i8.EtebaseUser(
     username: username,
     email: email,
   );
 }
 
-_i6.Pointer<_i2.EtebaseItemMetadata> _etebaseItemMetadataToNative(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i7.EtebaseItemMetadata? data,
+_i7.Pointer<_i3.EtebaseItemMetadata> _etebaseItemMetadataToNative(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i8.EtebaseItemMetadata? data,
 ) {
   if (data == null) {
-    return _i6.nullptr;
+    return _i7.nullptr;
   }
   final instance = pool.attachScoped(
     libEtebase.etebase_item_metadata_new(),
@@ -1101,21 +1103,21 @@ _i6.Pointer<_i2.EtebaseItemMetadata> _etebaseItemMetadataToNative(
   );
   if (data.itemType != null) {
     final itemType =
-        data.itemType!.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+        data.itemType!.toNativeUtf8(allocator: pool).cast<_i7.Char>();
     libEtebase.etebase_item_metadata_set_item_type(
       instance,
       itemType,
     );
   }
   if (data.name != null) {
-    final name = data.name!.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+    final name = data.name!.toNativeUtf8(allocator: pool).cast<_i7.Char>();
     libEtebase.etebase_item_metadata_set_name(
       instance,
       name,
     );
   }
   if (data.mtime != null) {
-    final mtime = pool<_i6.Int64>()..value = data.mtime!.millisecondsSinceEpoch;
+    final mtime = pool<_i7.Int64>()..value = data.mtime!.millisecondsSinceEpoch;
     libEtebase.etebase_item_metadata_set_mtime(
       instance,
       mtime,
@@ -1123,14 +1125,14 @@ _i6.Pointer<_i2.EtebaseItemMetadata> _etebaseItemMetadataToNative(
   }
   if (data.description != null) {
     final description =
-        data.description!.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+        data.description!.toNativeUtf8(allocator: pool).cast<_i7.Char>();
     libEtebase.etebase_item_metadata_set_description(
       instance,
       description,
     );
   }
   if (data.color != null) {
-    final color = data.color!.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+    final color = data.color!.toNativeUtf8(allocator: pool).cast<_i7.Char>();
     libEtebase.etebase_item_metadata_set_color(
       instance,
       color,
@@ -1139,35 +1141,36 @@ _i6.Pointer<_i2.EtebaseItemMetadata> _etebaseItemMetadataToNative(
   return instance;
 }
 
-_i7.EtebaseItemMetadata _etebaseItemMetadataFromNative(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i6.Pointer<_i2.EtebaseItemMetadata> data,
+_i8.EtebaseItemMetadata _etebaseItemMetadataFromNative(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i7.Pointer<_i3.EtebaseItemMetadata> data,
 ) {
   final instance = pool.attachScoped(
     data,
     libEtebase.etebase_item_metadata_destroy,
   );
   final itemTypeRaw = libEtebase.etebase_item_metadata_get_item_type(instance);
-  final itemType = itemTypeRaw == _i6.nullptr
+  final itemType = itemTypeRaw == _i7.nullptr
       ? null
-      : itemTypeRaw.cast<_i9.Utf8>().toDartString();
+      : itemTypeRaw.cast<_i10.Utf8>().toDartString();
   final nameRaw = libEtebase.etebase_item_metadata_get_name(instance);
   final name =
-      nameRaw == _i6.nullptr ? null : nameRaw.cast<_i9.Utf8>().toDartString();
+      nameRaw == _i7.nullptr ? null : nameRaw.cast<_i10.Utf8>().toDartString();
   final mtimeRaw = libEtebase.etebase_item_metadata_get_mtime(instance);
-  final mtime = mtimeRaw == _i6.nullptr
+  final mtime = mtimeRaw == _i7.nullptr
       ? null
       : DateTime.fromMillisecondsSinceEpoch(mtimeRaw.value);
   final descriptionRaw =
       libEtebase.etebase_item_metadata_get_description(instance);
-  final description = descriptionRaw == _i6.nullptr
+  final description = descriptionRaw == _i7.nullptr
       ? null
-      : descriptionRaw.cast<_i9.Utf8>().toDartString();
+      : descriptionRaw.cast<_i10.Utf8>().toDartString();
   final colorRaw = libEtebase.etebase_item_metadata_get_color(instance);
-  final color =
-      colorRaw == _i6.nullptr ? null : colorRaw.cast<_i9.Utf8>().toDartString();
-  return _i7.EtebaseItemMetadata(
+  final color = colorRaw == _i7.nullptr
+      ? null
+      : colorRaw.cast<_i10.Utf8>().toDartString();
+  return _i8.EtebaseItemMetadata(
     itemType: itemType,
     name: name,
     mtime: mtime,
@@ -1176,13 +1179,13 @@ _i7.EtebaseItemMetadata _etebaseItemMetadataFromNative(
   );
 }
 
-_i6.Pointer<_i2.EtebaseFetchOptions> _etebaseFetchOptionsToNative(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i7.EtebaseFetchOptions? data,
+_i7.Pointer<_i3.EtebaseFetchOptions> _etebaseFetchOptionsToNative(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i8.EtebaseFetchOptions? data,
 ) {
   if (data == null) {
-    return _i6.nullptr;
+    return _i7.nullptr;
   }
   final instance = pool.attachScoped(
     libEtebase.etebase_fetch_options_new(),
@@ -1211,14 +1214,14 @@ _i6.Pointer<_i2.EtebaseFetchOptions> _etebaseFetchOptionsToNative(
   }
   if (data.iterator != null) {
     final iterator =
-        data.iterator!.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+        data.iterator!.toNativeUtf8(allocator: pool).cast<_i7.Char>();
     libEtebase.etebase_fetch_options_set_iterator(
       instance,
       iterator,
     );
   }
   if (data.stoken != null) {
-    final stoken = data.stoken!.toNativeUtf8(allocator: pool).cast<_i6.Char>();
+    final stoken = data.stoken!.toNativeUtf8(allocator: pool).cast<_i7.Char>();
     libEtebase.etebase_fetch_options_set_stoken(
       instance,
       stoken,
@@ -1227,83 +1230,83 @@ _i6.Pointer<_i2.EtebaseFetchOptions> _etebaseFetchOptionsToNative(
   return instance;
 }
 
-_i7.EtebaseFetchOptions _etebaseFetchOptionsFromNative(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i6.Pointer<_i2.EtebaseFetchOptions> data,
+_i8.EtebaseFetchOptions _etebaseFetchOptionsFromNative(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i7.Pointer<_i3.EtebaseFetchOptions> data,
 ) {
   final instance = pool.attachScoped(
     data,
     libEtebase.etebase_fetch_options_destroy,
   );
-  return _i7.EtebaseFetchOptions();
+  return _i8.EtebaseFetchOptions();
 }
 
-_i1.MethodResult _etebase_user_profile_get_pubkey(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_user_profile_get_pubkey(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseUserProfile>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_user_profile_get_pubkey(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
+    _i11.TransferableTypedData.fromList([
       result
-          .cast<_i6.Uint8>()
+          .cast<_i7.Uint8>()
           .asTypedList(libEtebase.etebase_user_profile_get_pubkey_size(this_))
     ]),
   );
 }
 
-_i1.MethodResult _etebase_user_profile_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_user_profile_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseUserProfile>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseUserProfile>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_clone(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_clone(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_clone(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -1314,265 +1317,265 @@ _i1.MethodResult _etebase_signed_invitation_clone(
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_get_uid(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_get_uid(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_uid(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_get_username(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_get_username(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_username(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_get_collection(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_get_collection(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_collection(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_get_access_level(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_get_access_level(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_access_level(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i11.EtebaseCollectionAccessLevel>(
+  return _i2.MethodResult.successTyped<_i12.EtebaseCollectionAccessLevel>(
     invocation.id,
-    _i11.EtebaseCollectionAccessLevel.values[result],
+    _i12.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_get_from_username(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_get_from_username(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_from_username(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_get_from_pubkey(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_get_from_pubkey(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_signed_invitation_get_from_pubkey(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
-      result.cast<_i6.Uint8>().asTypedList(
+    _i11.TransferableTypedData.fromList([
+      result.cast<_i7.Uint8>().asTypedList(
           libEtebase.etebase_signed_invitation_get_from_pubkey_size(this_))
     ]),
   );
 }
 
-_i1.MethodResult _etebase_signed_invitation_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_signed_invitation_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_removed_collection_get_uid(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_removed_collection_get_uid(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_removed_collection_get_uid(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_removed_collection_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_removed_collection_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseRemovedCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseRemovedCollection>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_invitation_list_response_get_iterator(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_list_response_get_iterator(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result =
       libEtebase.etebase_invitation_list_response_get_iterator(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_invitation_list_response_get_data(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_list_response_get_data(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_invitation_list_response_get_data_length(this_);
-  final data = pool<_i6.Pointer<_i2.EtebaseSignedInvitation>>(dataSize);
+  final data = pool<_i7.Pointer<_i3.EtebaseSignedInvitation>>(dataSize);
   final result = libEtebase.etebase_invitation_list_response_get_data(
     this_,
     data,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<List<int>>(
+  return _i2.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i8.FfiHelpers.extractPointerList(
+    _i9.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -1580,94 +1583,94 @@ _i1.MethodResult _etebase_invitation_list_response_get_data(
   );
 }
 
-_i1.MethodResult _etebase_invitation_list_response_is_done(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_list_response_is_done(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_invitation_list_response_is_done(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_invitation_list_response_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_list_response_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseInvitationListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseInvitationListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_revisions_list_response_get_iterator(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_revisions_list_response_get_iterator(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result =
       libEtebase.etebase_item_revisions_list_response_get_iterator(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_item_revisions_list_response_get_data(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_revisions_list_response_get_data(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_item_revisions_list_response_get_data_length(this_);
-  final data = pool<_i6.Pointer<_i2.EtebaseItem>>(dataSize);
+  final data = pool<_i7.Pointer<_i3.EtebaseItem>>(dataSize);
   final result = libEtebase.etebase_item_revisions_list_response_get_data(
     this_,
     data,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<List<int>>(
+  return _i2.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i8.FfiHelpers.extractPointerList(
+    _i9.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -1675,93 +1678,93 @@ _i1.MethodResult _etebase_item_revisions_list_response_get_data(
   );
 }
 
-_i1.MethodResult _etebase_item_revisions_list_response_is_done(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_revisions_list_response_is_done(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_revisions_list_response_is_done(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_item_revisions_list_response_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_revisions_list_response_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemRevisionsListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemRevisionsListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_member_list_response_get_iterator(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_member_list_response_get_iterator(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_member_list_response_get_iterator(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_member_list_response_get_data(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_member_list_response_get_data(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_member_list_response_get_data_length(this_);
-  final data = pool<_i6.Pointer<_i2.EtebaseCollectionMember>>(dataSize);
+  final data = pool<_i7.Pointer<_i3.EtebaseCollectionMember>>(dataSize);
   final result = libEtebase.etebase_member_list_response_get_data(
     this_,
     data,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<List<int>>(
+  return _i2.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i8.FfiHelpers.extractPointerList(
+    _i9.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -1769,77 +1772,77 @@ _i1.MethodResult _etebase_member_list_response_get_data(
   );
 }
 
-_i1.MethodResult _etebase_member_list_response_is_done(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_member_list_response_is_done(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_member_list_response_is_done(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_member_list_response_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_member_list_response_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseMemberListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseMemberListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_manager_fetch(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_fetch(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter itemUid must be of type String');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_fetch(
     this_,
     itemUid,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -1850,31 +1853,31 @@ _i1.MethodResult _etebase_item_manager_fetch(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_create(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_create(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseItemMetadata,
+  assert(invocation.arguments[1] is _i8.EtebaseItemMetadata,
       'Parameter meta must be of type EtebaseItemMetadata');
-  assert(invocation.arguments[2] is _i10.TransferableTypedData,
+  assert(invocation.arguments[2] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final meta = _etebaseItemMetadataToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseItemMetadata),
+    (invocation.arguments[1] as _i8.EtebaseItemMetadata),
   );
-  final content_buffer = (invocation.arguments[2] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[2] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -1885,13 +1888,13 @@ _i1.MethodResult _etebase_item_manager_create(
     content.cast(),
     contentSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -1902,35 +1905,35 @@ _i1.MethodResult _etebase_item_manager_create(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_create_raw(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_create_raw(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter meta must be of type TransferableTypedData');
-  assert(invocation.arguments[2] is _i10.TransferableTypedData,
+  assert(invocation.arguments[2] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = pool<_i6.Uint8>(metaSize);
+  final meta = pool<_i7.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
       );
-  final content_buffer = (invocation.arguments[2] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[2] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -1942,13 +1945,13 @@ _i1.MethodResult _etebase_item_manager_create_raw(
     content.cast(),
     contentSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -1959,35 +1962,35 @@ _i1.MethodResult _etebase_item_manager_create_raw(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_list(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_list(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[1] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[1] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_list(
     this_,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -1998,39 +2001,39 @@ _i1.MethodResult _etebase_item_manager_list(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_item_revisions(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_item_revisions(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int, 'Parameter item must be of type int');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final item = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_item_revisions(
     this_,
     item,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -2041,32 +2044,32 @@ _i1.MethodResult _etebase_item_manager_item_revisions(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_fetch_updates(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_fetch_updates(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is List<int>,
       'Parameter items must be of type List<int>');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final items = pool<_i7.Pointer<_i3.EtebaseItem>>(itemsSize);
+  _i9.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_fetch_updates(
     this_,
@@ -2074,13 +2077,13 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
     itemsSize,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -2091,32 +2094,32 @@ _i1.MethodResult _etebase_item_manager_fetch_updates(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_fetch_multi(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_fetch_multi(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is List<String>,
       'Parameter items must be of type List<String>');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<String>).length;
-  final items = pool<_i6.Pointer<_i6.Char>>(itemsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final items = pool<_i7.Pointer<_i7.Char>>(itemsSize);
+  _i9.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<String>),
-    (s) => s.toNativeUtf8(allocator: pool).cast<_i6.Char>(),
+    (s) => s.toNativeUtf8(allocator: pool).cast<_i7.Char>(),
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_fetch_multi(
     this_,
@@ -2124,13 +2127,13 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
     itemsSize,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -2141,32 +2144,32 @@ _i1.MethodResult _etebase_item_manager_fetch_multi(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_batch(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_batch(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is List<int>,
       'Parameter items must be of type List<int>');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final items = pool<_i7.Pointer<_i3.EtebaseItem>>(itemsSize);
+  _i9.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_batch(
     this_,
@@ -2175,22 +2178,22 @@ _i1.MethodResult _etebase_item_manager_batch(
     fetchOptions,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_manager_batch_deps(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_batch_deps(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -2199,28 +2202,28 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
       'Parameter items must be of type List<int>');
   assert(invocation.arguments[2] is List<int>,
       'Parameter deps must be of type List<int>');
-  assert(invocation.arguments[3] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[3] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final items = pool<_i7.Pointer<_i3.EtebaseItem>>(itemsSize);
+  _i9.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final depsSize = (invocation.arguments[2] as List<int>).length;
-  final deps = pool<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final deps = pool<_i7.Pointer<_i3.EtebaseItem>>(depsSize);
+  _i9.FfiHelpers.assignPointerList(
     deps,
     (invocation.arguments[2] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[3] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[3] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_batch_deps(
     this_,
@@ -2231,43 +2234,43 @@ _i1.MethodResult _etebase_item_manager_batch_deps(
     fetchOptions,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_manager_transaction(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_transaction(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is List<int>,
       'Parameter items must be of type List<int>');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final items = pool<_i7.Pointer<_i3.EtebaseItem>>(itemsSize);
+  _i9.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_transaction(
     this_,
@@ -2276,22 +2279,22 @@ _i1.MethodResult _etebase_item_manager_transaction(
     fetchOptions,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_manager_transaction_deps(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_transaction_deps(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -2300,28 +2303,28 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
       'Parameter items must be of type List<int>');
   assert(invocation.arguments[2] is List<int>,
       'Parameter deps must be of type List<int>');
-  assert(invocation.arguments[3] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[3] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   final itemsSize = (invocation.arguments[1] as List<int>).length;
-  final items = pool<_i6.Pointer<_i2.EtebaseItem>>(itemsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final items = pool<_i7.Pointer<_i3.EtebaseItem>>(itemsSize);
+  _i9.FfiHelpers.assignPointerList(
     items,
     (invocation.arguments[1] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final depsSize = (invocation.arguments[2] as List<int>).length;
-  final deps = pool<_i6.Pointer<_i2.EtebaseItem>>(depsSize);
-  _i8.FfiHelpers.assignPointerList(
+  final deps = pool<_i7.Pointer<_i3.EtebaseItem>>(depsSize);
+  _i9.FfiHelpers.assignPointerList(
     deps,
     (invocation.arguments[2] as List<int>),
-    _i6.Pointer<_i2.EtebaseItem>.fromAddress,
+    _i7.Pointer<_i3.EtebaseItem>.fromAddress,
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[3] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[3] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_item_manager_transaction_deps(
     this_,
@@ -2332,35 +2335,35 @@ _i1.MethodResult _etebase_item_manager_transaction_deps(
     fetchOptions,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_manager_cache_load(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_cache_load(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter cached must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final cached_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final cached_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final cachedSize = cached_buffer.length;
-  final cached = pool<_i6.Uint8>(cachedSize);
+  final cached = pool<_i7.Uint8>(cachedSize);
   cached.asTypedList(cachedSize).setAll(
         0,
         cached_buffer,
@@ -2370,13 +2373,13 @@ _i1.MethodResult _etebase_item_manager_cache_load(
     cached.cast(),
     cachedSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -2387,142 +2390,142 @@ _i1.MethodResult _etebase_item_manager_cache_load(
   );
 }
 
-_i1.MethodResult _etebase_item_manager_cache_save(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_cache_save(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int, 'Parameter item must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final item = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_item_manager_cache_save(
     this_,
     item,
     retSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
-      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    _i11.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i7.Uint8>().asTypedList(retSize.value)
     ]),
   );
 }
 
-_i1.MethodResult _etebase_item_manager_cache_save_with_content(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_cache_save_with_content(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int, 'Parameter item must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final item = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_item_manager_cache_save_with_content(
     this_,
     item,
     retSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
-      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    _i11.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i7.Uint8>().asTypedList(retSize.value)
     ]),
   );
 }
 
-_i1.MethodResult _etebase_item_manager_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_manager_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_list_response_get_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_list_response_get_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_list_response_get_stoken(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_item_list_response_get_data(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_list_response_get_data(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize = libEtebase.etebase_item_list_response_get_data_length(this_);
-  final data = pool<_i6.Pointer<_i2.EtebaseItem>>(dataSize);
+  final data = pool<_i7.Pointer<_i3.EtebaseItem>>(dataSize);
   final result = libEtebase.etebase_item_list_response_get_data(
     this_,
     data,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<List<int>>(
+  return _i2.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i8.FfiHelpers.extractPointerList(
+    _i9.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -2530,61 +2533,61 @@ _i1.MethodResult _etebase_item_list_response_get_data(
   );
 }
 
-_i1.MethodResult _etebase_item_list_response_is_done(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_list_response_is_done(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_list_response_is_done(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_item_list_response_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_list_response_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItemListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItemListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_clone(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_clone(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_clone(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -2595,77 +2598,77 @@ _i1.MethodResult _etebase_item_clone(
   );
 }
 
-_i1.MethodResult _etebase_item_verify(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_verify(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_verify(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_item_set_meta(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_set_meta(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseItemMetadata,
+  assert(invocation.arguments[1] is _i8.EtebaseItemMetadata,
       'Parameter meta must be of type EtebaseItemMetadata');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final meta = _etebaseItemMetadataToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseItemMetadata),
+    (invocation.arguments[1] as _i8.EtebaseItemMetadata),
   );
   final result = libEtebase.etebase_item_set_meta(
     this_,
     meta,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_get_meta(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_get_meta(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_meta(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i7.EtebaseItemMetadata>(
+  return _i2.MethodResult.successTyped<_i8.EtebaseItemMetadata>(
     invocation.id,
     _etebaseItemMetadataFromNative(
       libEtebase,
@@ -2675,24 +2678,24 @@ _i1.MethodResult _etebase_item_get_meta(
   );
 }
 
-_i1.MethodResult _etebase_item_set_meta_raw(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_set_meta_raw(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter meta must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = pool<_i6.Uint8>(metaSize);
+  final meta = pool<_i7.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
@@ -2703,22 +2706,22 @@ _i1.MethodResult _etebase_item_set_meta_raw(
     metaSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_get_meta_raw(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation, {
+_i2.MethodResult _etebase_item_get_meta_raw(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -2726,32 +2729,32 @@ _i1.MethodResult _etebase_item_get_meta_raw(
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int?,
       'Parameter sizeHint must be of type int?');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = pool<_i6.Uint8>(bufSize);
+  final buf = pool<_i7.Uint8>(bufSize);
   final result = libEtebase.etebase_item_get_meta_raw(
     this_,
     buf.cast(),
     bufSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   } else if (result <= bufSize) {
-    return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+    return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
       invocation.id,
-      _i10.TransferableTypedData.fromList(
-          [buf.cast<_i6.Uint8>().asTypedList(result)]),
+      _i11.TransferableTypedData.fromList(
+          [buf.cast<_i7.Uint8>().asTypedList(result)]),
     );
   } else if (reinvokedWithSize != null) {
-    return _i1.MethodResult.failure(
+    return _i2.MethodResult.failure(
       invocation.id,
-      _i12.EtebaseErrorCode.generic,
+      _i13.EtebaseErrorCode.generic,
       'output size of etebase_item_get_meta_raw changed during invocation',
     );
   } else {
@@ -2765,24 +2768,24 @@ _i1.MethodResult _etebase_item_get_meta_raw(
   }
 }
 
-_i1.MethodResult _etebase_item_set_content(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_set_content(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
-  final content_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -2793,22 +2796,22 @@ _i1.MethodResult _etebase_item_set_content(
     contentSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_get_content(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation, {
+_i2.MethodResult _etebase_item_get_content(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -2816,32 +2819,32 @@ _i1.MethodResult _etebase_item_get_content(
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int?,
       'Parameter sizeHint must be of type int?');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = pool<_i6.Uint8>(bufSize);
+  final buf = pool<_i7.Uint8>(bufSize);
   final result = libEtebase.etebase_item_get_content(
     this_,
     buf.cast(),
     bufSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   } else if (result <= bufSize) {
-    return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+    return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
       invocation.id,
-      _i10.TransferableTypedData.fromList(
-          [buf.cast<_i6.Uint8>().asTypedList(result)]),
+      _i11.TransferableTypedData.fromList(
+          [buf.cast<_i7.Uint8>().asTypedList(result)]),
     );
   } else if (reinvokedWithSize != null) {
-    return _i1.MethodResult.failure(
+    return _i2.MethodResult.failure(
       invocation.id,
-      _i12.EtebaseErrorCode.generic,
+      _i13.EtebaseErrorCode.generic,
       'output size of etebase_item_get_content changed during invocation',
     );
   } else {
@@ -2855,119 +2858,119 @@ _i1.MethodResult _etebase_item_get_content(
   }
 }
 
-_i1.MethodResult _etebase_item_delete(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_delete(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_delete(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_item_is_deleted(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_is_deleted(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_is_deleted(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_item_get_uid(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_get_uid(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_uid(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_item_get_etag(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_get_etag(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_item_get_etag(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_item_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_item_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_new(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_new(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -2977,21 +2980,21 @@ _i1.MethodResult _etebase_fs_cache_new(
       'Parameter username must be of type String');
   final path = (invocation.arguments[0] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_new(
     path,
     username,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3002,49 +3005,49 @@ _i1.MethodResult _etebase_fs_cache_new(
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_clear_user(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_clear_user(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_clear_user(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_save_account(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_save_account(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(
       invocation.arguments[1] is int, 'Parameter etebase must be of type int');
-  assert(invocation.arguments[2] is _i10.TransferableTypedData?,
+  assert(invocation.arguments[2] is _i11.TransferableTypedData?,
       'Parameter encryptionKey must be of type TransferableTypedData?');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final etebase = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final etebase = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[1] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i10.TransferableTypedData?)
+      (invocation.arguments[2] as _i11.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
@@ -3055,8 +3058,8 @@ _i1.MethodResult _etebase_fs_cache_save_account(
     );
   }
   final encryptionKey = encryptionKey_buffer == null
-      ? _i6.nullptr
-      : pool<_i6.Uint8>(encryptionKeySize);
+      ? _i7.nullptr
+      : pool<_i7.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -3070,36 +3073,36 @@ _i1.MethodResult _etebase_fs_cache_save_account(
     encryptionKeySize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_load_account(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_load_account(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(
       invocation.arguments[1] is int, 'Parameter client must be of type int');
-  assert(invocation.arguments[2] is _i10.TransferableTypedData?,
+  assert(invocation.arguments[2] is _i11.TransferableTypedData?,
       'Parameter encryptionKey must be of type TransferableTypedData?');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final client = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[1] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i10.TransferableTypedData?)
+      (invocation.arguments[2] as _i11.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
@@ -3110,8 +3113,8 @@ _i1.MethodResult _etebase_fs_cache_load_account(
     );
   }
   final encryptionKey = encryptionKey_buffer == null
-      ? _i6.nullptr
-      : pool<_i6.Uint8>(encryptionKeySize);
+      ? _i7.nullptr
+      : pool<_i7.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -3124,13 +3127,13 @@ _i1.MethodResult _etebase_fs_cache_load_account(
     encryptionKey.cast(),
     encryptionKeySize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3141,63 +3144,63 @@ _i1.MethodResult _etebase_fs_cache_load_account(
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_save_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_save_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter stoken must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final stoken = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_save_stoken(
     this_,
     stoken,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_load_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_load_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_fs_cache_load_stoken(this_);
-  return _i1.MethodResult.successTyped<String?>(
+  return _i2.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr
+    result == _i7.nullptr
         ? null
-        : pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
+        : pool.attachScoped(result).cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_collection_save_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_collection_save_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3206,64 +3209,64 @@ _i1.MethodResult _etebase_fs_cache_collection_save_stoken(
       'Parameter colUid must be of type String');
   assert(invocation.arguments[2] is String,
       'Parameter stoken must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final colUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final stoken = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_collection_save_stoken(
     this_,
     colUid,
     stoken,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_collection_load_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_collection_load_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter colUid must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   final colUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_collection_load_stoken(
     this_,
     colUid,
   );
-  return _i1.MethodResult.successTyped<String?>(
+  return _i2.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr
+    result == _i7.nullptr
         ? null
-        : pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
+        : pool.attachScoped(result).cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_collection_set(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_collection_set(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3271,11 +3274,11 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
   assert(
       invocation.arguments[1] is int, 'Parameter colMgr must be of type int');
   assert(invocation.arguments[2] is int, 'Parameter col must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final colMgr = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final colMgr = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[1] as int));
-  final col = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final col = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[2] as int));
   final result = libEtebase.etebase_fs_cache_collection_set(
     this_,
@@ -3283,22 +3286,22 @@ _i1.MethodResult _etebase_fs_cache_collection_set(
     col,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_collection_unset(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_collection_unset(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3307,35 +3310,35 @@ _i1.MethodResult _etebase_fs_cache_collection_unset(
       invocation.arguments[1] is int, 'Parameter colMgr must be of type int');
   assert(invocation.arguments[2] is String,
       'Parameter colUid must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final colMgr = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final colMgr = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_collection_unset(
     this_,
     colMgr,
     colUid,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_collection_get(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_collection_get(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -3344,25 +3347,25 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
       invocation.arguments[1] is int, 'Parameter colMgr must be of type int');
   assert(invocation.arguments[2] is String,
       'Parameter colUid must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final colMgr = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final colMgr = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_collection_get(
     this_,
     colMgr,
     colUid,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3373,11 +3376,11 @@ _i1.MethodResult _etebase_fs_cache_collection_get(
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_item_set(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_item_set(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -3387,14 +3390,14 @@ _i1.MethodResult _etebase_fs_cache_item_set(
   assert(invocation.arguments[2] is String,
       'Parameter colUid must be of type String');
   assert(invocation.arguments[3] is int, 'Parameter item must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final itemMgr = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final itemMgr = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  final item = _i6.Pointer<_i2.EtebaseItem>.fromAddress(
+      .cast<_i7.Char>();
+  final item = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[3] as int));
   final result = libEtebase.etebase_fs_cache_item_set(
     this_,
@@ -3403,22 +3406,22 @@ _i1.MethodResult _etebase_fs_cache_item_set(
     item,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_item_unset(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_item_unset(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -3429,16 +3432,16 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
       'Parameter colUid must be of type String');
   assert(invocation.arguments[3] is String,
       'Parameter itemUid must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final itemMgr = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final itemMgr = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final itemUid = (invocation.arguments[3] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_item_unset(
     this_,
     itemMgr,
@@ -3446,22 +3449,22 @@ _i1.MethodResult _etebase_fs_cache_item_unset(
     itemUid,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_item_get(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_item_get(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
@@ -3472,29 +3475,29 @@ _i1.MethodResult _etebase_fs_cache_item_get(
       'Parameter colUid must be of type String');
   assert(invocation.arguments[3] is String,
       'Parameter itemUid must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
-  final itemMgr = _i6.Pointer<_i2.EtebaseItemManager>.fromAddress(
+  final itemMgr = _i7.Pointer<_i3.EtebaseItemManager>.fromAddress(
       (invocation.arguments[1] as int));
   final colUid = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final itemUid = (invocation.arguments[3] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_fs_cache_item_get(
     this_,
     itemMgr,
     colUid,
     itemUid,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3505,53 +3508,53 @@ _i1.MethodResult _etebase_fs_cache_item_get(
   );
 }
 
-_i1.MethodResult _etebase_fs_cache_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_fs_cache_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseFileSystemCache>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseFileSystemCache>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_member_manager_list(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_manager_list(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[1] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[1] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_collection_member_manager_list(
     this_,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3562,82 +3565,82 @@ _i1.MethodResult _etebase_collection_member_manager_list(
   );
 }
 
-_i1.MethodResult _etebase_collection_member_manager_remove(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_manager_remove(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter username must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_collection_member_manager_remove(
     this_,
     username,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_member_manager_leave(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_manager_leave(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_manager_leave(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_member_manager_modify_access_level(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_manager_modify_access_level(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter username must be of type String');
-  assert(invocation.arguments[2] is _i11.EtebaseCollectionAccessLevel,
+  assert(invocation.arguments[2] is _i12.EtebaseCollectionAccessLevel,
       'Parameter accessLevel must be of type EtebaseCollectionAccessLevel');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final accessLevel =
-      (invocation.arguments[2] as _i11.EtebaseCollectionAccessLevel).index;
+      (invocation.arguments[2] as _i12.EtebaseCollectionAccessLevel).index;
   final result =
       libEtebase.etebase_collection_member_manager_modify_access_level(
     this_,
@@ -3645,54 +3648,54 @@ _i1.MethodResult _etebase_collection_member_manager_modify_access_level(
     accessLevel,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_member_manager_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_manager_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMemberManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMemberManager>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_member_clone(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_clone(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_clone(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3703,107 +3706,107 @@ _i1.MethodResult _etebase_collection_member_clone(
   );
 }
 
-_i1.MethodResult _etebase_collection_member_get_username(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_get_username(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_username(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_collection_member_get_access_level(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_get_access_level(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_member_get_access_level(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i11.EtebaseCollectionAccessLevel>(
+  return _i2.MethodResult.successTyped<_i12.EtebaseCollectionAccessLevel>(
     invocation.id,
-    _i11.EtebaseCollectionAccessLevel.values[result],
+    _i12.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
-_i1.MethodResult _etebase_collection_member_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_member_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionMember>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionMember>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_fetch(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_fetch(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter colUid must be of type String');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final colUid = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_collection_manager_fetch(
     this_,
     colUid,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3814,36 +3817,36 @@ _i1.MethodResult _etebase_collection_manager_fetch(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_create(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_create(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter collectionType must be of type String');
-  assert(invocation.arguments[2] is _i7.EtebaseItemMetadata,
+  assert(invocation.arguments[2] is _i8.EtebaseItemMetadata,
       'Parameter meta must be of type EtebaseItemMetadata');
-  assert(invocation.arguments[3] is _i10.TransferableTypedData,
+  assert(invocation.arguments[3] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final meta = _etebaseItemMetadataToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseItemMetadata),
+    (invocation.arguments[2] as _i8.EtebaseItemMetadata),
   );
-  final content_buffer = (invocation.arguments[3] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[3] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -3855,13 +3858,13 @@ _i1.MethodResult _etebase_collection_manager_create(
     content.cast(),
     contentSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3872,40 +3875,40 @@ _i1.MethodResult _etebase_collection_manager_create(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_create_raw(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_create_raw(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 4,
       'Invocation must have exactly 4 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter collectionType must be of type String');
-  assert(invocation.arguments[2] is _i10.TransferableTypedData,
+  assert(invocation.arguments[2] is _i11.TransferableTypedData,
       'Parameter meta must be of type TransferableTypedData');
-  assert(invocation.arguments[3] is _i10.TransferableTypedData,
+  assert(invocation.arguments[3] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  final meta_buffer = (invocation.arguments[2] as _i10.TransferableTypedData)
+      .cast<_i7.Char>();
+  final meta_buffer = (invocation.arguments[2] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = pool<_i6.Uint8>(metaSize);
+  final meta = pool<_i7.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
       );
-  final content_buffer = (invocation.arguments[3] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[3] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -3918,13 +3921,13 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
     content.cast(),
     contentSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3935,31 +3938,31 @@ _i1.MethodResult _etebase_collection_manager_create_raw(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_get_item_manager(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_get_item_manager(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int, 'Parameter col must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final col = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final col = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
   final result = libEtebase.etebase_collection_manager_get_item_manager(
     this_,
     col,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -3970,41 +3973,41 @@ _i1.MethodResult _etebase_collection_manager_get_item_manager(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_list(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_list(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter collectionType must be of type String');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionType = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_collection_manager_list(
     this_,
     collectionType,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4015,32 +4018,32 @@ _i1.MethodResult _etebase_collection_manager_list(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_list_multi(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_list_multi(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is List<String>,
       'Parameter collectionTypes must be of type List<String>');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   final collectionTypesSize = (invocation.arguments[1] as List<String>).length;
-  final collectionTypes = pool<_i6.Pointer<_i6.Char>>(collectionTypesSize);
-  _i8.FfiHelpers.assignPointerList(
+  final collectionTypes = pool<_i7.Pointer<_i7.Char>>(collectionTypesSize);
+  _i9.FfiHelpers.assignPointerList(
     collectionTypes,
     (invocation.arguments[1] as List<String>),
-    (s) => s.toNativeUtf8(allocator: pool).cast<_i6.Char>(),
+    (s) => s.toNativeUtf8(allocator: pool).cast<_i7.Char>(),
   );
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_collection_manager_list_multi(
     this_,
@@ -4048,13 +4051,13 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
     collectionTypesSize,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4065,27 +4068,27 @@ _i1.MethodResult _etebase_collection_manager_list_multi(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_upload(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_upload(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter collection must be of type int');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_collection_manager_upload(
     this_,
@@ -4093,38 +4096,38 @@ _i1.MethodResult _etebase_collection_manager_upload(
     fetchOptions,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_transaction(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_transaction(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter collection must be of type int');
-  assert(invocation.arguments[2] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[2] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[2] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[2] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_collection_manager_transaction(
     this_,
@@ -4132,35 +4135,35 @@ _i1.MethodResult _etebase_collection_manager_transaction(
     fetchOptions,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_cache_load(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_cache_load(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter cached must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final cached_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final cached_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final cachedSize = cached_buffer.length;
-  final cached = pool<_i6.Uint8>(cachedSize);
+  final cached = pool<_i7.Uint8>(cachedSize);
   cached.asTypedList(cachedSize).setAll(
         0,
         cached_buffer,
@@ -4170,13 +4173,13 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
     cached.cast(),
     cachedSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4187,101 +4190,101 @@ _i1.MethodResult _etebase_collection_manager_cache_load(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_cache_save(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_cache_save(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter collection must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_collection_manager_cache_save(
     this_,
     collection,
     retSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
-      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    _i11.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i7.Uint8>().asTypedList(retSize.value)
     ]),
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_cache_save_with_content(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_cache_save_with_content(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter collection must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i6.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UnsignedLong>()..value = 0;
   final result = libEtebase.etebase_collection_manager_cache_save_with_content(
     this_,
     collection,
     retSize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
-      pool.attachScoped(result).cast<_i6.Uint8>().asTypedList(retSize.value)
+    _i11.TransferableTypedData.fromList([
+      pool.attachScoped(result).cast<_i7.Uint8>().asTypedList(retSize.value)
     ]),
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_get_member_manager(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_get_member_manager(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int, 'Parameter col must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final col = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final col = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
   final result = libEtebase.etebase_collection_manager_get_member_manager(
     this_,
     col,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4292,69 +4295,69 @@ _i1.MethodResult _etebase_collection_manager_get_member_manager(
   );
 }
 
-_i1.MethodResult _etebase_collection_manager_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_manager_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionManager>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_list_response_get_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_list_response_get_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_list_response_get_stoken(this_);
-  return _i1.MethodResult.successTyped<String?>(
+  return _i2.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
+    result == _i7.nullptr ? null : result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_collection_list_response_get_data(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_list_response_get_data(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize =
       libEtebase.etebase_collection_list_response_get_data_length(this_);
-  final data = pool<_i6.Pointer<_i2.EtebaseCollection>>(dataSize);
+  final data = pool<_i7.Pointer<_i3.EtebaseCollection>>(dataSize);
   final result = libEtebase.etebase_collection_list_response_get_data(
     this_,
     data,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<List<int>>(
+  return _i2.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i8.FfiHelpers.extractPointerList(
+    _i9.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -4362,52 +4365,52 @@ _i1.MethodResult _etebase_collection_list_response_get_data(
   );
 }
 
-_i1.MethodResult _etebase_collection_list_response_is_done(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_list_response_is_done(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_list_response_is_done(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_list_response_get_removed_memberships(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   final dataSize = libEtebase
       .etebase_collection_list_response_get_removed_memberships_length(this_);
-  final data = pool<_i6.Pointer<_i2.EtebaseRemovedCollection>>(dataSize);
+  final data = pool<_i7.Pointer<_i3.EtebaseRemovedCollection>>(dataSize);
   final result =
       libEtebase.etebase_collection_list_response_get_removed_memberships(
     this_,
     data,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<List<int>>(
+  return _i2.MethodResult.successTyped<List<int>>(
     invocation.id,
-    _i8.FfiHelpers.extractPointerList(
+    _i9.FfiHelpers.extractPointerList(
       data,
       dataSize,
       (p) => p.address,
@@ -4415,53 +4418,53 @@ _i1.MethodResult _etebase_collection_list_response_get_removed_memberships(
   );
 }
 
-_i1.MethodResult _etebase_collection_list_response_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_list_response_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionListResponse>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionListResponse>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_list_incoming(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_list_incoming(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[1] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[1] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_invitation_manager_list_incoming(
     this_,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4472,35 +4475,35 @@ _i1.MethodResult _etebase_invitation_manager_list_incoming(
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_list_outgoing(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_list_outgoing(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseFetchOptions?,
+  assert(invocation.arguments[1] is _i8.EtebaseFetchOptions?,
       'Parameter fetchOptions must be of type EtebaseFetchOptions?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final fetchOptions = _etebaseFetchOptionsToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseFetchOptions?),
+    (invocation.arguments[1] as _i8.EtebaseFetchOptions?),
   );
   final result = libEtebase.etebase_invitation_manager_list_outgoing(
     this_,
     fetchOptions,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4511,95 +4514,95 @@ _i1.MethodResult _etebase_invitation_manager_list_outgoing(
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_accept(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_accept(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter invitation must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final invitation = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final invitation = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[1] as int));
   final result = libEtebase.etebase_invitation_manager_accept(
     this_,
     invitation,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_reject(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_reject(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter invitation must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final invitation = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final invitation = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[1] as int));
   final result = libEtebase.etebase_invitation_manager_reject(
     this_,
     invitation,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_fetch_user_profile(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter username must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_invitation_manager_fetch_user_profile(
     this_,
     username,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4610,11 +4613,11 @@ _i1.MethodResult _etebase_invitation_manager_fetch_user_profile(
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_invite(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_invite(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 5,
       'Invocation must have exactly 5 arguments');
@@ -4623,28 +4626,28 @@ _i1.MethodResult _etebase_invitation_manager_invite(
       'Parameter collection must be of type int');
   assert(invocation.arguments[2] is String,
       'Parameter username must be of type String');
-  assert(invocation.arguments[3] is _i10.TransferableTypedData,
+  assert(invocation.arguments[3] is _i11.TransferableTypedData,
       'Parameter pubkey must be of type TransferableTypedData');
-  assert(invocation.arguments[4] is _i11.EtebaseCollectionAccessLevel,
+  assert(invocation.arguments[4] is _i12.EtebaseCollectionAccessLevel,
       'Parameter accessLevel must be of type EtebaseCollectionAccessLevel');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final collection = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
   final username = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
-  final pubkey_buffer = (invocation.arguments[3] as _i10.TransferableTypedData)
+      .cast<_i7.Char>();
+  final pubkey_buffer = (invocation.arguments[3] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final pubkeySize = pubkey_buffer.length;
-  final pubkey = pool<_i6.Uint8>(pubkeySize);
+  final pubkey = pool<_i7.Uint8>(pubkeySize);
   pubkey.asTypedList(pubkeySize).setAll(
         0,
         pubkey_buffer,
       );
   final accessLevel =
-      (invocation.arguments[4] as _i11.EtebaseCollectionAccessLevel).index;
+      (invocation.arguments[4] as _i12.EtebaseCollectionAccessLevel).index;
   final result = libEtebase.etebase_invitation_manager_invite(
     this_,
     collection,
@@ -4654,112 +4657,112 @@ _i1.MethodResult _etebase_invitation_manager_invite(
     accessLevel,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_disinvite(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_disinvite(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int,
       'Parameter invitation must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
-  final invitation = _i6.Pointer<_i2.EtebaseSignedInvitation>.fromAddress(
+  final invitation = _i7.Pointer<_i3.EtebaseSignedInvitation>.fromAddress(
       (invocation.arguments[1] as int));
   final result = libEtebase.etebase_invitation_manager_disinvite(
     this_,
     invitation,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_get_pubkey(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_get_pubkey(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_invitation_manager_get_pubkey(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList([
-      result.cast<_i6.Uint8>().asTypedList(
+    _i11.TransferableTypedData.fromList([
+      result.cast<_i7.Uint8>().asTypedList(
           libEtebase.etebase_invitation_manager_get_pubkey_size(this_))
     ]),
   );
 }
 
-_i1.MethodResult _etebase_invitation_manager_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_invitation_manager_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollectionInvitationManager>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollectionInvitationManager>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_clone(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_clone(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_clone(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -4770,77 +4773,77 @@ _i1.MethodResult _etebase_collection_clone(
   );
 }
 
-_i1.MethodResult _etebase_collection_verify(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_verify(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_verify(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_collection_set_meta(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_set_meta(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseItemMetadata,
+  assert(invocation.arguments[1] is _i8.EtebaseItemMetadata,
       'Parameter meta must be of type EtebaseItemMetadata');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final meta = _etebaseItemMetadataToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseItemMetadata),
+    (invocation.arguments[1] as _i8.EtebaseItemMetadata),
   );
   final result = libEtebase.etebase_collection_set_meta(
     this_,
     meta,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_get_meta(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_get_meta(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_meta(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i7.EtebaseItemMetadata>(
+  return _i2.MethodResult.successTyped<_i8.EtebaseItemMetadata>(
     invocation.id,
     _etebaseItemMetadataFromNative(
       libEtebase,
@@ -4850,24 +4853,24 @@ _i1.MethodResult _etebase_collection_get_meta(
   );
 }
 
-_i1.MethodResult _etebase_collection_set_meta_raw(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_set_meta_raw(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter meta must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final meta_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final meta_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final metaSize = meta_buffer.length;
-  final meta = pool<_i6.Uint8>(metaSize);
+  final meta = pool<_i7.Uint8>(metaSize);
   meta.asTypedList(metaSize).setAll(
         0,
         meta_buffer,
@@ -4878,22 +4881,22 @@ _i1.MethodResult _etebase_collection_set_meta_raw(
     metaSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_get_meta_raw(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation, {
+_i2.MethodResult _etebase_collection_get_meta_raw(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -4901,32 +4904,32 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int?,
       'Parameter sizeHint must be of type int?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = pool<_i6.Uint8>(bufSize);
+  final buf = pool<_i7.Uint8>(bufSize);
   final result = libEtebase.etebase_collection_get_meta_raw(
     this_,
     buf.cast(),
     bufSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   } else if (result <= bufSize) {
-    return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+    return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
       invocation.id,
-      _i10.TransferableTypedData.fromList(
-          [buf.cast<_i6.Uint8>().asTypedList(result)]),
+      _i11.TransferableTypedData.fromList(
+          [buf.cast<_i7.Uint8>().asTypedList(result)]),
     );
   } else if (reinvokedWithSize != null) {
-    return _i1.MethodResult.failure(
+    return _i2.MethodResult.failure(
       invocation.id,
-      _i12.EtebaseErrorCode.generic,
+      _i13.EtebaseErrorCode.generic,
       'output size of etebase_collection_get_meta_raw changed during invocation',
     );
   } else {
@@ -4940,24 +4943,24 @@ _i1.MethodResult _etebase_collection_get_meta_raw(
   }
 }
 
-_i1.MethodResult _etebase_collection_set_content(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_set_content(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
-  final content_buffer = (invocation.arguments[1] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[1] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
@@ -4968,22 +4971,22 @@ _i1.MethodResult _etebase_collection_set_content(
     contentSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_get_content(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation, {
+_i2.MethodResult _etebase_collection_get_content(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation, {
   int? reinvokedWithSize,
 }) {
   assert(invocation.arguments.length == 2,
@@ -4991,32 +4994,32 @@ _i1.MethodResult _etebase_collection_get_content(
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is int?,
       'Parameter sizeHint must be of type int?');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final bufSize = reinvokedWithSize ??
       (invocation.arguments[1] as int?) ??
       config.defaultContentBufferSize;
-  final buf = pool<_i6.Uint8>(bufSize);
+  final buf = pool<_i7.Uint8>(bufSize);
   final result = libEtebase.etebase_collection_get_content(
     this_,
     buf.cast(),
     bufSize,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   } else if (result <= bufSize) {
-    return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+    return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
       invocation.id,
-      _i10.TransferableTypedData.fromList(
-          [buf.cast<_i6.Uint8>().asTypedList(result)]),
+      _i11.TransferableTypedData.fromList(
+          [buf.cast<_i7.Uint8>().asTypedList(result)]),
     );
   } else if (reinvokedWithSize != null) {
-    return _i1.MethodResult.failure(
+    return _i2.MethodResult.failure(
       invocation.id,
-      _i12.EtebaseErrorCode.generic,
+      _i13.EtebaseErrorCode.generic,
       'output size of etebase_collection_get_content changed during invocation',
     );
   } else {
@@ -5030,133 +5033,133 @@ _i1.MethodResult _etebase_collection_get_content(
   }
 }
 
-_i1.MethodResult _etebase_collection_delete(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_delete(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_delete(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_collection_is_deleted(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_is_deleted(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_is_deleted(this_);
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result,
   );
 }
 
-_i1.MethodResult _etebase_collection_get_uid(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_get_uid(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_uid(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_collection_get_etag(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_get_etag(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_etag(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    result.cast<_i9.Utf8>().toDartString(),
+    result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_collection_get_stoken(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_get_stoken(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_stoken(this_);
-  return _i1.MethodResult.successTyped<String?>(
+  return _i2.MethodResult.successTyped<String?>(
     invocation.id,
-    result == _i6.nullptr ? null : result.cast<_i9.Utf8>().toDartString(),
+    result == _i7.nullptr ? null : result.cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_collection_as_item(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_as_item(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_as_item(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5167,77 +5170,77 @@ _i1.MethodResult _etebase_collection_as_item(
   );
 }
 
-_i1.MethodResult _etebase_collection_get_collection_type(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_get_collection_type(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_collection_type(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
+    pool.attachScoped(result).cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_collection_get_access_level(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_get_access_level(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_collection_get_access_level(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i11.EtebaseCollectionAccessLevel>(
+  return _i2.MethodResult.successTyped<_i12.EtebaseCollectionAccessLevel>(
     invocation.id,
-    _i11.EtebaseCollectionAccessLevel.values[result],
+    _i12.EtebaseCollectionAccessLevel.values[result],
   );
 }
 
-_i1.MethodResult _etebase_collection_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_collection_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseCollection>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_client_new(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_client_new(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
@@ -5247,22 +5250,22 @@ _i1.MethodResult _etebase_client_new(
       'Parameter serverUrl must be of type Uri');
   final clientName = (invocation.arguments[0] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final serverUrl = (invocation.arguments[1] as Uri)
       .toString()
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_client_new(
     clientName,
     serverUrl,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5273,87 +5276,87 @@ _i1.MethodResult _etebase_client_new(
   );
 }
 
-_i1.MethodResult _etebase_client_set_server_url(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_client_set_server_url(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is Uri,
       'Parameter serverUrl must be of type Uri');
-  final this_ = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final serverUrl = (invocation.arguments[1] as Uri)
       .toString()
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_client_set_server_url(
     this_,
     serverUrl,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_client_check_etebase_server(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_client_check_etebase_server(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(
       invocation.arguments[0] is int, 'Parameter client must be of type int');
-  final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final client = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_client_check_etebase_server(client);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<bool>(
+  return _i2.MethodResult.successTyped<bool>(
     invocation.id,
     result == 0,
   );
 }
 
-_i1.MethodResult _etebase_client_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_client_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_account_login(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_login(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -5363,26 +5366,26 @@ _i1.MethodResult _etebase_account_login(
       'Parameter username must be of type String');
   assert(invocation.arguments[2] is String,
       'Parameter password must be of type String');
-  final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final client = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final username = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final password = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_account_login(
     client,
     username,
     password,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5393,42 +5396,42 @@ _i1.MethodResult _etebase_account_login(
   );
 }
 
-_i1.MethodResult _etebase_account_signup(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_signup(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
   assert(
       invocation.arguments[0] is int, 'Parameter client must be of type int');
-  assert(invocation.arguments[1] is _i7.EtebaseUser,
+  assert(invocation.arguments[1] is _i8.EtebaseUser,
       'Parameter user must be of type EtebaseUser');
   assert(invocation.arguments[2] is String,
       'Parameter password must be of type String');
-  final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final client = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final user = _etebaseUserToNative(
     libEtebase,
     pool,
-    (invocation.arguments[1] as _i7.EtebaseUser),
+    (invocation.arguments[1] as _i8.EtebaseUser),
   );
   final password = (invocation.arguments[2] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_account_signup(
     client,
     user,
     password,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5439,162 +5442,162 @@ _i1.MethodResult _etebase_account_signup(
   );
 }
 
-_i1.MethodResult _etebase_account_fetch_token(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_fetch_token(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_token(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_account_fetch_dashboard_url(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_fetch_dashboard_url(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_fetch_dashboard_url(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<Uri>(
+  return _i2.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(pool.attachScoped(result).cast<_i9.Utf8>().toDartString()),
+    Uri.parse(pool.attachScoped(result).cast<_i10.Utf8>().toDartString()),
   );
 }
 
-_i1.MethodResult _etebase_account_force_server_url(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_force_server_url(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is Uri,
       'Parameter serverUrl must be of type Uri');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final serverUrl = (invocation.arguments[1] as Uri)
       .toString()
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_account_force_server_url(
     this_,
     serverUrl,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_account_change_password(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_change_password(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter password must be of type String');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final password = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final result = libEtebase.etebase_account_change_password(
     this_,
     password,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_account_logout(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_logout(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_logout(this_);
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_account_get_collection_manager(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_get_collection_manager(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_get_collection_manager(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5605,25 +5608,25 @@ _i1.MethodResult _etebase_account_get_collection_manager(
   );
 }
 
-_i1.MethodResult _etebase_account_get_invitation_manager(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_get_invitation_manager(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final result = libEtebase.etebase_account_get_invitation_manager(this_);
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5634,21 +5637,21 @@ _i1.MethodResult _etebase_account_get_invitation_manager(
   );
 }
 
-_i1.MethodResult _etebase_account_save(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_save(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 2,
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  assert(invocation.arguments[1] is _i10.TransferableTypedData?,
+  assert(invocation.arguments[1] is _i11.TransferableTypedData?,
       'Parameter encryptionKey must be of type TransferableTypedData?');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   final encryptionKey_buffer =
-      (invocation.arguments[1] as _i10.TransferableTypedData?)
+      (invocation.arguments[1] as _i11.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
@@ -5659,8 +5662,8 @@ _i1.MethodResult _etebase_account_save(
     );
   }
   final encryptionKey = encryptionKey_buffer == null
-      ? _i6.nullptr
-      : pool<_i6.Uint8>(encryptionKeySize);
+      ? _i7.nullptr
+      : pool<_i7.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -5672,23 +5675,23 @@ _i1.MethodResult _etebase_account_save(
     encryptionKey.cast(),
     encryptionKeySize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    pool.attachScoped(result).cast<_i9.Utf8>().toDartString(),
+    pool.attachScoped(result).cast<_i10.Utf8>().toDartString(),
   );
 }
 
-_i1.MethodResult _etebase_account_restore(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_restore(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 3,
       'Invocation must have exactly 3 arguments');
@@ -5696,15 +5699,15 @@ _i1.MethodResult _etebase_account_restore(
       invocation.arguments[0] is int, 'Parameter client must be of type int');
   assert(invocation.arguments[1] is String,
       'Parameter accountDataStored must be of type String');
-  assert(invocation.arguments[2] is _i10.TransferableTypedData?,
+  assert(invocation.arguments[2] is _i11.TransferableTypedData?,
       'Parameter encryptionKey must be of type TransferableTypedData?');
-  final client = _i6.Pointer<_i2.EtebaseClient>.fromAddress(
+  final client = _i7.Pointer<_i3.EtebaseClient>.fromAddress(
       (invocation.arguments[0] as int));
   final accountDataStored = (invocation.arguments[1] as String)
       .toNativeUtf8(allocator: pool)
-      .cast<_i6.Char>();
+      .cast<_i7.Char>();
   final encryptionKey_buffer =
-      (invocation.arguments[2] as _i10.TransferableTypedData?)
+      (invocation.arguments[2] as _i11.TransferableTypedData?)
           ?.materialize()
           .asUint8List();
   final encryptionKeySize = encryptionKey_buffer?.length ?? 0;
@@ -5715,8 +5718,8 @@ _i1.MethodResult _etebase_account_restore(
     );
   }
   final encryptionKey = encryptionKey_buffer == null
-      ? _i6.nullptr
-      : pool<_i6.Uint8>(encryptionKeySize);
+      ? _i7.nullptr
+      : pool<_i7.Uint8>(encryptionKeySize);
   if (encryptionKey_buffer != null) {
     encryptionKey.asTypedList(encryptionKeySize).setAll(
           0,
@@ -5729,13 +5732,13 @@ _i1.MethodResult _etebase_account_restore(
     encryptionKey.cast(),
     encryptionKeySize,
   );
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<int>(
+  return _i2.MethodResult.successTyped<int>(
     invocation.id,
     pool
         .attachGlobal(
@@ -5746,106 +5749,106 @@ _i1.MethodResult _etebase_account_restore(
   );
 }
 
-_i1.MethodResult _etebase_account_destroy(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_account_destroy(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter this_ must be of type int');
-  final this_ = _i6.Pointer<_i2.EtebaseAccount>.fromAddress(
+  final this_ = _i7.Pointer<_i3.EtebaseAccount>.fromAddress(
       (invocation.arguments[0] as int));
   pool.freeGlobal(this_);
-  return _i1.MethodResult.successTyped<void>(
+  return _i2.MethodResult.successTyped<void>(
     invocation.id,
     null,
   );
 }
 
-_i1.MethodResult _etebase_utils_randombytes(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_utils_randombytes(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
   assert(invocation.arguments[0] is int, 'Parameter size must be of type int');
   final size = (invocation.arguments[0] as int);
-  final buf = pool<_i6.Uint8>(size);
+  final buf = pool<_i7.Uint8>(size);
   final result = libEtebase.etebase_utils_randombytes(
     buf.cast(),
     size,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<_i10.TransferableTypedData>(
+  return _i2.MethodResult.successTyped<_i11.TransferableTypedData>(
     invocation.id,
-    _i10.TransferableTypedData.fromList(
-        [buf.cast<_i6.Uint8>().asTypedList(size)]),
+    _i11.TransferableTypedData.fromList(
+        [buf.cast<_i7.Uint8>().asTypedList(size)]),
   );
 }
 
-_i1.MethodResult _etebase_utils_pretty_fingerprint(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_utils_pretty_fingerprint(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 1,
       'Invocation must have exactly 1 arguments');
-  assert(invocation.arguments[0] is _i10.TransferableTypedData,
+  assert(invocation.arguments[0] is _i11.TransferableTypedData,
       'Parameter content must be of type TransferableTypedData');
-  final content_buffer = (invocation.arguments[0] as _i10.TransferableTypedData)
+  final content_buffer = (invocation.arguments[0] as _i11.TransferableTypedData)
       .materialize()
       .asUint8List();
   final contentSize = content_buffer.length;
-  final content = pool<_i6.Uint8>(contentSize);
+  final content = pool<_i7.Uint8>(contentSize);
   content.asTypedList(contentSize).setAll(
         0,
         content_buffer,
       );
-  final buf = pool<_i6.Char>(libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE);
+  final buf = pool<_i7.Char>(libEtebase.ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE);
   final result = libEtebase.etebase_utils_pretty_fingerprint(
     content.cast(),
     contentSize,
     buf,
   );
   if (result < 0) {
-    return _i8.FfiHelpers.errorResult(
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<String>(
+  return _i2.MethodResult.successTyped<String>(
     invocation.id,
-    buf.cast<_i9.Utf8>().toDartString(length: 89),
+    buf.cast<_i10.Utf8>().toDartString(length: 89),
   );
 }
 
-_i1.MethodResult _etebase_get_default_server_url(
-  _i2.LibEtebaseFFI libEtebase,
-  _i3.EtebasePool pool,
-  _i4.EtebaseConfig config,
-  _i5.MethodInvocation invocation,
+_i2.MethodResult _etebase_get_default_server_url(
+  _i3.LibEtebaseFFI libEtebase,
+  _i4.EtebasePool pool,
+  _i5.EtebaseConfig config,
+  _i6.MethodInvocation invocation,
 ) {
   assert(invocation.arguments.length == 0,
       'Invocation must have exactly 0 arguments');
   final result = libEtebase.etebase_get_default_server_url();
-  if (result == _i6.nullptr) {
-    return _i8.FfiHelpers.errorResult(
+  if (result == _i7.nullptr) {
+    return _i9.FfiHelpers.errorResult(
       libEtebase,
       invocation.id,
     );
   }
-  return _i1.MethodResult.successTyped<Uri>(
+  return _i2.MethodResult.successTyped<Uri>(
     invocation.id,
-    Uri.parse(result.cast<_i9.Utf8>().toDartString()),
+    Uri.parse(result.cast<_i10.Utf8>().toDartString()),
   );
 }
