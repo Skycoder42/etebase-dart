@@ -100,24 +100,6 @@ class EtebaseIsolate {
   void _dispose() {
     _receivePort.close();
     _exitPort.close();
-
-    assert(_instance == this, 'this should be the active instance!');
-    _instance = null;
-  }
-
-  // static parts
-
-  static EtebaseIsolate? _instance;
-
-  /// @nodoc
-  static bool get hasInstance => _instance != null;
-
-  /// @nodoc
-  static EtebaseIsolate get current {
-    if (_instance == null) {
-      throw EtebaseIsolateError.notInitialized();
-    }
-    return _instance!;
   }
 
   /// @nodoc
@@ -126,10 +108,6 @@ class EtebaseIsolate {
     required EtebaseConfig etebaseConfig,
     required MethodInvocationHandler methodInvocationHandler,
   }) async {
-    if (_instance != null) {
-      return _instance!;
-    }
-
     ReceivePort? receivePort;
     ReceivePort? exitPort;
     Isolate? isolate;
@@ -159,7 +137,7 @@ class EtebaseIsolate {
         'ID of setup result should be $_controlInitializeIsolateMessageId',
       );
 
-      return _instance = EtebaseIsolate._(
+      return EtebaseIsolate._(
         isolate,
         exitPort,
         receivePort,
