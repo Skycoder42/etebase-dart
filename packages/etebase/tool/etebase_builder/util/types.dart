@@ -59,9 +59,9 @@ abstract class Types {
       ..url = 'dart:ffi',
   );
 
-  static final UnsignedLong$ = TypeReference(
+  static final UintPtr$ = TypeReference(
     (b) => b
-      ..symbol = 'UnsignedLong'
+      ..symbol = 'UintPtr'
       ..url = 'dart:ffi',
   );
 

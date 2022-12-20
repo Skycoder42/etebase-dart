@@ -62,7 +62,7 @@ class TypeParser {
     switch (pointerElement!.name) {
       case 'Char':
         return TypeRef.string(nullable: isNullable, mutable: isMutable);
-      case 'UnsignedLong':
+      case 'UintPtr':
         return TypeRef.returnSize();
       case 'Int64': // is always a nullable date time in etebase context
         return TypeRef.dateTime();

@@ -2404,7 +2404,7 @@ _i2.MethodResult _etebase_item_manager_cache_save(
       (invocation.arguments[0] as int));
   final item = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i7.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UintPtr>()..value = 0;
   final result = libEtebase.etebase_item_manager_cache_save(
     this_,
     item,
@@ -2438,7 +2438,7 @@ _i2.MethodResult _etebase_item_manager_cache_save_with_content(
       (invocation.arguments[0] as int));
   final item = _i7.Pointer<_i3.EtebaseItem>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i7.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UintPtr>()..value = 0;
   final result = libEtebase.etebase_item_manager_cache_save_with_content(
     this_,
     item,
@@ -4205,7 +4205,7 @@ _i2.MethodResult _etebase_collection_manager_cache_save(
       (invocation.arguments[0] as int));
   final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i7.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UintPtr>()..value = 0;
   final result = libEtebase.etebase_collection_manager_cache_save(
     this_,
     collection,
@@ -4240,7 +4240,7 @@ _i2.MethodResult _etebase_collection_manager_cache_save_with_content(
       (invocation.arguments[0] as int));
   final collection = _i7.Pointer<_i3.EtebaseCollection>.fromAddress(
       (invocation.arguments[1] as int));
-  final retSize = pool<_i7.UnsignedLong>()..value = 0;
+  final retSize = pool<_i7.UintPtr>()..value = 0;
   final result = libEtebase.etebase_collection_manager_cache_save_with_content(
     this_,
     collection,

@@ -20,8 +20,8 @@ class LibEtebaseFFI {
           lookup)
       : _lookup = lookup;
 
-  late final ffi.Pointer<uintptr_t> _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE =
-      _lookup<uintptr_t>('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE');
+  late final ffi.Pointer<ffi.UintPtr> _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE =
+      _lookup<ffi.UintPtr>('ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE');
 
   int get ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE =>
       _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE.value;
@@ -77,7 +77,7 @@ class LibEtebaseFFI {
     ffi.Pointer<ffi.Char> string,
     ffi.Pointer<ffi.Void> buf,
     int buf_maxlen,
-    ffi.Pointer<uintptr_t> buf_len,
+    ffi.Pointer<ffi.UintPtr> buf_len,
   ) {
     return _etebase_utils_from_base64(
       string,
@@ -89,12 +89,15 @@ class LibEtebaseFFI {
 
   late final _etebase_utils_from_base64Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Void>,
-              uintptr_t, ffi.Pointer<uintptr_t>)>>('etebase_utils_from_base64');
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Void>,
+              ffi.UintPtr,
+              ffi.Pointer<ffi.UintPtr>)>>('etebase_utils_from_base64');
   late final _etebase_utils_from_base64 =
       _etebase_utils_from_base64Ptr.asFunction<
           int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Void>, int,
-              ffi.Pointer<uintptr_t>)>();
+              ffi.Pointer<ffi.UintPtr>)>();
 
   /// Convert a buffer to a Base64 URL encoded string
   ///
@@ -118,8 +121,8 @@ class LibEtebaseFFI {
 
   late final _etebase_utils_to_base64Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ffi.Void>, uintptr_t,
-              ffi.Pointer<ffi.Char>, uintptr_t)>>('etebase_utils_to_base64');
+          ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.UintPtr,
+              ffi.Pointer<ffi.Char>, ffi.UintPtr)>>('etebase_utils_to_base64');
   late final _etebase_utils_to_base64 = _etebase_utils_to_base64Ptr.asFunction<
       int Function(ffi.Pointer<ffi.Void>, int, ffi.Pointer<ffi.Char>, int)>();
 
@@ -139,8 +142,8 @@ class LibEtebaseFFI {
 
   late final _etebase_utils_randombytesPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ffi.Pointer<ffi.Void>, uintptr_t)>>('etebase_utils_randombytes');
+          ffi.Int32 Function(ffi.Pointer<ffi.Void>,
+              ffi.UintPtr)>>('etebase_utils_randombytes');
   late final _etebase_utils_randombytes = _etebase_utils_randombytesPtr
       .asFunction<int Function(ffi.Pointer<ffi.Void>, int)>();
 
@@ -170,7 +173,7 @@ class LibEtebaseFFI {
 
   late final _etebase_utils_pretty_fingerprintPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<ffi.Void>, uintptr_t,
+          ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.UintPtr,
               ffi.Pointer<ffi.Char>)>>('etebase_utils_pretty_fingerprint');
   late final _etebase_utils_pretty_fingerprint =
       _etebase_utils_pretty_fingerprintPtr.asFunction<
@@ -581,7 +584,7 @@ class LibEtebaseFFI {
   late final _etebase_account_savePtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<ffi.Char> Function(ffi.Pointer<EtebaseAccount>,
-              ffi.Pointer<ffi.Void>, uintptr_t)>>('etebase_account_save');
+              ffi.Pointer<ffi.Void>, ffi.UintPtr)>>('etebase_account_save');
   late final _etebase_account_save = _etebase_account_savePtr.asFunction<
       ffi.Pointer<ffi.Char> Function(
           ffi.Pointer<EtebaseAccount>, ffi.Pointer<ffi.Void>, int)>();
@@ -612,7 +615,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseClient>,
               ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_account_restore');
+              ffi.UintPtr)>>('etebase_account_restore');
   late final _etebase_account_restore = _etebase_account_restorePtr.asFunction<
       ffi.Pointer<EtebaseAccount> Function(ffi.Pointer<EtebaseClient>,
           ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Void>, int)>();
@@ -732,7 +735,8 @@ class LibEtebaseFFI {
 
   late final _etebase_collection_list_response_get_data_lengthPtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(ffi.Pointer<EtebaseCollectionListResponse>)>>(
+              ffi.UintPtr Function(
+                  ffi.Pointer<EtebaseCollectionListResponse>)>>(
       'etebase_collection_list_response_get_data_length');
   late final _etebase_collection_list_response_get_data_length =
       _etebase_collection_list_response_get_data_lengthPtr.asFunction<
@@ -796,7 +800,7 @@ class LibEtebaseFFI {
   late final _etebase_collection_list_response_get_removed_memberships_lengthPtr =
       _lookup<
               ffi.NativeFunction<
-                  uintptr_t Function(
+                  ffi.UintPtr Function(
                       ffi.Pointer<EtebaseCollectionListResponse>)>>(
           'etebase_collection_list_response_get_removed_memberships_length');
   late final _etebase_collection_list_response_get_removed_memberships_length =
@@ -881,7 +885,7 @@ class LibEtebaseFFI {
 
   late final _etebase_item_list_response_get_data_lengthPtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(ffi.Pointer<EtebaseItemListResponse>)>>(
+              ffi.UintPtr Function(ffi.Pointer<EtebaseItemListResponse>)>>(
       'etebase_item_list_response_get_data_length');
   late final _etebase_item_list_response_get_data_length =
       _etebase_item_list_response_get_data_lengthPtr
@@ -983,7 +987,7 @@ class LibEtebaseFFI {
 
   late final _etebase_item_revisions_list_response_get_data_lengthPtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(
+              ffi.UintPtr Function(
                   ffi.Pointer<EtebaseItemRevisionsListResponse>)>>(
       'etebase_item_revisions_list_response_get_data_length');
   late final _etebase_item_revisions_list_response_get_data_length =
@@ -1060,7 +1064,7 @@ class LibEtebaseFFI {
   late final _etebase_fetch_options_set_limitPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(ffi.Pointer<EtebaseFetchOptions>,
-              uintptr_t)>>('etebase_fetch_options_set_limit');
+              ffi.UintPtr)>>('etebase_fetch_options_set_limit');
   late final _etebase_fetch_options_set_limit =
       _etebase_fetch_options_set_limitPtr
           .asFunction<void Function(ffi.Pointer<EtebaseFetchOptions>, int)>();
@@ -1484,7 +1488,7 @@ class LibEtebaseFFI {
               ffi.Pointer<ffi.Char>,
               ffi.Pointer<EtebaseItemMetadata>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_manager_create');
+              ffi.UintPtr)>>('etebase_collection_manager_create');
   late final _etebase_collection_manager_create =
       _etebase_collection_manager_createPtr.asFunction<
           ffi.Pointer<EtebaseCollection> Function(
@@ -1531,9 +1535,9 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseCollectionManager>,
               ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_manager_create_raw');
+              ffi.UintPtr)>>('etebase_collection_manager_create_raw');
   late final _etebase_collection_manager_create_raw =
       _etebase_collection_manager_create_rawPtr.asFunction<
           ffi.Pointer<EtebaseCollection> Function(
@@ -1627,7 +1631,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseCollectionListResponse> Function(
                   ffi.Pointer<EtebaseCollectionManager>,
                   ffi.Pointer<ffi.Pointer<ffi.Char>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_collection_manager_list_multi');
   late final _etebase_collection_manager_list_multi =
@@ -1724,7 +1728,7 @@ class LibEtebaseFFI {
           ffi.Pointer<EtebaseCollection> Function(
               ffi.Pointer<EtebaseCollectionManager>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_manager_cache_load');
+              ffi.UintPtr)>>('etebase_collection_manager_cache_load');
   late final _etebase_collection_manager_cache_load =
       _etebase_collection_manager_cache_loadPtr.asFunction<
           ffi.Pointer<EtebaseCollection> Function(
@@ -1742,7 +1746,7 @@ class LibEtebaseFFI {
   ffi.Pointer<ffi.Void> etebase_collection_manager_cache_save(
     ffi.Pointer<EtebaseCollectionManager> this_,
     ffi.Pointer<EtebaseCollection> collection,
-    ffi.Pointer<uintptr_t> ret_size,
+    ffi.Pointer<ffi.UintPtr> ret_size,
   ) {
     return _etebase_collection_manager_cache_save(
       this_,
@@ -1756,12 +1760,12 @@ class LibEtebaseFFI {
               ffi.Pointer<ffi.Void> Function(
                   ffi.Pointer<EtebaseCollectionManager>,
                   ffi.Pointer<EtebaseCollection>,
-                  ffi.Pointer<uintptr_t>)>>(
+                  ffi.Pointer<ffi.UintPtr>)>>(
       'etebase_collection_manager_cache_save');
   late final _etebase_collection_manager_cache_save =
       _etebase_collection_manager_cache_savePtr.asFunction<
           ffi.Pointer<ffi.Void> Function(ffi.Pointer<EtebaseCollectionManager>,
-              ffi.Pointer<EtebaseCollection>, ffi.Pointer<uintptr_t>)>();
+              ffi.Pointer<EtebaseCollection>, ffi.Pointer<ffi.UintPtr>)>();
 
   /// Save the collection object and its content to a byte buffer for caching
   ///
@@ -1773,7 +1777,7 @@ class LibEtebaseFFI {
   ffi.Pointer<ffi.Void> etebase_collection_manager_cache_save_with_content(
     ffi.Pointer<EtebaseCollectionManager> this_,
     ffi.Pointer<EtebaseCollection> collection,
-    ffi.Pointer<uintptr_t> ret_size,
+    ffi.Pointer<ffi.UintPtr> ret_size,
   ) {
     return _etebase_collection_manager_cache_save_with_content(
       this_,
@@ -1787,12 +1791,12 @@ class LibEtebaseFFI {
               ffi.Pointer<ffi.Void> Function(
                   ffi.Pointer<EtebaseCollectionManager>,
                   ffi.Pointer<EtebaseCollection>,
-                  ffi.Pointer<uintptr_t>)>>(
+                  ffi.Pointer<ffi.UintPtr>)>>(
       'etebase_collection_manager_cache_save_with_content');
   late final _etebase_collection_manager_cache_save_with_content =
       _etebase_collection_manager_cache_save_with_contentPtr.asFunction<
           ffi.Pointer<ffi.Void> Function(ffi.Pointer<EtebaseCollectionManager>,
-              ffi.Pointer<EtebaseCollection>, ffi.Pointer<uintptr_t>)>();
+              ffi.Pointer<EtebaseCollection>, ffi.Pointer<ffi.UintPtr>)>();
 
   /// Return the collection member manager for the supplied collection
   ///
@@ -1896,7 +1900,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseItemManager>,
               ffi.Pointer<EtebaseItemMetadata>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_manager_create');
+              ffi.UintPtr)>>('etebase_item_manager_create');
   late final _etebase_item_manager_create =
       _etebase_item_manager_createPtr.asFunction<
           ffi.Pointer<EtebaseItem> Function(ffi.Pointer<EtebaseItemManager>,
@@ -1935,9 +1939,9 @@ class LibEtebaseFFI {
           ffi.Pointer<EtebaseItem> Function(
               ffi.Pointer<EtebaseItemManager>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_manager_create_raw');
+              ffi.UintPtr)>>('etebase_item_manager_create_raw');
   late final _etebase_item_manager_create_raw =
       _etebase_item_manager_create_rawPtr.asFunction<
           ffi.Pointer<EtebaseItem> Function(ffi.Pointer<EtebaseItemManager>,
@@ -2025,7 +2029,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseItemListResponse> Function(
                   ffi.Pointer<EtebaseItemManager>,
                   ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_item_manager_fetch_updates');
   late final _etebase_item_manager_fetch_updates =
@@ -2063,7 +2067,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseItemListResponse> Function(
                   ffi.Pointer<EtebaseItemManager>,
                   ffi.Pointer<ffi.Pointer<ffi.Char>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_item_manager_fetch_multi');
   late final _etebase_item_manager_fetch_multi =
@@ -2099,7 +2103,7 @@ class LibEtebaseFFI {
           ffi.Int32 Function(
               ffi.Pointer<EtebaseItemManager>,
               ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<EtebaseFetchOptions>)>>('etebase_item_manager_batch');
   late final _etebase_item_manager_batch =
       _etebase_item_manager_batchPtr.asFunction<
@@ -2142,9 +2146,9 @@ class LibEtebaseFFI {
               ffi.Int32 Function(
                   ffi.Pointer<EtebaseItemManager>,
                   ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_item_manager_batch_deps');
   late final _etebase_item_manager_batch_deps =
@@ -2184,7 +2188,7 @@ class LibEtebaseFFI {
               ffi.Int32 Function(
                   ffi.Pointer<EtebaseItemManager>,
                   ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_item_manager_transaction');
   late final _etebase_item_manager_transaction =
@@ -2226,9 +2230,9 @@ class LibEtebaseFFI {
               ffi.Int32 Function(
                   ffi.Pointer<EtebaseItemManager>,
                   ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<ffi.Pointer<EtebaseItem>>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_item_manager_transaction_deps');
   late final _etebase_item_manager_transaction_deps =
@@ -2263,7 +2267,7 @@ class LibEtebaseFFI {
           ffi.Pointer<EtebaseItem> Function(
               ffi.Pointer<EtebaseItemManager>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_manager_cache_load');
+              ffi.UintPtr)>>('etebase_item_manager_cache_load');
   late final _etebase_item_manager_cache_load =
       _etebase_item_manager_cache_loadPtr.asFunction<
           ffi.Pointer<EtebaseItem> Function(
@@ -2279,7 +2283,7 @@ class LibEtebaseFFI {
   ffi.Pointer<ffi.Void> etebase_item_manager_cache_save(
     ffi.Pointer<EtebaseItemManager> this_,
     ffi.Pointer<EtebaseItem> item,
-    ffi.Pointer<uintptr_t> ret_size,
+    ffi.Pointer<ffi.UintPtr> ret_size,
   ) {
     return _etebase_item_manager_cache_save(
       this_,
@@ -2293,11 +2297,11 @@ class LibEtebaseFFI {
           ffi.Pointer<ffi.Void> Function(
               ffi.Pointer<EtebaseItemManager>,
               ffi.Pointer<EtebaseItem>,
-              ffi.Pointer<uintptr_t>)>>('etebase_item_manager_cache_save');
+              ffi.Pointer<ffi.UintPtr>)>>('etebase_item_manager_cache_save');
   late final _etebase_item_manager_cache_save =
       _etebase_item_manager_cache_savePtr.asFunction<
           ffi.Pointer<ffi.Void> Function(ffi.Pointer<EtebaseItemManager>,
-              ffi.Pointer<EtebaseItem>, ffi.Pointer<uintptr_t>)>();
+              ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.UintPtr>)>();
 
   /// Save the item object and its content to a byte buffer for caching
   ///
@@ -2309,7 +2313,7 @@ class LibEtebaseFFI {
   ffi.Pointer<ffi.Void> etebase_item_manager_cache_save_with_content(
     ffi.Pointer<EtebaseItemManager> this_,
     ffi.Pointer<EtebaseItem> item,
-    ffi.Pointer<uintptr_t> ret_size,
+    ffi.Pointer<ffi.UintPtr> ret_size,
   ) {
     return _etebase_item_manager_cache_save_with_content(
       this_,
@@ -2321,12 +2325,12 @@ class LibEtebaseFFI {
   late final _etebase_item_manager_cache_save_with_contentPtr = _lookup<
           ffi.NativeFunction<
               ffi.Pointer<ffi.Void> Function(ffi.Pointer<EtebaseItemManager>,
-                  ffi.Pointer<EtebaseItem>, ffi.Pointer<uintptr_t>)>>(
+                  ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.UintPtr>)>>(
       'etebase_item_manager_cache_save_with_content');
   late final _etebase_item_manager_cache_save_with_content =
       _etebase_item_manager_cache_save_with_contentPtr.asFunction<
           ffi.Pointer<ffi.Void> Function(ffi.Pointer<EtebaseItemManager>,
-              ffi.Pointer<EtebaseItem>, ffi.Pointer<uintptr_t>)>();
+              ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.UintPtr>)>();
 
   /// Destroy the object
   ///
@@ -2452,7 +2456,7 @@ class LibEtebaseFFI {
           ffi.Int32 Function(
               ffi.Pointer<EtebaseCollection>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_set_meta_raw');
+              ffi.UintPtr)>>('etebase_collection_set_meta_raw');
   late final _etebase_collection_set_meta_raw =
       _etebase_collection_set_meta_rawPtr.asFunction<
           int Function(
@@ -2480,7 +2484,7 @@ class LibEtebaseFFI {
           ffi.IntPtr Function(
               ffi.Pointer<EtebaseCollection>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_get_meta_raw');
+              ffi.UintPtr)>>('etebase_collection_get_meta_raw');
   late final _etebase_collection_get_meta_raw =
       _etebase_collection_get_meta_rawPtr.asFunction<
           int Function(
@@ -2508,7 +2512,7 @@ class LibEtebaseFFI {
           ffi.Int32 Function(
               ffi.Pointer<EtebaseCollection>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_set_content');
+              ffi.UintPtr)>>('etebase_collection_set_content');
   late final _etebase_collection_set_content =
       _etebase_collection_set_contentPtr.asFunction<
           int Function(
@@ -2536,7 +2540,7 @@ class LibEtebaseFFI {
           ffi.IntPtr Function(
               ffi.Pointer<EtebaseCollection>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_collection_get_content');
+              ffi.UintPtr)>>('etebase_collection_get_content');
   late final _etebase_collection_get_content =
       _etebase_collection_get_contentPtr.asFunction<
           int Function(
@@ -2812,7 +2816,7 @@ class LibEtebaseFFI {
   late final _etebase_item_set_meta_rawPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_set_meta_raw');
+              ffi.UintPtr)>>('etebase_item_set_meta_raw');
   late final _etebase_item_set_meta_raw =
       _etebase_item_set_meta_rawPtr.asFunction<
           int Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>, int)>();
@@ -2837,7 +2841,7 @@ class LibEtebaseFFI {
   late final _etebase_item_get_meta_rawPtr = _lookup<
       ffi.NativeFunction<
           ffi.IntPtr Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_get_meta_raw');
+              ffi.UintPtr)>>('etebase_item_get_meta_raw');
   late final _etebase_item_get_meta_raw =
       _etebase_item_get_meta_rawPtr.asFunction<
           int Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>, int)>();
@@ -2862,7 +2866,7 @@ class LibEtebaseFFI {
   late final _etebase_item_set_contentPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_set_content');
+              ffi.UintPtr)>>('etebase_item_set_content');
   late final _etebase_item_set_content =
       _etebase_item_set_contentPtr.asFunction<
           int Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>, int)>();
@@ -2887,7 +2891,7 @@ class LibEtebaseFFI {
   late final _etebase_item_get_contentPtr = _lookup<
       ffi.NativeFunction<
           ffi.IntPtr Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_item_get_content');
+              ffi.UintPtr)>>('etebase_item_get_content');
   late final _etebase_item_get_content =
       _etebase_item_get_contentPtr.asFunction<
           int Function(ffi.Pointer<EtebaseItem>, ffi.Pointer<ffi.Void>, int)>();
@@ -3013,7 +3017,7 @@ class LibEtebaseFFI {
 
   late final _etebase_user_profile_get_pubkey_sizePtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(ffi.Pointer<EtebaseUserProfile>)>>(
+              ffi.UintPtr Function(ffi.Pointer<EtebaseUserProfile>)>>(
       'etebase_user_profile_get_pubkey_size');
   late final _etebase_user_profile_get_pubkey_size =
       _etebase_user_profile_get_pubkey_sizePtr
@@ -3095,7 +3099,8 @@ class LibEtebaseFFI {
 
   late final _etebase_invitation_list_response_get_data_lengthPtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(ffi.Pointer<EtebaseInvitationListResponse>)>>(
+              ffi.UintPtr Function(
+                  ffi.Pointer<EtebaseInvitationListResponse>)>>(
       'etebase_invitation_list_response_get_data_length');
   late final _etebase_invitation_list_response_get_data_length =
       _etebase_invitation_list_response_get_data_lengthPtr.asFunction<
@@ -3302,7 +3307,7 @@ class LibEtebaseFFI {
                   ffi.Pointer<EtebaseCollection>,
                   ffi.Pointer<ffi.Char>,
                   ffi.Pointer<ffi.Void>,
-                  uintptr_t,
+                  ffi.UintPtr,
                   EtebaseCollectionAccessLevel)>>(
       'etebase_invitation_manager_invite');
   late final _etebase_invitation_manager_invite =
@@ -3377,7 +3382,7 @@ class LibEtebaseFFI {
 
   late final _etebase_invitation_manager_get_pubkey_sizePtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(
+              ffi.UintPtr Function(
                   ffi.Pointer<EtebaseCollectionInvitationManager>)>>(
       'etebase_invitation_manager_get_pubkey_size');
   late final _etebase_invitation_manager_get_pubkey_size =
@@ -3563,7 +3568,7 @@ class LibEtebaseFFI {
 
   late final _etebase_signed_invitation_get_from_pubkey_sizePtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(ffi.Pointer<EtebaseSignedInvitation>)>>(
+              ffi.UintPtr Function(ffi.Pointer<EtebaseSignedInvitation>)>>(
       'etebase_signed_invitation_get_from_pubkey_size');
   late final _etebase_signed_invitation_get_from_pubkey_size =
       _etebase_signed_invitation_get_from_pubkey_sizePtr
@@ -3727,7 +3732,7 @@ class LibEtebaseFFI {
 
   late final _etebase_member_list_response_get_data_lengthPtr = _lookup<
           ffi.NativeFunction<
-              uintptr_t Function(ffi.Pointer<EtebaseMemberListResponse>)>>(
+              ffi.UintPtr Function(ffi.Pointer<EtebaseMemberListResponse>)>>(
       'etebase_member_list_response_get_data_length');
   late final _etebase_member_list_response_get_data_length =
       _etebase_member_list_response_get_data_lengthPtr
@@ -3959,7 +3964,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseFileSystemCache>,
               ffi.Pointer<EtebaseAccount>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_fs_cache_save_account');
+              ffi.UintPtr)>>('etebase_fs_cache_save_account');
   late final _etebase_fs_cache_save_account =
       _etebase_fs_cache_save_accountPtr.asFunction<
           int Function(ffi.Pointer<EtebaseFileSystemCache>,
@@ -3991,7 +3996,7 @@ class LibEtebaseFFI {
               ffi.Pointer<EtebaseFileSystemCache>,
               ffi.Pointer<EtebaseClient>,
               ffi.Pointer<ffi.Void>,
-              uintptr_t)>>('etebase_fs_cache_load_account');
+              ffi.UintPtr)>>('etebase_fs_cache_load_account');
   late final _etebase_fs_cache_load_account =
       _etebase_fs_cache_load_accountPtr.asFunction<
           ffi.Pointer<EtebaseAccount> Function(
@@ -4350,7 +4355,6 @@ class EtebaseUser extends ffi.Opaque {}
 
 class EtebaseUserProfile extends ffi.Opaque {}
 
-typedef uintptr_t = ffi.UnsignedLong;
 typedef EtebaseErrorCode = ffi.Uint32;
 typedef EtebaseCollectionListResponse
     = EtebaseCollectionListResponse_Collection;

@@ -58,7 +58,7 @@ class IsolateOutParamBuilder {
           IsolateBuilder.poolRef.call(
             const [],
             const {},
-            [Types.UnsignedLong$],
+            [Types.UintPtr$],
           ),
         )
         .cascade('value')

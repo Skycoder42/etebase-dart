@@ -76,7 +76,7 @@ class IntTypeRef implements TypeRef {
 
 class ReturnSizeTypeRef implements TypeRef {
   @override
-  TypeReference get ffiType => Types.pointer(Types.UnsignedLong$);
+  TypeReference get ffiType => Types.pointer(Types.UintPtr$);
 
   @override
   TypeReference get publicType => Types.int$;
