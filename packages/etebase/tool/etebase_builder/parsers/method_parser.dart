@@ -99,6 +99,10 @@ class MethodRef {
 
     return matcher.firstMatch(ffiName)![1]!.snakeToDart();
   }
+
+  bool get isClientNew => ffiName == 'etebase_client_new';
+
+  bool get isClientDestroy => ffiName == 'etebase_client_destroy';
 }
 
 class MethodParser {
@@ -214,11 +218,13 @@ class MethodParser {
   }) {
     final prefixLength = methodPrefix?.length ?? -1;
 
-    final mappedParams = _paramParser.parse(
-      methodName: method.name,
-      parameters: method.parameters,
-      typeDefs: typeDefs,
-    );
+    final mappedParams = [
+      ..._paramParser.parse(
+        methodName: method.name,
+        parameters: method.parameters,
+        typeDefs: typeDefs,
+      )
+    ];
 
     return MethodRef(
       name: method.name.substring(prefixLength + 1).snakeToDart(),

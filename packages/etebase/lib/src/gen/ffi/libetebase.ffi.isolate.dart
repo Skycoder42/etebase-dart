@@ -5246,15 +5246,16 @@ _i2.MethodResult _etebase_client_new(
       'Invocation must have exactly 2 arguments');
   assert(invocation.arguments[0] is String,
       'Parameter clientName must be of type String');
-  assert(invocation.arguments[1] is Uri,
-      'Parameter serverUrl must be of type Uri');
+  assert(invocation.arguments[1] is Uri?,
+      'Parameter serverUrl must be of type Uri?');
   final clientName = (invocation.arguments[0] as String)
       .toNativeUtf8(allocator: pool)
       .cast<_i7.Char>();
-  final serverUrl = (invocation.arguments[1] as Uri)
-      .toString()
-      .toNativeUtf8(allocator: pool)
-      .cast<_i7.Char>();
+  final serverUrl = (invocation.arguments[1] as Uri?)
+          ?.toString()
+          .toNativeUtf8(allocator: pool)
+          .cast<_i7.Char>() ??
+      libEtebase.etebase_get_default_server_url();
   final result = libEtebase.etebase_client_new(
     clientName,
     serverUrl,

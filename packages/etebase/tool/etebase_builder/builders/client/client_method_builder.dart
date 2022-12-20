@@ -11,8 +11,8 @@ class ClientMethodBuilder {
   static const sizeHintRef = Reference(_sizeHintName);
 
   static const _docsMap = {
-    'etebase_client_new': '/// Creates a new etebase client.\n',
-    'etebase_client_set_server_url': '/// Sets the server URL of the client.\n',
+    'etebase_client_new': '/// Creates a new etebase client.',
+    'etebase_client_set_server_url': '/// Sets the server URL of the client.',
   };
 
   final ClientMethodBodyBuilder _clientMethodBodyBuilder;
@@ -21,13 +21,27 @@ class ClientMethodBuilder {
     this._clientMethodBodyBuilder = const ClientMethodBodyBuilder(),
   ]);
 
-  Method buildMethod(MethodRef method, {bool global = false}) => Method(
+  Method buildMethod(
+    MethodRef method, {
+    bool global = false,
+    bool isUtil = false,
+  }) =>
+      Method(
         (b) {
+          if ((method.isNew && !method.isClientNew) || isUtil) {
+            b.requiredParameters.add(
+              Parameter(
+                (b) => b
+                  ..name = 'client'
+                  ..type = TypeReference((b) => b..symbol = 'EtebaseClient'),
+              ),
+            );
+          }
+
           b
             ..name = _getMethodName(method)
             ..static = method.isStatic || method.isDestroy
-            ..modifier =
-                _isAsync(method.outOrReturnType) ? MethodModifier.async : null
+            ..modifier = _isAsync(method, global) ? MethodModifier.async : null
             ..returns = Types.future(_buildReturnType(method))
             ..requiredParameters.addAll(
               method
@@ -48,7 +62,7 @@ class ClientMethodBuilder {
                   .where((p) => p.isOptional)
                   .map(_buildParam),
             ])
-            ..body = _clientMethodBodyBuilder.buildBody(method);
+            ..body = _clientMethodBodyBuilder.buildBody(method, global: global);
 
           final docComment = method.documentation ?? _docsMap[method.ffiName];
           if (docComment != null && !method.isDestroy) {
@@ -57,10 +71,14 @@ class ClientMethodBuilder {
         },
       );
 
-  bool _isAsync(TypeRef type) =>
-      (type is EtebaseClassTypeRef && !type.dataClass) ||
-      type is EtebaseClassListTypeRef ||
-      type is ByteArrayTypeRef;
+  bool _isAsync(MethodRef method, bool global) {
+    final type = method.outOrReturnType;
+    return global ||
+        method.isClientDestroy ||
+        (type is EtebaseClassTypeRef && !type.dataClass) ||
+        type is EtebaseClassListTypeRef ||
+        type is ByteArrayTypeRef;
+  }
 
   String _getMethodName(MethodRef method) {
     if (method.isNew) {
@@ -77,8 +95,10 @@ class ClientMethodBuilder {
         (b) => b
           ..name = param.name
           ..type = isDestroy && param.isThisParam
-              ? param.type.ffiType
-              : param.type.publicType,
+              ? Types.destroyReference(param.type.ffiType.types.single)
+              : (param.isOptional
+                  ? param.type.publicType.asNullable
+                  : param.type.publicType),
       );
 
   TypeReference _buildReturnType(MethodRef method) {

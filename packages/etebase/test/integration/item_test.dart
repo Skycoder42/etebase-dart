@@ -28,7 +28,7 @@ void main() {
   late String itemId3;
 
   setUpAll(() async {
-    await Etebase.ensureInitialized(loadLibEtebase);
+    Etebase.ensureInitialized(loadLibEtebase);
 
     final client = await EtebaseClient.create('item-test', serverUri);
     addTearDown(client.dispose);

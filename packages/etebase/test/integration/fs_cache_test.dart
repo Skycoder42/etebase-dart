@@ -19,7 +19,7 @@ void main() {
   late final EtebaseFileSystemCache cache;
 
   setUpAll(() async {
-    await Etebase.ensureInitialized(loadLibEtebase);
+    Etebase.ensureInitialized(loadLibEtebase);
 
     client = await EtebaseClient.create('fs-cache-test', serverUri);
     addTearDown(client.dispose);
@@ -37,7 +37,11 @@ void main() {
 
     final cacheDir = await Directory.systemTemp.createTemp();
     addTearDown(() => cacheDir.delete(recursive: true));
-    cache = await EtebaseFileSystemCache.create(cacheDir.path, username);
+    cache = await EtebaseFileSystemCache.create(
+      client,
+      cacheDir.path,
+      username,
+    );
     addTearDown(cache.dispose);
   });
 
@@ -47,7 +51,7 @@ void main() {
     addTearDown(restoredAccount.dispose);
     await restoredAccount.fetchToken();
 
-    final encryptionKey = await EtebaseUtils.randombytes(32);
+    final encryptionKey = await EtebaseUtils.randombytes(client, 32);
     await cache.saveAccount(account, encryptionKey);
     final restoredAccountEnc = await cache.loadAccount(client, encryptionKey);
     addTearDown(restoredAccountEnc.dispose);

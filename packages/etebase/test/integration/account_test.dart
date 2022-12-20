@@ -10,8 +10,8 @@ import 'util/library_loader.dart';
 import 'util/matchers.dart';
 
 void main() {
-  setUpAll(() async {
-    await Etebase.ensureInitialized(loadLibEtebase);
+  setUpAll(() {
+    Etebase.ensureInitialized(loadLibEtebase);
   });
 
   group('etebase client and account tests', () {
@@ -104,11 +104,11 @@ void main() {
             .forceServerUrl(await etebaseGetDefaultServerUrl());
 
         expect(
-          () async => account.save(await EtebaseUtils.randombytes(64)),
+          () async => account.save(await EtebaseUtils.randombytes(client, 64)),
           throwsA(isA<ArgumentError>()),
         );
 
-        final encryptionKey = await EtebaseUtils.randombytes(32);
+        final encryptionKey = await EtebaseUtils.randombytes(client, 32);
         final savedAccountEnc = await account.save(encryptionKey);
         final restoredAccountEnc = await EtebaseAccount.restore(
           client,

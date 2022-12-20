@@ -5,8 +5,8 @@ class EtebaseIsolateError extends StateError {
   /// Gets thrown if the isolate has not been initialized.
   EtebaseIsolateError.notInitialized()
       : super(
-          'No active etebase isolate - '
-          'call Etebase.ensureInitialized to create one',
+          'Etebase has not been initialized - '
+          'call Etebase.ensureInitialized to do so.',
         );
 
   /// Gets thrown if the isolate has been terminated.
@@ -14,5 +14,12 @@ class EtebaseIsolateError extends StateError {
       : super(
           'Method invocation failed because the etebase isolate was '
           'terminated before it could process the invocation.',
+        );
+
+  /// Gets thrown if the EtebaseClient has already been disposed
+  EtebaseIsolateError.clientDisposed()
+      : super(
+          'Tried to invoke a method after EtebaseClient has '
+          'already been disposed.',
         );
 }

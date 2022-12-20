@@ -101,6 +101,12 @@ abstract class Types {
       ..url = 'package:etebase/src/model/etebase_config.dart',
   );
 
+  static final EtebaseIsolateReference$ = TypeReference(
+    (b) => b
+      ..symbol = 'EtebaseIsolateReference'
+      ..url = 'package:etebase/src/isolate/etebase_isolate_reference.dart',
+  );
+
   static final MethodResult$ = TypeReference(
     (b) => b
       ..symbol = 'MethodResult'
@@ -164,6 +170,17 @@ abstract class Types {
         (b) => b
           ..replace(type.type as TypeReference)
           ..url = 'package:etebase/src/gen/ffi/libetebase.ffi.client.dart',
+      );
+
+  static TypeReference destroyReference(Reference? type) => TypeReference(
+        (b) {
+          b
+            ..symbol = 'DestroyReference'
+            ..url = 'package:etebase/src/isolate/destroy_reference.dart';
+          if (type != null) {
+            b.types.add(type);
+          }
+        },
       );
 }
 

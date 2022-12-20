@@ -1,7 +1,6 @@
-import 'package:synchronized/synchronized.dart';
-
 import 'gen/ffi/libetebase.ffi.isolate.dart';
 import 'isolate/etebase_isolate.dart';
+import 'isolate/etebase_isolate_reference.dart';
 import 'isolate/logging_invocation_handler_wrapper.dart';
 import 'model/etebase_config.dart';
 
@@ -10,8 +9,6 @@ import 'model/etebase_config.dart';
 /// When using this library as part of a flutter application, you should
 /// instead use TODO
 abstract class Etebase {
-  static final _lock = Lock();
-
   /// Asynchronously initializes the etebase background isolate for processing.
   ///
   /// If the isolate is already running, this method does nothing and will
@@ -22,63 +19,35 @@ abstract class Etebase {
   ///
   /// When using this library as part of a flutter application, you should
   /// instead use TODO
-  static Future<void> ensureInitialized(
+  static void ensureInitialized(
     LoadLibetebaseFn loadLibetebase, {
     EtebaseConfig config = const EtebaseConfig(),
     int? logLevel,
-  }) =>
-      _lock.synchronized(() async {
-        var handler = etebaseIsolateMessageHandler;
-        if (logLevel != null) {
-          handler = LoggingInvocationHandlerWrapper(
-            etebaseIsolateMessageHandler,
-            logLevel: logLevel,
-          );
-        }
-
-        // ignore: prefer_asserts_with_message
-        assert(() {
-          if (logLevel == null) {
-            handler = const LoggingInvocationHandlerWrapper(
-              etebaseIsolateMessageHandler,
-            );
-          }
-          return true;
-        }());
-
-        await EtebaseIsolate.spawn(
-          loadLibetebase: loadLibetebase,
-          etebaseConfig: config,
-          methodInvocationHandler: handler,
-        );
-      });
-
-  /// Terminates the background isolate.
-  ///
-  /// This is required to be called shortly before you terminate your
-  /// application. If it is not called, the application will never terminate, as
-  /// the isolate in the background keeps running. Calling this method more than
-  /// once is allowed and will do nothing.
-  ///
-  /// If you are writing a pure dart application, I recommend to terminate in
-  /// the main:
-  ///
-  /// ```dart
-  /// Future<void> main() async {
-  ///   await Etebase.ensureInitialized(...);
-  ///   try {
-  ///     // your application code ...
-  ///   } finally {
-  ///     await Etebase.terminate();
-  ///   }
-  /// }
-  /// ```
-  ///
-  /// When using this library as part of a flutter application, you should
-  /// instead use TODO
-  static Future<void> terminate() => _lock.synchronized(
-        () => EtebaseIsolate.hasInstance
-            ? EtebaseIsolate.current.terminate()
-            : Future.value(),
+    bool overwrite = false,
+  }) {
+    var handler = etebaseIsolateMessageHandler;
+    if (logLevel != null) {
+      handler = LoggingInvocationHandlerWrapper(
+        etebaseIsolateMessageHandler,
+        logLevel: logLevel,
       );
+    }
+
+    // ignore: prefer_asserts_with_message
+    assert(() {
+      if (logLevel == null) {
+        handler = const LoggingInvocationHandlerWrapper(
+          etebaseIsolateMessageHandler,
+        );
+      }
+      return true;
+    }());
+
+    EtebaseIsolateReference.initialize(
+      loadLibetebase: loadLibetebase,
+      etebaseConfig: config,
+      methodInvocationHandler: handler,
+      overwrite: overwrite,
+    );
+  }
 }

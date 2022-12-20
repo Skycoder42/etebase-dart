@@ -53,8 +53,13 @@ class ClientBuilder {
           ..abstract = true
           ..constructors.add(Constructor((b) => b..name = '_'))
           ..methods.addAll(
-            etebase.utilsFunctions.map(_clientMethodBuilder.buildMethod),
+            etebase.utilsFunctions.map(
+              (m) => _clientMethodBuilder.buildMethod(
+                m,
+                isUtil: true,
+              ),
+            ),
           )
-          ..docs.add('/// The dart binding of the EtebaseUtils rust class\n'),
+          ..docs.add('/// The dart binding of the EtebaseUtils rust class'),
       );
 }

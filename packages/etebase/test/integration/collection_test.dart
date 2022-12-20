@@ -21,7 +21,7 @@ void main() {
   late final EtebaseCollectionManager collectionManager;
 
   setUpAll(() async {
-    await Etebase.ensureInitialized(loadLibEtebase);
+    Etebase.ensureInitialized(loadLibEtebase);
 
     final client = await EtebaseClient.create('collection-test', serverUri);
     addTearDown(client.dispose);

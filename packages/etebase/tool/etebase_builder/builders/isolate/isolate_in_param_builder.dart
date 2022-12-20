@@ -22,7 +22,7 @@ class IsolateInParamBuilder {
     for (var argumentIndex = 0; argumentIndex < paramsLength; ++argumentIndex) {
       final param = params[argumentIndex];
       final argument =
-          arguments.index(literalNum(argumentIndex)).asA(_castType(param.type));
+          arguments.index(literalNum(argumentIndex)).asA(_castType(param));
       yield* buildInParameter(param, argument);
     }
 
@@ -71,10 +71,12 @@ class IsolateInParamBuilder {
     }
   }
 
-  TypeReference _castType(TypeRef typeRef) =>
-      typeRef is EtebaseClassTypeRef && typeRef.dataClass
-          ? Types.client(typeRef.transferType)
-          : typeRef.transferType;
+  TypeReference _castType(ParameterRef param) {
+    final type = param.type;
+    return type is EtebaseClassTypeRef && type.dataClass
+        ? Types.client(type.transferType)
+        : (param.isOptional ? type.transferType.asNullable : type.transferType);
+  }
 
   Iterable<Code> _buildAssertions(
     MethodRef method,
@@ -90,7 +92,7 @@ class IsolateInParamBuilder {
 
     for (var i = 0; i < paramsLength; ++i) {
       final param = params[i];
-      final transferType = _castType(param.type);
+      final transferType = _castType(param);
       yield arguments.index(literalNum(i)).isA(transferType).asserted(
             'Parameter ${param.name} must be of type '
             '${transferType.accept(DartEmitter(useNullSafetySyntax: true))}',
@@ -124,9 +126,25 @@ class IsolateInParamBuilder {
     Expression variable,
     Expression argument,
   ) sync* {
-    yield variable
-        .assign(_stringToPointer(argument.property('toString').call(const [])))
-        .statement;
+    if (parameter.isOptional) {
+      yield variable
+          .assign(
+            _stringToPointer(
+              argument.nullSafeProperty('toString').call(const []),
+            ).ifNullThen(
+              IsolateBuilder.libEtebaseRef
+                  .property('etebase_get_default_server_url')
+                  .call(const []),
+            ),
+          )
+          .statement;
+    } else {
+      yield variable
+          .assign(
+            _stringToPointer(argument.property('toString').call(const [])),
+          )
+          .statement;
+    }
   }
 
   Iterable<Code> _buildDateTimeParam(

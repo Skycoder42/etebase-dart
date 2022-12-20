@@ -6,7 +6,7 @@ import 'util/library_loader.dart';
 
 void main() {
   setUpAll(() async {
-    await Etebase.ensureInitialized(loadLibEtebase);
+    Etebase.ensureInitialized(loadLibEtebase);
   });
 
   test('etebaseGetDefaultServerUrl returns correct server URL', () async {

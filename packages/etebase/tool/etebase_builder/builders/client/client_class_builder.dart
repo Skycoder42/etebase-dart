@@ -10,6 +10,8 @@ import 'client_method_builder.dart';
 class ClientClassBuilder {
   static const _finalizerName = '_finalizer';
   static const _finalizerRef = Reference(_finalizerName);
+  static const _isolateName = '_isolate';
+  static const isolateRef = Reference(_isolateName);
   static const pointerName = '_pointer';
   static const pointerRef = Reference(pointerName);
   static const _ownerName = '_owner';
@@ -41,6 +43,12 @@ class ClientClassBuilder {
           ),
           Field(
             (b) => b
+              ..name = _isolateName
+              ..type = Types.EtebaseIsolateReference$
+              ..modifier = FieldModifier.final$,
+          ),
+          Field(
+            (b) => b
               ..name = pointerName
               ..type = Types.pointer(
                 Types.ffi(refer(clazz.name)),
@@ -59,20 +67,25 @@ class ClientClassBuilder {
           ...clazz.methods.map(_clientMethodBuilder.buildMethod),
           _buildDispose(clazz.methods),
         ])
-        ..docs.add('/// The dart binding of the ${clazz.name} rust class\n'),
+        ..docs.add('/// The dart binding of the ${clazz.name} rust class'),
     );
   }
 
   Constructor _buildConstructor() => Constructor(
         (b) => b
           ..name = '_'
-          ..requiredParameters.add(
+          ..requiredParameters.addAll([
+            Parameter(
+              (b) => b
+                ..name = _isolateName
+                ..toThis = true,
+            ),
             Parameter(
               (b) => b
                 ..name = pointerName
                 ..toThis = true,
             ),
-          )
+          ])
           ..optionalParameters.add(
             Parameter(
               (b) => b
@@ -82,7 +95,11 @@ class ClientClassBuilder {
           )
           ..body = if$(_ownedRef.equalTo(literalNull), [
             _finalizerRef.property('attach').call(
-              [literalThis, pointerRef],
+              [
+                literalThis,
+                Types.destroyReference(null)
+                    .newInstance([isolateRef, pointerRef]),
+              ],
               {'detach': literalThis},
             ).statement,
           ]),
@@ -96,7 +113,15 @@ class ClientClassBuilder {
             ..modifier = MethodModifier.async
             ..body = if$(_ownedRef.equalTo(literalNull), [
               _finalizerRef.property('detach').call([literalThis]).statement,
-              _destroyMethodRef.call([pointerRef]).awaited.statement,
+              _destroyMethodRef
+                  .call([
+                    Types.destroyReference(null).newInstance([
+                      isolateRef,
+                      pointerRef,
+                    ]),
+                  ])
+                  .awaited
+                  .statement,
             ]);
 
           final docs = methods

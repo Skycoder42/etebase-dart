@@ -4,20 +4,20 @@ import '../../parsers/method_parser.dart';
 import '../../parsers/param_parser.dart';
 import '../../parsers/type_ref.dart';
 import '../../util/expression_extensions.dart';
+import '../../util/try_catch.dart';
 import '../../util/types.dart';
 import 'client_class_builder.dart';
 import 'client_method_builder.dart';
 
 class ClientMethodBodyBuilder {
+  static const _clientIsolateName = 'isolate';
+  static const _clientIsolateRef = Reference(_clientIsolateName);
+
   const ClientMethodBodyBuilder();
 
-  Code buildBody(MethodRef method) {
-    var expression = TypeReference(
-      (b) => b
-        ..symbol = 'EtebaseIsolate'
-        ..url = 'package:etebase/src/isolate/etebase_isolate.dart',
-    ).property('current').property('invoke');
-
+  Code buildBody(MethodRef method, {bool global = false}) {
+    final isolateRef = _getIsolateRef(method, global);
+    var expression = isolateRef.property('invoke');
     final inParams = method
         .exportedParams(withThis: true)
         .map((param) => _mapCallParam(param, method))
@@ -39,23 +39,48 @@ class ClientMethodBodyBuilder {
       [returnType.transferType],
     );
 
-    if (returnType is EtebaseOutListTypeRef) {
-      return _buildOutListMethodBody(expression, returnType);
+    if (global) {
+      return _buildGlobal(expression, isolateRef);
+    } else if (method.isClientNew) {
+      return _buildClientNew(expression, returnType, isolateRef);
+    } else if (method.isClientDestroy) {
+      return _buildClientDestroy(expression, isolateRef);
+    } else if (returnType is EtebaseOutListTypeRef) {
+      return _buildOutListMethodBody(expression, returnType, isolateRef);
     } else if (returnType is ByteArrayTypeRef) {
       return _buildByteArrayMethodBody(expression, returnType);
     } else if (returnType is EtebaseClassTypeRef && !returnType.dataClass) {
-      expression = _fromAddress(returnType.publicType, expression.awaited);
+      expression = _fromAddress(
+        returnType.publicType,
+        expression.awaited,
+        isolateRef,
+      );
     }
 
     return expression.code;
+  }
+
+  Expression _getIsolateRef(MethodRef method, bool global) {
+    if (method.isClientNew || global) {
+      return _clientIsolateRef;
+    } else if (method.isDestroy) {
+      return refer(
+        method.parameters.singleWhere((p) => p.isThisParam).name,
+      ).property('isolate');
+    } else if (method.isNew || method.isStatic) {
+      return refer('client').property(ClientClassBuilder.isolateRef.symbol!);
+    } else {
+      return ClientClassBuilder.isolateRef;
+    }
   }
 
   Expression _mapCallParam(ParameterRef param, MethodRef method) {
     final paramType = param.type;
 
     if (param.isThisParam) {
-      final ref =
-          method.isDestroy ? refer(param.name) : ClientClassBuilder.pointerRef;
+      final ref = method.isDestroy
+          ? refer(param.name).property('pointer')
+          : ClientClassBuilder.pointerRef;
       return ref.property('address');
     } else if (paramType is ByteArrayTypeRef) {
       final expression = Types.TransferableTypedData$.newInstanceNamed(
@@ -101,10 +126,12 @@ class ClientMethodBodyBuilder {
 
   Expression _fromAddress(
     Reference classType,
-    Expression address, {
+    Expression address,
+    Expression isolateRef, {
     bool withOwner = false,
   }) =>
       classType.newInstanceNamed('_', [
+        isolateRef,
         Types.pointer(null).newInstanceNamed(
           'fromAddress',
           [address],
@@ -112,9 +139,56 @@ class ClientMethodBodyBuilder {
         if (withOwner) literalThis,
       ]);
 
-  Block _buildOutListMethodBody(
+  Code _buildGlobal(
+    Expression expression,
+    Expression isolateRef,
+  ) =>
+      Block.of([
+        declareFinal(_clientIsolateName)
+            .assign(
+              Types.EtebaseIsolateReference$.property('create')
+                  .call(const []).awaited,
+            )
+            .statement,
+        try$([
+          expression.awaited.returned.statement,
+        ]).finally$([
+          isolateRef.property('dispose').call(const []).awaited.statement,
+        ]),
+      ]);
+
+  Code _buildClientNew(
+    Expression expression,
+    TypeRef returnType,
+    Expression isolateRef,
+  ) =>
+      Block.of([
+        declareFinal(_clientIsolateName)
+            .assign(
+              Types.EtebaseIsolateReference$.property('create')
+                  .call(const []).awaited,
+            )
+            .statement,
+        _fromAddress(
+          returnType.publicType,
+          expression.awaited,
+          isolateRef,
+        ).returned.statement,
+      ]);
+
+  Code _buildClientDestroy(
+    Expression expression,
+    Expression isolateRef,
+  ) =>
+      Block.of([
+        expression.awaited.statement,
+        isolateRef.property('dispose').call(const []).awaited.statement,
+      ]);
+
+  Code _buildOutListMethodBody(
     Expression expression,
     EtebaseOutListTypeRef returnType,
+    Expression isolateRef,
   ) =>
       Block(
         (p) => p
@@ -131,6 +205,7 @@ class ClientMethodBodyBuilder {
                       ..body = _fromAddress(
                         returnType.publicInnerType,
                         refer('a'),
+                        isolateRef,
                         withOwner: true,
                       ).code,
                   ).closure
@@ -141,7 +216,7 @@ class ClientMethodBodyBuilder {
           ),
       );
 
-  Block _buildByteArrayMethodBody(
+  Code _buildByteArrayMethodBody(
     Expression expression,
     ByteArrayTypeRef returnType,
   ) =>

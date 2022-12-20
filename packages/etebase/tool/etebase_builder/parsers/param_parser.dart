@@ -55,6 +55,7 @@ class ParamParser {
   static final _optionalParams = {
     RegExp('.*'): ['fetch_options'],
     RegExp('etebase_(fs_cache_.*)?account.*'): ['encryption_key'],
+    RegExp(r'^etebase_client_new$'): ['server_url'],
   };
 
   final TypeParser _typeParser;

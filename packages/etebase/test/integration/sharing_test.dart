@@ -15,6 +15,8 @@ void main() {
   final userName1 = generateUsername('sharing-test-user-1');
   final userName2 = generateUsername('sharing-test-user-2');
 
+  late final EtebaseClient client;
+
   late final EtebaseCollectionManager collectionManager1;
   late final EtebaseCollectionInvitationManager invitationManager1;
 
@@ -22,9 +24,9 @@ void main() {
   late final EtebaseCollectionInvitationManager invitationManager2;
 
   setUpAll(() async {
-    await Etebase.ensureInitialized(loadLibEtebase);
+    Etebase.ensureInitialized(loadLibEtebase);
 
-    final client = await EtebaseClient.create('sharing-test', serverUri);
+    client = await EtebaseClient.create('sharing-test', serverUri);
     addTearDown(client.dispose);
 
     final account1 = await EtebaseAccount.signup(
@@ -64,8 +66,8 @@ void main() {
 
     expect(pubKey1, isNot(pubKey2));
 
-    final prettyPubKey1 = await EtebaseUtils.prettyFingerprint(pubKey1);
-    final prettyPubKey2 = await EtebaseUtils.prettyFingerprint(pubKey2);
+    final prettyPubKey1 = await EtebaseUtils.prettyFingerprint(client, pubKey1);
+    final prettyPubKey2 = await EtebaseUtils.prettyFingerprint(client, pubKey2);
 
     expect(prettyPubKey1, isNot(prettyPubKey2));
 

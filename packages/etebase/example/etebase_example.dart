@@ -5,20 +5,20 @@ import 'package:etebase/etebase.dart';
 import '../test/integration/util/library_loader.dart';
 
 Future<void> main() async {
+  print('Initializing etebase');
+  Etebase.ensureInitialized(loadLibEtebase);
+  print('Etebase was initialized!');
+
+  final client = await EtebaseClient.create(
+    'example-client',
+    // serverUrl,
+    Uri.http('localhost:3735', '/'),
+  );
   try {
-    print('Initializing etebase');
-    await Etebase.ensureInitialized(loadLibEtebase);
-    print('Etebase was initialized!');
+    print('Client is valid: ${await client.checkEtebaseServer()}');
 
     final serverUrl = await etebaseGetDefaultServerUrl();
-
     print('Server-URL: $serverUrl');
-    final client = await EtebaseClient.create(
-      'example-client',
-      // serverUrl,
-      Uri.http('localhost:3735', '/'),
-    );
-    print('Client is valid: ${await client.checkEtebaseServer()}');
 
     final account = await EtebaseAccount.signup(
       client,
@@ -30,7 +30,6 @@ Future<void> main() async {
     );
     print(await account.save());
   } finally {
-    await Etebase.terminate();
-    print('Isolate terminated');
+    await client.dispose();
   }
 }

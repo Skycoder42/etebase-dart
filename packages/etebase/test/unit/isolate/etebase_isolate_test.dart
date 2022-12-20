@@ -186,7 +186,7 @@ void main() {
 
       expect(EtebaseIsolate.hasInstance, isTrue);
 
-      await instance.terminate(timeout: Duration.zero);
+      await instance.terminate();
 
       expect(EtebaseIsolate.hasInstance, isFalse);
 
@@ -203,7 +203,7 @@ void main() {
         methodInvocationHandler: testInvocationHandler,
       );
 
-      await instance.terminate(timeout: Duration.zero);
+      await instance.terminate();
 
       expect(
         () => instance.invoke<String>(#test_method, const <dynamic>[]),

@@ -80,7 +80,7 @@ class EtebaseIsolate {
 
   /// @nodoc
   Future<void> terminate({
-    Duration timeout = const Duration(seconds: 30),
+    Duration? timeout,
   }) {
     _sendPort.send(
       MethodInvocation(
@@ -90,7 +90,7 @@ class EtebaseIsolate {
       ),
     );
 
-    if (timeout == Duration.zero) {
+    if (timeout == null) {
       return _terminatedAndDisposed;
     } else {
       return _terminatedAndDisposed.timeout(timeout, onTimeout: _isolate.kill);
