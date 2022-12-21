@@ -17,7 +17,9 @@ class ClientMethodBodyBuilder {
 
   Code buildBody(MethodRef method, {bool global = false}) {
     final isolateRef = _getIsolateRef(method, global);
-    var expression = isolateRef.property('invoke');
+    var expression = method.isDestroy
+        ? isolateRef.property('maybeInvoke')
+        : isolateRef.property('invoke');
     final inParams = method
         .exportedParams(withThis: true)
         .map((param) => _mapCallParam(param, method))

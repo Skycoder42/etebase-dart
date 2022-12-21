@@ -77,6 +77,10 @@ class EtebaseIsolateReference {
   }
 
   /// @nodoc
+  Future<T?> maybeInvoke<T>(Symbol method, List<dynamic> arguments) =>
+      _currentIsolate?.invoke<T>(method, arguments) ?? Future.value();
+
+  /// @nodoc
   Future<void> dispose() async {
     if (--_refCtr == 0) {
       assert(

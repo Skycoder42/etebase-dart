@@ -167,7 +167,7 @@ class EtebaseUserProfile {
 
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseUserProfile> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_user_profile_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -278,7 +278,7 @@ class EtebaseSignedInvitation {
 
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseSignedInvitation> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_signed_invitation_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -333,7 +333,7 @@ class EtebaseRemovedCollection {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseRemovedCollection> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_removed_collection_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -414,7 +414,7 @@ class EtebaseInvitationListResponse {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseInvitationListResponse> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_invitation_list_response_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -495,7 +495,7 @@ class EtebaseItemRevisionsListResponse {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseItemRevisionsListResponse> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_item_revisions_list_response_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -576,7 +576,7 @@ class EtebaseMemberListResponse {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseMemberListResponse> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_member_list_response_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -921,7 +921,7 @@ class EtebaseItemManager {
 
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseItemManager> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_item_manager_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -1002,7 +1002,7 @@ class EtebaseItemListResponse {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseItemListResponse> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_item_list_response_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -1181,7 +1181,7 @@ class EtebaseItem {
         <dynamic>[_pointer.address],
       );
   static Future<void> _destroy(_i3.DestroyReference<_i5.EtebaseItem> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_item_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -1479,7 +1479,7 @@ class EtebaseFileSystemCache {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseFileSystemCache> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_fs_cache_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -1581,7 +1581,7 @@ class EtebaseCollectionMemberManager {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseCollectionMemberManager> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_collection_member_manager_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -1656,7 +1656,7 @@ class EtebaseCollectionMember {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseCollectionMember> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_collection_member_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -1950,7 +1950,7 @@ class EtebaseCollectionManager {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseCollectionManager> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_collection_manager_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -2050,7 +2050,7 @@ class EtebaseCollectionListResponse {
 
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseCollectionListResponse> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_collection_list_response_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -2226,7 +2226,7 @@ class EtebaseCollectionInvitationManager {
 
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseCollectionInvitationManager> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_invitation_manager_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -2444,7 +2444,7 @@ class EtebaseCollection {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseCollection> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_collection_destroy,
         <dynamic>[this_.pointer.address],
       );
@@ -2526,7 +2526,7 @@ class EtebaseClient {
       );
   static Future<void> _destroy(
       _i3.DestroyReference<_i5.EtebaseClient> this_) async {
-    await this_.isolate.invoke<void>(
+    await this_.isolate.maybeInvoke<void>(
       #etebase_client_destroy,
       <dynamic>[this_.pointer.address],
     );
@@ -2732,7 +2732,7 @@ class EtebaseAccount {
       );
   static Future<void> _destroy(
           _i3.DestroyReference<_i5.EtebaseAccount> this_) =>
-      this_.isolate.invoke<void>(
+      this_.isolate.maybeInvoke<void>(
         #etebase_account_destroy,
         <dynamic>[this_.pointer.address],
       );
