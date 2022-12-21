@@ -4,7 +4,12 @@
 // EtebaseClientGenerator
 // **************************************************************************
 
-// ignore_for_file: require_trailing_commas, avoid_positional_boolean_parameters, lines_longer_than_80_chars, comment_references, prefer_relative_imports, prefer_if_elements_to_conditional_expressions, unused_element
+// ignore_for_file: avoid_positional_boolean_parameters, comment_references
+// ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: prefer_if_elements_to_conditional_expressions
+// ignore_for_file: prefer_relative_imports, require_trailing_commas
+// ignore_for_file: unused_element
+
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:ffi' as _i4;
 import 'dart:isolate' as _i7;

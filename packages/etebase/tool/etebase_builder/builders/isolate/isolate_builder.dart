@@ -38,6 +38,20 @@ class IsolateBuilder {
     final methods = _allMethods(etebase);
     return Library(
       (b) => b
+        ..ignoreForFile.addAll(const [
+          'non_constant_identifier_names',
+          'require_trailing_commas',
+          'unnecessary_parenthesis',
+          'prefer_relative_imports',
+          'lines_longer_than_80_chars',
+          'prefer_is_empty',
+          'constant_identifier_names',
+          'avoid_bool_literals_in_conditional_expressions',
+          'prefer_const_constructors',
+          'unused_element',
+          'unused_local_variable',
+          'public_member_api_docs'
+        ])
         ..directives.add(Directive.import('package:ffi/ffi.dart'))
         ..body.add(_buildHandler(methods))
         ..body.addAll(

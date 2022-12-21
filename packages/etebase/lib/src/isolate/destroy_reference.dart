@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 import 'dart:ffi';
 
 import 'package:meta/meta.dart';

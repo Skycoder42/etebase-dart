@@ -17,7 +17,7 @@ dev_dependencies:
   build: ^2.3.1
   build_config: ^1.1.1
   build_runner: ^2.3.3
-  code_builder: ^4.3.0
+  code_builder: ^4.4.0
   dart_pre_commit: ^4.0.0
   dart_test_tools: ^4.6.0
   ffigen: ^7.2.4

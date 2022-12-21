@@ -30,6 +30,11 @@ MethodResult testInvocationHandler(
     throw Exception('test-error');
   }
 
+  if (invocation.method == #test_blocking_method) {
+    sleep(const Duration(seconds: 2));
+    return MethodResult.success(invocation.id, null);
+  }
+
   return MethodResult.success(invocation.id, {
     'config': config,
     'method': invocation.method,
@@ -43,50 +48,33 @@ void main() {
       defaultContentBufferSize: 111,
     );
 
-    tearDown(() async {
-      if (EtebaseIsolate.hasInstance) {
-        await EtebaseIsolate.current.terminate();
-      }
-    });
-
-    test('current throws state error if not spawned yet', () {
-      expect(
-        () => EtebaseIsolate.current,
-        throwsA(isA<EtebaseIsolateError>()),
-      );
-    });
-
     test('spawn creates new isolate', () async {
-      expect(EtebaseIsolate.hasInstance, isFalse);
-
       final instance = await EtebaseIsolate.spawn(
         loadLibetebase: testLoadLibetebase,
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
-
-      expect(EtebaseIsolate.hasInstance, isTrue);
-      expect(instance, same(EtebaseIsolate.current));
+      addTearDown(instance.terminate);
     });
 
-    test('spawn does nothing if already spawned', () async {
+    test('spawn can create multiple isolates', () async {
       final instance1 = await EtebaseIsolate.spawn(
         loadLibetebase: testLoadLibetebase,
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
+      addTearDown(instance1.terminate);
       final instance2 = await EtebaseIsolate.spawn(
         loadLibetebase: testLoadLibetebase,
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
+      addTearDown(instance2.terminate);
 
-      expect(instance2, same(instance1));
+      expect(instance2, isNot(same(instance1)));
     });
 
     test('spawn throws if creation of isolate fails', () async {
-      expect(EtebaseIsolate.hasInstance, isFalse);
-
       await expectLater(
         () => EtebaseIsolate.spawn(
           loadLibetebase: testAlwaysThrow,
@@ -95,8 +83,6 @@ void main() {
         ),
         throwsException,
       );
-
-      expect(EtebaseIsolate.hasInstance, isFalse);
     });
 
     test('invoke sends call to message handler and waits for result', () async {
@@ -105,6 +91,7 @@ void main() {
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
+      addTearDown(instance.terminate);
 
       const testMethod = #test_method;
       const testArguments = [1, 'a', false];
@@ -127,6 +114,7 @@ void main() {
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
+      addTearDown(instance.terminate);
 
       expect(
         () => instance.invoke<void>(#test_error_method, const <dynamic>[]),
@@ -140,6 +128,7 @@ void main() {
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
+      addTearDown(instance.terminate);
 
       const testMethod1 = #test_method1;
       const testMethod2 = #test_method2;
@@ -170,6 +159,7 @@ void main() {
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
+      addTearDown(instance.terminate);
 
       expect(
         () => instance.invoke<String>(#test_method, const <dynamic>[]),
@@ -184,29 +174,33 @@ void main() {
         methodInvocationHandler: testInvocationHandler,
       );
 
-      expect(EtebaseIsolate.hasInstance, isTrue);
-
       await instance.terminate();
 
-      expect(EtebaseIsolate.hasInstance, isFalse);
-
       expect(
-        () => instance.invoke<String>(#test_method, const <dynamic>[]),
+        () => instance.invoke<Map<String, dynamic>>(
+          #test_method,
+          const <dynamic>[],
+        ),
         throwsA(isA<EtebaseIsolateError>()),
       );
     });
 
-    test('invoke throws if already been terminated', () async {
+    test('terminate with timeout kills isolate if timeout is reached',
+        () async {
       final instance = await EtebaseIsolate.spawn(
         loadLibetebase: testLoadLibetebase,
         etebaseConfig: testConfig,
         methodInvocationHandler: testInvocationHandler,
       );
 
-      await instance.terminate();
+      instance.invoke<void>(#test_blocking_method, const <dynamic>[]).ignore();
+      await instance.terminate(timeout: const Duration(milliseconds: 500));
 
       expect(
-        () => instance.invoke<String>(#test_method, const <dynamic>[]),
+        () => instance.invoke<Map<String, dynamic>>(
+          #test_method,
+          const <dynamic>[],
+        ),
         throwsA(isA<EtebaseIsolateError>()),
       );
     });

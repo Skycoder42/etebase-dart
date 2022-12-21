@@ -14,8 +14,6 @@ class EtebaseClientGenerator extends RestorableGenerator {
     final etebaseRef = const EtebaseParser().parse(library);
 
     final buffer = StringBuffer();
-    _writeIgnoreComment(buffer);
-
     final emitter = DartEmitter.scoped(
       orderDirectives: true,
       useNullSafetySyntax: true,
@@ -28,17 +26,3 @@ class EtebaseClientGenerator extends RestorableGenerator {
     return buffer.toString();
   }
 }
-
-void _writeIgnoreComment(StringBuffer buffer) => buffer
-  ..write('// ignore_for_file: ')
-  ..writeln(
-    const [
-      'require_trailing_commas',
-      'avoid_positional_boolean_parameters',
-      'lines_longer_than_80_chars',
-      'comment_references',
-      'prefer_relative_imports',
-      'prefer_if_elements_to_conditional_expressions',
-      'unused_element',
-    ].join(', '),
-  );

@@ -19,6 +19,15 @@ class ClientBuilder {
 
   Library build(EtebaseRef etebase, AssetId assetId) => Library(
         (b) => b
+          ..ignoreForFile.addAll(const [
+            'require_trailing_commas',
+            'avoid_positional_boolean_parameters',
+            'lines_longer_than_80_chars',
+            'comment_references',
+            'prefer_relative_imports',
+            'prefer_if_elements_to_conditional_expressions',
+            'unused_element',
+          ])
           ..directives.add(
             Directive.import(
               'package:freezed_annotation/freezed_annotation.dart',
