@@ -12,5 +12,6 @@
     "stoken",
     "Stoken"
   ],
-  "dart.runPubGetOnPubspecChanges": "never"
+  "dart.runPubGetOnPubspecChanges": "never",
+  "cmake.configureOnOpen": false
 }

@@ -1,0 +1,3 @@
+dependency_overrides:
+  etebase:
+    path: ../etebase

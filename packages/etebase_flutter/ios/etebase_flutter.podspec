@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'etebase_flutter'
-  s.version          = '0.0.1'
+  s.version          = '1.0.0'
   s.summary          = 'Flutter extensions for the dart bindings of libetebase'
   s.description      = <<-DESC
 Flutter extensions for the dart bindings of libetebase
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Skycoder42' => 'skycoder42@users.noreply.github.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'

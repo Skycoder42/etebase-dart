@@ -1,17 +1,15 @@
+import 'package:etebase_flutter/etebase_flutter_method_channel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:etebase_flutter/etebase_flutter_method_channel.dart';
 
 void main() {
-  MethodChannelEtebaseFlutter platform = MethodChannelEtebaseFlutter();
-  const MethodChannel channel = MethodChannel('etebase_flutter');
+  final platform = MethodChannelEtebaseFlutter();
+  const channel = MethodChannel('etebase_flutter');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
-    });
+    channel.setMockMethodCallHandler((methodCall) async => '42');
   });
 
   tearDown(() {
