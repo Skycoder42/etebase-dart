@@ -1,0 +1,11 @@
+#!/bin/bash
+# https://github.com/rust-lang/cargo/issues/4133#issuecomment-1296719998
+
+# When cross-building for same host arch, cargo uses the same linker
+# for the build tools as it does for the target which is wrong
+# So we detect why it is being called, if an argument includes the
+# words build_script_build then we are building build tools for the host
+# and use host gcc, otherwise we use target CC
+
+grep -q 'build_script_main\|build_script_build' <<<"$*" && exec gcc "$@" || exec ${TARGET_CC:-${CC}} "$@"
+
