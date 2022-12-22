@@ -1,0 +1,13 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 0dc27be..e0335a5 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -11,7 +11,7 @@ readme = "README.md"
+ 
+ [lib]
+ name = "etebase"
+-crate-type = ["cdylib"]
++crate-type = ["staticlib"]
+ 
+ [build-dependencies]
+ cbindgen = "^0.14.2"
