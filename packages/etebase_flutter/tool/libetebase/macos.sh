@@ -13,7 +13,7 @@ patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 # DEBUG
 pushd "$install_dir/example/macos"
 pod install || true
-git diff
+cat macos/Podfile
 popd
 
 if [ "$CACHE_HIT" = "true" ]; then
