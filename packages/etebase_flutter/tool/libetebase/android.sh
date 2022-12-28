@@ -40,6 +40,7 @@ for arch in "${arches[@]}"; do
   export CC=${arch[2]}
   export CXX=${arch[3]}
 
+  rustup target add "$target"
 
   cargo build \
     --config "target.$target.linker=\"$install_dir/android/my-hacky-linker-cc\"" \

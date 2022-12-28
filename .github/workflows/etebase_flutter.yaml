@@ -24,7 +24,8 @@ jobs:
       workingDirectory: packages/etebase_flutter
       buildRunner: false
       unitTestPaths: ""
-      integrationTestPaths: test/integration
+      integrationTestProject: example
+      integrationTestPaths: integration_test
       integrationTestCacheConfig: >-
         {
           "key": "etebase_flutter-libetebase-v0.5.3",

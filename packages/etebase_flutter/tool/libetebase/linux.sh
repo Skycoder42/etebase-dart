@@ -8,7 +8,7 @@ install_dir=${2:-$PWD}
 cache_dir="$install_dir/tool/libetebase/lib"
 
 if [ "$CACHE_HIT" = "true" ]; then
-  sudo rsync -a "$cache_dir/" /
+  sudo rsync -av "$cache_dir/" /
   exit 0
 fi
 
@@ -19,4 +19,4 @@ cd "$build_dir"
 make
 make install DESTDIR="$cache_dir"
 
-sudo rsync -a "$cache_dir/" /
+sudo rsync -av "$cache_dir/" /
