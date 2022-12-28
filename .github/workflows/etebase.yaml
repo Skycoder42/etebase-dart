@@ -43,18 +43,18 @@ jobs:
           "macos": "bash tool/integration/setup_macos.sh v0.5.3",
           "windows": "powershell -File tool\\integration\\setup_win.ps1 v0.5.3"
         }
-  # cd:
-  #   name: CD
-  #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
-  #   needs:
-  #     - ci
-  #   with:
-  #     workingDirectory: packages/etebase
-  #     buildRunner: true
-  #     buildRunnerArgs: >-
-  #       --delete-conflicting-outputs
-  #       --define etebase:etebase_client_builder=restoreMode=true
-  #       --define etebase:etebase_isolate_builder=restoreMode=true
-  #     tagPrefix: etebase/v
-  #   secrets:
-  #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
+  cd:
+    name: CD
+    uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+    needs:
+      - ci
+    with:
+      workingDirectory: packages/etebase
+      buildRunner: true
+      buildRunnerArgs: >-
+        --delete-conflicting-outputs
+        --define etebase:etebase_client_builder=restoreMode=true
+        --define etebase:etebase_isolate_builder=restoreMode=true
+      tagPrefix: etebase/v
+    secrets:
+      PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
