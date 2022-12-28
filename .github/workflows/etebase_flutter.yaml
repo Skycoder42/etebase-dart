@@ -18,7 +18,7 @@ on:
 jobs:
   ci:
     name: CI
-    uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
+    uses: Skycoder42/dart_test_tools/.github/workflows/flutter.yml@main
     with:
       platforms: '["android", "ios", "linux", "macos", "windows"]'
       workingDirectory: packages/etebase_flutter
@@ -40,12 +40,8 @@ jobs:
   #   needs:
   #     - ci
   #   with:
-  #     workingDirectory: packages/etebase
-  #     buildRunner: true
-  #     buildRunnerArgs: >-
-  #       --delete-conflicting-outputs
-  #       --define etebase:etebase_client_builder=restoreMode=true
-  #       --define etebase:etebase_isolate_builder=restoreMode=true
-  #     tagPrefix: etebase/v
+  #     workingDirectory: packages/etebase_flutter
+  #     buildRunner: false
+  #     tagPrefix: etebase_flutter/v
   #   secrets:
   #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
