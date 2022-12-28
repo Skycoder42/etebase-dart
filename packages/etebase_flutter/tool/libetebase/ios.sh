@@ -27,14 +27,16 @@ git apply "$patch_file"
 cargo build --target aarch64-apple-ios --release
 cargo build --target x86_64-apple-ios --release
 
-mkdir -p target/universal/release
+universal_dir=target/universal-ios/release/
+universal_lib=$universal_dir/libetebase.dylib
+mkdir -p $universal_dir
 lipo -create \
   target/aarch64-apple-ios/release/libetebase.dylib \
   target/x86_64-apple-ios/release/libetebase.dylib \
-  -output target/universal-ios/release/libetebase.dylib
+  -output $universal_lib
 
 mkdir -p "$cache_dir"
-cp -a target/universal-ios/release/libetebase.dylib "$cache_dylib"
+cp -a $universal_lib "$cache_dylib"
 
 mkdir -p "$lib_dir"
 cp -a "$cache_dylib" "$lib_dir/"
