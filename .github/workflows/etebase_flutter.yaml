@@ -1,0 +1,51 @@
+name: CI/CD for etebase_flutter
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "packages/etebase_flutter/**"
+      - ".github/workflows/etebase_flutter.yaml"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "packages/etebase_flutter/**"
+      - ".github/workflows/etebase_flutter.yaml"
+
+jobs:
+  ci:
+    name: CI
+    uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
+    with:
+      platforms: '["android", "ios", "linux", "macos", "windows"]'
+      workingDirectory: packages/etebase_flutter
+      buildRunner: false
+      unitTestPaths: ""
+      integrationTestPaths: test/integration
+      integrationTestCacheConfig: >-
+        {
+          "key": "etebase_flutter-libetebase-v0.5.3",
+          "path": "packages/etebase_flutter/tool/libetebase/lib"
+        }
+      integrationTestSetup: >-
+        {
+          "android": "bash tool/libetebase/android.sh v0.5.3",
+        }
+  # cd:
+  #   name: CD
+  #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+  #   needs:
+  #     - ci
+  #   with:
+  #     workingDirectory: packages/etebase
+  #     buildRunner: true
+  #     buildRunnerArgs: >-
+  #       --delete-conflicting-outputs
+  #       --define etebase:etebase_client_builder=restoreMode=true
+  #       --define etebase:etebase_isolate_builder=restoreMode=true
+  #     tagPrefix: etebase/v
+  #   secrets:
+  #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}

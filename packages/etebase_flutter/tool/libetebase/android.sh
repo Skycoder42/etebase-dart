@@ -2,7 +2,7 @@
 set -ex
 
 version=${1:-v0.5.3}
-install_dir=${2:-$PWD}
+install_dir=${2:-$PWD/android}
 host_arch=${3:-linux-x86_64}
 ndk_version=${4:-22.1.7171670}
 
@@ -38,7 +38,7 @@ for arch in "${arches[@]}"; do
     --release
 
   mkdir -p "$jniDir"
-  cp "target/$target/release/libetebase.so" "$jniDir"
+  cp -a "target/$target/release/libetebase.so" "$jniDir"
 done
 
 popd

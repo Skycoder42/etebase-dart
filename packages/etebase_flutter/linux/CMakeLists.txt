@@ -1,7 +1,7 @@
 # The Flutter tooling requires that developers have CMake 3.10 or later
 # installed. You should not increase this version, as doing so will cause
 # the plugin to fail to compile for some customers of the plugin.
-cmake_minimum_required(VERSION 3.19 ) # required for corrosion
+cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
 set(PROJECT_NAME "etebase_flutter")
@@ -45,26 +45,3 @@ set(etebase_flutter_bundled_libraries
   ""
   PARENT_SCOPE
 )
-
-### Custom code to add libetebase as build dependency
-include(ExternalProject)
-
-# download and build libetebase
-ExternalProject_Add(libetebase
-  BINARY_DIR ${SOURCE_DIR}/target
-  GIT_REPOSITORY https://github.com/etesync/libetebase.git
-  GIT_TAG v0.5.3
-  PATCH_COMMAND git apply staticlib.patch
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND cargo build COMMAND cargo build --release
-  INSTALL_COMMAND ""
-  LOG_DOWNLOAD ON
-  LOG_PATCH ON
-  LOG_BUILD ON
-)
-
-# link it
-add_dependencies(${PLUGIN_NAME} libetebase)
-target_link_libraries(${PLUGIN_NAME}
-    debug "${CMAKE_SOURCE_DIR}/common-rust/target/debug/libetebase.a"
-    optimized "${CMAKE_SOURCE_DIR}/common-rust/target/release/libetebase.a")

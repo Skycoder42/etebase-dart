@@ -34,7 +34,7 @@ jobs:
       integrationTestPaths: -j1 test/integration
       integrationTestCacheConfig: >-
         {
-          "key": "libetebase-v0.5.3",
+          "key": "etebase-libetebase-v0.5.3",
           "path": "packages/etebase/tool/integration/libetebase"
         }
       integrationTestSetup: >-
