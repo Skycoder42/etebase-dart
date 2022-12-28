@@ -10,6 +10,12 @@ cache_dylib="$cache_dir/lib/libetebase.dylib"
 lib_dir="$install_dir/macos/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
+# DEBUG
+pushd "$install_dir/example/macos"
+pod install
+git diff
+popd
+
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"
   cp -a "$cache_dylib" "$lib_dir/"
@@ -26,8 +32,3 @@ make install DESTDIR="$cache_dir" PREFIX=/
 
 mkdir -p "$lib_dir"
 cp -a "$cache_dylib" "$lib_dir/"
-
-# DEBUG
-cd "$install_dir/example/macos"
-pod install
-git diff

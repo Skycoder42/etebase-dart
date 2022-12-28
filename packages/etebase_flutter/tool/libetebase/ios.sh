@@ -26,7 +26,6 @@ cd "$build_dir"
 git apply "$patch_file"
 cargo lipo --release
 
-find target
 mkdir -p "$cache_dir"
 cp -a target/universal/release/libetebase.a "$cache_dylib"
 
