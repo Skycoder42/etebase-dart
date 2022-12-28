@@ -24,6 +24,7 @@ git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 cd "$build_dir"
 git apply "$patch_file"
 
+export IPHONEOS_DEPLOYMENT_TARGET=9.0
 cargo build --target aarch64-apple-ios --release
 cargo build --target x86_64-apple-ios --release
 cargo build --target aarch64-apple-ios-sim --release

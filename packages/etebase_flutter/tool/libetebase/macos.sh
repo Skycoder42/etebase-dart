@@ -10,16 +10,6 @@ cache_dylib="$cache_dir/lib/libetebase.dylib"
 lib_dir="$install_dir/macos/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
-pushd "$install_dir/example/macos"
-pod install || true
-git add -A
-echo "#######"
-git diff --cached
-echo "#######"
-cat Podfile
-echo "#######"
-popd
-
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"
   cp -a "$cache_dylib" "$lib_dir/"
@@ -31,6 +21,8 @@ build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 cd "$build_dir"
 git apply "$patch_file"
+
+export MACOSX_DEPLOYMENT_TARGET=10.11
 make PREFIX=/
 make install DESTDIR="$cache_dir" PREFIX=/
 
