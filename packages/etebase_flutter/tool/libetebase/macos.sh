@@ -10,6 +10,15 @@ cache_dylib="$cache_dir/lib/libetebase.dylib"
 lib_dir="$install_dir/macos/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
+pushd "$install_dir/example/macos"
+pod install || true
+echo "#######"
+git diff
+echo "#######"
+cat macos/Podfile
+echo "#######"
+popd
+
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"
   cp -a "$cache_dylib" "$lib_dir/"
