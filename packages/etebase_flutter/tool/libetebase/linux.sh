@@ -23,8 +23,8 @@ segments=( ${version//./ } )
 major=${segments[0]}
 minor=${segments[1]}
 patch=${segments[2]}
-ln -s "$cache_dir/usr/lib/libetebase.so" "$cache_dir/usr/lib/libetebase.so.$major"
-ln -s "$cache_dir/usr/lib/libetebase.so" "$cache_dir/usr/lib/libetebase.so.$major.$minor"
-ln -s "$cache_dir/usr/lib/libetebase.so" "$cache_dir/usr/lib/libetebase.so.$major.$minor.$patch"
+ln -s libetebase.so "$cache_dir/usr/lib/libetebase.so.$major"
+ln -s libetebase.so "$cache_dir/usr/lib/libetebase.so.$major.$minor"
+ln -s libetebase.so "$cache_dir/usr/lib/libetebase.so.$major.$minor.$patch"
 
 sudo rsync -av "$cache_dir/" /

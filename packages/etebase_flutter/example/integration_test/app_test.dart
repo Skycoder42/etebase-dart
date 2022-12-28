@@ -10,6 +10,10 @@ void main() {
     app.main();
     await tester.pumpAndSettle();
 
-    expect(find.text('Plugin example app'), findsOneWidget);
+    expect(find.text('etebase flutter plugin'), findsOneWidget);
+    expect(
+      find.text('etebase default server URL: https://api.etebase.com/'),
+      findsOneWidget,
+    );
   });
 }
