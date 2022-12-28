@@ -16,7 +16,7 @@ if [ "$CACHE_HIT" = "true" ]; then
 fi
 
 rustup target add aarch64-apple-ios x86_64-apple-ios
-cargo install lipo
+cargo install cargo-lipo
 
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"

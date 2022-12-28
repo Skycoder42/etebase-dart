@@ -17,9 +17,9 @@ if [ "$CACHE_HIT" = "true" ]; then
   exit 0
 fi
 
-armv7="armeabi-v7a armv7-linux-androideabi armv7a-linux-androideabi19-clang armv7a-linux-androideabi19-clang++"
+armv7="armeabi-v7a armv7-linux-androideabi armv7a-linux-androideabi21-clang armv7a-linux-androideabi21-clang++"
 aarch64="arm64-v8a aarch64-linux-android aarch64-linux-android21-clang aarch64-linux-android21-clang++"
-x86="x86 i686-linux-android i686-linux-android19-clang i686-linux-android19-clang++"
+x86="x86 i686-linux-android i686-linux-android21-clang i686-linux-android21-clang++"
 x86_64="x86_64 x86_64-linux-android x86_64-linux-android21-clang x86_64-linux-android21-clang"
 arches=( "$aarch64" "$x86_64" "$armv7" "$x86" )
 

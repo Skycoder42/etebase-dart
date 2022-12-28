@@ -14,6 +14,7 @@ Flutter extensions for the dart bindings of libetebase
   s.author           = { 'Skycoder42' => 'skycoder42@users.noreply.github.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
+  s.vendored_libraries = 'Libraries/libetebase.dylib'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
 

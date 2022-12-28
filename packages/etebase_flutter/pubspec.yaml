@@ -31,10 +31,12 @@ flutter:
       android:
         package: de.skycoder42.etebase_flutter
         pluginClass: EtebaseFlutterPlugin
+        dartPluginClass: EtebaseFlutterAndroid
       ios:
         pluginClass: EtebaseFlutterPlugin
       linux:
         pluginClass: EtebaseFlutterPlugin
+        dartPluginClass: EtebaseFlutterLinux
       macos:
         pluginClass: EtebaseFlutterPlugin
       windows:

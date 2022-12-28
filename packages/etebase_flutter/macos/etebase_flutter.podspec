@@ -17,7 +17,7 @@ Flutter extensions for the dart bindings of libetebase
   s.vendored_libraries = 'Libraries/libetebase.dylib'
   s.dependency 'FlutterMacOS'
 
-  s.platform = :osx, '10.11'
+  s.platform = :osx, '11.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'
 end

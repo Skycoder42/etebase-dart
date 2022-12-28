@@ -11,13 +11,6 @@ G_BEGIN_DECLS
 #define FLUTTER_PLUGIN_EXPORT
 #endif
 
-typedef struct _EtebaseFlutterPlugin EtebaseFlutterPlugin;
-typedef struct {
-  GObjectClass parent_class;
-} EtebaseFlutterPluginClass;
-
-FLUTTER_PLUGIN_EXPORT GType etebase_flutter_plugin_get_type();
-
 FLUTTER_PLUGIN_EXPORT void etebase_flutter_plugin_register_with_registrar(
     FlPluginRegistrar* registrar);
 
