@@ -15,7 +15,7 @@ if [ "$CACHE_HIT" = "true" ]; then
   exit 0
 fi
 
-rustup target add aarch64-apple-ios armv7s-apple-ios x86_64-apple-ios i386-apple-ios
+rustup target add aarch64-apple-ios x86_64-apple-ios i386-apple-ios
 cargo install lipo
 
 # build and install libetebase
