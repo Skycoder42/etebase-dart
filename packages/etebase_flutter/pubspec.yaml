@@ -20,6 +20,7 @@ dev_dependencies:
     sdk: flutter
 
 # TODO remove
+publish_to: none
 dependency_overrides:
   etebase:
     path: ../etebase

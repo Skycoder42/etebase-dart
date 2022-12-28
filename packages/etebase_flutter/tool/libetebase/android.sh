@@ -1,4 +1,8 @@
 #!/bin/bash
+#$1 libetebase version
+#$2 install dir: $PWD
+#$3 host architecture: linux-x86_64
+#$4 NDK version: 22.1.7171670
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
