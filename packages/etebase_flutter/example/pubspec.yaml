@@ -26,10 +26,5 @@ dev_dependencies:
   integration_test:
     sdk: flutter
 
-# TODO remove
-dependency_overrides:
-  etebase:
-    path: ../../etebase
-
 flutter:
   uses-material-design: true

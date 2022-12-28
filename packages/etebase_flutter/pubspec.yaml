@@ -3,12 +3,15 @@ description: Flutter extensions for the dart bindings of libetebase
 version: 1.0.0
 homepage: https://github.com/Skycoder42/etebase-dart
 
+# TODO remove
+publish_to: none
+
 environment:
   sdk: ">=2.18.4 <3.0.0"
   flutter: ">=3.3.0"
 
 dependencies:
-  etebase: ^1.0.0
+  etebase: ^1.0.0-alpha.1
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
@@ -18,12 +21,6 @@ dev_dependencies:
   dart_test_tools: ^4.6.0
   flutter_test:
     sdk: flutter
-
-# TODO remove
-publish_to: none
-dependency_overrides:
-  etebase:
-    path: ../etebase
 
 flutter:
   plugin:
