@@ -20,5 +20,10 @@ dependencies:
 dev_dependencies:
   flutter_lints: ^2.0.0
 
+# TODO remove
+dependency_overrides:
+  etebase:
+    path: ../../etebase
+
 flutter:
   uses-material-design: true

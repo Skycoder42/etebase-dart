@@ -19,6 +19,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+# TODO remove
+dependency_overrides:
+  etebase:
+    path: ../etebase
+
 flutter:
   plugin:
     platforms:

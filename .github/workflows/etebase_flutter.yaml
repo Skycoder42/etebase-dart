@@ -33,6 +33,7 @@ jobs:
       integrationTestSetup: >-
         {
           "android": "bash tool/libetebase/android.sh v0.5.3",
+          "linux": "bash tool/libetebase/linux.sh v0.5.3",
         }
   # cd:
   #   name: CD
