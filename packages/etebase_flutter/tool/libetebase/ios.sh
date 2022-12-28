@@ -16,7 +16,7 @@ if [ "$CACHE_HIT" = "true" ]; then
   exit 0
 fi
 
-rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios-sim
+rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
 
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"
@@ -27,11 +27,9 @@ git apply "$patch_file"
 cargo build --target aarch64-apple-ios --release
 cargo build --target x86_64-apple-ios --release
 cargo build --target aarch64-apple-ios-sim --release
-cargo build --target x86_64-apple-ios-sim --release
 
 universal_dir=target/universal-ios/release/
 universal_lib=$universal_dir/libetebase.dylib
-universal_sim_lib=$universal_dir/libetebase_simulator.dylib
 universal_framework=$universal_dir/libetebase.xcframework
 mkdir -p $universal_dir
 mkdir -p $universal_dir/headers
@@ -42,14 +40,9 @@ lipo -create \
   target/x86_64-apple-ios/release/libetebase.dylib \
   -output $universal_lib
 
-lipo -create \
-  target/aarch64-apple-ios-sim/release/libetebase.dylib \
-  target/x86_64-apple-ios-sim/release/libetebase.dylib \
-  -output $universal_sim_lib
-
 xcodebuild -create-xcframework \
   -library $universal_lib -headers $universal_dir/headers/ \
-  -library $universal_sim_lib -headers $universal_dir/headers/ \
+  -library target/aarch64-apple-ios-sim/release/libetebase.dylib -headers $universal_dir/headers/ \
   -output $universal_framework
 
 mkdir -p "$cache_dir"

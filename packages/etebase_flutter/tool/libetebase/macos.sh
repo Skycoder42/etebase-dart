@@ -12,10 +12,11 @@ patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
 pushd "$install_dir/example/macos"
 pod install || true
+git add -A
 echo "#######"
-git diff
+git diff --cached
 echo "#######"
-cat macos/Podfile
+cat Podfile
 echo "#######"
 popd
 
