@@ -2,9 +2,15 @@
 set -ex
 
 version=${1:-v0.5.3}
-install_dir=${2:-$PWD/android}
+install_dir=${2:-$PWD}
 host_arch=${3:-linux-x86_64}
 ndk_version=${4:-22.1.7171670}
+jniDir="$install_dir/android/src/main/jniLibs"
+cacheDir="$install_dir/tool/libetebase/lib"
+
+if [ "$CACHE_HIT" = "true" ]; then
+  cp -a "$cacheDir" "$jniDir"
+fi
 
 armv7="armeabi-v7a armv7-linux-androideabi armv7a-linux-androideabi19-clang armv7a-linux-androideabi19-clang++"
 aarch64="arm64-v8a aarch64-linux-android aarch64-linux-android21-clang aarch64-linux-android21-clang++"
@@ -30,16 +36,18 @@ for arch in "${arches[@]}"; do
   export CC=${arch[2]}
   export CXX=${arch[3]}
 
-  jniDir="$install_dir/src/main/jniLibs/$jniLibArch"
 
   cargo build \
-    --config "target.$target.linker=\"$install_dir/my-hacky-linker-cc\"" \
+    --config "target.$target.linker=\"$install_dir/android/my-hacky-linker-cc\"" \
     --target "$target" \
     --release
 
-  mkdir -p "$jniDir"
-  cp -a "target/$target/release/libetebase.so" "$jniDir"
+  jniArchDir="$jniDir/$jniLibArch"
+  mkdir -p "$jniArchDir"
+  cp -a "target/$target/release/libetebase.so" "$jniArchDir"
 done
 
 popd
 rm -rf "$build_dir"
+
+cp -a "$jniDir" "$cacheDir"
