@@ -26,7 +26,7 @@ arches=( "$aarch64" "$x86_64" "$armv7" "$x86" )
 "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$ndk_version"
 
 build_dir=$RUNNER_TEMP/libetebase
-git clone https://github.com/etesync/libetebase -b "$version" "$build_dir"
+git clone https://github.com/etesync/libetebase -b "v$version" "$build_dir"
 cd "$build_dir"
 
 openssl_version=$(cat Cargo.lock | grep 'name = "openssl"' -A 3 | grep "version" | cut -d '"' -f 2)

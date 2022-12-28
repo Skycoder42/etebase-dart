@@ -14,9 +14,17 @@ fi
 
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"
-git clone https://github.com/etesync/libetebase.git -b "$version" "$build_dir"
+git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 cd "$build_dir"
 make
 make install DESTDIR="$cache_dir"
+
+segments=( ${version//./ } )
+major=${segments[0]}
+minor=${segments[1]}
+patch=${segments[2]}
+ln -s "$cache_dir/libetebase.so" "$cache_dir/libetebase.so.$major"
+ln -s "$cache_dir/libetebase.so" "$cache_dir/libetebase.so.$major.$minor"
+ln -s "$cache_dir/libetebase.so" "$cache_dir/libetebase.so.$major.$minor.$patch"
 
 sudo rsync -av "$cache_dir/" /

@@ -18,7 +18,7 @@ fi
 
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"
-git clone https://github.com/etesync/libetebase.git -b "$version" "$build_dir"
+git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 cd "$build_dir"
 git apply "$patch_file"
 make PREFIX=/

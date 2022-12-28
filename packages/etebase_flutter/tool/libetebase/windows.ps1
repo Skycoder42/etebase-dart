@@ -25,7 +25,7 @@ function Invoke-Exe() {
 
 # build libetebase
 $pwd = Get-Location
-$version = $args[0]
+$version = "v$args[0]"
 $buildDir = "$env:RUNNER_TEMP\libetebase"
 $cacheDir = "$pwd\tool\libetebase\lib"
 $libDir = "$pwd\windows\lib"
