@@ -34,8 +34,10 @@ jobs:
       integrationTestSetup: >-
         {
           "android": "bash tool/libetebase/android.sh v0.5.3",
+          "ios": "bash tool/libetebase/ios.sh v0.5.3",
           "linux": "bash tool/libetebase/linux.sh v0.5.3",
           "macos": "bash tool/libetebase/macos.sh v0.5.3",
+          "windows": "powershell -File tool\\libetebase\\windows.ps1 v0.5.3"
         }
   # cd:
   #   name: CD

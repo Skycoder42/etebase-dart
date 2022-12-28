@@ -23,6 +23,8 @@ x86="x86 i686-linux-android i686-linux-android19-clang i686-linux-android19-clan
 x86_64="x86_64 x86_64-linux-android x86_64-linux-android21-clang x86_64-linux-android21-clang"
 arches=( "$aarch64" "$x86_64" "$armv7" "$x86" )
 
+"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$ndk_version"
+
 build_dir=$RUNNER_TEMP/libetebase
 git clone https://github.com/etesync/libetebase -b "$version" "$build_dir"
 cd "$build_dir"

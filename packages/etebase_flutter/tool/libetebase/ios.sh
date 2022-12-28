@@ -7,22 +7,21 @@ version=${1:?First argument must be the libetebase version to build}
 install_dir=${2:-$PWD}
 cache_dir="$install_dir/tool/libetebase/lib"
 cache_dylib="$cache_dir/lib/libetebase.dylib"
-lib_dir="$install_dir/macos/Libraries"
+lib_dir="$install_dir/ios/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
 if [ "$CACHE_HIT" = "true" ]; then
-  mkdir -p "$lib_dir"
   cp -a "$cache_dylib" "$lib_dir/"
   exit 0
 fi
+
+rustup target add aarch64-apple-ios armv7-apple-ios armv7s-apple-ios x86_64-apple-ios i386-apple-ios
+cargo install lipo
 
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "$version" "$build_dir"
 cd "$build_dir"
 git apply "$patch_file"
-make PREFIX=/
-make install DESTDIR="$cache_dir" PREFIX=/
-
-mkdir -p "$lib_dir"
+cargo lipo --release
 cp -a "$cache_dylib" "$lib_dir/"
