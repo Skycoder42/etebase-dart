@@ -26,3 +26,8 @@ make install DESTDIR="$cache_dir" PREFIX=/
 
 mkdir -p "$lib_dir"
 cp -a "$cache_dylib" "$lib_dir/"
+
+# DEBUG
+cd "$install_dir/example/macos"
+pod install
+git diff
