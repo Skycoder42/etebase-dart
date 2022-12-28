@@ -4,13 +4,13 @@ import 'package:etebase/etebase.dart';
 
 import '../etebase_flutter_platform.dart';
 
-class EtebaseFlutterLinux extends EtebaseFlutterPlatform {
+class EtebaseFlutterWindows extends EtebaseFlutterPlatform {
   static void registerWith() {
-    EtebaseFlutterPlatform.instance = EtebaseFlutterLinux();
+    EtebaseFlutterPlatform.instance = EtebaseFlutterWindows();
   }
 
   @override
   LoadLibetebaseFn get loadLibetebase => _loadLibetebase;
 
-  static DynamicLibrary _loadLibetebase() => DynamicLibrary.process();
+  static DynamicLibrary _loadLibetebase() => DynamicLibrary.open('etebase.dll');
 }

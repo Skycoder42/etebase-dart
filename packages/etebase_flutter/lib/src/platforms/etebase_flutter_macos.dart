@@ -4,9 +4,9 @@ import 'package:etebase/etebase.dart';
 
 import '../etebase_flutter_platform.dart';
 
-class EtebaseFlutterLinux extends EtebaseFlutterPlatform {
+class EtebaseFlutterMacos extends EtebaseFlutterPlatform {
   static void registerWith() {
-    EtebaseFlutterPlatform.instance = EtebaseFlutterLinux();
+    EtebaseFlutterPlatform.instance = EtebaseFlutterMacos();
   }
 
   @override

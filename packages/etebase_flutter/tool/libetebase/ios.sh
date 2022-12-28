@@ -6,7 +6,7 @@ set -ex
 version=${1:?First argument must be the libetebase version to build}
 install_dir=${2:-$PWD}
 cache_dir="$install_dir/tool/libetebase/lib"
-cache_dylib="$cache_dir/lib/libetebase.dylib"
+cache_dylib="$cache_dir/lib/libetebase.a"
 lib_dir="$install_dir/ios/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 

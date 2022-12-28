@@ -36,5 +36,7 @@ flutter:
         dartPluginClass: EtebaseFlutterLinux
       macos:
         pluginClass: EtebaseFlutterPlugin
+        dartPluginClass: EtebaseFlutterMacos
       windows:
         pluginClass: EtebaseFlutterPluginCApi
+        dartPluginClass: EtebaseFlutterWindows
