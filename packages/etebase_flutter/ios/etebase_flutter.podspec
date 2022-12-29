@@ -20,5 +20,7 @@ Flutter extensions for the dart bindings of libetebase
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+  # build only active arches
+  s.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
   s.swift_version = '5.0'
 end
