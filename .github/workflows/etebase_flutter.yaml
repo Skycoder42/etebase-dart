@@ -25,7 +25,7 @@ jobs:
       buildRunner: false
       unitTestPaths: ""
       integrationTestProject: example
-      integrationTestPaths: -v integration_test
+      integrationTestPaths: integration_test
       integrationTestCacheConfig: >-
         {
           "key": "etebase_flutter-libetebase-v0.5.3",
