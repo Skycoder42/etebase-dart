@@ -6,13 +6,13 @@ set -ex
 version=${1:?First argument must be the libetebase version to build}
 install_dir=${2:-$PWD}
 cache_dir="$install_dir/tool/libetebase/lib"
-cache_framework="$cache_dir/libetebase.xcframework"
+cache_lib="$cache_dir/libetebase.dylib"
 lib_dir="$install_dir/ios/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"
-  cp -a "$cache_framework" "$lib_dir/"
+  cp -a "$cache_lib" "$lib_dir/"
   exit 0
 fi
 
@@ -29,19 +29,14 @@ cargo build --target aarch64-apple-ios --release
 cargo build --target x86_64-apple-ios --release
 # cargo build --target aarch64-apple-ios-sim --release
 
-universal_dir=target/universal-ios/release/
-universal_framework=$universal_dir/libetebase.xcframework
-mkdir -p $universal_dir
-mkdir -p $universal_dir/headers
-cp -a target/etebase.h $universal_dir/headers/
-
-xcodebuild -create-xcframework \
-  -library target/aarch64-apple-ios/release/libetebase.dylib -headers $universal_dir/headers/ \
-  -library target/x86_64-apple-ios/release/libetebase.dylib -headers $universal_dir/headers/ \
-  -output $universal_framework
+universal_lib=target/libetebase.dylib
+lipo -create \
+  target/aarch64-apple-ios/release/libetebase.dylib \
+  target/x86_64-apple-ios/release/libetebase.dylib \
+  -output $universal_lib
 
 mkdir -p "$cache_dir"
-cp -a $universal_framework "$cache_framework"
+cp -a $universal_lib "$cache_lib"
 
 mkdir -p "$lib_dir"
-cp -a "$cache_framework" "$lib_dir/"
+cp -a "$cache_lib" "$lib_dir/"
