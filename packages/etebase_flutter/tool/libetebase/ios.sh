@@ -10,12 +10,9 @@ cache_lib="$cache_dir/libetebase.dylib"
 lib_dir="$install_dir/ios/Libraries"
 patch_file=$PWD/../etebase/tool/integration/libetebase-macos.patch
 
-export IPHONEOS_DEPLOYMENT_TARGET=9.0
-
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"
   cp -a "$cache_lib" "$lib_dir/"
-  ls -lsa "$lib_dir"
   exit 0
 fi
 
@@ -24,9 +21,10 @@ rustup target add aarch64-apple-ios x86_64-apple-ios
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
-cd "$build_dir"
+pushd "$build_dir"
 git apply "$patch_file"
 
+export IPHONEOS_DEPLOYMENT_TARGET=9.0
 cargo build --target aarch64-apple-ios --release
 cargo build --target x86_64-apple-ios --release
 
@@ -38,6 +36,8 @@ lipo -create \
 
 mkdir -p "$cache_dir"
 cp -a $universal_lib "$cache_lib"
+popd
+rm -rf "$build_dir"
 
 mkdir -p "$lib_dir"
 cp -a "$cache_lib" "$lib_dir/"
