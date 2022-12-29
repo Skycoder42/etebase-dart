@@ -25,9 +25,11 @@ git apply "$patch_file"
 export MACOSX_DEPLOYMENT_TARGET=10.11
 make PREFIX=/
 make install DESTDIR="$cache_dir" PREFIX=/
+otool -L "$cache_dylib"
 
 popd
 rm -rf "$build_dir"
 
 mkdir -p "$lib_dir"
 cp -a "$cache_dylib" "$lib_dir/"
+otool -L "$lib_dir/libetebase.dylib"

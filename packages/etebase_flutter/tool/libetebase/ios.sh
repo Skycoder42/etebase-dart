@@ -36,8 +36,11 @@ lipo -create \
 
 mkdir -p "$cache_dir"
 cp -a $universal_lib "$cache_lib"
+otool -L "$cache_lib"
+
 popd
 rm -rf "$build_dir"
 
 mkdir -p "$lib_dir"
 cp -a "$cache_lib" "$lib_dir/"
+otool -L "$lib_dir/libetebase.dylib"
