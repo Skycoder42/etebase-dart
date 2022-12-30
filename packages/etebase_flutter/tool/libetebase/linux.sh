@@ -19,12 +19,14 @@ cd "$build_dir"
 make
 make install DESTDIR="$cache_dir"
 
+pushd "$cache_dir/usr/lib"
 segments=( ${version//./ } )
 major=${segments[0]}
 minor=${segments[1]}
-patch=${segments[2]}
-ln -s libetebase.so "$cache_dir/usr/lib/libetebase.so.$major"
-ln -s libetebase.so "$cache_dir/usr/lib/libetebase.so.$major.$minor"
-ln -s libetebase.so "$cache_dir/usr/lib/libetebase.so.$major.$minor.$patch"
+mv libetebase.so "libetebase.so.$version"
+ln -s "libetebase.so.$version" "libetebase.so.$major.$minor"
+ln -s "libetebase.so.$version" "libetebase.so.$major"
+ln -s "libetebase.so.$version" libetebase.so
+popd
 
 sudo rsync -av "$cache_dir/" /

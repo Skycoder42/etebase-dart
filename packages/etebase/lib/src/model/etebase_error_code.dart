@@ -51,5 +51,16 @@ enum EtebaseErrorCode {
   serverError,
 
   /// A http error occurred.
-  http,
+  http;
+
+  /// Failsafe method to get the [EtebaseErrorCode] from it's index
+  ///
+  /// If the index is out of range, [EtebaseErrorCode.generic] is returned.
+  static EtebaseErrorCode fromIndex(int index) {
+    if (index >= 0 && index < values.length) {
+      return values[index];
+    } else {
+      return EtebaseErrorCode.generic; // generic error as fallback
+    }
+  }
 }

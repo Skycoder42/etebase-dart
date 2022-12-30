@@ -331,7 +331,6 @@ class IsolateInParamBuilder {
         )
         .statement;
 
-    // TODO generalize, as property from parser (or maybe remove?)
     if (parameter.name == 'encryptionKey') {
       yield if$(
           argument
