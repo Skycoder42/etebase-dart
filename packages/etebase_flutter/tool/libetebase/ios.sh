@@ -28,25 +28,15 @@ export IPHONEOS_DEPLOYMENT_TARGET=9.0
 cargo build --target aarch64-apple-ios --release
 cargo build --target x86_64-apple-ios --release
 
-
-otool -L target/aarch64-apple-ios/release/libetebase.dylib
-otool -L target/x86_64-apple-ios/release/libetebase.dylib
-otool -L target/aarch64-apple-ios/release/deps/libetebase.dylib
-otool -L target/x86_64-apple-ios/release/deps/libetebase.dylib
-
 universal_lib=target/libetebase.dylib
 lipo -create \
   target/aarch64-apple-ios/release/libetebase.dylib \
   target/x86_64-apple-ios/release/libetebase.dylib \
   -output $universal_lib
+install_name_tool -id @rpath/libetebase.dylib $universal_lib
 
 mkdir -p "$cache_dir"
 cp -a $universal_lib "$cache_lib"
-otool -L "$cache_lib"
-
-popd
-rm -rf "$build_dir"
 
 mkdir -p "$lib_dir"
 cp -a "$cache_lib" "$lib_dir/"
-otool -L "$lib_dir/libetebase.dylib"
