@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Flutter extensions for the dart bindings of libetebase
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/Skycoder42/etebase-dart'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Skycoder42' => 'skycoder42@users.noreply.github.com' }
   s.source           = { :path => '.' }

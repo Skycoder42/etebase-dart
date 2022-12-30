@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Flutter extensions for the dart bindings of libetebase
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/Skycoder42/etebase-dart'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Skycoder42' => 'skycoder42@users.noreply.github.com' }
   s.source           = { :path => '.' }
@@ -20,7 +20,7 @@ Flutter extensions for the dart bindings of libetebase
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  # build only active arches
+  # libetebase currently doesn't support arm64 for the simulator
   s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.swift_version = '5.0'
 end

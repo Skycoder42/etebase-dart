@@ -16,7 +16,7 @@ if [ "$CACHE_HIT" = "true" ]; then
   exit 0
 fi
 
-rustup target add aarch64-apple-ios x86_64-apple-ios
+arches=(aarch64-apple-ios x86_64-apple-ios)
 
 # build and install libetebase
 build_dir="$RUNNER_TEMP/libetebase"
@@ -24,15 +24,18 @@ git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 pushd "$build_dir"
 git apply "$patch_file"
 
-export IPHONEOS_DEPLOYMENT_TARGET=9.0
-cargo build --target aarch64-apple-ios --release
-cargo build --target x86_64-apple-ios --release
+declare -a dylibs
+for arch in "${arches[@]}"; do
+  rustup target add "$arch"
+
+  export IPHONEOS_DEPLOYMENT_TARGET=9.0
+  cargo build --target "$arch" --release
+
+  dylibs+=("target/$arch/release/libetebase.dylib")
+done
 
 universal_lib=target/libetebase.dylib
-lipo -create \
-  target/aarch64-apple-ios/release/libetebase.dylib \
-  target/x86_64-apple-ios/release/libetebase.dylib \
-  -output $universal_lib
+lipo -create "${dylibs[@]}" -output $universal_lib
 install_name_tool -id @rpath/libetebase.dylib $universal_lib
 
 mkdir -p "$cache_dir"

@@ -1,3 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="de.skycoder42.etebase_flutter">
+
+  <!-- Required to communicate with the etebase server -->
+  <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
