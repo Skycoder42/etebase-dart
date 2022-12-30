@@ -26,7 +26,11 @@ export MACOSX_DEPLOYMENT_TARGET=10.11
 make PREFIX=/
 make install DESTDIR="$cache_dir" PREFIX=/
 otool -L "$cache_dylib"
-otool -L "$build_dir/target/release/deps/libetebase.dylib"
+install_name_tool -change \
+  "$build_dir/target/release/deps/libetebase.dylib"
+  libetebase.dylib
+  "$cache_dylib"
+otool -L "$cache_dylib"
 
 popd
 rm -rf "$build_dir"
