@@ -4,7 +4,9 @@ import 'package:etebase/etebase.dart';
 
 import '../etebase_flutter_platform.dart';
 
+/// Windows implementation of [EtebaseFlutterPlatform]
 class EtebaseFlutterWindows extends EtebaseFlutterPlatform {
+  /// @nodoc
   static void registerWith() {
     EtebaseFlutterPlatform.instance = EtebaseFlutterWindows();
   }

@@ -2,6 +2,7 @@ name: etebase
 
 packages:
   - packages/etebase/*
+  - packages/etebase_flutter/*
 
 scripts:
   get:

@@ -7,7 +7,8 @@ import 'model/etebase_config.dart';
 /// A static class to initialize the library.
 ///
 /// When using this library as part of a flutter application, you should
-/// instead use TODO
+// ignore: comment_references
+/// instead use [EtebaseFlutter].
 abstract class Etebase {
   /// Asynchronously initializes the etebase background isolate for processing.
   ///
@@ -18,7 +19,8 @@ abstract class Etebase {
   /// methods.
   ///
   /// When using this library as part of a flutter application, you should
-  /// instead use TODO
+  // ignore: comment_references
+  /// instead use [EtebaseFlutter.configure]
   static void ensureInitialized(
     LoadLibetebaseFn loadLibetebase, {
     EtebaseConfig config = const EtebaseConfig(),
