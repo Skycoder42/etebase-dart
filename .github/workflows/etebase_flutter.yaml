@@ -29,7 +29,7 @@ jobs:
       integrationTestCacheConfig: >-
         {
           "key": "etebase_flutter-libetebase-v0.5.3",
-          "path": "${{ env.RUNNER_TEMP }}/cache"
+          "path": ".cache"
         }
       integrationTestSetup: >-
         {

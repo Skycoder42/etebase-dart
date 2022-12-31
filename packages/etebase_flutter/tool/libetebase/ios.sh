@@ -6,7 +6,7 @@ version=${1:?First argument must be the libetebase version to build}
 
 patch_file=$GITHUB_WORKSPACE/packages/etebase/tool/integration/libetebase-macos.patch
 lib_dir="$PWD/ios/Libraries"
-cache_dir="$RUNNER_TEMP/cache"
+cache_dir="$GITHUB_WORKSPACE/.cache"
 
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"

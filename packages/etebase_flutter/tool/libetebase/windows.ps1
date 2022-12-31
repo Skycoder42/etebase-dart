@@ -29,7 +29,7 @@ $version = "v$arg1"
 
 $pwd = Get-Location
 $buildDir = "$env:RUNNER_TEMP\libetebase"
-$cacheDir = "$env:RUNNER_TEMP\cache"
+$cacheDir = "$env:GITHUB_WORKSPACE\.cache"
 $libDir = "$pwd\windows\lib"
 
 if ($env:CACHE_HIT -eq "true") {

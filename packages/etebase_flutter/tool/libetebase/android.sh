@@ -10,7 +10,7 @@ ndk_version=${3:-22.1.7171670}
 
 android_dir="$PWD/android"
 jni_dir="$android_dir/src/main/jniLibs"
-cache_dir="$RUNNER_TEMP/cache"
+cache_dir="$GITHUB_WORKSPACE/.cache"
 
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$jni_dir/"
