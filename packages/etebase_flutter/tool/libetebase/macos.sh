@@ -24,7 +24,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.11
 cargo build --release
 
 mkdir -p "$cache_dir"
-mv target/release/libetebase.so "$cache_dir/"
+mv target/release/libetebase.dylib "$cache_dir/"
 install_name_tool -id @rpath/libetebase.dylib "$cache_dir/libetebase.dylib"
 
 mkdir -p "$lib_dir"

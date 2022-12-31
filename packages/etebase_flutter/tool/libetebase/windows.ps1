@@ -24,7 +24,8 @@ function Invoke-Exe() {
     }
 }
 
-$version = "v$args[0]"
+$arg1 = $args[0]
+$version = "v$arg1"
 
 $pwd = Get-Location
 $buildDir = "$env:RUNNER_TEMP\libetebase"
