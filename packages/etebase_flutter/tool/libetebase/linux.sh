@@ -1,11 +1,10 @@
 #!/bin/bash
 #$1 libetebase version
-#$2 install dir: $PWD
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
-install_dir=${2:-$PWD}
-cache_dir="$install_dir/tool/libetebase/lib"
+
+cache_dir="$RUNNER_TEMP/cache"
 
 if [ "$CACHE_HIT" = "true" ]; then
   sudo rsync -av "$cache_dir/" /

@@ -1,3 +1,4 @@
+#$1 libetebase version
 $ErrorActionPreference = "Stop"
 
 # https://stackoverflow.com/a/58184408
@@ -23,11 +24,11 @@ function Invoke-Exe() {
     }
 }
 
-# build libetebase
-$pwd = Get-Location
 $version = "v$args[0]"
+
+$pwd = Get-Location
 $buildDir = "$env:RUNNER_TEMP\libetebase"
-$cacheDir = "$pwd\tool\libetebase\lib"
+$cacheDir = "$env:RUNNER_TEMP\cache"
 $libDir = "$pwd\windows\lib"
 
 if ($env:CACHE_HIT -eq "true") {
@@ -38,9 +39,9 @@ if ($env:CACHE_HIT -eq "true") {
 
 Invoke-Exe git clone https://github.com/etesync/libetebase.git -b $version $buildDir
 cd $buildDir
-Invoke-Exe make
+Invoke-Exe cargo build --release
 New-Item -ItemType Directory -Path $cacheDir
-Copy-Item .\target\release\etebase.dll -Destination $cacheDir
+Move-Item .\target\release\etebase.dll -Destination $cacheDir
 
 New-Item -ItemType Directory -Path $libDir
-Copy-Item .\target\release\etebase.dll -Destination $libDir
+Copy-Item "$cacheDir\etebase.dll" -Destination $libDir

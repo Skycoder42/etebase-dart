@@ -1,19 +1,20 @@
 #!/bin/bash
 #$1 libetebase version
-#$2 install dir: $PWD
-#$3 host architecture: linux-x86_64
-#$4 NDK version: 22.1.7171670
+#$2 host architecture: linux-x86_64
+#$3 NDK version: 22.1.7171670
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
-install_dir=${2:-$PWD}
 host_arch=${3:-linux-x86_64}
 ndk_version=${4:-22.1.7171670}
-jni_dir="$install_dir/android/src/main/jniLibs"
-cache_dir="$install_dir/tool/libetebase/lib"
+
+android_dir="$PWD/android"
+jni_dir="$android_dir/src/main/jniLibs"
+cache_dir="$RUNNER_TEMP/cache"
 
 if [ "$CACHE_HIT" = "true" ]; then
-  cp -a "$cache_dir" "$jni_dir"
+  mkdir -p "$jni_dir/"
+  rsync -av "$cache_dir/" "$jni_dir/"
   exit 0
 fi
 
@@ -45,13 +46,14 @@ for arch in "${arches[@]}"; do
   rustup target add "$target"
 
   cargo build \
-    --config "target.$target.linker=\"$install_dir/android/my-hacky-linker-cc\"" \
+    --config "target.$target.linker=\"$android_dir/my-hacky-linker-cc\"" \
     --target "$target" \
     --release
 
-  jni_arch_dir="$jni_dir/$jni_lib_arch"
+  jni_arch_dir="$cache_dir/$jni_lib_arch"
   mkdir -p "$jni_arch_dir"
-  cp -a "target/$target/release/libetebase.so" "$jni_arch_dir"
+  mv "target/$target/release/libetebase.so" "$jni_arch_dir/"
 done
 
-cp -a "$jni_dir" "$cache_dir"
+mkdir -p "$jni_dir/"
+rsync -av "$cache_dir/" "$jni_dir/"

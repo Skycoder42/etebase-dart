@@ -33,7 +33,7 @@ jobs:
         }
       integrationTestSetup: >-
         {
-          "android": "bash tool/libetebase/android.sh 0.5.3 '' darwin-x86_64",
+          "android": "bash tool/libetebase/android.sh 0.5.3 darwin-x86_64",
           "ios": "bash tool/libetebase/ios.sh 0.5.3",
           "linux": "bash tool/libetebase/linux.sh 0.5.3",
           "macos": "bash tool/libetebase/macos.sh 0.5.3",
