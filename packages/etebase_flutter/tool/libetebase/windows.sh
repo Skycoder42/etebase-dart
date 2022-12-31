@@ -9,7 +9,7 @@ cache_dir="$GITHUB_WORKSPACE/.cache"
 
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$lib_dir"
-  rsync -av "$cache_dir/" "$lib_dir/"
+  cp -a "$cache_dir/etebase.dll" "$lib_dir/"
   exit 0
 fi
 
@@ -24,4 +24,4 @@ mkdir -p "$cache_dir"
 mv target/release/etebase.dll "$cache_dir/"
 
 mkdir -p "$lib_dir"
-rsync -av "$cache_dir/" "$lib_dir/"
+cp -a "$cache_dir/etebase.dll" "$lib_dir/"
