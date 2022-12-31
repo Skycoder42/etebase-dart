@@ -71,6 +71,9 @@ jobs:
       #   with:
       #     key: ${{ matrix.platform }}-etebase_flutter-libetebase-v${{ env.libetebaseVersion }}
       #     path: .cache
+      - name: Checkout repository
+        # if: steps.libetebase-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v3
       - name: Build library if not restored
         # if: steps.libetebase-cache.outputs.cache-hit != 'true'
         run: bash tool/libetebase/linux.sh ${{ env.libetebaseVersion }}
