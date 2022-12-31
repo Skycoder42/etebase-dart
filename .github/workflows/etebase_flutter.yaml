@@ -42,8 +42,6 @@ jobs:
 
   libetebase:
     name: Prepare CD artifacts
-    needs:
-      - ci
     if: github.ref == 'refs/heads/main'
     env:
       libetebaseVersion: 0.5.3
