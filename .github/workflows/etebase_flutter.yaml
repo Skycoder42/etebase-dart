@@ -76,7 +76,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build library if not restored
         # if: steps.libetebase-cache.outputs.cache-hit != 'true'
-        run: bash tool/libetebase/linux.sh ${{ env.libetebaseVersion }}
+        run: bash tool/libetebase/${{ matrix.platform }}.sh ${{ env.libetebaseVersion }}
         working-directory: packages/etebase_flutter
       - name: Generate cache artifact for deployment
         uses: actions/upload-artifact@v3
