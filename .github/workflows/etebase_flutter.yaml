@@ -65,14 +65,14 @@ jobs:
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - id: libetebase-cache
-        name: Restore libetebase from cache
-        uses: actions/cache@v3
-        with:
-          key: ${{ matrix.platform }}-etebase_flutter-libetebase-v${{ env.libetebaseVersion }}
-          path: .cache
+      # - id: libetebase-cache
+      #   name: Restore libetebase from cache
+      #   uses: actions/cache/restore@v3
+      #   with:
+      #     key: ${{ matrix.platform }}-etebase_flutter-libetebase-v${{ env.libetebaseVersion }}
+      #     path: .cache
       - name: Build library if not restored
-        if: steps.libetebase-cache.outputs.cache-hit != 'true'
+        # if: steps.libetebase-cache.outputs.cache-hit != 'true'
         run: bash tool/libetebase/linux.sh ${{ env.libetebaseVersion }}
       - name: Generate cache artifact for deployment
         uses: actions/upload-artifact@v3
