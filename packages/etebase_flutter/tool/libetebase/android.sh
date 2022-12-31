@@ -5,8 +5,8 @@
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
-host_arch=${3:-linux-x86_64}
-ndk_version=${4:-22.1.7171670}
+host_arch=${2:-linux-x86_64}
+ndk_version=${3:-22.1.7171670}
 
 android_dir="$PWD/android"
 jni_dir="$android_dir/src/main/jniLibs"
