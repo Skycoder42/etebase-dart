@@ -39,6 +39,55 @@ jobs:
           "macos": "bash tool/libetebase/macos.sh 0.5.3",
           "windows": "powershell -File tool\\libetebase\\windows.ps1 0.5.3"
         }
+
+  libetebase:
+    name: libetebase-artifacts
+    needs:
+      - ci
+    if: github.ref == 'refs/heads/main'
+    env:
+      libetebaseVersion: 0.5.3
+    strategy:
+      fail-fast: true
+      matrix:
+        platform:
+          - android
+          - ios
+          - linux
+          - macos
+          - windows
+
+        include:
+          - platform: android
+            os: ubuntu-latest
+          - platform: ios
+            os: macos-latest
+          - platform: linux
+            os: ubuntu-latest
+          - platform: macos
+            os: macos-latest
+          - platform: windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - id: libetebase-cache
+        name: Restore libetebase from cache
+        uses: actions/cache@v3
+        with:
+          key: ${{ matrix.platform }}-etebase_flutter-libetebase-v${{ env.libetebaseVersion }}
+          path: libetebase-${{ matrix.platform }}-${{ env.libetebaseVersion }}
+      - name: Validate cache was restored
+        if: steps.libetebase-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "ERROR: Failed to restore libetebase from cache"
+          exit 1
+      - name: Generate cache artifact for deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: libetebase-${{ matrix.platform }}-${{ env.libetebaseVersion }}
+          path: libetebase-${{ matrix.platform }}-${{ env.libetebaseVersion }}
+          retention-days: 1
+
   # cd:
   #   name: CD
   #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
