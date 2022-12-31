@@ -3,8 +3,7 @@
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
-
-cache_dir="$GITHUB_WORKSPACE/.cache"
+cache_dir=${CACHE_DIR:-$GITHUB_WORKSPACE/.cache}
 
 if [ "$CACHE_HIT" = "true" ]; then
   sudo rsync -av "$cache_dir/" /

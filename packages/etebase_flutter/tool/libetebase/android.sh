@@ -7,10 +7,10 @@ set -ex
 version=${1:?First argument must be the libetebase version to build}
 host_arch=${2:-linux-x86_64}
 ndk_version=${3:-22.1.7171670}
+cache_dir=${CACHE_DIR:-$GITHUB_WORKSPACE/.cache}
 
 android_dir="$PWD/android"
 jni_dir="$android_dir/src/main/jniLibs"
-cache_dir="$GITHUB_WORKSPACE/.cache"
 
 if [ "$CACHE_HIT" = "true" ]; then
   mkdir -p "$jni_dir/"
