@@ -96,7 +96,7 @@ jobs:
     with:
       workingDirectory: packages/etebase_flutter
       buildRunner: false
-      restoreArtifacts: >-
+      extraArtifacts: >-
         {
           "path": "artifacts"
         }
