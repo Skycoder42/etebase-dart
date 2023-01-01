@@ -87,15 +87,20 @@ jobs:
           path: .cache/
           retention-days: 1
 
-  # cd:
-  #   name: CD
-  #   uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
-  #   needs:
-  #     - ci
-  #     - libetebase
-  #   with:
-  #     workingDirectory: packages/etebase_flutter
-  #     buildRunner: false
-  #     tagPrefix: etebase_flutter/v
-  #   secrets:
-  #     PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
+  cd:
+    name: CD
+    uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+    needs:
+      - ci
+      - libetebase
+    with:
+      workingDirectory: packages/etebase_flutter
+      buildRunner: false
+      restoreArtifacts: >-
+        {
+          "path": "artifacts"
+        }
+      prePublish: bash tool/libetebase/all.sh 0.5.3 artifacts
+      tagPrefix: etebase_flutter/v
+    secrets:
+      PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}

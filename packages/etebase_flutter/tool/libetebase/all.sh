@@ -4,7 +4,9 @@
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
-artifact_dir=${2:?Second argument must be the artifact directory}
+shift
+artifact_dir=${1:?Second argument must be the artifact directory}
+shift
 
 platforms=(android ios macos windows)
 
