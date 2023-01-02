@@ -12,6 +12,6 @@ platforms=(android ios macos windows)
 
 export CACHE_HIT=true
 for platform in "${platforms[@]}"; do
-  export CACHE_DIR="$artifact_dir/libetebase-$platform-$version"
+  export CACHE_DIR="$GITHUB_WORKSPACE/$artifact_dir/libetebase-$platform-$version"
   "$PWD/tool/libetebase/$platform.sh" "$version" "$@"
 done
