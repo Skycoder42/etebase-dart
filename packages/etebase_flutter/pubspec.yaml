@@ -1,6 +1,6 @@
 name: etebase_flutter
-description: Flutter extensions for the dart bindings of libetebase
-version: 1.0.0-alpha.1
+description: Flutter platform plugins for the dart bindings of libetebase
+version: 1.0.0
 homepage: https://github.com/Skycoder42/etebase-dart
 
 environment:
@@ -8,12 +8,13 @@ environment:
   flutter: ">=3.3.0"
 
 dependencies:
-  etebase: ^1.0.0-alpha.1
+  etebase: ^1.0.0
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.3
 
 dev_dependencies:
+  cider: ^0.1.3
   dart_pre_commit: ^4.0.0
   dart_test_tools: ^4.6.0
 
@@ -36,3 +37,8 @@ flutter:
       windows:
         pluginClass: EtebaseFlutterPluginCApi
         dartPluginClass: EtebaseFlutterWindows
+
+cider:
+  link_template:
+    tag: https://github.com/Skycoder42/etebase-dart/releases/tag/etebase_flutter%2Fv%tag%
+    diff: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter%2Fv%from%...etebase_flutter%2Fv%to%

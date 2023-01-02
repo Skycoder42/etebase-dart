@@ -71,4 +71,4 @@ ffigen:
 cider:
   link_template:
     tag: https://github.com/Skycoder42/etebase-dart/releases/tag/etebase%2Fv%tag%
-    diff: https://github.com/Skycoder42/etebase-dart/compare/%from%...%to%
+    diff: https://github.com/Skycoder42/etebase-dart/compare/etebase%2Fv%from%...etebase%2Fv%to%

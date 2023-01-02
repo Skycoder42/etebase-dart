@@ -5,9 +5,9 @@
 Pod::Spec.new do |s|
   s.name             = 'etebase_flutter'
   s.version          = '1.0.0'
-  s.summary          = 'Flutter extensions for the dart bindings of libetebase'
+  s.summary          = 'Flutter platform plugins for the dart bindings of libetebase'
   s.description      = <<-DESC
-Flutter extensions for the dart bindings of libetebase
+Flutter platform plugins for the dart bindings of libetebase
                        DESC
   s.homepage         = 'https://github.com/Skycoder42/etebase-dart'
   s.license          = { :file => '../LICENSE' }
