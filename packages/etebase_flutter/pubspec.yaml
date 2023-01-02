@@ -1,10 +1,7 @@
 name: etebase_flutter
 description: Flutter extensions for the dart bindings of libetebase
-version: 1.0.0
+version: 1.0.0-alpha.1
 homepage: https://github.com/Skycoder42/etebase-dart
-
-# TODO remove
-publish_to: none
 
 environment:
   sdk: ">=2.18.4 <3.0.0"

@@ -94,6 +94,7 @@ jobs:
       - ci
       - libetebase
     with:
+      flutter: true
       workingDirectory: packages/etebase_flutter
       buildRunner: false
       extraArtifacts: >-
