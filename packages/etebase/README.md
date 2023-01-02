@@ -13,7 +13,7 @@ Dart client library for etebase using FFI bindings with libetebase
   * [Disposing and cleanup](#disposing-and-cleanup)
 - [Documentation](#documentation)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+<small><i><a href='https://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ## Features
 - A dart API that mirrors the official Rust API (as seen on https://docs.etebase.com/)

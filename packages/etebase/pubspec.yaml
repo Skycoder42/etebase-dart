@@ -1,6 +1,6 @@
 name: etebase
 description: Dart client library for etebase using FFI bindings with libetebase
-version: 1.0.0-alpha.1
+version: 1.0.0
 homepage: https://github.com/Skycoder42/etebase-dart
 
 environment:
@@ -17,6 +17,7 @@ dev_dependencies:
   build: ^2.3.1
   build_config: ^1.1.1
   build_runner: ^2.3.3
+  cider: ^0.1.3
   code_builder: ^4.4.0
   dart_pre_commit: ^4.0.0
   dart_test_tools: ^4.6.0
@@ -66,3 +67,8 @@ ffigen:
     avoid_positional_boolean_parameters,
     camel_case_types,
     public_member_api_docs
+
+cider:
+  link_template:
+    tag: https://github.com/Skycoder42/etebase-dart/releases/tag/etebase%2Fv%tag%
+    diff: https://github.com/Skycoder42/etebase-dart/compare/%from%...%to%
