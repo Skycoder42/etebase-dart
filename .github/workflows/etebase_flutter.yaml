@@ -28,16 +28,16 @@ jobs:
       integrationTestPaths: integration_test
       integrationTestCacheConfig: >-
         {
-          "key": "etebase_flutter-libetebase-v0.5.3",
+          "key": "etebase_flutter-libetebase-v0.5.4",
           "path": ".cache"
         }
       integrationTestSetup: >-
         {
-          "android": "bash tool/libetebase/android.sh 0.5.3 darwin-x86_64",
-          "ios": "bash tool/libetebase/ios.sh 0.5.3",
-          "linux": "bash tool/libetebase/linux.sh 0.5.3",
-          "macos": "bash tool/libetebase/macos.sh 0.5.3",
-          "windows": "bash tool/libetebase/windows.sh 0.5.3"
+          "android": "bash tool/libetebase/android.sh 0.5.4 darwin-x86_64",
+          "ios": "bash tool/libetebase/ios.sh 0.5.4",
+          "linux": "bash tool/libetebase/linux.sh 0.5.4",
+          "macos": "bash tool/libetebase/macos.sh 0.5.4",
+          "windows": "bash tool/libetebase/windows.sh 0.5.4"
         }
 
   libetebase:
@@ -46,7 +46,7 @@ jobs:
       - ci
     if: github.ref == 'refs/heads/main'
     env:
-      libetebaseVersion: 0.5.3
+      libetebaseVersion: 0.5.4
     strategy:
       fail-fast: false
       matrix:
@@ -101,7 +101,7 @@ jobs:
         {
           "path": "artifacts"
         }
-      prePublish: bash tool/libetebase/all.sh 0.5.3 artifacts
+      prePublish: bash tool/libetebase/all.sh 0.5.4 artifacts
       tagPrefix: etebase_flutter/v
     secrets:
       PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
