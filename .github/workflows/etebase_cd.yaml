@@ -1,0 +1,19 @@
+name: CD - Publish etebase to pub.dev
+
+on:
+  push:
+    tags:
+      - "etebase-v*"
+
+jobs:
+  publish:
+    name: Publish
+    uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+    with:
+      tagPrefix: etebase-v
+      workingDirectory: packages/etebase
+      buildRunner: true
+      buildRunnerArgs: >-
+        --delete-conflicting-outputs
+        --define etebase:etebase_client_builder=restoreMode=true
+        --define etebase:etebase_isolate_builder=restoreMode=true

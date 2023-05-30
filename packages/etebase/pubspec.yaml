@@ -6,6 +6,11 @@ homepage: https://github.com/Skycoder42/etebase-dart
 environment:
   sdk: "^3.0.0"
 
+platforms:
+  linux:
+  macos:
+  windows:
+
 dependencies:
   ffi: ^2.0.2
   freezed_annotation: ^2.2.0

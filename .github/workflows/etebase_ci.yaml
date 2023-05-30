@@ -20,7 +20,6 @@ jobs:
     name: CI
     uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
     with:
-      platforms: '["linux", "macos", "windows"]'
       workingDirectory: packages/etebase
       buildRunner: true
       buildRunnerArgs: >-
@@ -45,16 +44,11 @@ jobs:
         }
   cd:
     name: CD
-    uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+    uses: Skycoder42/dart_test_tools/.github/workflows/release.yml@main
     needs:
       - ci
     with:
       workingDirectory: packages/etebase
-      buildRunner: true
-      buildRunnerArgs: >-
-        --delete-conflicting-outputs
-        --define etebase:etebase_client_builder=restoreMode=true
-        --define etebase:etebase_isolate_builder=restoreMode=true
-      tagPrefix: etebase/v
+      tagPrefix: etebase-v
     secrets:
-      PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
+      githubToken: ${{ secrets.GH_PAT }}

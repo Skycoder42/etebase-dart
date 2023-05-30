@@ -7,6 +7,13 @@ environment:
   sdk: "^3.0.0"
   flutter: ">=3.10.0"
 
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  windows:
+
 dependencies:
   etebase: ^1.0.0
   flutter:
