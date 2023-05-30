@@ -10,10 +10,6 @@ import 'package:etebase/src/isolate/method_result.dart';
 import 'package:etebase/src/model/etebase_config.dart';
 import 'package:test/test.dart';
 
-abstract class Callable<R, T1, T2, T3> {
-  R call(T1 t1, T2 t2, T3 t3);
-}
-
 DynamicLibrary testLoadLibetebase() => DynamicLibrary.executable();
 
 Never testAlwaysThrow() => throw Exception();

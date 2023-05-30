@@ -27,3 +27,5 @@ pubspec.lock
 
 # Binaries
 packages/etebase/tool/integration/libetebase
+
+*.log

@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
-// ignore: test_library_import
+// ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/uuid_util.dart';

@@ -32,7 +32,7 @@ abstract class Etebase {
       handler = LoggingInvocationHandlerWrapper(
         etebaseIsolateMessageHandler,
         logLevel: logLevel,
-      );
+      ).call;
     }
 
     // ignore: prefer_asserts_with_message
@@ -40,7 +40,7 @@ abstract class Etebase {
       if (logLevel == null) {
         handler = const LoggingInvocationHandlerWrapper(
           etebaseIsolateMessageHandler,
-        );
+        ).call;
       }
       return true;
     }());

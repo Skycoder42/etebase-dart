@@ -12,8 +12,6 @@ import 'package:test/test.dart';
 
 class MockLibEtebaseFFI extends Mock implements LibEtebaseFFI {}
 
-class MockAllocator extends Mock implements Allocator {}
-
 void main() {
   setUpAll(() {
     registerFallbackValue(nullptr);

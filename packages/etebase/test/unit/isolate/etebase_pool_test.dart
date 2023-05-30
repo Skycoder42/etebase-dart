@@ -68,7 +68,7 @@ void main() {
       test('can attach pointer with custom destroy method', () {
         final testPtr = Pointer<Int64>.fromAddress(0x42);
 
-        final attached = sut.attachScoped(testPtr, mockDestroy);
+        final attached = sut.attachScoped(testPtr, mockDestroy.call);
         expect(attached, same(testPtr));
         verifyZeroInteractions(mockAllocator);
 
@@ -102,8 +102,8 @@ void main() {
         sut
           ..attachScoped(testPtr1)
           ..attachScoped(testPtr2)
-          ..attachScoped(testPtr3, mockDestroy)
-          ..attachScoped(testPtr4, mockDestroy)
+          ..attachScoped(testPtr3, mockDestroy.call)
+          ..attachScoped(testPtr4, mockDestroy.call)
           ..freeScoped(testPtr2)
           ..freeScoped(testPtr4);
         clearInteractions(mockAllocator);
@@ -154,7 +154,7 @@ void main() {
       test('can attach pointer with custom destroy method', () {
         final testPtr = Pointer<Int64>.fromAddress(0x42);
 
-        final attached = sut.attachGlobal(testPtr, mockDestroy);
+        final attached = sut.attachGlobal(testPtr, mockDestroy.call);
         expect(attached, same(testPtr));
         verifyZeroInteractions(mockAllocator);
 
@@ -175,10 +175,10 @@ void main() {
         sut
           ..attachGlobal(testPtr1)
           ..attachGlobal(testPtr2)
-          ..attachGlobal(testPtr3, mockDestroy)
-          ..attachGlobal(testPtr4, mockDestroy)
+          ..attachGlobal(testPtr3, mockDestroy.call)
+          ..attachGlobal(testPtr4, mockDestroy.call)
           ..attachScoped(testPtr5)
-          ..attachScoped(testPtr6, mockDestroy)
+          ..attachScoped(testPtr6, mockDestroy.call)
           ..freeGlobal(testPtr2)
           ..freeGlobal(testPtr4);
         clearInteractions(mockAllocator);

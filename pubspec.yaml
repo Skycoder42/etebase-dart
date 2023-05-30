@@ -1,0 +1,7 @@
+name: etebase_dart_melos
+
+environment:
+  sdk: "^3.0.0"
+
+dependencies:
+  melos:

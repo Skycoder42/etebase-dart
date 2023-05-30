@@ -40,7 +40,7 @@ void main() {
     setUp(() {
       reset(mockHandler);
 
-      sut = LoggingInvocationHandlerWrapper(mockHandler);
+      sut = LoggingInvocationHandlerWrapper(mockHandler.call);
     });
 
     test('invokes handler and returns success result', () {

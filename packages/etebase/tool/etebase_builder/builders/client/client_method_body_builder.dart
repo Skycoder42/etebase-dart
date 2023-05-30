@@ -121,10 +121,12 @@ class ClientMethodBodyBuilder {
   }
 
   Expression _toAddress(Reference reference, TypeReference publicType) =>
-      (reference.nullableProperty(
-        ClientClassBuilder.pointerName,
-        isNullable: publicType.isNullable ?? false,
-      )).property('address');
+      reference
+          .nullableProperty(
+            ClientClassBuilder.pointerName,
+            isNullable: publicType.isNullable ?? false,
+          )
+          .property('address');
 
   Expression _fromAddress(
     Reference classType,

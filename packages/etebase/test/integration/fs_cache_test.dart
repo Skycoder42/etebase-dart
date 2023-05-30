@@ -4,7 +4,7 @@ library fs_cache_test;
 import 'dart:io';
 import 'dart:typed_data';
 
-// ignore: test_library_import
+// ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 

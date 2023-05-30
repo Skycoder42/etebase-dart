@@ -5,12 +5,16 @@ builders:
     build_extensions: { ".dart": [".client.dart"] }
     auto_apply: dependents
     build_to: source
+    runs_before:
+      - freezed|freezed
   etebase_isolate_builder:
     import: "tool/etebase_builder.dart"
     builder_factories: ["etebaseIsolateBuilder"]
     build_extensions: { ".dart": [".isolate.dart"] }
     auto_apply: dependents
     build_to: source
+    runs_before:
+      - freezed|freezed
 
 targets:
   $default:

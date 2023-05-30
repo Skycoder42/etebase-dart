@@ -18,7 +18,7 @@ class TypeParser {
     bool isMutable = false,
     required TypedefRef typeDefs,
   }) {
-    if (type.isVoid) {
+    if (type is VoidType) {
       return TypeRef.void$();
     } else if (type.isDartCoreBool) {
       return TypeRef.bool();

@@ -159,7 +159,7 @@ class ByteArrayTypeRef implements TypeRef {
 }
 
 class EnumTypeRef extends _SingleTypeRef {
-  EnumTypeRef(super.type);
+  EnumTypeRef(super._type);
 
   @override
   TypeReference get ffiType => Types.int$;
