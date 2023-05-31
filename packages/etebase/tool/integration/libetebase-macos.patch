@@ -1,5 +1,5 @@
 diff --git a/Cargo.toml b/Cargo.toml
-index 0dc27be..541f206 100644
+index dea0d60..8b45b1b 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -11,7 +11,7 @@ readme = "README.md"
@@ -24,3 +24,16 @@ index 8b7f1af..a6a27ed 100644
  HEADER_FILE = $(BUILDDIR)/$(PKGNAME).h
  PKGCONFIG_FILE = $(BUILDDIR)/$(PKGNAME).pc
  CMAKECONFIG_FILE = EtebaseConfig.cmake
+diff --git a/build.rs b/build.rs
+index 69a99ca..d84c210 100644
+--- a/build.rs
++++ b/build.rs
+@@ -7,7 +7,8 @@ use std::env;
+
+ fn main() {
+     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+-    if cfg!(unix) && !cfg!(macos) {
++    if cfg!(unix) && cfg!(not(target_os="macos")) {
+         // Set soname for platforms other than Windows
+         const VERSION_MAJOR: &'static str = env!("CARGO_PKG_VERSION_MAJOR");
+         println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libetebase.so.{}", VERSION_MAJOR);
