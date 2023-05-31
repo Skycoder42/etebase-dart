@@ -25,10 +25,10 @@ index 8b7f1af..a6a27ed 100644
  PKGCONFIG_FILE = $(BUILDDIR)/$(PKGNAME).pc
  CMAKECONFIG_FILE = EtebaseConfig.cmake
 diff --git a/build.rs b/build.rs
-index 69a99ca..d84c210 100644
+index 69a99ca..43d1d19 100644
 --- a/build.rs
 +++ b/build.rs
-@@ -7,7 +7,8 @@ use std::env;
+@@ -7,7 +7,7 @@ use std::env;
 
  fn main() {
      let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
