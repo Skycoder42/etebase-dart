@@ -33,6 +33,7 @@ if [ -n "$PATCH_FILE" ]; then
   git apply "$PATCH_FILE"
 fi
 
+rm Cargo.lock # delete lockfile to get up-to-date dependencies
 make PREFIX=$PREFIX
 make install PREFIX=$PREFIX DESTDIR="$DESTDIR"
 

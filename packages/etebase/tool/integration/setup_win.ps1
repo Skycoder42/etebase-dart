@@ -34,6 +34,7 @@ $libetebaseDir = "$env:RUNNER_TEMP\libetebase"
 $installDir = "$pwd\tool\integration\libetebase\lib\"
 Invoke-Exe git clone https://github.com/etesync/libetebase.git -b $tag $libetebaseDir
 cd $libetebaseDir
+rm Cargo.lock # delete lockfile to get up-to-date dependencies
 Invoke-Exe make
 New-Item -ItemType Directory -Path $installDir
 Copy-Item .\target\release\etebase.dll -Destination $installDir

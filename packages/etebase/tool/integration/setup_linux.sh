@@ -24,6 +24,7 @@ DESTDIR=$PWD
 libetebaseDir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "$TAG" "$libetebaseDir"
 cd "$libetebaseDir"
+rm Cargo.lock # delete lockfile to get up-to-date dependencies
 make PREFIX=$PREFIX
 make install PREFIX=$PREFIX DESTDIR="$DESTDIR"
 
