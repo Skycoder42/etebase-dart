@@ -33,14 +33,14 @@ jobs:
       integrationTestPaths: -j1 test/integration
       integrationTestCacheConfig: >-
         {
-          "key": "etebase-libetebase-v0.5.4",
+          "key": "etebase-libetebase-v0.5.5",
           "path": "packages/etebase/tool/integration/libetebase"
         }
       integrationTestSetup: >-
         {
-          "linux": "bash tool/integration/setup_linux.sh v0.5.4",
-          "macos": "bash tool/integration/setup_macos.sh v0.5.4",
-          "windows": "powershell -File tool\\integration\\setup_win.ps1 v0.5.4"
+          "linux": "bash tool/integration/setup_linux.sh v0.5.5",
+          "macos": "bash tool/integration/setup_macos.sh v0.5.5",
+          "windows": "powershell -File tool\\integration\\setup_win.ps1 v0.5.5"
         }
   cd:
     name: CD

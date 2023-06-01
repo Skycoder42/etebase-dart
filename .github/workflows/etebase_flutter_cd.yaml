@@ -17,4 +17,4 @@ jobs:
         {
           "path": "artifacts"
         }
-      prePublish: bash tool/libetebase/all.sh 0.5.4 artifacts
+      prePublish: bash tool/libetebase/all.sh 0.5.5 artifacts
