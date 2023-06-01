@@ -35,5 +35,5 @@ index 69a99ca..43d1d19 100644
 -    if cfg!(unix) && !cfg!(macos) {
 +    if cfg!(unix) && cfg!(not(target_os="macos")) {
          // Set soname for platforms other than Windows
-         const VERSION_MAJOR: &'static str = env!("CARGO_PKG_VERSION_MAJOR");
-         println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libetebase.so.{}", VERSION_MAJOR);
+         const VERSION_MAJOR: &str = env!("CARGO_PKG_VERSION_MAJOR");
+         println!(
