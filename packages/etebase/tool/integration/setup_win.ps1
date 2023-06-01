@@ -27,7 +27,13 @@ function Invoke-Exe() {
     }
 }
 
+# Setup vcpkg
+echo ::group::Setup vcpkg
+Invoke-Exe vcpkg integrate install
+echo ::endgroup::
+
 # build libetebase
+echo ::group::Build libetebase
 $pwd = Get-Location
 $tag = $args[0] #?? "master"
 $libetebaseDir = "$env:RUNNER_TEMP\libetebase"
@@ -38,3 +44,5 @@ rm Cargo.lock # delete lockfile to get up-to-date dependencies
 Invoke-Exe make
 New-Item -ItemType Directory -Path $installDir
 Copy-Item .\target\release\etebase.dll -Destination $installDir
+echo ::endgroup::
+
