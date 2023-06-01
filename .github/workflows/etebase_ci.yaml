@@ -7,13 +7,8 @@ on:
       - "*"
     paths:
       - "packages/etebase/**"
-      - ".github/workflows/etebase.yaml"
-  pull_request:
-    branches:
-      - "*"
-    paths:
-      - "packages/etebase/**"
-      - ".github/workflows/etebase.yaml"
+      - ".github/workflows/etebase_ci.yaml"
+      - ".github/workflows/etebase_cd.yaml"
 
 jobs:
   ci:

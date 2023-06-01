@@ -7,13 +7,8 @@ on:
       - "*"
     paths:
       - "packages/etebase_flutter/**"
-      - ".github/workflows/etebase_flutter.yaml"
-  pull_request:
-    branches:
-      - "*"
-    paths:
-      - "packages/etebase_flutter/**"
-      - ".github/workflows/etebase_flutter.yaml"
+      - ".github/workflows/etebase_flutter_ci.yaml"
+      - ".github/workflows/etebase_flutter_cd.yaml"
 
 jobs:
   ci:
