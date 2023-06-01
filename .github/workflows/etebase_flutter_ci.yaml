@@ -83,7 +83,7 @@ jobs:
 
   cd:
     name: CD
-    uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
+    uses: Skycoder42/dart_test_tools/.github/workflows/release.yml@main
     needs:
       - ci
       - libetebase
