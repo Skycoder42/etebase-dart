@@ -11,7 +11,7 @@ PREFIX=/tool/integration/libetebase
 DESTDIR=$PWD
 
 function startServer {
-  echo ::group::Start etesync server
+  echo "::group::Start etesync server"
   ./manage.py migrate
   nohup uvicorn etebase_server.asgi:application --host 127.0.0.1 --port 3735 &
   echo ::endgroup::
@@ -28,7 +28,7 @@ if [ "$CACHE_HIT" = "true" ]; then
 fi
 
 # build and install libetebase
-echo ::group::Build libetebase
+echo "::group::Build libetebase"
 libetebaseDir=$RUNNER_TEMP/libetebase
 git clone https://github.com/etesync/libetebase.git -b "$TAG" "$libetebaseDir"
 cd "$libetebaseDir"
@@ -43,13 +43,13 @@ make install PREFIX=$PREFIX DESTDIR="$DESTDIR"
 echo ::endgroup::
 
 # enable python 3.7
-echo ::group::Setup python 3.7
+echo "::group::Setup python 3.7"
 PYTHON_DIRS=("$RUNNER_TOOL_CACHE"/Python/3.7.*/x64/bin)
 export PATH=${PYTHON_DIRS[0]}:$PATH
 which python3
 echo ::endgroup::
 
-echo ::group::Build etebase server
+echo "::group::Build etebase server"
 # clone etebase server
 etebaseServerDir=$DESTDIR/$PREFIX/server
 git clone https://github.com/etesync/server.git "$etebaseServerDir"

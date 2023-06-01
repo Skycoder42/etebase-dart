@@ -3,7 +3,7 @@
 set -e
 
 function startServer {
-  echo ::group::Start etesync server
+  echo "::group::Start etesync server"
   docker run -d --rm \
     --pull always \
     -e SUPER_USER=admin \
@@ -19,7 +19,7 @@ if [ "$CACHE_HIT" = "true" ]; then
 fi
 
 # build and install libetebase
-echo ::group::Build libetebase
+echo "::group::Build libetebase"
 TAG=${1:-master}
 PREFIX=/tool/integration/libetebase
 DESTDIR=$PWD

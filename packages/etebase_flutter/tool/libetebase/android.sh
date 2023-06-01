@@ -1,12 +1,12 @@
 #!/bin/bash
 #$1 libetebase version
 #$2 host architecture: linux-x86_64
-#$3 NDK version: 22.1.7171670
+#$3 NDK version: 25.2.9519653
 set -ex
 
 version=${1:?First argument must be the libetebase version to build}
 host_arch=${2:-linux-x86_64}
-ndk_version=${3:-22.1.7171670}
+ndk_version=${3:-25.2.9519653}
 cache_dir=${CACHE_DIR:-$GITHUB_WORKSPACE/.cache}
 
 android_dir="$PWD/android"
@@ -34,6 +34,8 @@ openssl_version=$(cat Cargo.lock | grep 'name = "openssl"' -A 3 | grep "version"
 echo "openssl = { version = \"$openssl_version\", features = [\"vendored\"] }" >> Cargo.toml
 
 export PATH="$ANDROID_HOME/ndk/$ndk_version/toolchains/llvm/prebuilt/$host_arch/bin/:$PATH"
+export AR=$ANDROID_HOME/ndk/$ndk_version/toolchains/llvm/prebuilt/$host_arch/bin/llvm-ar
+export RANLIB=$ANDROID_HOME/ndk/$ndk_version/toolchains/llvm/prebuilt/$host_arch/bin/llvm-ranlib
 for arch in "${arches[@]}"; do
   cargo clean
 
