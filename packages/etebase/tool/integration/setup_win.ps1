@@ -29,6 +29,10 @@ function Invoke-Exe() {
 
 # Setup vcpkg
 echo "::group::Setup vcpkg"
+dir "C:\Program Files\"
+Invoke-Exe vcpkg list
+Invoke-Exe vcpkg install openssl-windows:x64-windows
+Invoke-Exe vcpkg install openssl:x64-windows-static
 Invoke-Exe vcpkg integrate install
 echo ::endgroup::
 
