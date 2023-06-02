@@ -27,15 +27,6 @@ function Invoke-Exe() {
     }
 }
 
-# Setup vcpkg
-echo "::group::Setup vcpkg"
-dir "C:\Program Files\"
-Invoke-Exe vcpkg list
-Invoke-Exe vcpkg install openssl-windows:x64-windows
-Invoke-Exe vcpkg install openssl:x64-windows-static
-Invoke-Exe vcpkg integrate install
-echo ::endgroup::
-
 # build libetebase
 echo "::group::Build libetebase"
 $pwd = Get-Location
@@ -45,6 +36,8 @@ $installDir = "$pwd\tool\integration\libetebase\lib\"
 Invoke-Exe git clone https://github.com/etesync/libetebase.git -b $tag $libetebaseDir
 cd $libetebaseDir
 rm Cargo.lock # delete lockfile to get up-to-date dependencies
+
+$Env:OPENSSL_DIR = 'C:\Program Files\OpenSSL'
 Invoke-Exe make
 New-Item -ItemType Directory -Path $installDir
 Copy-Item .\target\release\etebase.dll -Destination $installDir
