@@ -6,12 +6,60 @@ on:
       - "etebase_flutter-v*"
 
 jobs:
+  libetebase:
+    name: Prepare CD artifacts
+    if: github.ref == 'refs/heads/main'
+    env:
+      libetebaseVersion: 0.5.5
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - android
+          - ios
+          - macos
+          - windows
+
+        include:
+          - platform: android
+            os: ubuntu-latest
+          - platform: ios
+            os: macos-latest
+          - platform: macos
+            os: macos-latest
+          - platform: windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - id: libetebase-cache
+        name: Restore libetebase from cache
+        uses: actions/cache/restore@v3
+        with:
+          key: ${{ matrix.platform }}-etebase_flutter-libetebase-v${{ env.libetebaseVersion }}
+          path: .cache
+      - name: Checkout repository
+        if: steps.libetebase-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v3
+      - name: Build library if not restored
+        if: steps.libetebase-cache.outputs.cache-hit != 'true'
+        run: bash tool/libetebase/${{ matrix.platform }}.sh ${{ env.libetebaseVersion }}
+        working-directory: packages/etebase_flutter
+      - name: Generate cache artifact for deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: libetebase-${{ matrix.platform }}-${{ env.libetebaseVersion }}
+          path: .cache/
+          retention-days: 1
+
   publish:
     name: Publish
+    needs:
+      - libetebase
     uses: Skycoder42/dart_test_tools/.github/workflows/publish.yml@main
     with:
-      workingDirectory: packages/etebase_flutter
+      environment: pub-deploy
       tagPrefix: etebase_flutter-v
+      workingDirectory: packages/etebase_flutter
       flutter: true
       extraArtifacts: >-
         {
