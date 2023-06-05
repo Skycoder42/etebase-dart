@@ -1,8 +1,8 @@
 # etebase-dart
-[![Continous Integration for package etebase](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase.yaml/badge.svg)](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase.yaml)
+[![CI/CD for etebase](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_ci.yaml/badge.svg)](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_ci.yaml)
 [![Pub Version](https://img.shields.io/pub/v/etebase)](https://pub.dev/packages/etebase)
 
-[![Continous Integration for package etebase_flutter](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter.yaml/badge.svg)](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter.yaml)
+[![CI/CD for etebase_flutter](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter_ci.yaml/badge.svg)](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter_ci.yaml)
 [![Pub Version](https://img.shields.io/pub/v/etebase_flutter)](https://pub.dev/packages/etebase_flutter)
 
 This repository is a multi package repository for dart bindings of [libetebase](https://github.com/etesync/libetebase).

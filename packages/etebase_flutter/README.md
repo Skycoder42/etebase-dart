@@ -1,5 +1,5 @@
 # etebase_flutter
-[![CI/CD for etebase_flutter](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter.yaml/badge.svg)](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter.yaml)
+[![CI/CD for etebase_flutter](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter_ci.yaml/badge.svg)](https://github.com/Skycoder42/etebase-dart/actions/workflows/etebase_flutter_ci.yaml)
 [![Pub Version](https://img.shields.io/pub/v/etebase_flutter)](https://pub.dev/packages/etebase_flutter)
 
 Flutter platform plugins for the dart bindings of libetebase.
