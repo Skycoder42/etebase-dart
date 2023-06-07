@@ -21,6 +21,9 @@ build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 pushd "$build_dir"
 git apply "$patch_file"
+
+openssl_version=$(cat Cargo.lock | grep 'name = "openssl"' -A 3 | grep "version" | cut -d '"' -f 2)
+echo "openssl = { version = \"^$openssl_version\", features = [\"vendored\"] }" >> Cargo.toml
 rm Cargo.lock
 
 export IPHONEOS_DEPLOYMENT_TARGET=9.0

@@ -19,6 +19,7 @@ git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 pushd "$build_dir"
 rm Cargo.lock
 
+export OPENSSL_DIR='/c/Program Files/OpenSSL'
 cargo build --release
 
 mkdir -p "$cache_dir"
