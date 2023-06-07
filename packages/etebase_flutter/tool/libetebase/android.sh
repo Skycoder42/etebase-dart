@@ -31,7 +31,8 @@ git clone https://github.com/etesync/libetebase -b "v$version" "$build_dir"
 cd "$build_dir"
 
 openssl_version=$(cat Cargo.lock | grep 'name = "openssl"' -A 3 | grep "version" | cut -d '"' -f 2)
-echo "openssl = { version = \"$openssl_version\", features = [\"vendored\"] }" >> Cargo.toml
+echo "openssl = { version = \"^$openssl_version\", features = [\"vendored\"] }" >> Cargo.toml
+rm Cargo.lock
 
 export PATH="$ANDROID_HOME/ndk/$ndk_version/toolchains/llvm/prebuilt/$host_arch/bin/:$PATH"
 export AR=$ANDROID_HOME/ndk/$ndk_version/toolchains/llvm/prebuilt/$host_arch/bin/llvm-ar

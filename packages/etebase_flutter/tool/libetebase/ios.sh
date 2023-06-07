@@ -21,6 +21,7 @@ build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 pushd "$build_dir"
 git apply "$patch_file"
+rm Cargo.lock
 
 export IPHONEOS_DEPLOYMENT_TARGET=9.0
 declare -a dylibs

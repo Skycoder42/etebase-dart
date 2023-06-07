@@ -19,6 +19,7 @@ build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 pushd "$build_dir"
 git apply "$patch_file"
+rm Cargo.lock
 
 export MACOSX_DEPLOYMENT_TARGET=10.11
 cargo build --release

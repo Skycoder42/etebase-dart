@@ -17,6 +17,7 @@ fi
 build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 pushd "$build_dir"
+rm Cargo.lock
 
 cargo build --release
 

@@ -14,6 +14,8 @@ fi
 build_dir="$RUNNER_TEMP/libetebase"
 git clone https://github.com/etesync/libetebase.git -b "v$version" "$build_dir"
 cd "$build_dir"
+rm Cargo.lock
+
 make
 make install DESTDIR="$cache_dir"
 
