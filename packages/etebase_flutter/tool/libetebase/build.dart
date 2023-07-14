@@ -2,32 +2,39 @@ import 'dart:io';
 
 import 'github/github_env.dart';
 import 'github/github_logger.dart';
-import 'targets/android_target.dart';
-import 'targets/build_target_base.dart';
+import 'targets/build_target.dart';
+import 'targets/platform_targets.dart';
 
 Future<void> main(List<String> args) => GithubLogger.runZoned(() async {
-      final etebaseVersion = args[0];
-      const target = AndroidTarget.arm64_v8a;
+      final target = PlatformTargets.findTargetByName(args[0]);
+      final etebaseVersion = args[1];
 
+      final artifactDir = await Directory.fromUri(
+        GithubEnv.runnerTemp.uri.resolve('libetebase-${target.name}'),
+      ).create(recursive: true);
       final tmpDir = await GithubEnv.runnerTemp.createTemp();
       try {
         await _prepareRustTarget(target);
-        await _cloneRepo(tmpDir, target, etebaseVersion);
-        await _build(tmpDir, target);
+        final srcDir = await _cloneRepo(tmpDir, target, etebaseVersion);
+        final binary = await _build(srcDir, target);
+
+        await binary.rename(
+          artifactDir.uri.resolve(target.binaryName).toFilePath(),
+        );
       } finally {
         await tmpDir.delete(recursive: true);
       }
     });
 
-Future<void> _prepareRustTarget(BuildTargetBase target) =>
+Future<void> _prepareRustTarget(BuildTarget target) =>
     GithubLogger.logGroupAsync('Install Rust target ${target.rustTarget}',
         () async {
       await GithubEnv.run('rustup', ['target', 'add', target.rustTarget]);
     });
 
-Future<void> _cloneRepo(
+Future<Directory> _cloneRepo(
   Directory tmpDir,
-  BuildTargetBase target,
+  BuildTarget target,
   String etebaseVersion,
 ) =>
     GithubLogger.logGroupAsync(
@@ -44,6 +51,8 @@ Future<void> _cloneRepo(
           srcDir.path,
         ]);
 
+        await target.fixupSources(srcDir);
+
         if (target.openSslVendored) {
           GithubLogger.logInfo('Settings OpenSSL to vendored');
           await _setOpenSslVendored(srcDir);
@@ -51,22 +60,30 @@ Future<void> _cloneRepo(
 
         GithubLogger.logInfo('Deleting Cargo.lock');
         await File.fromUri(srcDir.uri.resolve('Cargo.lock')).delete();
+
+        return srcDir;
       },
     );
 
-Future<void> _build(Directory srcDir, BuildTargetBase target) =>
+Future<File> _build(Directory srcDir, BuildTarget target) =>
     GithubLogger.logGroupAsync('Building libetebase for $target', () async {
       await GithubEnv.run(
         'cargo',
         [
           'build',
-          '--release',
+          ...target.extraBuildArgs,
           '--target',
           target.rustTarget,
-          ...target.extraBuildArgs,
+          '--release',
         ],
         environment: target.buildEnv,
         workingDirectory: srcDir,
+      );
+
+      return File.fromUri(
+        srcDir.uri.resolve(
+          'target/${target.rustTarget}/release/${target.binaryName}',
+        ),
       );
     });
 
