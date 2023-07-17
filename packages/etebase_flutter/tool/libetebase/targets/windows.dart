@@ -21,7 +21,7 @@ final class WindowsTarget extends BuildTarget {
 
   @override
   Map<String, String> get buildEnv => const {
-        'OPENSSL_DIR': r'C:\Program Files\OpenSSL',
+        'OPENSSL_DIR': '/c/Program Files/OpenSSL',
       };
 }
 
