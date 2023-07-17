@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../util/fs.dart';
 import 'build_platform.dart';
 import 'build_target.dart';
 
@@ -55,11 +56,10 @@ final class AndroidTarget extends BuildTarget {
 
   @override
   List<String> get extraBuildArgs {
-    final androidDir =
-        Directory.current.absolute.uri.resolve('android').toFilePath();
+    final linkerFile = Directory.current.subFile('android/my-hacky-linker-cc');
     return [
       '--config',
-      'target.$rustTarget.linker="$androidDir/my-hacky-linker-cc"',
+      'target.$rustTarget.linker="${linkerFile.absolute.path}"',
     ];
   }
 
@@ -109,13 +109,15 @@ final class AndroidPlatform extends BuildPlatform<AndroidTarget> {
   @override
   Future<void> createBundleImpl(
     Directory bundleDir,
+    String version,
     Map<AndroidTarget, File> binaries,
   ) async {
     for (final MapEntry(key: target, value: binary) in binaries.entries) {
-      final targetUri =
-          bundleDir.uri.resolve('${target._architecture}/${target.binaryName}');
-      await File.fromUri(targetUri).parent.create(recursive: true);
-      await binary.rename(targetUri.toFilePath());
+      final targetFile = bundleDir.subFile(
+        '${target._architecture}/${target.binaryName}',
+      );
+      await targetFile.parent.create(recursive: true);
+      await binary.rename(targetFile.path);
     }
   }
 }

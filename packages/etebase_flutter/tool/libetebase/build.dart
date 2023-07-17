@@ -4,33 +4,35 @@ import 'github/github_env.dart';
 import 'github/github_logger.dart';
 import 'targets/build_target.dart';
 import 'targets/platform_targets.dart';
+import 'util/fs.dart';
 
 Future<void> main(List<String> args) => GithubLogger.runZoned(() async {
       final target = PlatformTargets.findTargetByName(args[0]);
       final etebaseVersion = args[1];
 
-      final artifactDir = await Directory.fromUri(
-        GithubEnv.runnerTemp.uri.resolve('libetebase-${target.name}'),
-      ).create(recursive: true);
+      final artifactDir = await GithubEnv.runnerTemp
+          .subDir('libetebase-${target.name}')
+          .create(recursive: true);
       final tmpDir = await GithubEnv.runnerTemp.createTemp();
       try {
         await _prepareRustTarget(target);
         final srcDir = await _cloneRepo(tmpDir, target, etebaseVersion);
         final binary = await _build(srcDir, target);
 
-        await binary.rename(
-          artifactDir.uri.resolve(target.binaryName).toFilePath(),
-        );
+        await binary.rename(artifactDir.subFile(target.binaryName).path);
       } finally {
         await tmpDir.delete(recursive: true);
       }
     });
 
 Future<void> _prepareRustTarget(BuildTarget target) =>
-    GithubLogger.logGroupAsync('Install Rust target ${target.rustTarget}',
-        () async {
-      await GithubEnv.run('rustup', ['target', 'add', target.rustTarget]);
-    });
+    GithubLogger.logGroupAsync(
+      'Install Rust target ${target.rustTarget}',
+      () => GithubEnv.run(
+        'rustup',
+        ['target', 'add', target.rustTarget],
+      ),
+    );
 
 Future<Directory> _cloneRepo(
   Directory tmpDir,
@@ -40,7 +42,7 @@ Future<Directory> _cloneRepo(
     GithubLogger.logGroupAsync(
       'Preparing libetebase sources',
       () async {
-        final srcDir = Directory.fromUri(tmpDir.uri.resolve('libetebase'));
+        final srcDir = tmpDir.subDir('libetebase');
 
         GithubLogger.logInfo('Cloning libetebase repository');
         await GithubEnv.run('git', [
@@ -59,7 +61,7 @@ Future<Directory> _cloneRepo(
         }
 
         GithubLogger.logInfo('Deleting Cargo.lock');
-        await File.fromUri(srcDir.uri.resolve('Cargo.lock')).delete();
+        await srcDir.subFile('Cargo.lock').delete();
 
         return srcDir;
       },
@@ -80,11 +82,8 @@ Future<File> _build(Directory srcDir, BuildTarget target) =>
         workingDirectory: srcDir,
       );
 
-      return File.fromUri(
-        srcDir.uri.resolve(
-          'target/${target.rustTarget}/release/${target.binaryName}',
-        ),
-      );
+      return srcDir
+          .subFile('target/${target.rustTarget}/release/${target.binaryName}');
     });
 
 Future<void> _setOpenSslVendored(Directory srcDir) async {
@@ -94,20 +93,18 @@ Future<void> _setOpenSslVendored(Directory srcDir) async {
 openssl = { version = "^$openSslVersion", features = ["vendored"] }
 ''';
 
-  final cargoFile = File.fromUri(srcDir.uri.resolve('Cargo.toml'));
-  await cargoFile.writeAsString(
-    cargoEntry,
-    mode: FileMode.append,
-    flush: true,
-  );
+  await srcDir.subFile('Cargo.toml').writeAsString(
+        cargoEntry,
+        mode: FileMode.append,
+        flush: true,
+      );
 }
 
 Future<String> _getLockedPackageVersion(
   Directory srcDir,
   String packageName,
 ) async {
-  final cargoLockFile = File.fromUri(srcDir.uri.resolve('Cargo.lock'));
-  final cargoPackages = await cargoLockFile.readAsLines();
+  final cargoPackages = await srcDir.subFile('Cargo.lock').readAsLines();
 
   final versionLineSegments = cargoPackages
       .groupLockLines()

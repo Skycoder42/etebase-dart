@@ -11,9 +11,14 @@ abstract base class BuildPlatform<T extends BuildTarget> {
 
   Future<void> createBundle(
     Directory bundleDir,
+    String version,
     Map<BuildTarget, File> binaries,
   ) =>
-      createBundleImpl(bundleDir, binaries.cast());
+      createBundleImpl(bundleDir, version, binaries.cast());
 
-  Future<void> createBundleImpl(Directory bundleDir, Map<T, File> binaries);
+  Future<void> createBundleImpl(
+    Directory bundleDir,
+    String version,
+    Map<T, File> binaries,
+  );
 }

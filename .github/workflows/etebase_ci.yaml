@@ -3,8 +3,6 @@ name: CI/CD for etebase
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "*"
     paths:
       - "packages/etebase/**"
       - ".github/workflows/etebase_ci.yaml"

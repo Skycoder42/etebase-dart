@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import '../util/fs.dart';
+
 abstract class GithubEnv {
   GithubEnv._();
 
@@ -12,7 +14,7 @@ abstract class GithubEnv {
     final githubWorkspace = Platform.environment['GITHUB_WORKSPACE'];
     return githubWorkspace != null
         ? Directory(githubWorkspace)
-        : Directory.fromUri(Directory.current.uri.resolve('../..'));
+        : Directory.current.subDir('../..');
   }
 
   static Future<int> run(

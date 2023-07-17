@@ -2,16 +2,15 @@ import 'dart:io';
 
 import '../github/github_env.dart';
 import '../github/github_logger.dart';
-import 'build_platform.dart';
-import 'build_target.dart';
+import '../util/fs.dart';
+import 'darwin.dart';
 
-final class IosTarget extends BuildTarget {
+final class IosTarget extends DarwinTarget {
   static const arm64 = IosTarget._(
     architecture: 'arm64',
     rustTarget: 'aarch64-apple-ios',
   );
 
-  // TODO pull request
   static const simulator_arm64 = IosTarget._(
     architecture: 'arm64',
     rustTarget: 'aarch64-apple-ios-sim',
@@ -49,21 +48,12 @@ final class IosTarget extends BuildTarget {
   @override
   Map<String, String> get buildEnv => {
         'IPHONEOS_DEPLOYMENT_TARGET': '11.0',
-        'SODIUM_LIB_DIR': '${GithubEnv.runnerTemp.path}/libsodium',
+        'SODIUM_LIB_DIR': GithubEnv.runnerTemp.subDir('libsodium/$name').path,
       };
 
   @override
   Future<void> fixupSources(Directory srcDir) async {
-    GithubLogger.logInfo('Applying darwin patch');
-    await GithubEnv.run(
-      'git',
-      [
-        'apply',
-        '${GithubEnv.githubWorkspace.path}/packages/etebase/tool/integration/libetebase-macos.patch',
-      ],
-      workingDirectory: srcDir,
-    );
-
+    await applyPatch(srcDir);
     await _downloadLibsodiumBinary(srcDir);
   }
 
@@ -94,17 +84,19 @@ final class IosTarget extends BuildTarget {
         workingDirectory: tmpDir,
       );
 
-      final lipoSlice =
+      final frameworkSlice =
           _isSimulator ? 'ios-arm64_x86_64-simulator' : 'ios-arm64';
-      await Directory('${GithubEnv.runnerTemp.path}/libsodium').create();
+      final outDir = await GithubEnv.runnerTemp
+          .subDir('libsodium/$name')
+          .create(recursive: true);
       await GithubEnv.run(
         'lipo',
         [
           '-thin',
           _architecture,
-          'libsodium.xcframework/$lipoSlice/libsodium.a',
+          'libsodium.xcframework/$frameworkSlice/libsodium.a',
           '-output',
-          '${GithubEnv.runnerTemp.path}/libsodium/libsodium.a',
+          outDir.subFile('libsodium.a').path,
         ],
         workingDirectory: tmpDir,
       );
@@ -125,12 +117,11 @@ final class IosTarget extends BuildTarget {
       ),
     );
     final response = await request.close();
-    final file = File.fromUri(targetDir.uri.resolve(fileName));
-    await response.pipe(file.openWrite());
+    await response.pipe(targetDir.subFile(fileName).openWrite());
   }
 }
 
-final class IosPlatform extends BuildPlatform<IosTarget> {
+final class IosPlatform extends DarwinPlatform<IosTarget> {
   const IosPlatform();
 
   @override
@@ -146,20 +137,23 @@ final class IosPlatform extends BuildPlatform<IosTarget> {
   @override
   Future<void> createBundleImpl(
     Directory bundleDir,
+    String version,
     Map<IosTarget, File> binaries,
   ) async {
     final tmpDir = await GithubEnv.runnerTemp.createTemp();
     try {
-      final iosBinaryArchive = await _createLipoBinary(
+      final iosBinaryArchive = await createLipoBinary(
         tmpDir,
-        'ios',
-        binaries.entries.where((e) => !e.key._isSimulator).toList(),
+        prefix: 'ios',
+        'libetebase.a',
+        binaries.entries.where((e) => !e.key._isSimulator).map((e) => e.value),
       );
 
-      final iosSimulatorBinary = await _createLipoBinary(
+      final iosSimulatorBinary = await createLipoBinary(
         tmpDir,
-        'ios-simulator',
-        binaries.entries.where((e) => e.key._isSimulator).toList(),
+        prefix: 'ios-simulator',
+        'libetebase.a',
+        binaries.entries.where((e) => e.key._isSimulator).map((e) => e.value),
       );
 
       await _createXcFramework(bundleDir, [
@@ -169,23 +163,6 @@ final class IosPlatform extends BuildPlatform<IosTarget> {
     } finally {
       await tmpDir.delete(recursive: true);
     }
-  }
-
-  Future<File> _createLipoBinary(
-    Directory tmpDir,
-    String prefix,
-    List<MapEntry<IosTarget, File>> binaries,
-  ) async {
-    final targetFile = File('${tmpDir.path}/$prefix/libetebase.a');
-    await targetFile.parent.create(recursive: true);
-    await GithubEnv.run('lipo', [
-      '-create',
-      ...binaries.map((e) => e.value.path),
-      '-output',
-      targetFile.path,
-    ]);
-
-    return targetFile;
   }
 
   Future<void> _createXcFramework(
@@ -199,7 +176,7 @@ final class IosPlatform extends BuildPlatform<IosTarget> {
         library.path,
       ],
       '-output',
-      '${targetDir.path}/libetebase.xcframework',
+      targetDir.subDir('libetebase.xcframework').path,
     ]);
   }
 }

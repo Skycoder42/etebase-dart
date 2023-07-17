@@ -3,8 +3,6 @@ name: CI/CD for etebase_flutter
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "*"
     paths:
       - "packages/etebase_flutter/**"
       - ".github/workflows/etebase_flutter_ci.yaml"
