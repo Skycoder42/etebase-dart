@@ -10,24 +10,28 @@ void main(List<String> args) async {
   final version = args[0];
   final workspaceDir = GithubEnv.githubWorkspace;
   final artifactsDir = workspaceDir.subDir('artifacts');
-  final archivesDir = workspaceDir.subDir('archive');
   final publishDir = workspaceDir.subDir('publish');
   final secretKey = GithubEnv.runnerTemp.subFile('minisign.key');
 
   for (final platform in PlatformTargets.values) {
-    final platformBundleDir =
-        await archivesDir.subDir(platform.name).create(recursive: true);
-    await _createBundle(platform, version, artifactsDir, platformBundleDir);
+    await _createPublishArchive(
+      platform,
+      version,
+      artifactsDir,
+      publishDir,
+      secretKey,
+    );
   }
 }
 
-Future<void> _createBundle(
+Future<void> _createPublishArchive(
   BuildPlatform platform,
   String version,
   Directory artifactsDir,
-  Directory bundleDir,
+  Directory publishDir,
+  File secretKey,
 ) =>
-    GithubLogger.logGroupAsync('Bundling binaries for ${platform.name}',
+    GithubLogger.logGroupAsync('Publishing binaries for ${platform.name}',
         () async {
       final binaryMap = {
         for (final target in platform.targets)
@@ -36,5 +40,33 @@ Future<void> _createBundle(
           ),
       };
 
-      await platform.createBundle(bundleDir, version, binaryMap);
+      final tmpDir = await GithubEnv.runnerTemp.createTemp();
+      try {
+        await platform.createBundle(tmpDir, version, binaryMap);
+
+        final archive = publishDir.subFile(
+          'libetebase-$version-${platform.name}.tar.xz',
+        );
+        await _compress(tmpDir, archive);
+        await _sign(archive, secretKey);
+      } finally {
+        await tmpDir.delete(recursive: true);
+      }
     });
+
+Future<void> _compress(Directory srcDir, File targetFile) async {
+  await GithubEnv.run(
+    'tar',
+    ['-cavf', targetFile.path, '.'],
+    workingDirectory: srcDir,
+  );
+}
+
+Future<void> _sign(File file, File secretKeyFile) async {
+  await GithubEnv.run('minisign', [
+    '-Ss',
+    secretKeyFile.path,
+    '-m',
+    file.path,
+  ]);
+}
