@@ -9,8 +9,6 @@ on:
     paths:
       - packages/etebase_flutter/tool/libetebase/**
       - .github/workflows/libetebase.yaml
-  schedule:
-    - cron: "47 2 * * 2"
 
 env:
   libetebaseVersion: 0.5.5

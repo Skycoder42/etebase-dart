@@ -10,7 +10,7 @@ void main(List<String> args) async {
   final version = args[0];
   final workspaceDir = GithubEnv.githubWorkspace;
   final artifactsDir = workspaceDir.subDir('artifacts');
-  final publishDir = workspaceDir.subDir('publish');
+  final publishDir = await workspaceDir.subDir('publish').create();
   final secretKey = GithubEnv.runnerTemp.subFile('minisign.key');
 
   for (final platform in PlatformTargets.values) {
