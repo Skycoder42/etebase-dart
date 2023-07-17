@@ -90,12 +90,12 @@ jobs:
       - name: Cleanup minisign key
         if: always()
         run: rm -f '${{ runner.temp }}/minisign.key'
-      # - name: Create or update release
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     tag_name: libetebase-binaries/v${{ env.libetebaseVersion }}
-      #     name: "[INTERNAL] Precompiled libetebase binaries v${{ env.libetebaseVersion }}"
-      #     body: Internal release of precompiled libetebase binaries, required for the etebase_libs package.
-      #     prerelease: true
-      #     files: publish/*
-      #     fail_on_unmatched_files: true
+      - name: Create or update release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: libetebase-binaries/v${{ env.libetebaseVersion }}
+          name: "[INTERNAL] Precompiled libetebase binaries v${{ env.libetebaseVersion }}"
+          body: Internal release of precompiled libetebase binaries, required for the etebase_libs package.
+          prerelease: true
+          files: publish/*
+          fail_on_unmatched_files: true
