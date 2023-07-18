@@ -30,4 +30,7 @@ abstract base class PlatformTargets {
   static BuildTarget findTargetByName(String name) => values
       .expand((platform) => platform.targets)
       .singleWhere((target) => target.name == name);
+
+  static BuildPlatform findPlatformByName(String name) =>
+      values.singleWhere((platform) => platform.name == name);
 }

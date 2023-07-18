@@ -28,6 +28,10 @@ abstract base class DarwinPlatform<T extends DarwinTarget>
     extends BuildPlatform<T> {
   const DarwinPlatform();
 
+  @override
+  Directory installDir(Directory platformDir) =>
+      platformDir.subDir('Libraries');
+
   Future<File> createLipoBinary(
     Directory targetDir,
     String fileName,

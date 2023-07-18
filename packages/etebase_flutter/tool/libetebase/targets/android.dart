@@ -107,6 +107,10 @@ final class AndroidPlatform extends BuildPlatform<AndroidTarget> {
       ];
 
   @override
+  Directory installDir(Directory platformDir) =>
+      platformDir.subDir('src/main/jniLibs');
+
+  @override
   Future<void> createBundleImpl(
     Directory bundleDir,
     String version,

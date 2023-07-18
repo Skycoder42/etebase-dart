@@ -32,6 +32,9 @@ final class LinuxPlatform extends BuildPlatform<LinuxTarget> {
       ];
 
   @override
+  Directory installDir(Directory platformDir) => platformDir.subDir('lib');
+
+  @override
   Future<void> createBundleImpl(
     Directory bundleDir,
     String version,

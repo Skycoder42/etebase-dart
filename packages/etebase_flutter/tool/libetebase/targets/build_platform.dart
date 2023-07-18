@@ -9,6 +9,8 @@ abstract base class BuildPlatform<T extends BuildTarget> {
 
   List<T> get targets;
 
+  Directory installDir(Directory platformDir);
+
   Future<void> createBundle(
     Directory bundleDir,
     String version,

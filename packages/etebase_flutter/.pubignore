@@ -1,5 +1,6 @@
 # libetebase binaries
 !android/src/main/jniLibs
 !ios/Libraries
+!linux/lib
 !macos/Libraries
 !windows/lib
