@@ -11,12 +11,14 @@ final class IosTarget extends DarwinTarget {
     rustTarget: 'aarch64-apple-ios',
   );
 
+  // ignore: constant_identifier_names
   static const simulator_arm64 = IosTarget._(
     architecture: 'arm64',
     rustTarget: 'aarch64-apple-ios-sim',
     isSimulator: true,
   );
 
+  // ignore: constant_identifier_names
   static const simulator_x86_64 = IosTarget._(
     architecture: 'x86_64',
     rustTarget: 'x86_64-apple-ios',
