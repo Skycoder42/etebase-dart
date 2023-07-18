@@ -14,10 +14,12 @@ Flutter platform plugins for the dart bindings of libetebase
   s.author           = { 'Skycoder42' => 'skycoder42@users.noreply.github.com' }
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
-  s.vendored_libraries = 'Libraries/libetebase.dylib'
   s.dependency 'FlutterMacOS'
 
   s.platform = :osx, '10.14'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'
+
+  # libetebase
+  s.vendored_libraries = 'Libraries/libetebase.dylib'
 end

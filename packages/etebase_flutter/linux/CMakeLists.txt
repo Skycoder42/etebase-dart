@@ -12,8 +12,13 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 set(PLUGIN_NAME "etebase_flutter_plugin")
 
 # Add libetebase dependency
-find_package(PkgConfig)
-pkg_check_modules(ETEBASE REQUIRED IMPORTED_TARGET etebase)
+if(DEFINED ENV{LIBETEBASE_USE_PKGCONFIG})
+  find_package(PkgConfig)
+  pkg_check_modules(ETEBASE REQUIRED IMPORTED_TARGET etebase)
+else()
+  add_library(etebase SHARED IMPORTED)
+  set_property(TARGET etebase PROPERTY IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/libetebase.so")
+endif()
 
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
@@ -44,12 +49,23 @@ target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
-target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::ETEBASE)
+if(DEFINED ENV{LIBETEBASE_USE_PKGCONFIG})
+  target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::ETEBASE)
+else()
+  target_link_libraries(${PLUGIN_NAME} PRIVATE etebase)
+endif()
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
-set(etebase_flutter_bundled_libraries
-  ""
-  PARENT_SCOPE
-)
+if(DEFINED ENV{LIBETEBASE_USE_PKGCONFIG})
+  set(etebase_flutter_bundled_libraries
+    ""
+    PARENT_SCOPE
+  )
+else()
+  set(etebase_flutter_bundled_libraries
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/libetebase.so"
+    PARENT_SCOPE
+  )
+endif()

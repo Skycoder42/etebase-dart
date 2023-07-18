@@ -18,18 +18,13 @@ jobs:
       unitTestPaths: ""
       integrationTestProject: example
       integrationTestPaths: integration_test
-      integrationTestCacheConfig: >-
-        {
-          "key": "etebase_flutter-libetebase-v0.5.5",
-          "path": ".cache"
-        }
       integrationTestSetup: >-
         {
-          "android": "bash tool/libetebase/android.sh 0.5.5 darwin-x86_64",
-          "ios": "bash tool/libetebase/ios.sh 0.5.5",
-          "linux": "bash tool/libetebase/linux.sh 0.5.5",
-          "macos": "bash tool/libetebase/macos.sh 0.5.5",
-          "windows": "bash tool/libetebase/windows.sh 0.5.5"
+          "android": "dart run tool/libetebase/download.dart 0.5.5 android",
+          "ios": "dart run tool/libetebase/download.dart 0.5.5 ios",
+          "linux": "dart run tool/libetebase/download.dart 0.5.5 linux",
+          "macos": "dart run tool/libetebase/download.dart 0.5.5 macos",
+          "windows": "dart run tool/libetebase/download.dart 0.5.5 windows"
         }
 
   cd:

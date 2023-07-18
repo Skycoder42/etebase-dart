@@ -41,15 +41,6 @@ final class LinuxPlatform extends BuildPlatform<LinuxTarget> {
     Map<LinuxTarget, File> binaries,
   ) async {
     final MapEntry(key: target, value: binary) = binaries.entries.single;
-    final targetPath = bundleDir.subFile(target.binaryName).path;
-
-    final segments = version.split('.');
-    final [major, minor, ...] = segments;
-
-    final bundleBinary = await binary.rename('$targetPath.$version');
-    final binaryName = bundleBinary.uri.pathSegments.last;
-    await Link('$targetPath.$major.$minor').create(binaryName);
-    await Link('$targetPath.$major').create(binaryName);
-    await Link(targetPath).create(binaryName);
+    await binary.rename(bundleDir.subFile(target.binaryName).path);
   }
 }

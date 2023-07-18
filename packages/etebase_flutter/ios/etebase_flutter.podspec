@@ -14,13 +14,17 @@ Flutter platform plugins for the dart bindings of libetebase
   s.author           = { 'Skycoder42' => 'skycoder42@users.noreply.github.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
-  s.vendored_libraries = 'Libraries/libetebase.dylib'
   s.dependency 'Flutter'
-  s.platform = :ios, '11.0'
 
+  s.platform = :ios, '11.0'
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  # libetebase currently doesn't support arm64 for the simulator
-  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.swift_version = '5.0'
+
+  # libetebase
+  s.vendored_frameworks = "Libraries/libetebase.xcframework"
+  s.xcconfig = {
+    'OTHER_LDFLAGS[sdk=iphoneos*]' => '$(inherited) -force_load "$(PODS_ROOT)/../.symlinks/plugins/etebase_flutter/ios/Libraries/libetebase.xcframework/ios-arm64/libetebase.a"',
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited) -force_load "$(PODS_ROOT)/../.symlinks/plugins/etebase_flutter/ios/Libraries/libetebase.xcframework/ios-arm64_x86_64-simulator/libetebase.a"',
+  }
 end
