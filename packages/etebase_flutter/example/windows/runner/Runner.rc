@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "etebase_flutter_example" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "etebase_flutter_example" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 de.skycoder42. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 de.skycoder42. All rights reserved." "\0"
             VALUE "OriginalFilename", "etebase_flutter_example.exe" "\0"
             VALUE "ProductName", "etebase_flutter_example" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

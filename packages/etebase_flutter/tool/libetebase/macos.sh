@@ -21,7 +21,7 @@ pushd "$build_dir"
 git apply "$patch_file"
 rm Cargo.lock
 
-export MACOSX_DEPLOYMENT_TARGET=10.11
+export MACOSX_DEPLOYMENT_TARGET=10.14
 cargo build --release
 
 mkdir -p "$cache_dir"

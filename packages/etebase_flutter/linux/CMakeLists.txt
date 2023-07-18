@@ -15,12 +15,15 @@ set(PLUGIN_NAME "etebase_flutter_plugin")
 find_package(PkgConfig)
 pkg_check_modules(ETEBASE REQUIRED IMPORTED_TARGET etebase)
 
+# Any new source files that you add to the plugin should be added here.
+list(APPEND PLUGIN_SOURCES
+  "etebase_flutter_plugin.cc"
+)
+
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
-#
-# Any new source files that you add to the plugin should be added here.
 add_library(${PLUGIN_NAME} SHARED
-  "etebase_flutter_plugin.cc"
+  ${PLUGIN_SOURCES}
 )
 
 # Apply a standard set of build settings that are configured in the

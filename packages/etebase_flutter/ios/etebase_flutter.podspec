@@ -16,7 +16,7 @@ Flutter platform plugins for the dart bindings of libetebase
   s.source_files = 'Classes/**/*'
   s.vendored_libraries = 'Libraries/libetebase.dylib'
   s.dependency 'Flutter'
-  s.platform = :ios, '9.0'
+  s.platform = :ios, '11.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

@@ -1,6 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.skycoder42.etebase_flutter_example">
-   <application
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
         android:label="etebase_flutter_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
