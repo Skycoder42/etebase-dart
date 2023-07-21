@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import '../github/github_env.dart';
-import '../github/github_logger.dart';
-import '../util/fs.dart';
+import 'package:dart_test_tools/tools.dart';
+
 import 'darwin.dart';
 
 final class IosTarget extends DarwinTarget {
@@ -50,7 +49,7 @@ final class IosTarget extends DarwinTarget {
   @override
   Map<String, String> get buildEnv => {
         'IPHONEOS_DEPLOYMENT_TARGET': '11.0',
-        'SODIUM_LIB_DIR': GithubEnv.runnerTemp.subDir('libsodium/$name').path,
+        'SODIUM_LIB_DIR': Github.env.runnerTemp.subDir('libsodium/$name').path,
       };
 
   @override
@@ -60,38 +59,31 @@ final class IosTarget extends DarwinTarget {
   }
 
   Future<void> _downloadLibsodiumBinary(Directory srcDir) async {
-    GithubLogger.logInfo('Downloading libsodium binaries');
+    Github.logInfo('Downloading libsodium binaries');
     final client = HttpClient();
-    final tmpDir = await GithubEnv.runnerTemp.createTemp();
+    final tmpDir = await Github.env.runnerTemp.createTemp();
     try {
-      const archiveName = 'libsodium-1.0.18-ios.tar.xz';
-
-      await _downloadReleaseFile(client, tmpDir, archiveName);
-      await _downloadReleaseFile(client, tmpDir, '$archiveName.minisig');
-
-      await GithubEnv.run(
-        'minisign',
-        const [
-          '-P',
-          'RWQV/WsoL5F1nbrM9y7gJtszibGirYi+hNUI4P3orTZD8dZBCsBd7D/h',
-          '-Vm',
-          archiveName
-        ],
-        workingDirectory: tmpDir,
+      final archive = await client.download(
+        tmpDir,
+        Uri.https(
+          'github.com',
+          '/Skycoder42/libsodium_dart_bindings/releases/download/libsodium-binaries%2Fv1.0.18/libsodium-1.0.18-ios.tar.xz',
+        ),
       );
 
-      await GithubEnv.run(
-        'tar',
-        const ['-xvf', archiveName],
-        workingDirectory: tmpDir,
+      await Minisign.verify(
+        archive,
+        'RWQV/WsoL5F1nbrM9y7gJtszibGirYi+hNUI4P3orTZD8dZBCsBd7D/h',
       );
+
+      await Archive.extract(archive: archive, outDir: tmpDir);
 
       final frameworkSlice =
           _isSimulator ? 'ios-arm64_x86_64-simulator' : 'ios-arm64';
-      final outDir = await GithubEnv.runnerTemp
+      final outDir = await Github.env.runnerTemp
           .subDir('libsodium/$name')
           .create(recursive: true);
-      await GithubEnv.run(
+      await Github.exec(
         'lipo',
         [
           '-thin',
@@ -106,20 +98,6 @@ final class IosTarget extends DarwinTarget {
       client.close();
       await tmpDir.delete(recursive: true);
     }
-  }
-
-  Future<void> _downloadReleaseFile(
-    HttpClient client,
-    Directory targetDir,
-    String fileName,
-  ) async {
-    final request = await client.getUrl(
-      Uri.parse(
-        'https://github.com/Skycoder42/libsodium_dart_bindings/releases/download/libsodium-binaries%2Fv1.0.18/$fileName',
-      ),
-    );
-    final response = await request.close();
-    await response.pipe(targetDir.subFile(fileName).openWrite());
   }
 }
 
@@ -142,7 +120,7 @@ final class IosPlatform extends DarwinPlatform<IosTarget> {
     String version,
     Map<IosTarget, File> binaries,
   ) async {
-    final tmpDir = await GithubEnv.runnerTemp.createTemp();
+    final tmpDir = await Github.env.runnerTemp.createTemp();
     try {
       final iosBinaryArchive = await createLipoBinary(
         tmpDir,
@@ -171,7 +149,7 @@ final class IosPlatform extends DarwinPlatform<IosTarget> {
     Directory targetDir,
     Iterable<File> libraries,
   ) async {
-    await GithubEnv.run('xcodebuild', [
+    await Github.exec('xcodebuild', [
       '-create-xcframework',
       for (final library in libraries) ...[
         '-library',

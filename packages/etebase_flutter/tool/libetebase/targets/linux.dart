@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import '../util/fs.dart';
+import 'package:dart_test_tools/tools.dart';
+
 import 'build_platform.dart';
 import 'build_target.dart';
 

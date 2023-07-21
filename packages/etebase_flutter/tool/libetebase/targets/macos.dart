@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import '../github/github_env.dart';
+import 'package:dart_test_tools/tools.dart';
+
 import 'darwin.dart';
 
 final class MacosTarget extends DarwinTarget {
@@ -65,7 +66,7 @@ final class MacosPlatform extends DarwinPlatform<MacosTarget> {
       binaries.entries.map((e) => e.value),
     );
 
-    await GithubEnv.run('install_name_tool', [
+    await Github.exec('install_name_tool', [
       '-id',
       '@rpath/libsodium.dylib',
       libsodiumDylib.path,

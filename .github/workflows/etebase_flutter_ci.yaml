@@ -20,11 +20,11 @@ jobs:
       integrationTestPaths: integration_test
       integrationTestSetup: >-
         {
-          "android": "tool/setup/macos.sh 0.5.5 android",
-          "ios": "tool/setup/macos.sh 0.5.5 ios",
-          "linux": "tool/setup/linux.sh 0.5.5 linux",
-          "macos": "tool/setup/macos.sh 0.5.5 macos",
-          "windows": "bash tool/setup/windows.sh 0.5.5 windows",
+          "android": "dart run tool/libetebase/download.dart 0.5.5 android",
+          "ios": "dart run tool/libetebase/download.dart 0.5.5 ios",
+          "linux": "dart run tool/libetebase/download.dart 0.5.5 linux",
+          "macos": "dart run tool/libetebase/download.dart 0.5.5 macos",
+          "windows": "dart run tool/libetebase/download.dart 0.5.5 windows"
         }
 
   cd:

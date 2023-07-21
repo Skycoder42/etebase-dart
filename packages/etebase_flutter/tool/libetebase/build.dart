@@ -1,19 +1,23 @@
 import 'dart:io';
 
-import 'github/github_env.dart';
-import 'github/github_logger.dart';
+import 'package:dart_test_tools/tools.dart';
+
 import 'targets/build_target.dart';
 import 'targets/platform_targets.dart';
-import 'util/fs.dart';
 
-Future<void> main(List<String> args) => GithubLogger.runZoned(() async {
+Future<void> main(List<String> args) => Github.runZoned(() async {
       final target = PlatformTargets.findTargetByName(args[0]);
       final etebaseVersion = args[1];
 
-      final artifactDir = await GithubEnv.runnerTemp
+      await Github.logGroupAsync(
+        'Ensure minisign is installed',
+        Minisign.ensureInstalled,
+      );
+
+      final artifactDir = await Github.env.runnerTemp
           .subDir('libetebase-${target.name}')
           .create(recursive: true);
-      final tmpDir = await GithubEnv.runnerTemp.createTemp();
+      final tmpDir = await Github.env.runnerTemp.createTemp();
       try {
         await _prepareRustTarget(target);
         final srcDir = await _cloneRepo(tmpDir, target, etebaseVersion);
@@ -25,10 +29,9 @@ Future<void> main(List<String> args) => GithubLogger.runZoned(() async {
       }
     });
 
-Future<void> _prepareRustTarget(BuildTarget target) =>
-    GithubLogger.logGroupAsync(
+Future<void> _prepareRustTarget(BuildTarget target) => Github.logGroupAsync(
       'Install Rust target ${target.rustTarget}',
-      () => GithubEnv.run(
+      () => Github.exec(
         'rustup',
         ['target', 'add', target.rustTarget],
       ),
@@ -39,13 +42,13 @@ Future<Directory> _cloneRepo(
   BuildTarget target,
   String etebaseVersion,
 ) =>
-    GithubLogger.logGroupAsync(
+    Github.logGroupAsync(
       'Preparing libetebase sources',
       () async {
         final srcDir = tmpDir.subDir('libetebase');
 
-        GithubLogger.logInfo('Cloning libetebase repository');
-        await GithubEnv.run('git', [
+        Github.logInfo('Cloning libetebase repository');
+        await Github.exec('git', [
           'clone',
           'https://github.com/etesync/libetebase',
           '-b',
@@ -56,11 +59,11 @@ Future<Directory> _cloneRepo(
         await target.fixupSources(srcDir);
 
         if (target.openSslVendored) {
-          GithubLogger.logInfo('Settings OpenSSL to vendored');
+          Github.logInfo('Settings OpenSSL to vendored');
           await _setOpenSslVendored(srcDir);
         }
 
-        GithubLogger.logInfo('Deleting Cargo.lock');
+        Github.logInfo('Deleting Cargo.lock');
         await srcDir.subFile('Cargo.lock').delete();
 
         return srcDir;
@@ -68,8 +71,8 @@ Future<Directory> _cloneRepo(
     );
 
 Future<File> _build(Directory srcDir, BuildTarget target) =>
-    GithubLogger.logGroupAsync('Building libetebase for $target', () async {
-      await GithubEnv.run(
+    Github.logGroupAsync('Building libetebase for $target', () async {
+      await Github.exec(
         'cargo',
         [
           'build',
