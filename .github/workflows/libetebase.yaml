@@ -47,6 +47,12 @@ jobs:
             runs-on: windows-latest
     runs-on: ${{ matrix.runs-on || 'ubuntu-latest' }}
     steps:
+      - name: Install scoop
+        if: runner.os == 'Windows'
+        run: |
+          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+          Join-Path (Resolve-Path ~).Path "scoop\shims" >> $Env:GITHUB_PATH
+        shell: pwsh
       - name: Install Flutter-SDK
         uses: subosito/flutter-action@v2
         with:
