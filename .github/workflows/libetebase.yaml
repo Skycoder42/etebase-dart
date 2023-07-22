@@ -47,14 +47,16 @@ jobs:
             runs-on: windows-latest
     runs-on: ${{ matrix.runs-on || 'ubuntu-latest' }}
     steps:
-      - name: Install Dart-SDK (stable)
-        uses: dart-lang/setup-dart@v1
+      - name: Install Flutter-SDK
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
       - name: Install minisign
         uses: Skycoder42/dart_test_tools/.github/actions/install-minisign@main
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Restore dependencies
-        run: dart pub get
+        run: flutter pub get
         working-directory: packages/etebase_flutter
       - name: Build libetebase binaries
         run: dart run tool/libetebase/build.dart '${{ matrix.platform }}' '${{ env.libetebaseVersion }}'
@@ -75,8 +77,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Install Dart-SDK (stable)
-        uses: dart-lang/setup-dart@v1
+      - name: Install Flutter-SDK
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
       - name: Install minisign
         uses: Skycoder42/dart_test_tools/.github/actions/install-minisign@main
       - name: Checkout Repository
@@ -88,7 +92,7 @@ jobs:
       - name: Create secret key for minisign
         run: echo '${{ secrets.MINISIGN_SECRET_KEY }}' > '${{ runner.temp }}/minisign.key'
       - name: Restore dependencies
-        run: dart pub get
+        run: flutter pub get
         working-directory: packages/etebase_flutter
       - name: Build release archives
         run: dart run tool/libetebase/publish.dart '${{ env.libetebaseVersion }}'
