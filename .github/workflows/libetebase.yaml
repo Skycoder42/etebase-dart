@@ -49,10 +49,13 @@ jobs:
     steps:
       - name: Install Dart-SDK (stable)
         uses: dart-lang/setup-dart@v1
+      - name: Install minisign
+        uses: Skycoder42/dart_test_tools/install-minisign@main
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Install minisign
-        uses: ./.github/actions/install-minisign
+      - name: Restore dependencies
+        run: dart pub get
+        working-directory: packages/etebase_flutter
       - name: Build libetebase binaries
         run: dart run tool/libetebase/build.dart '${{ matrix.platform }}' '${{ env.libetebaseVersion }}'
         working-directory: packages/etebase_flutter
@@ -75,7 +78,7 @@ jobs:
       - name: Install Dart-SDK (stable)
         uses: dart-lang/setup-dart@v1
       - name: Install minisign
-        uses: Skycoder42/dart_test_tools/.github/actions/install-minisign@main
+        uses: Skycoder42/dart_test_tools/install-minisign@main
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Download all binary artifacts
