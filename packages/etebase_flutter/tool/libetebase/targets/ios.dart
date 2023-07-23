@@ -67,7 +67,7 @@ final class IosTarget extends DarwinTarget {
         tmpDir,
         Uri.https(
           'github.com',
-          '/Skycoder42/libsodium_dart_bindings/releases/download/libsodium-binaries%2Fv1.0.18/libsodium-1.0.18-ios.tar.xz',
+          '/Skycoder42/libsodium_dart_bindings/releases/download/libsodium-binaries/v1.0.18/libsodium-1.0.18-ios.tar.xz',
         ),
       );
 
