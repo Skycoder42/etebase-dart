@@ -43,9 +43,9 @@ final class MacosTarget extends DarwinTarget {
     await applyPatch(srcDir);
 
     // delete libsodium pkgconfig
-    final pkgConfigFile = File(
-      '${Platform.environment['HOMEBREW_PREFIX']}/lib/pkgconfig/libsodium.pc',
-    );
+    final brewPrefix =
+        await Github.execLines('brew', const ['--prefix']).single;
+    final pkgConfigFile = File('$brewPrefix/lib/pkgconfig/libsodium.pc');
     Github.logInfo('Deleting ${pkgConfigFile.path}');
     await pkgConfigFile.delete();
   }
