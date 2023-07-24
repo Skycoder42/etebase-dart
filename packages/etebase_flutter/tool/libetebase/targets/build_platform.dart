@@ -9,6 +9,8 @@ abstract base class BuildPlatform<T extends BuildTarget> {
 
   List<T> get targets;
 
+  String get archiveSuffix => 'tar.xz';
+
   Directory installDir(Directory platformDir);
 
   Future<void> createBundle(

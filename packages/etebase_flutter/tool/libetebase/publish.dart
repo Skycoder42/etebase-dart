@@ -48,7 +48,7 @@ Future<void> _createPublishArchive(
         await platform.createBundle(tmpDir, version, binaryMap);
 
         final archive = publishDir.subFile(
-          'libetebase-$version-${platform.name}.tar.xz',
+          'libetebase-$version-${platform.name}.${platform.archiveSuffix}',
         );
         await Archive.compress(inDir: tmpDir, archive: archive);
         await Minisign.sign(archive, secretKey);

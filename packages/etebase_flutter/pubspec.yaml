@@ -18,7 +18,7 @@ dependencies:
   etebase: ^1.0.1+1
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.4
+  plugin_platform_interface: ^2.1.5
 
 dev_dependencies:
   custom_lint: ^0.5.0

@@ -34,7 +34,7 @@ Future<void> _downloadArtifact(String version, BuildPlatform platform) =>
         // download archive
         final uri = Uri.https(
           'github.com',
-          '/Skycoder42/etebase-dart/releases/download/libetebase-binaries/v$version/libetebase-$version-${platform.name}.tar.xz',
+          '/Skycoder42/etebase-dart/releases/download/libetebase-binaries/v$version/libetebase-$version-${platform.name}.${platform.archiveSuffix}',
         );
         Github.logDebug('Downloading $uri');
         final archive = await client.download(tmpDir, uri);

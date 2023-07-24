@@ -36,6 +36,7 @@ final class MacosTarget extends DarwinTarget {
   @override
   Map<String, String> get buildEnv => {
         'MACOSX_DEPLOYMENT_TARGET': '10.14',
+        'LIBSODIUM_NO_PKG_CONFIG': '1',
       };
 
   @override

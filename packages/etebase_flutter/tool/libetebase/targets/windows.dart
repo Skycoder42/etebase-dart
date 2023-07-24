@@ -38,6 +38,9 @@ final class WindowsPlatform extends BuildPlatform<WindowsTarget> {
       ];
 
   @override
+  String get archiveSuffix => 'zip';
+
+  @override
   Directory installDir(Directory platformDir) => platformDir.subDir('lib');
 
   @override
