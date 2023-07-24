@@ -36,11 +36,19 @@ final class MacosTarget extends DarwinTarget {
   @override
   Map<String, String> get buildEnv => const {
         'MACOSX_DEPLOYMENT_TARGET': '10.14',
-        'SODIUM_STATIC': '1',
       };
 
   @override
-  Future<void> fixupSources(Directory srcDir) => applyPatch(srcDir);
+  Future<void> fixupSources(Directory srcDir) async {
+    await applyPatch(srcDir);
+
+    await Github.exec('brew', const [
+      'uninstall',
+      '--ignore-dependencies',
+      'minisign',
+      'libsodium',
+    ]);
+  }
 }
 
 final class MacosPlatform extends DarwinPlatform<MacosTarget> {
