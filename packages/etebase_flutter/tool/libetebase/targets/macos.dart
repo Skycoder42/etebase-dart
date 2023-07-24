@@ -34,20 +34,20 @@ final class MacosTarget extends DarwinTarget {
   String get binaryName => 'libetebase.dylib';
 
   @override
-  Map<String, String> get buildEnv => {
+  Map<String, String> get buildEnv => const {
         'MACOSX_DEPLOYMENT_TARGET': '10.14',
-        'LIBSODIUM_NO_PKG_CONFIG': '1',
       };
 
   @override
   Future<void> fixupSources(Directory srcDir) async {
     await applyPatch(srcDir);
 
-    await Github.exec(
-      'cargo',
-      const ['tree', '-e', 'features', '-i', 'libsodium-sys'],
-      workingDirectory: srcDir,
+    // delete libsodium pkgconfig
+    final pkgConfigFile = File(
+      '${Platform.environment['HOMEBREW_PREFIX']}/lib/pkgconfig/libsodium.pc',
     );
+    Github.logInfo('Deleting ${pkgConfigFile.path}');
+    await pkgConfigFile.delete();
   }
 }
 
