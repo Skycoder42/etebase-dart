@@ -71,7 +71,7 @@ Future<Directory> _cloneRepo(
     );
 
 Future<File> _build(Directory srcDir, BuildTarget target) =>
-    Github.logGroupAsync('Building libetebase for $target', () async {
+    Github.logGroupAsync('Building libetebase for ${target.name}', () async {
       await Github.exec(
         'cargo',
         [

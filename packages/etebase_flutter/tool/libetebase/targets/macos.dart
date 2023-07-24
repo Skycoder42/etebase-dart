@@ -40,7 +40,15 @@ final class MacosTarget extends DarwinTarget {
       };
 
   @override
-  Future<void> fixupSources(Directory srcDir) => applyPatch(srcDir);
+  Future<void> fixupSources(Directory srcDir) async {
+    await applyPatch(srcDir);
+
+    await Github.exec(
+      'cargo',
+      const ['tree', '-e', 'features', '-i', 'libsodium-sys'],
+      workingDirectory: srcDir,
+    );
+  }
 }
 
 final class MacosPlatform extends DarwinPlatform<MacosTarget> {
