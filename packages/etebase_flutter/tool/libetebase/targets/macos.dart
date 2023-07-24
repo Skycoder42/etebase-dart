@@ -39,16 +39,7 @@ final class MacosTarget extends DarwinTarget {
       };
 
   @override
-  Future<void> fixupSources(Directory srcDir) async {
-    await applyPatch(srcDir);
-
-    await Github.exec('brew', const [
-      'uninstall',
-      '--ignore-dependencies',
-      'minisign',
-      'libsodium',
-    ]);
-  }
+  Future<void> fixupSources(Directory srcDir) => applyPatch(srcDir);
 }
 
 final class MacosPlatform extends DarwinPlatform<MacosTarget> {
@@ -77,7 +68,7 @@ final class MacosPlatform extends DarwinPlatform<MacosTarget> {
 
     await Github.exec('install_name_tool', [
       '-id',
-      '@rpath/libsodium.dylib',
+      '@rpath/libetebase.dylib',
       libsodiumDylib.path,
     ]);
   }
