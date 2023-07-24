@@ -36,19 +36,11 @@ final class MacosTarget extends DarwinTarget {
   @override
   Map<String, String> get buildEnv => const {
         'MACOSX_DEPLOYMENT_TARGET': '10.14',
+        'SODIUM_STATIC': '1',
       };
 
   @override
-  Future<void> fixupSources(Directory srcDir) async {
-    await applyPatch(srcDir);
-
-    // delete libsodium pkgconfig
-    final brewPrefix =
-        await Github.execLines('brew', const ['--prefix']).single;
-    final pkgConfigFile = File('$brewPrefix/lib/pkgconfig/libsodium.pc');
-    Github.logInfo('Deleting ${pkgConfigFile.path}');
-    await pkgConfigFile.delete();
-  }
+  Future<void> fixupSources(Directory srcDir) => applyPatch(srcDir);
 }
 
 final class MacosPlatform extends DarwinPlatform<MacosTarget> {
