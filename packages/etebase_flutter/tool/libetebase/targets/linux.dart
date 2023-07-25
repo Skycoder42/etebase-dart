@@ -6,16 +6,29 @@ import 'build_platform.dart';
 import 'build_target.dart';
 
 final class LinuxTarget extends BuildTarget {
-  const LinuxTarget();
+  static const aarch64 = LinuxTarget._(
+    architecture: 'aarch64',
+    rustTarget: 'aarch64-unknown-linux-gnu',
+  );
+  static const x86_64 = LinuxTarget._(
+    architecture: 'x86_64',
+    rustTarget: 'x86_64-unknown-linux-gnu',
+  );
+
+  final String _architecture;
+  @override
+  final String rustTarget;
+
+  const LinuxTarget._({
+    required String architecture,
+    required this.rustTarget,
+  }) : _architecture = architecture;
 
   @override
-  String get name => 'linux';
+  String get name => 'linux_$_architecture';
 
   @override
-  String get rustTarget => 'x86_64-unknown-linux-gnu';
-
-  @override
-  bool get openSslVendored => false;
+  bool get openSslVendored => true;
 
   @override
   String get binaryName => 'libetebase.so';
@@ -29,7 +42,8 @@ final class LinuxPlatform extends BuildPlatform<LinuxTarget> {
 
   @override
   List<LinuxTarget> get targets => const [
-        LinuxTarget(),
+        LinuxTarget.x86_64,
+        LinuxTarget.aarch64,
       ];
 
   @override
@@ -43,9 +57,11 @@ final class LinuxPlatform extends BuildPlatform<LinuxTarget> {
   ) async {
     final versionSplit = version.split('.');
 
-    final MapEntry(key: target, value: binary) = binaries.entries.single;
-    await binary.rename(
-      bundleDir.subFile('${target.binaryName}.${versionSplit[0]}').path,
-    );
+    for (final MapEntry(key: target, value: binary) in binaries.entries) {
+      final archDir = await bundleDir.subDir(target._architecture).create();
+      await binary.rename(
+        archDir.subFile('${target.binaryName}.${versionSplit[0]}').path,
+      );
+    }
   }
 }
