@@ -15,15 +15,7 @@ final class WindowsTarget extends BuildTarget {
   String get rustTarget => 'x86_64-pc-windows-msvc';
 
   @override
-  bool get openSslVendored => false;
-
-  @override
   String get binaryName => 'etebase.dll';
-
-  @override
-  Map<String, String> get buildEnv => const {
-        'OPENSSL_DIR': r'C:\Program Files\OpenSSL',
-      };
 }
 
 final class WindowsPlatform extends BuildPlatform<WindowsTarget> {

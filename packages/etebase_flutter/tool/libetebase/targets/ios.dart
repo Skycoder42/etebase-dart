@@ -41,9 +41,6 @@ final class IosTarget extends DarwinTarget {
       _isSimulator ? 'ios_simulator_$_architecture' : 'ios_$_architecture';
 
   @override
-  bool get openSslVendored => true;
-
-  @override
   String get binaryName => 'libetebase.a';
 
   @override

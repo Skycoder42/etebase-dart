@@ -28,9 +28,6 @@ final class MacosTarget extends DarwinTarget {
   String get name => 'macos_$_architecture';
 
   @override
-  bool get openSslVendored => true;
-
-  @override
   String get binaryName => 'libetebase.dylib';
 
   @override

@@ -28,9 +28,6 @@ final class LinuxTarget extends BuildTarget {
   String get name => 'linux_$_architecture';
 
   @override
-  bool get openSslVendored => true;
-
-  @override
   String get binaryName => 'libetebase.so';
 }
 

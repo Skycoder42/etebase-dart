@@ -58,10 +58,8 @@ Future<Directory> _cloneRepo(
 
         await target.fixupSources(srcDir);
 
-        if (target.openSslVendored) {
-          Github.logInfo('Settings OpenSSL to vendored');
-          await _setOpenSslVendored(srcDir);
-        }
+        Github.logInfo('Setting OpenSSL to vendored');
+        await _setOpenSslVendored(srcDir);
 
         Github.logInfo('Deleting Cargo.lock');
         await srcDir.subFile('Cargo.lock').delete();

@@ -7,8 +7,6 @@ abstract base class BuildTarget {
 
   String get rustTarget;
 
-  bool get openSslVendored;
-
   String get binaryName;
 
   Map<String, String> get buildEnv => const {};

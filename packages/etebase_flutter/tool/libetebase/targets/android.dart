@@ -50,9 +50,6 @@ final class AndroidTarget extends BuildTarget {
   String get name => 'android_$_architecture';
 
   @override
-  bool get openSslVendored => true;
-
-  @override
   String get binaryName => 'libetebase.so';
 
   @override
