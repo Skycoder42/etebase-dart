@@ -29,6 +29,18 @@ final class LinuxTarget extends BuildTarget {
 
   @override
   String get binaryName => 'libetebase.so';
+
+  @override
+  String get buildTool => 'cross';
+
+  @override
+  Future<void> fixupSources(Directory srcDir) async {
+    await Github.exec(
+      'cargo',
+      const ['install', '-f', 'cross'],
+      workingDirectory: srcDir,
+    );
+  }
 }
 
 final class LinuxPlatform extends BuildPlatform<LinuxTarget> {

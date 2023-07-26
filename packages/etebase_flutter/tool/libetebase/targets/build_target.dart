@@ -9,6 +9,8 @@ abstract base class BuildTarget {
 
   String get binaryName;
 
+  String get buildTool => 'cargo';
+
   Map<String, String> get buildEnv => const {};
 
   List<String> get extraBuildArgs => const [];
