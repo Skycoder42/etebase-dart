@@ -6,8 +6,6 @@ import 'build_platform.dart';
 import 'build_target.dart';
 
 final class AndroidTarget extends BuildTarget {
-  static const _ndkVersion = '25.2.9519653';
-
   // ignore: constant_identifier_names
   static const arm64_v8a = AndroidTarget._(
     architecture: 'arm64-v8a',
@@ -63,9 +61,17 @@ final class AndroidTarget extends BuildTarget {
 
   @override
   Map<String, String> get buildEnv {
-    final androidHome = Platform.environment['ANDROID_HOME'];
-    final toolchainPath =
-        '$androidHome/ndk/$_ndkVersion/toolchains/llvm/prebuilt/$_hostArch/bin';
+    final androidHome = Directory(Platform.environment['ANDROID_HOME']!);
+    final ndkHome = androidHome.subDir('ndk');
+    final ndkList = ndkHome.listSync().whereType<Directory>().toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
+    final latestNdk = ndkList.last;
+    final toolchainPath = latestNdk
+        .subDir('toolchains/llvm/prebuilt/$_hostArch/bin')
+        .absolute
+        .path;
+
+    Github.logInfo('Using NDK toolchain: $toolchainPath');
     return {
       'PATH': '$toolchainPath:${Platform.environment['PATH']}',
       'CC': '$_compilerPrefix$_minSdkVersion-clang',
