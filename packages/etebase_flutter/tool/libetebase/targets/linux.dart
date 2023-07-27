@@ -80,13 +80,9 @@ final class LinuxPlatform extends BuildPlatform<LinuxTarget> {
     String version,
     Map<LinuxTarget, File> binaries,
   ) async {
-    final versionSplit = version.split('.');
-
     for (final MapEntry(key: target, value: binary) in binaries.entries) {
       final archDir = await bundleDir.subDir(target._architecture).create();
-      await binary.rename(
-        archDir.subFile('${target.binaryName}.${versionSplit[0]}').path,
-      );
+      await binary.rename(archDir.subFile(target.binaryName).path);
     }
   }
 }
