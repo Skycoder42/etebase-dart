@@ -58,9 +58,18 @@ For all other information regarding the usage of the library, refer to the [eteb
 package.
 
 ### Linux Platform setup
-When working with linux, you need to install https://github.com/etesync/libetebase in a way that the `pkg-config` tool
-can find the installed library. The compile-process of linux search pkg config for a package named `etebase`. When
-deploying a linux application, you need to make sure to bundle the library with your application.
+When working with linux, you can optionally decide to use `pkg-config` for resolving libetebase instead of using the
+bundled library. This will cause the linux build to link against the system library instead of the embedded one,
+providing it is installed.
+
+To enable this mode, simply set the `LIBETEBASE_USE_PKGCONFIG` environment variable to anything but an empty value
+before compiling. Example:
+
+```bash
+export LIBETEBASE_USE_PKGCONFIG=1
+flutter clean # recommended to ensure no build artifacts are cached
+flutter build linux
+```
 
 ## Documentation
 The documentation is available at https://pub.dev/documentation/etebase_flutter/latest/. A basic example can be found at
