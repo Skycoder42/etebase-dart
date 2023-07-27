@@ -61,6 +61,9 @@ Future<Directory> _cloneRepo(
         Github.logInfo('Setting OpenSSL to vendored');
         await _setOpenSslVendored(srcDir);
 
+        Github.logInfo('Enabling size optimizations');
+        await _enableStripSymbols(srcDir);
+
         Github.logInfo('Deleting Cargo.lock');
         await srcDir.subFile('Cargo.lock').delete();
 
@@ -96,6 +99,24 @@ Future<void> _setOpenSslVendored(Directory srcDir) async {
 
   final cargoEntry = '''
 openssl = { version = "^$openSslVersion", features = ["vendored"] }
+''';
+
+  await srcDir.subFile('Cargo.toml').writeAsString(
+        cargoEntry,
+        mode: FileMode.append,
+        flush: true,
+      );
+}
+
+Future<void> _enableStripSymbols(Directory srcDir) async {
+  const cargoEntry = '''
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
 ''';
 
   await srcDir.subFile('Cargo.toml').writeAsString(
