@@ -17,7 +17,11 @@ if(DEFINED ENV{LIBETEBASE_USE_PKGCONFIG})
   pkg_check_modules(ETEBASE REQUIRED IMPORTED_TARGET etebase)
 else()
   add_library(etebase SHARED IMPORTED)
-  set_property(TARGET etebase PROPERTY IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/libetebase.so.0")
+  set_target_properties(etebase PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/${CMAKE_SYSTEM_PROCESSOR}/libetebase.so")
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+  set(CMAKE_INSTALL_RPATH $ORIGIN)
 endif()
 
 # Any new source files that you add to the plugin should be added here.
@@ -65,7 +69,7 @@ if(DEFINED ENV{LIBETEBASE_USE_PKGCONFIG})
   )
 else()
   set(etebase_flutter_bundled_libraries
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/libetebase.so.0"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/${CMAKE_SYSTEM_PROCESSOR}/libetebase.so"
     PARENT_SCOPE
   )
 endif()

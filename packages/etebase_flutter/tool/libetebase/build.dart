@@ -83,8 +83,12 @@ Future<File> _build(Directory srcDir, BuildTarget target) =>
         workingDirectory: srcDir,
       );
 
-      return srcDir
-          .subFile('target/${target.rustTarget}/release/${target.binaryName}');
+      final binary = srcDir.subFile(
+        'target/${target.rustTarget}/release/${target.binaryName}',
+      );
+      await target.postBuild(srcDir, binary);
+
+      return binary;
     });
 
 Future<void> _setOpenSslVendored(Directory srcDir) async {

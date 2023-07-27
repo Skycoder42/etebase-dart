@@ -48,6 +48,15 @@ final class LinuxTarget extends BuildTarget {
       );
     }
   }
+
+  @override
+  Future<void> postBuild(Directory srcDir, File binary) async {
+    await Github.exec('patchelf', [
+      '--set-soname',
+      'libetebase.so',
+      binary.path,
+    ]);
+  }
 }
 
 final class LinuxPlatform extends BuildPlatform<LinuxTarget> {

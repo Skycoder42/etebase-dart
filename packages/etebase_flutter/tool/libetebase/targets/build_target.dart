@@ -16,4 +16,6 @@ abstract base class BuildTarget {
   List<String> get extraBuildArgs => const [];
 
   Future<void> fixupSources(Directory srcDir) => Future.value();
+
+  Future<void> postBuild(Directory srcDir, File binary) => Future.value();
 }
