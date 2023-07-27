@@ -7,6 +7,7 @@ on:
       - "packages/etebase_flutter/**"
       - ".github/workflows/etebase_flutter_ci.yaml"
       - ".github/workflows/etebase_flutter_cd.yaml"
+      - "!packages/etebase_flutter/tool/libetebase/**"
 
 jobs:
   ci:
