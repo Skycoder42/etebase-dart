@@ -1,0 +1,22 @@
+name: etebase_sync
+description: Easy data synchronization based on the etebase library.
+version: 1.0.0
+homepage: https://github.com/Skycoder42/etebase-dart
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  etebase: ^1.0.2
+
+dev_dependencies:
+  custom_lint: ^0.5.0
+  dart_pre_commit: ^5.2.0+1
+  dart_test_tools: ^5.2.0
+  mocktail: ^0.3.0
+  test: ^1.24.4
+
+cider:
+  link_template:
+    tag: https://github.com/Skycoder42/etebase-dart/releases/tag/etebase_sync-v%tag%
+    diff: https://github.com/Skycoder42/etebase-dart/compare/etebase_sync-v%from%...etebase_sync-v%to%
