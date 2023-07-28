@@ -1,10 +1,4 @@
-import 'package:etebase/etebase.dart';
-
 abstract class ItemRepository<T> {
-  Future<EtebaseCollection> getCollection();
-
-  Future<String> getColUid();
-
   Future<List<T>> getAll({bool sync = true});
 
   Future<T> get(String id, {bool sync = true});
