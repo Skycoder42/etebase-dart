@@ -1,0 +1,28 @@
+name: CI/CD for etebase_sync
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "packages/etebase_sync/**"
+      - ".github/workflows/etebase_sync_ci.yaml"
+      - ".github/workflows/etebase_sync_cd.yaml"
+
+jobs:
+  ci:
+    name: CI
+    uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
+    with:
+      workingDirectory: packages/etebase_sync
+      buildRunner: false
+      unitTestPaths: ""
+  cd:
+    name: CD
+    uses: Skycoder42/dart_test_tools/.github/workflows/release.yml@main
+    needs:
+      - ci
+    with:
+      workingDirectory: packages/etebase_sync
+      tagPrefix: etebase_sync-v
+    secrets:
+      githubToken: ${{ secrets.GH_PAT }}
