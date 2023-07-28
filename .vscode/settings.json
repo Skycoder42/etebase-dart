@@ -1,13 +1,17 @@
 {
   "cSpell.words": [
+    "ARGB",
     "disinvite",
     "etebase",
     "finalizer",
+    "lerp",
     "libetebase",
     "Libetebase",
     "nullptr",
     "pubkey",
     "Pubkey",
+    "rgba",
+    "RGBO",
     "signup",
     "stoken",
     "Stoken"
