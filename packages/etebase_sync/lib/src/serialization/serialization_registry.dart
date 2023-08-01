@@ -1,5 +1,7 @@
 import 'serializer.dart';
 
-abstract class SerializationRegistry {
-  Serializer getSerializer(String itemType);
+abstract interface class SerializationRegistry {
+  String? findItemType(Type type);
+
+  Serializer getSerializer(String? itemType);
 }
