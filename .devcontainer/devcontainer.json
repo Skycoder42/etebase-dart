@@ -5,7 +5,8 @@
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
-			"TAG": "v0.5.5"
+			"LIBETEBASE_TAG": "v0.5.5",
+			"ETEBASE_SERVER_TAG": "0.11.0"
 		}
 	},
 	"customizations": {

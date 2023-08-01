@@ -11,6 +11,12 @@ scripts:
       dart pub global run melos exec -c1 --no-flutter -- dart pub get &&
       dart pub global run melos exec -c1 --flutter -- flutter pub get
 
+  build:
+    run: >-
+      dart pub global run melos exec
+      --depends-on=build_runner
+      -- dart run build_runner build --delete-conflicting-outputs
+
   pre-commit:init:
     run: >-
       bash -c "echo -e
