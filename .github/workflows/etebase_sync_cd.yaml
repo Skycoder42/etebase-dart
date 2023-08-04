@@ -15,4 +15,4 @@ jobs:
       environment: pub-deploy
       tagPrefix: etebase_sync-v
       workingDirectory: packages/etebase_sync
-      buildRunner: false
+      buildRunner: true

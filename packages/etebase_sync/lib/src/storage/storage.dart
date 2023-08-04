@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:etebase/etebase.dart';
+
+typedef OnSavedCb = FutureOr<void> Function();
 
 abstract interface class Storage {
   Future<EtebaseItem?> load(String uid);
 
-  Future<void> save(EtebaseItem item);
-  Future<void> saveAll(Iterable<EtebaseItem> items);
+  void save(EtebaseItem item);
+
+  void delete(String uid);
 }

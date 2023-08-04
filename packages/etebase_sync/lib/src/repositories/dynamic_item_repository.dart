@@ -1,37 +1,39 @@
+import 'dart:async';
+
 import 'package:etebase/etebase.dart';
 
-import '../serialization/serialization_registry.dart';
-import '../storage/storage.dart';
+import '../items/dispose_ref.dart';
+import '../items/local_item_manager.dart';
+import '../items/sync_item.dart';
+
+// TODO exception handling on the *Many functions
 
 abstract class DynamicItemRepository {
   final String colUid;
 
-  final EtebaseItemManager _itemManager;
-  final Storage _storage;
-  final SerializationRegistry _serializationRegistry;
+  final EtebaseItemManager _etebaseItemManager;
+  final LocalItemManager _localItemManager;
 
   DynamicItemRepository({
     required this.colUid,
-    required EtebaseItemManager itemManager,
-    required Storage storage,
-    required SerializationRegistry serializationRegistry,
-  })  : _itemManager = itemManager,
-        _storage = storage,
-        _serializationRegistry = serializationRegistry;
+    required EtebaseItemManager etebaseItemManager,
+    required LocalItemManager localItemManager,
+  })  : _etebaseItemManager = etebaseItemManager,
+        _localItemManager = localItemManager;
 
   Stream<dynamic> getAll({
     bool sync = true,
     int? limit,
   }) =>
       _streamItems(
-        fetchNext: _itemManager.list,
+        fetchNext: _etebaseItemManager.list,
         limit: limit,
       );
 
   Future<dynamic> get(String id, {bool sync = true}) async {
-    final etebaseItem = await _itemManager.fetch(id);
-    await _storage.save(etebaseItem);
-    return _deserializeItem(etebaseItem);
+    final etebaseItem = await _etebaseItemManager.fetch(id);
+    final syncItem = await _localItemManager.attach(etebaseItem);
+    return syncItem.data;
   }
 
   Stream<dynamic> getMany(
@@ -41,7 +43,7 @@ abstract class DynamicItemRepository {
   }) =>
       _streamItems(
         // ignore: discarded_futures
-        fetchNext: (options) => _itemManager.fetchMulti(ids, options),
+        fetchNext: (options) => _etebaseItemManager.fetchMulti(ids, options),
         limit: limit,
       );
 
@@ -50,17 +52,11 @@ abstract class DynamicItemRepository {
     String? itemType,
     bool transaction = true,
   }) async {
-    final etebaseItem = await _createItem(item, itemType);
-    await _storage.save(etebaseItem);
+    final syncItem = await _localItemManager.create(itemType, item);
 
-    if (transaction) {
-      await _itemManager.transaction([etebaseItem]);
-    } else {
-      await _itemManager.batch([etebaseItem]);
-    }
-    await _storage.save(etebaseItem);
+    await _upload([syncItem], transaction);
 
-    return etebaseItem.getUid();
+    return syncItem.uid;
   }
 
   Future<List<String>> createMany(
@@ -68,53 +64,50 @@ abstract class DynamicItemRepository {
     String? itemType,
     bool transaction = true,
   }) async {
-    final etebaseItems = await Stream.fromIterable(items)
-        .asyncMap((item) => _createItem(item, itemType))
+    final syncItems = await Stream.fromIterable(items)
+        .asyncMap((item) => _localItemManager.create(itemType, item))
         .toList();
-    await _storage.saveAll(etebaseItems);
 
-    if (transaction) {
-      await _itemManager.transaction(etebaseItems);
-    } else {
-      await _itemManager.batch(etebaseItems);
-    }
-    await _storage.saveAll(etebaseItems);
+    await _upload(syncItems, transaction);
 
-    return Stream.fromIterable(etebaseItems)
-        .asyncMap((item) => item.getUid())
-        .toList();
+    return syncItems.map((s) => s.uid).toList();
   }
 
   Future<void> update(
     String id,
     dynamic item, {
     bool transaction = true,
-    String? itemType,
   }) async {
-    final etebaseItem = await _storage.load(id);
-    if (etebaseItem == null) {
-      throw Exception('TODO');
+    final syncItem = await _localItemManager.restore(id);
+    if (syncItem == null) {
+      throw Exception('TODO: $id');
     }
 
-    final serializer = _serializationRegistry.getSerializer(itemType);
-    final meta = await etebaseItem.getMeta();
-    await etebaseItem.setMeta(meta.copyWith(itemType: itemType));
-    await etebaseItem.setContent(serializer.serialize(item));
-    await _storage.save(etebaseItem);
-
-    if (transaction) {
-      await _itemManager.transaction([etebaseItem]);
-    } else {
-      await _itemManager.batch([etebaseItem]);
-    }
-    await _storage.save(etebaseItem);
+    final updatedSyncItem = await _localItemManager.update(syncItem, item);
+    await _upload([updatedSyncItem], transaction);
   }
 
   Future<void> updateMany(
     Map<String, dynamic> items, {
     bool transaction = true,
     String? itemType,
-  });
+    bool forceItemType = false,
+  }) async {
+    final updatedSyncItems = <SyncItem>[];
+    final failedIds = <String>[];
+
+    for (final MapEntry(key: id, value: item) in items.entries) {
+      final syncItem = await _localItemManager.restore(id);
+      if (syncItem == null) {
+        failedIds.add(id);
+      } else {
+        updatedSyncItems.add(await _localItemManager.update(syncItem, item));
+      }
+    }
+
+    await _upload(updatedSyncItems, transaction);
+    throw Exception('TODO: $failedIds');
+  }
 
   Future<void> delete(String id);
 
@@ -138,34 +131,30 @@ abstract class DynamicItemRepository {
         ),
       );
 
-      stoken = await etebaseItems.getStoken();
-      isDone = await etebaseItems.isDone();
+      final disposable = Disposable(etebaseItems.dispose);
+      try {
+        stoken = await etebaseItems.getStoken();
+        isDone = await etebaseItems.isDone();
 
-      final data = await etebaseItems.getData();
-      await _storage.saveAll(data);
-      yield* Stream.fromIterable(data).asyncMap(_deserializeItem);
+        final data = await etebaseItems.getData();
 
-      await etebaseItems.dispose();
+        yield* _localItemManager
+            .attachAll(data, disposable: Disposable(etebaseItems.dispose))
+            .map((s) => s.data);
+      } finally {
+        await disposable.unlockDispose();
+      }
     }
   }
 
-  Future<EtebaseItem> _createItem(dynamic item, String? itemType) async {
-    final serializer = _serializationRegistry.getSerializer(itemType);
-    final etebaseItem = await _itemManager.create(
-      EtebaseItemMetadata(
-        itemType: itemType,
-        mtime: DateTime.now(),
-      ),
-      serializer.serialize(item),
-    );
-    return etebaseItem;
-  }
+  Future<void> _upload(Iterable<SyncItem> syncItems, bool transaction) async {
+    if (transaction) {
+      await _etebaseItemManager
+          .transaction(syncItems.map((s) => s.item).toList());
+    } else {
+      await _etebaseItemManager.batch(syncItems.map((s) => s.item).toList());
+    }
 
-  Future<dynamic> _deserializeItem(EtebaseItem etebaseItem) async {
-    final metadata = await etebaseItem.getMeta();
-    final serializer = _serializationRegistry.getSerializer(metadata.itemType);
-
-    final content = await etebaseItem.getContent();
-    return serializer.deserialize(content);
+    syncItems.forEach(_localItemManager.refreshCache);
   }
 }
