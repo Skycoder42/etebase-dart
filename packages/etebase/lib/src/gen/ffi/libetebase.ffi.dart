@@ -778,7 +778,8 @@ class LibEtebaseFFI {
 
   late final _etebase_collection_list_response_get_removed_membershipsPtr =
       _lookup<
-              ffi.NativeFunction<
+              ffi
+              .NativeFunction<
                   ffi.Int32 Function(ffi.Pointer<EtebaseCollectionListResponse>,
                       ffi.Pointer<ffi.Pointer<EtebaseRemovedCollection>>)>>(
           'etebase_collection_list_response_get_removed_memberships');
@@ -1172,8 +1173,8 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_fetch_options_destroyPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<EtebaseFetchOptions>)>>(
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<EtebaseFetchOptions>)>>(
       'etebase_fetch_options_destroy');
   late final _etebase_fetch_options_destroy = _etebase_fetch_options_destroyPtr
       .asFunction<void Function(ffi.Pointer<EtebaseFetchOptions>)>();
@@ -1420,8 +1421,8 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_item_metadata_destroyPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<EtebaseItemMetadata>)>>(
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<EtebaseItemMetadata>)>>(
       'etebase_item_metadata_destroy');
   late final _etebase_item_metadata_destroy = _etebase_item_metadata_destroyPtr
       .asFunction<void Function(ffi.Pointer<EtebaseItemMetadata>)>();
@@ -2345,8 +2346,8 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_item_manager_destroyPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<EtebaseItemManager>)>>(
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<EtebaseItemManager>)>>(
       'etebase_item_manager_destroy');
   late final _etebase_item_manager_destroy = _etebase_item_manager_destroyPtr
       .asFunction<void Function(ffi.Pointer<EtebaseItemManager>)>();
@@ -2385,9 +2386,9 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_collection_verifyPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Bool Function(
-              ffi.Pointer<EtebaseCollection>)>>('etebase_collection_verify');
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<EtebaseCollection>)>>(
+      'etebase_collection_verify');
   late final _etebase_collection_verify = _etebase_collection_verifyPtr
       .asFunction<bool Function(ffi.Pointer<EtebaseCollection>)>();
 
@@ -2561,9 +2562,9 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_collection_deletePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(
-              ffi.Pointer<EtebaseCollection>)>>('etebase_collection_delete');
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<EtebaseCollection>)>>(
+      'etebase_collection_delete');
   late final _etebase_collection_delete = _etebase_collection_deletePtr
       .asFunction<int Function(ffi.Pointer<EtebaseCollection>)>();
 
@@ -2579,8 +2580,8 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_collection_is_deletedPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Bool Function(ffi.Pointer<EtebaseCollection>)>>(
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<EtebaseCollection>)>>(
       'etebase_collection_is_deleted');
   late final _etebase_collection_is_deleted = _etebase_collection_is_deletedPtr
       .asFunction<bool Function(ffi.Pointer<EtebaseCollection>)>();
@@ -2714,9 +2715,9 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_collection_destroyPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<EtebaseCollection>)>>('etebase_collection_destroy');
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<EtebaseCollection>)>>(
+      'etebase_collection_destroy');
   late final _etebase_collection_destroy = _etebase_collection_destroyPtr
       .asFunction<void Function(ffi.Pointer<EtebaseCollection>)>();
 
@@ -3036,8 +3037,8 @@ class LibEtebaseFFI {
   }
 
   late final _etebase_user_profile_destroyPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<EtebaseUserProfile>)>>(
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<EtebaseUserProfile>)>>(
       'etebase_user_profile_destroy');
   late final _etebase_user_profile_destroy = _etebase_user_profile_destroyPtr
       .asFunction<void Function(ffi.Pointer<EtebaseUserProfile>)>();

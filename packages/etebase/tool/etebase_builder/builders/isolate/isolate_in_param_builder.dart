@@ -250,7 +250,7 @@ class IsolateInParamBuilder {
             refer('_${parameterType.name.lowerFirstChar()}ToNative').call([
               IsolateBuilder.libEtebaseRef,
               IsolateBuilder.poolRef,
-              argument
+              argument,
             ]),
           )
           .statement;
@@ -343,7 +343,7 @@ class IsolateInParamBuilder {
                     'should be 32 bytes long, '
                     'but has \$${sizeVariable.symbol} bytes',
                   ),
-                  literalString(parameter.name)
+                  literalString(parameter.name),
                 ])
                 .thrown
                 .statement,

@@ -50,7 +50,7 @@ class IsolateBuilder {
           'prefer_const_constructors',
           'unused_element',
           'unused_local_variable',
-          'public_member_api_docs'
+          'public_member_api_docs',
         ])
         ..directives.add(Directive.import('package:ffi/ffi.dart'))
         ..body.add(_buildHandler(methods))
@@ -87,7 +87,7 @@ class IsolateBuilder {
             literalString('Method does not exist'),
           ])
           .thrown
-          .statement
+          .statement,
     ]);
 
     return Method(

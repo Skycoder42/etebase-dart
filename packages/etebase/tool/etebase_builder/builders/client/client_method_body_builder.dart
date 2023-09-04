@@ -88,7 +88,7 @@ class ClientMethodBodyBuilder {
       final expression = Types.TransferableTypedData$.newInstanceNamed(
         'fromList',
         [
-          literalList([refer(param.name)])
+          literalList([refer(param.name)]),
         ],
       );
 
@@ -212,7 +212,7 @@ class ClientMethodBodyBuilder {
                         isolateRef,
                         withOwner: true,
                       ).code,
-                  ).closure
+                  ).closure,
                 ])
                 .property('toList')
                 .call(const [])

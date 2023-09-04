@@ -60,7 +60,7 @@ class ClientClassBuilder {
               ..name = _ownerName
               ..type = Types.Object$.asNullable
               ..modifier = FieldModifier.final$,
-          )
+          ),
         ])
         ..constructors.add(_buildConstructor())
         ..methods.addAll([

@@ -127,7 +127,7 @@ class IsolateReturnBuilder {
         if (thrown)
           _buildErrorThrow().statement
         else
-          _buildErrorReturn().statement
+          _buildErrorReturn().statement,
       ]);
 
   Code _checkPointerSuccess(
@@ -138,7 +138,7 @@ class IsolateReturnBuilder {
         if (thrown)
           _buildErrorThrow().statement
         else
-          _buildErrorReturn().statement
+          _buildErrorReturn().statement,
       ]);
 
   Code _buildReturnStatement(Expression result, TypeRef type) =>
@@ -239,7 +239,7 @@ class IsolateReturnBuilder {
             .property('cast')
             .call(const [], const {}, [Types.Uint8$])
             .property('asTypedList')
-            .call([length])
+            .call([length]),
       ]),
     ]);
   }

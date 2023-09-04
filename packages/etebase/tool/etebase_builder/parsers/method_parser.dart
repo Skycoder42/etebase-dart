@@ -134,7 +134,7 @@ class MethodParser {
   ];
 
   static final _methodsWithLengthConstants = [
-    'etebase_utils_pretty_fingerprint'
+    'etebase_utils_pretty_fingerprint',
   ];
 
   final ParamParser _paramParser;
@@ -223,7 +223,7 @@ class MethodParser {
         methodName: method.name,
         parameters: method.parameters,
         typeDefs: typeDefs,
-      )
+      ),
     ];
 
     return MethodRef(
