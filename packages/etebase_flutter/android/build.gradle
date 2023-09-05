@@ -25,6 +25,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    if (project.android.hasProperty("namespace")) {
+        namespace 'de.skycoder42.etebase_flutter'
+    }
+
     compileSdkVersion 33
 
     compileOptions {
@@ -41,6 +45,6 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 19
     }
 }
