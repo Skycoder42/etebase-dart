@@ -61,7 +61,7 @@ jobs:
       - name: Install minisign
         uses: Skycoder42/dart_test_tools/.github/actions/install-minisign@main
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Restore dependencies
         run: flutter pub get
         working-directory: packages/etebase_flutter
@@ -91,7 +91,7 @@ jobs:
       - name: Install minisign
         uses: Skycoder42/dart_test_tools/.github/actions/install-minisign@main
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download all binary artifacts
         uses: actions/download-artifact@v3
         with:
