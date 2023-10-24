@@ -3,15 +3,14 @@ import 'dart:io';
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
+import 'package:uuid/data.dart';
+import 'package:uuid/rng.dart';
 import 'package:uuid/uuid.dart';
-import 'package:uuid/uuid_util.dart';
 
 const _libEtebaseBasePath = 'tool/integration/libetebase/lib/';
 
-const _uuid = Uuid(
-  options: <String, dynamic>{
-    'grng': UuidUtil.cryptoRNG,
-  },
+final _uuid = Uuid(
+  goptions: GlobalOptions(CryptoRNG()),
 );
 
 final serverUri = Uri.http('localhost:3735', '/');
