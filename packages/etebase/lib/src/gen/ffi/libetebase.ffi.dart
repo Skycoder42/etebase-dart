@@ -778,8 +778,7 @@ class LibEtebaseFFI {
 
   late final _etebase_collection_list_response_get_removed_membershipsPtr =
       _lookup<
-              ffi
-              .NativeFunction<
+              ffi.NativeFunction<
                   ffi.Int32 Function(ffi.Pointer<EtebaseCollectionListResponse>,
                       ffi.Pointer<ffi.Pointer<EtebaseRemovedCollection>>)>>(
           'etebase_collection_list_response_get_removed_memberships');
@@ -4358,12 +4357,15 @@ final class EtebaseUser extends ffi.Opaque {}
 final class EtebaseUserProfile extends ffi.Opaque {}
 
 typedef EtebaseErrorCode = ffi.Uint32;
+typedef DartEtebaseErrorCode = int;
 typedef EtebaseCollectionListResponse
     = EtebaseCollectionListResponse_Collection;
 typedef EtebaseItemListResponse = EtebaseItemListResponse_Item;
 typedef EtebaseItemRevisionsListResponse = EtebaseIteratorListResponse_Item;
 typedef EtebasePrefetchOption = ffi.Uint32;
+typedef DartEtebasePrefetchOption = int;
 typedef EtebaseCollectionAccessLevel = ffi.Uint32;
+typedef DartEtebaseCollectionAccessLevel = int;
 typedef EtebaseInvitationListResponse
     = EtebaseIteratorListResponse_SignedInvitation;
 typedef EtebaseMemberListResponse
