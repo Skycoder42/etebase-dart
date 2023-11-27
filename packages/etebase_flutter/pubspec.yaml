@@ -18,12 +18,12 @@ dependencies:
   etebase: ^1.0.2
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.6
+  plugin_platform_interface: ^2.1.7
 
 dev_dependencies:
-  custom_lint: ^0.5.3
+  custom_lint: ^0.5.7
   dart_pre_commit: ^5.2.1
-  dart_test_tools: ^5.3.0
+  dart_test_tools: ^5.5.0
 
 flutter:
   plugin:
