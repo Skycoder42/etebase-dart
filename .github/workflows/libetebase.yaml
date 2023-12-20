@@ -69,7 +69,7 @@ jobs:
         run: dart run tool/libetebase/build.dart '${{ matrix.platform }}' '${{ env.libetebaseVersion }}'
         working-directory: packages/etebase_flutter
       - name: Create artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: libetebase-${{ matrix.platform }}
           path: ${{ runner.temp }}/libetebase-${{ matrix.platform }}
