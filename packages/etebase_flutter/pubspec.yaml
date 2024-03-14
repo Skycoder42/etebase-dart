@@ -1,11 +1,11 @@
 name: etebase_flutter
 description: Flutter platform plugins for the dart bindings of libetebase
-version: 1.1.0
+version: 1.1.1
 homepage: https://github.com/Skycoder42/etebase-dart
 
 environment:
-  sdk: "^3.1.0"
-  flutter: ">=3.13.0"
+  sdk: ^3.3.0
+  flutter: ">=3.19.0"
 
 platforms:
   android:
@@ -15,15 +15,15 @@ platforms:
   windows:
 
 dependencies:
-  etebase: ^1.0.2
+  etebase: ^1.0.3
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.7
+  plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
-  custom_lint: ">=0.5.7 <0.7.0"
-  dart_pre_commit: ^5.2.1
-  dart_test_tools: ^5.5.0
+  custom_lint: ^0.6.2
+  dart_pre_commit: ^5.3.0
+  dart_test_tools: ^5.6.2
 
 flutter:
   plugin:

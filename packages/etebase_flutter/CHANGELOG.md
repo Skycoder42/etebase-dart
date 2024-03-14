@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2024-03-14
+### Changed
+- Updated dependencies
+- Updated minimum etebase to 1.0.3
+- Updated minimum required dart sdk to 3.3.0
+- Updated minimum required flutter sdk to 3.19.0
+- Updated embedded libetebase to v0.5.6
+
 ## [1.1.0] - 2023-07-27
 ### Added
 - Add support for ios simulator on arm and arm64 linux
@@ -21,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
+[1.1.1]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter-v1.1.0...etebase_flutter-v1.1.1
 [1.1.0]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter-v1.0.1...etebase_flutter-v1.1.0
 [1.0.1]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter%2Fv1.0.0...etebase_flutter-v1.0.1
 [1.0.0]: https://github.com/Skycoder42/etebase-dart/releases/tag/etebase_flutter%2Fv1.0.0
