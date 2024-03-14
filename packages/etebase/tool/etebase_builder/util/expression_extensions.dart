@@ -21,7 +21,7 @@ class _AssertStatement implements Code, Spec {
     if (_message != null) {
       context.write(', ');
       // ignore: unnecessary_cast
-      (literalString(_message!) as Spec).accept(visitor, context);
+      (literalString(_message) as Spec).accept(visitor, context);
     }
     context.write(');');
 

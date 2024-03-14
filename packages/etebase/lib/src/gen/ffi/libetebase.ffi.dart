@@ -27,9 +27,6 @@ class LibEtebaseFFI {
   int get ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE =>
       _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE.value;
 
-  set ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE(int value) =>
-      _ETEBASE_UTILS_PRETTY_FINGERPRINT_SIZE.value = value;
-
   /// Get the error code
   ///
   /// Call this immediately after a failed API call

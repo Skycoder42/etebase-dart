@@ -56,7 +56,7 @@ class IfThen implements Code, Spec {
 
     if (_else != null) {
       context.write(' else {');
-      _else!.acceptAll(visitor, context);
+      _else.acceptAll(visitor, context);
       context.write('}');
     }
 

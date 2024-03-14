@@ -12,8 +12,7 @@ jobs:
     permissions:
       id-token: write
     with:
-      environment: pub-deploy
       tagPrefix: etebase_flutter-v
       workingDirectory: packages/etebase_flutter
       flutter: true
-      prePublish: dart run tool/libetebase/download.dart 0.5.5
+      prePublish: dart run tool/libetebase/download.dart 0.5.6

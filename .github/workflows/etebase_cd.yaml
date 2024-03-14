@@ -12,7 +12,6 @@ jobs:
     permissions:
       id-token: write
     with:
-      environment: pub-deploy
       tagPrefix: etebase-v
       workingDirectory: packages/etebase
       buildRunner: true

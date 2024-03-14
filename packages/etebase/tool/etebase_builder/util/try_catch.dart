@@ -77,7 +77,7 @@ class TryCatch implements Code, Spec {
 
     if (_finally != null) {
       context.write(' finally {');
-      _finally!.acceptAll(visitor, context);
+      _finally.acceptAll(visitor, context);
       context.write('}');
     }
 
