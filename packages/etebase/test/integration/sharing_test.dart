@@ -1,5 +1,5 @@
 @TestOn('!windows')
-library sharing_test;
+library;
 
 import 'dart:typed_data';
 

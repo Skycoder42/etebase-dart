@@ -45,6 +45,7 @@ class ClientDataClassBuilder {
     return Class(
       (b) => b
         ..name = clazz.name
+        ..sealed = true
         ..annotations.add(Types.freezed$)
         ..mixins.add(refer('_\$${clazz.name}'))
         ..constructors.add(

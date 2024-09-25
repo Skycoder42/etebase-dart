@@ -6,6 +6,7 @@
 
 // ignore_for_file: avoid_positional_boolean_parameters, comment_references
 // ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: missing_code_block_language_in_doc_comment
 // ignore_for_file: prefer_if_elements_to_conditional_expressions
 // ignore_for_file: prefer_relative_imports, require_trailing_commas
 // ignore_for_file: unused_element
@@ -39,7 +40,7 @@ Future<Uri> etebaseGetDefaultServerUrl() async {
 
 /// The dart binding of the EtebaseUser rust class
 @freezed
-class EtebaseUser with _$EtebaseUser {
+sealed class EtebaseUser with _$EtebaseUser {
   /// Return a new user instance
   ///
   /// Should be destroyed with `etebase_user_destroy`
@@ -61,7 +62,7 @@ class EtebaseUser with _$EtebaseUser {
 
 /// The dart binding of the EtebaseItemMetadata rust class
 @freezed
-class EtebaseItemMetadata with _$EtebaseItemMetadata {
+sealed class EtebaseItemMetadata with _$EtebaseItemMetadata {
   /// Create a new metadata object
   ///
   /// Should be destroyed with `etebase_item_metadata_destroy`
@@ -95,7 +96,7 @@ class EtebaseItemMetadata with _$EtebaseItemMetadata {
 
 /// The dart binding of the EtebaseFetchOptions rust class
 @freezed
-class EtebaseFetchOptions with _$EtebaseFetchOptions {
+sealed class EtebaseFetchOptions with _$EtebaseFetchOptions {
   /// Return a new fetch options object
   ///
   /// Should be destroyed with `etebase_fetch_options_destroy`

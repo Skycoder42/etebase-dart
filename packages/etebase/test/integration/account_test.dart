@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_lambdas
 @TestOn('!windows')
-library account_test;
+library;
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';

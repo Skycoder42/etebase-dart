@@ -1,5 +1,5 @@
 @TestOn('!windows')
-library fs_cache_test;
+library;
 
 import 'dart:io';
 import 'dart:typed_data';

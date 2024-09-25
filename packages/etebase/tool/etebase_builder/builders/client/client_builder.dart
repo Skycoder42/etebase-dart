@@ -27,6 +27,7 @@ class ClientBuilder {
             'prefer_relative_imports',
             'prefer_if_elements_to_conditional_expressions',
             'unused_element',
+            'missing_code_block_language_in_doc_comment',
           ])
           ..directives.add(
             Directive.import(

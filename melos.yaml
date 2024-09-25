@@ -6,9 +6,38 @@ packages:
 
 scripts:
   get:
-    run: >-
-      dart pub global run melos exec -c1 --no-flutter -- dart pub get &&
-      dart pub global run melos exec -c1 --flutter -- flutter pub get
+    steps:
+      - get:dart
+      - get:flutter
+
+  get:dart:
+    packageFilters:
+      flutter: false
+    exec: dart pub get
+
+  get:flutter:
+    packageFilters:
+      flutter: true
+    exec: flutter pub get
+
+  upgrade:
+    steps:
+      - upgrade:dart
+      - upgrade:flutter
+
+  upgrade:dart:
+    packageFilters:
+      flutter: false
+    exec: >-
+      dart pub add 'dev:flutter:{"sdk":"flutter"}' &&
+      dart pub upgrade --major-versions --tighten &&
+      dart pub remove flutter &&
+      dart pub upgrade
+
+  upgrade:flutter:
+    packageFilters:
+      flutter: true
+    exec: flutter pub upgrade --major-versions --tighten
 
   pre-commit:init:
     run: >-
@@ -22,5 +51,5 @@ scripts:
     description: Remove pre commit hooks
 
   pre-commit:run:
-    run: dart pub global run melos exec -c1 -- dart run dart_pre_commit
+    exec: dart run dart_pre_commit
     description: Run pre commit hooks in all projects

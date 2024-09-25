@@ -1,5 +1,5 @@
 @TestOn('!windows')
-library collection_test;
+library;
 
 import 'dart:convert';
 import 'dart:typed_data';

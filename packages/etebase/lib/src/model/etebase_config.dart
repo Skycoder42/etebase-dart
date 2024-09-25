@@ -6,7 +6,7 @@ part 'etebase_config.freezed.dart';
 
 /// A configuration to set global parameters for etebase.
 @freezed
-class EtebaseConfig with _$EtebaseConfig {
+sealed class EtebaseConfig with _$EtebaseConfig {
   /// Default constructor.
   const factory EtebaseConfig({
     /// The size of getContent buffer allocations if no explicit size is given.

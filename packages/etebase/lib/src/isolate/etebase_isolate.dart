@@ -127,7 +127,6 @@ class EtebaseIsolate {
           receivePort.sendPort,
         ),
         debugName: '$EtebaseIsolate',
-        errorsAreFatal: true,
         onExit: exitPort.sendPort,
       );
 

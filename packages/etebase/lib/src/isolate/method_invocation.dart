@@ -7,7 +7,7 @@ part 'method_invocation.freezed.dart';
 /// @nodoc
 @freezed
 @internal
-class MethodInvocation with _$MethodInvocation {
+sealed class MethodInvocation with _$MethodInvocation {
   /// @nodoc
   const factory MethodInvocation(
     int id,
