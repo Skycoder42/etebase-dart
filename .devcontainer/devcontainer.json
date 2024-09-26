@@ -23,7 +23,10 @@
 				"timonwong.shellcheck"
 			],
 			"settings": {
-				"terminal.integrated.defaultProfile.linux": "zsh"
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"terminal.integrated.env.linux": {
+					"LIBETEBASE_PATH": "/usr/lib/libetebase.so"
+				}
 			}
 		}
 	},
@@ -31,7 +34,8 @@
 		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
 			"plugins": "git colorize vscode",
 			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions"
-		}
+		},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
 	"postCreateCommand": "melos run pre-commit:init"
 }

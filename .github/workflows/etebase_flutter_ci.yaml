@@ -18,7 +18,7 @@ jobs:
       buildRunner: false
       unitTestPaths: ""
       integrationTestProject: example
-      integrationTestPaths: integration_test
+      integrationTestPaths: integration_test/app_test.dart
       integrationTestSetup: >-
         {
           "android": "dart run tool/libetebase/download.dart 0.5.6 android",
