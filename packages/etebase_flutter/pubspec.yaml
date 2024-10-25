@@ -21,7 +21,7 @@ dependencies:
   plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
-  custom_lint: ^0.6.7
+  custom_lint: ^0.6.8
   dart_pre_commit: ^5.4.0
   dart_test_tools: ^6.0.0
 
