@@ -1,0 +1,9 @@
+presets:
+  unit:
+    paths:
+      - test/unit
+
+  integration:
+    concurrency: 1
+    paths:
+      - test/integration
