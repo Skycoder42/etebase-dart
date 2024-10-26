@@ -1,3 +1,5 @@
+import 'package:sodium/sodium_sumo.dart';
+
 import '../../impl/managers/client.dart';
 import '../../impl/rest/etebase_api_client.dart';
 
@@ -8,7 +10,7 @@ abstract interface class EtebaseClient {
 
   /// Creates a new etebase client.
   factory EtebaseClient.create(
-    String clientName, [
+    SodiumSumo sodium, [
     Uri? serverUrl,
   ]) = Client.create;
 
