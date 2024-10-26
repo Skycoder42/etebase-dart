@@ -1,12 +1,15 @@
 import 'dart:typed_data';
 
+import 'base/etebase_cloneable.dart';
 import 'etebase_collection_access_level.dart';
 
 /// The dart binding of the EtebaseSignedInvitation rust class
-abstract class EtebaseSignedInvitation {
+abstract class EtebaseSignedInvitation
+    implements EtebaseCloneable<EtebaseSignedInvitation> {
   /// Clone the invitation object
   ///
   /// @param this_ the object handle
+  @override
   EtebaseSignedInvitation clone();
 
   /// The uid of the invitation

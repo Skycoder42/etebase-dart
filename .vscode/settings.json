@@ -4,13 +4,11 @@
     "etebase",
     "finalizer",
     "libetebase",
-    "Libetebase",
     "nullptr",
     "pubkey",
-    "Pubkey",
     "signup",
     "stoken",
-    "Stoken"
+    "cloneable"
   ],
   "dart.runPubGetOnPubspecChanges": "never",
   "cmake.configureOnOpen": false
