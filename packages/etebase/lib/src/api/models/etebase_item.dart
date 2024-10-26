@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
+import 'base/etebase_cloneable.dart';
 import 'etebase_item_metadata.dart';
 
 /// The dart binding of the EtebaseItem rust class
-abstract class EtebaseItem {
+abstract class EtebaseItem implements EtebaseCloneable<EtebaseItem> {
   /// Clone an item object
   ///
   /// @param this_ the object handle
+  @override
   EtebaseItem clone();
 
   /// Manually verify the integrity of the item
