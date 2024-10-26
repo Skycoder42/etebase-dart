@@ -1,25 +1,20 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'etebase_user.freezed.dart';
+part 'etebase_user.g.dart';
 
-/// The dart binding of the EtebaseUser rust class
+/// A etebase user object for signing up
 @freezed
 sealed class EtebaseUser with _$EtebaseUser {
-  /// Return a new user instance
-  ///
-  /// Should be destroyed with `etebase_user_destroy`
-  ///
-  /// @param username the user's username
-  /// @param email the user's email
+  /// Default constructor
   const factory EtebaseUser({
-    /// Get the username
-    ///
-    /// @param this_ the object handle
+    /// The username
     required String username,
 
-    /// Get the email address
-    ///
-    /// @param this_ the object handle
+    /// The email address
     required String email,
   }) = _EtebaseUser;
+
+  factory EtebaseUser.fromJson(Map<String, dynamic> json) =>
+      _$EtebaseUserFromJson(json);
 }

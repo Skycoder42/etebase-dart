@@ -1,20 +1,17 @@
-/// The URL of the main hosted server
-Uri etebaseGetDefaultServerUrl() => throw UnimplementedError();
+import '../../impl/managers/client.dart';
+import '../../impl/rest/etebase_api_client.dart';
 
 /// The dart binding of the EtebaseClient rust class
-abstract class EtebaseClient {
+abstract interface class EtebaseClient {
+  /// The URL of the main hosted server
+  static Uri get defaultServerUrl => EtebaseApiClient.defaultUrl;
+
   /// Creates a new etebase client.
-  static Future<EtebaseClient> create(
+  factory EtebaseClient.create(
     String clientName, [
     Uri? serverUrl,
-  ]) =>
-      throw UnimplementedError();
+  ]) = Client.create;
 
-  /// Sets the server URL of the client.
-  void setServerUrl(Uri serverUrl);
-
-  /// Returns 0 if client is pointing an etebase server, 1 if not, -1 on error
-  ///
-  /// @param client the object handle
+  /// Returns true if client is pointing an etebase server, false if not
   Future<bool> checkEtebaseServer();
 }

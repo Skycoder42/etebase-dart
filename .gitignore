@@ -24,6 +24,8 @@ pubspec.lock
 
 # Generated files
 *.freezed.dart
+*.g.dart
+*.chopper.dart
 
 # Binaries
 packages/etebase/tool/integration/libetebase
