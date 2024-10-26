@@ -6,7 +6,7 @@ import 'etebase_collection_invitation_manager.dart';
 import 'etebase_collection_manager.dart';
 
 /// The dart binding of the EtebaseAccount rust class
-abstract class EtebaseAccount {
+abstract interface class EtebaseAccount {
   /// Login a user and return a handle to an `EtebaseAccount` object
   ///
   /// @param client the already setup `EtebaseClient` object

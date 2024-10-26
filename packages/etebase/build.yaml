@@ -5,3 +5,7 @@ targets:
         options:
           map: false
           when: false
+      json_serializable:
+        options:
+          explicit_to_json: true
+
