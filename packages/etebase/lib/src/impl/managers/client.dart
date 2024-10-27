@@ -4,23 +4,30 @@ import 'package:sodium/sodium_sumo.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_user.dart';
+import '../crypto/key_derivator.dart';
 import '../rest/etebase_api_client.dart';
 
 @internal
 class Client implements EtebaseClient {
   final EtebaseApiClient _apiClient;
   final SodiumSumo _sodium;
+  final KeyDerivator _keyDerivator;
 
   Client(
     this._apiClient,
     this._sodium,
+    this._keyDerivator,
   );
 
   factory Client.create(
     SodiumSumo sodium, [
     Uri? serverUrl,
   ]) =>
-      Client(EtebaseApiClient(baseUrl: serverUrl), sodium);
+      Client(
+        EtebaseApiClient(baseUrl: serverUrl),
+        sodium,
+        KeyDerivator(sodium),
+      );
 
   void dispose() {
     _apiClient.dispose();
@@ -38,12 +45,9 @@ class Client implements EtebaseClient {
     String password,
   ) async {
     final salt = _sodium.randombytes.buf(_sodium.crypto.pwhash.saltBytes);
-    final mainKey = _sodium.crypto.pwhash(
-      outLen: 32,
-      password: password.toCharArray(),
+    final mainKey = await _keyDerivator(
+      password: password,
       salt: salt,
-      opsLimit: _sodium.crypto.pwhash.opsLimitSensitive,
-      memLimit: _sodium.crypto.pwhash.opsLimitModerate,
     );
     throw UnimplementedError();
   }
