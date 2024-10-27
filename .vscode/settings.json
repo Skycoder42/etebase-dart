@@ -1,15 +1,18 @@
 {
   "cSpell.words": [
+    "chunker",
+    "cloneable",
     "concat",
+    "derivator",
     "disinvite",
     "etebase",
     "finalizer",
     "libetebase",
     "nullptr",
-    "pubkey",
+    "rollsum",
+    "scalarmult",
     "signup",
     "stoken",
-    "cloneable"
   ],
   "dart.runPubGetOnPubspecChanges": "never",
   "cmake.configureOnOpen": false
