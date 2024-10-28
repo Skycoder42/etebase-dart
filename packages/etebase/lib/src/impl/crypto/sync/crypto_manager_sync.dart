@@ -3,17 +3,19 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import 'crypto_mac_sync.dart';
-import 'crypto_manager.dart';
-import 'crypto_utils.dart';
-import 'rollsum.dart';
+import '../crypto_mac.dart';
+import '../crypto_manager.dart';
+import '../crypto_utils.dart';
+import '../i_crypto_manager.dart';
+import '../rollsum.dart';
 
 @internal
-abstract base class CryptoManagerSync implements CryptoManager {
-  static const keySize = 32;
+abstract base class CryptoManagerSync
+    implements CryptoManager, ICryptoManagerSync {
   static const _hashSize = 32;
 
   final SodiumSumo sodium;
+  @override
   final int version;
 
   late final SecureKey cipherKey;
@@ -201,7 +203,7 @@ abstract base class CryptoManagerSync implements CryptoManager {
         masterKey: key,
         context: context.padRight(sodium.crypto.kdf.contextBytes),
         subkeyId: BigInt.from(keyId),
-        subkeyLen: keySize,
+        subkeyLen: CryptoManager.keySize,
       );
 
   static String prettyFingerprintSync(

@@ -3,17 +3,21 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import 'box_crypto_manager.dart';
-import 'crypto_utils.dart';
+import '../box_crypto_manager.dart';
+import '../crypto_utils.dart';
+import '../i_crypto_manager.dart';
 
 @internal
-class BoxCryptoManagerSync implements BoxCryptoManager {
+class BoxCryptoManagerSync implements BoxCryptoManager, ICryptoManagerSync {
   final SodiumSumo _sodium;
   final KeyPair _keyPair;
 
   BoxCryptoManagerSync(this._sodium, this._keyPair);
 
-  factory BoxCryptoManagerSync.fromSeed(SodiumSumo sodium, [SecureKey? seed]) =>
+  factory BoxCryptoManagerSync.fromSeed(
+    SodiumSumo sodium, [
+    SecureKey? seed,
+  ]) =>
       BoxCryptoManagerSync(
         sodium,
         seed != null

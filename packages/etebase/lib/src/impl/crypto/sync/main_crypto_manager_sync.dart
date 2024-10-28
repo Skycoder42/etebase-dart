@@ -1,13 +1,11 @@
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import 'account_crypto_manager.dart';
-import 'box_crypto_manager.dart';
+import '../main_crypto_manager.dart';
+import 'account_crypto_manager_sync.dart';
 import 'box_crypto_manager_sync.dart';
 import 'crypto_manager_sync.dart';
-import 'login_crypto_manager.dart';
 import 'login_crypto_manager_sync.dart';
-import 'main_crypto_manager.dart';
 
 @internal
 final class MainCryptoManagerSync extends CryptoManagerSync
@@ -18,17 +16,17 @@ final class MainCryptoManagerSync extends CryptoManagerSync
   String get context => 'Main';
 
   @override
-  LoginCryptoManager createLoginCryptoManager() => LoginCryptoManagerSync(
+  LoginCryptoManagerSync createLoginCryptoManager() => LoginCryptoManagerSync(
         sodium,
         sodium.crypto.sign.seedKeyPair(asymmetricKeySeed),
       );
 
   @override
-  AccountCryptoManager createAccountCryptoManager(SecureKey privKey) =>
-      throw UnimplementedError();
+  AccountCryptoManagerSync createAccountCryptoManager(SecureKey privKey) =>
+      AccountCryptoManagerSync(sodium, privKey, version);
 
   @override
-  BoxCryptoManager createBoxCryptoManager(SecureKey privKey) =>
+  BoxCryptoManagerSync createBoxCryptoManager(SecureKey privKey) =>
       BoxCryptoManagerSync(
         sodium,
         KeyPair(
