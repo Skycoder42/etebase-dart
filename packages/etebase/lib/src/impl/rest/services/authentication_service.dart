@@ -4,14 +4,15 @@ import 'package:meta/meta.dart';
 import '../models/login_response.dart';
 import '../models/signup_request.dart';
 
-part 'account_service.chopper.dart';
+part 'authentication_service.chopper.dart';
 
 @internal
 @ChopperApi(baseUrl: '/api/v1/authentication')
-abstract class AccountService extends ChopperService {
-  AccountService();
+abstract class AuthenticationService extends ChopperService {
+  AuthenticationService();
 
-  factory AccountService.create([ChopperClient? client]) = _$AccountService;
+  factory AuthenticationService.create([ChopperClient? client]) =
+      _$AuthenticationService;
 
   @Get(path: 'is_etebase/')
   Future<Response<void>> isEtebase();

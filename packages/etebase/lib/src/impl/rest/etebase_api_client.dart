@@ -2,7 +2,8 @@ import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 
 import 'interceptors/msg_pack_interceptor.dart';
-import 'services/account_service.dart';
+import 'msg_pack_converter.dart';
+import 'services/authentication_service.dart';
 
 @internal
 final class EtebaseApiClient extends ChopperClient {
@@ -11,13 +12,15 @@ final class EtebaseApiClient extends ChopperClient {
   EtebaseApiClient({Uri? baseUrl})
       : super(
           baseUrl: baseUrl ?? defaultUrl,
+          converter: MsgPackConverter(),
           interceptors: [
             const MessagePackInterceptor(),
           ],
           services: [
-            AccountService.create(),
+            AuthenticationService.create(),
           ],
         );
 
-  AccountService get accounts => getService<AccountService>();
+  AuthenticationService get authentication =>
+      getService<AuthenticationService>();
 }

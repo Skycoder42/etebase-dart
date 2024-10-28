@@ -3,14 +3,16 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-import 'crypto_mac_sync.dart';
+import 'crypto_mac.dart';
+import 'i_crypto_manager.dart';
 import 'rollsum.dart';
 
 @internal
-abstract interface class CryptoManager {
+abstract interface class CryptoManager implements ICryptoManager {
+  static const keySize = 32;
   static const defaultFingerprintDelimiter = '   ';
 
-  void dispose();
+  int get version;
 
   FutureOr<Uint8List> encrypt(
     Uint8List message, [

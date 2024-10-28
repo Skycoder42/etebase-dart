@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import 'crypto_manager_sync.dart';
+import 'crypto_manager.dart';
 
 @internal
 enum KeyDerivationDifficulty {
@@ -24,19 +24,19 @@ class KeyDerivator {
     KeyDerivationDifficulty difficulty = KeyDerivationDifficulty.hard,
   }) async =>
       await _sodium.runIsolated(
-        (sodium, _, __) => _sodium.crypto.pwhash(
-          outLen: CryptoManagerSync.keySize,
+        (sodium, _, __) => sodium.crypto.pwhash(
+          outLen: CryptoManager.keySize,
           password: password.toCharArray(),
           salt: salt,
           opsLimit: switch (difficulty) {
             KeyDerivationDifficulty.hard =>
-              _sodium.crypto.pwhash.opsLimitSensitive,
+              sodium.crypto.pwhash.opsLimitSensitive,
             KeyDerivationDifficulty.medium =>
-              _sodium.crypto.pwhash.opsLimitModerate,
+              sodium.crypto.pwhash.opsLimitModerate,
             KeyDerivationDifficulty.easy =>
-              _sodium.crypto.pwhash.opsLimitInteractive,
+              sodium.crypto.pwhash.opsLimitInteractive,
           },
-          memLimit: _sodium.crypto.pwhash.opsLimitModerate,
+          memLimit: sodium.crypto.pwhash.memLimitModerate,
         ),
       );
 }

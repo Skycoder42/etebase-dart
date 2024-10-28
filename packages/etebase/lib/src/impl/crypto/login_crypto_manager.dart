@@ -3,11 +3,11 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-@internal
-abstract interface class LoginCryptoManager {
-  Uint8List get pubKey;
+import 'i_crypto_manager.dart';
 
-  void dispose();
+@internal
+abstract interface class LoginCryptoManager implements ICryptoManager {
+  FutureOr<Uint8List> get pubKey;
 
   FutureOr<Uint8List> signDetached(Uint8List message);
 
