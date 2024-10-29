@@ -103,9 +103,13 @@ void main(List<String> args) async {
     await SodiumSumoInit.init(
       () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
     ),
+    Uri.http('127.0.0.1:3735'),
   );
   await c.signup(
-    const EtebaseUser(username: 'username', email: 'email'),
-    'password',
+    const EtebaseUser(
+      username: 'thisisarandomusername5',
+      email: 'thisisarandomusername5@mail.de',
+    ),
+    'skdhsjldfhsöhfelflsehfkjdsh',
   );
 }
