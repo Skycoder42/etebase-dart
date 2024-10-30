@@ -5,13 +5,13 @@ import 'package:sodium/sodium_sumo.dart';
 
 import '../crypto_mac.dart';
 import '../crypto_manager.dart';
+import '../crypto_manager_base.dart';
 import '../crypto_utils.dart';
-import '../i_crypto_manager.dart';
 import '../rollsum.dart';
 
 @internal
 abstract base class CryptoManagerSync
-    implements CryptoManager, ICryptoManagerSync {
+    implements CryptoManager, CryptoManagerBaseSync {
   static const _hashSize = 32;
 
   final SodiumSumo sodium;
@@ -39,7 +39,6 @@ abstract base class CryptoManagerSync
     asymmetricKeySeed = _keyGen(key, 3);
     subDerivationKey = _keyGen(key, 4);
     deterministicEncryptionKey = _keyGen(key, 5);
-    key.dispose();
   }
 
   @override

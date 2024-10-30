@@ -18,6 +18,9 @@ class KeyDerivator {
 
   KeyDerivator(this._sodium);
 
+  Uint8List randomSalt() =>
+      _sodium.randombytes.buf(_sodium.crypto.pwhash.saltBytes);
+
   Future<SecureKey> call({
     required Uint8List salt,
     required String password,

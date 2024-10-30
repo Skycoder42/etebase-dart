@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import '../crypto_manager_factory.dart';
+import '../crypto_service.dart';
+import '../key_derivator.dart';
 import '../sync/box_crypto_manager_sync.dart';
 import '../sync/main_crypto_manager_sync.dart';
 import 'box_crypto_manager_async.dart';
@@ -11,19 +13,31 @@ import 'isolated_crypto_manager.dart';
 import 'main_crypto_manager_async.dart';
 
 @internal
-final class CryptoManagerFactoryAsync implements CryptoManagerFactory {
+final class CryptoServiceAsync implements CryptoService {
   final IsolatedCryptoManager _isolated;
 
-  CryptoManagerFactoryAsync(this._isolated);
+  CryptoServiceAsync(this._isolated);
 
-  factory CryptoManagerFactoryAsync.sodium(SodiumSumo sodium) =>
-      CryptoManagerFactoryAsync(IsolatedCryptoManager(sodium));
+  factory CryptoServiceAsync.fromSodium(SodiumSumo sodium) =>
+      CryptoServiceAsync(IsolatedCryptoManager(sodium));
+
+  @override
+  late final keyDerivator = KeyDerivator(_isolated.sodium);
+
+  @override
+  Uint8List randomBytes(int length) => _isolated.sodium.randombytes.buf(length);
+
+  @override
+  SecureKey secureRandom(int length) => _isolated.sodium.secureRandom(length);
+
+  @override
+  SecureKey secureCopy(Uint8List bytes) => _isolated.sodium.secureCopy(bytes);
 
   @override
   Future<MainCryptoManagerAsync> createMainCryptoManager(
-    SecureKey key, [
-    int version = CryptoManagerFactory.currentVersion,
-  ]) async {
+    SecureKey key, {
+    int version = CryptoService.currentVersion,
+  }) async {
     final cmRef = await _isolated.createCryptoManager(
       secureKeys: [key],
       cryptoManagerFactory: (sodium, secureKeys, _) =>
@@ -33,7 +47,7 @@ final class CryptoManagerFactoryAsync implements CryptoManagerFactory {
   }
 
   @override
-  Future<BoxCryptoManagerAsync> createBoxCryptoManager([
+  Future<BoxCryptoManagerAsync> createIdentityCryptoManager([
     SecureKey? seed,
   ]) async {
     final cmRef = await _isolated.createCryptoManager(

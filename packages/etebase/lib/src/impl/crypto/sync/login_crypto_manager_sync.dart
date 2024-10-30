@@ -3,11 +3,12 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import '../i_crypto_manager.dart';
+import '../crypto_manager_base.dart';
 import '../login_crypto_manager.dart';
 
 @internal
-class LoginCryptoManagerSync implements LoginCryptoManager, ICryptoManagerSync {
+class LoginCryptoManagerSync
+    implements LoginCryptoManager, CryptoManagerBaseSync {
   final SodiumSumo _sodium;
   final KeyPair _keyPair;
 

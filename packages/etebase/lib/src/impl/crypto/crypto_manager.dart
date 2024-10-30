@@ -4,11 +4,11 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import 'crypto_mac.dart';
-import 'i_crypto_manager.dart';
+import 'crypto_manager_base.dart';
 import 'rollsum.dart';
 
 @internal
-abstract interface class CryptoManager implements ICryptoManager {
+abstract interface class CryptoManager implements CryptoManagerBase {
   static const keySize = 32;
   static const defaultFingerprintDelimiter = '   ';
 

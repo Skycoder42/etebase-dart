@@ -1,31 +1,35 @@
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:meta/meta.dart';
+import 'package:msgpack_dart/msgpack_dart.dart' as msg_pack;
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_user.dart';
+import '../crypto/crypto_arena.dart';
 import '../crypto/crypto_manager.dart';
-import '../crypto/crypto_manager_factory.dart';
+import '../crypto/crypto_service.dart';
 import '../crypto/crypto_utils.dart';
-import '../crypto/key_derivator.dart';
-import '../crypto/sync/crypto_manager_factory_sync.dart';
+import '../crypto/main_crypto_manager.dart';
+import '../crypto/sync/crypto_service_sync.dart';
 import '../rest/etebase_api_client.dart';
+import '../rest/models/challenge_request.dart';
+import '../rest/models/challenge_response.dart';
+import '../rest/models/login_request.dart';
+import '../rest/models/login_response.dart';
 import '../rest/models/signup_request.dart';
+import 'account.dart';
 
 @internal
 class Client implements EtebaseClient {
-  final EtebaseApiClient _apiClient;
-  final SodiumSumo _sodium;
-  final KeyDerivator _keyDerivator;
-  final CryptoManagerFactory _cryptoManagerFactory;
+  final EtebaseApiClient apiClient;
+  final CryptoService _cryptoService;
 
   Client(
-    this._apiClient,
-    this._sodium,
-    this._keyDerivator,
-    this._cryptoManagerFactory,
+    this.apiClient,
+    this._cryptoService,
   );
 
   factory Client.create(
@@ -34,18 +38,16 @@ class Client implements EtebaseClient {
   ]) =>
       Client(
         EtebaseApiClient(baseUrl: serverUrl),
-        sodium,
-        KeyDerivator(sodium),
-        CryptoManagerFactorySync(sodium), // TODO allow async
+        CryptoServiceSync(sodium), // TODO allow async
       );
 
   void dispose() {
-    _apiClient.dispose();
+    apiClient.dispose();
   }
 
   @override
   Future<bool> checkEtebaseServer() async {
-    final response = await _apiClient.authentication.isEtebase();
+    final response = await apiClient.authentication.isEtebase();
     return response.isSuccessful;
   }
 
@@ -53,31 +55,35 @@ class Client implements EtebaseClient {
     EtebaseUser user,
     String password,
   ) async {
-    SecureKey? mainKey;
-    SecureKey? accountKey;
+    final arena = CryptoArena();
     try {
-      final salt = _sodium.randombytes.buf(_sodium.crypto.pwhash.saltBytes);
-      mainKey = await _keyDerivator(
-        password: password,
-        salt: salt,
+      final salt = _cryptoService.keyDerivator.randomSalt();
+      final mainKey = arena(
+        await _cryptoService.keyDerivator(
+          password: password,
+          salt: salt,
+        ),
       );
 
       final mainCryptoManager =
-          await _cryptoManagerFactory.createMainCryptoManager(mainKey);
+          arena(await _cryptoService.createMainCryptoManager(mainKey));
       final loginCryptoManager =
-          await mainCryptoManager.createLoginCryptoManager();
+          arena(await mainCryptoManager.createLoginCryptoManager());
       final identityCryptoManager =
-          await _cryptoManagerFactory.createBoxCryptoManager();
+          arena(await _cryptoService.createIdentityCryptoManager());
 
-      accountKey = _sodium.secureRandom(CryptoManager.keySize);
-      final encryptedKeys = await mainCryptoManager.encrypt(
-        CryptoUtils.concat([
-          accountKey.extractBytes(),
-          (await identityCryptoManager.privKey).extractBytes(),
-        ]),
+      final accountKey =
+          arena(_cryptoService.secureRandom(CryptoManager.keySize));
+      final encryptedKeys = await accountKey.runUnlockedAsync(
+        (accountKeyData) async =>
+            (await identityCryptoManager.privKey).runUnlockedAsync(
+          (privKeyBytes) async => await mainCryptoManager.encrypt(
+            CryptoUtils.concat([accountKeyData, privKeyBytes]),
+          ),
+        ),
       );
 
-      final response = await _apiClient.authentication.signup(
+      final response = await apiClient.authentication.signup(
         SignupRequest(
           user: user,
           salt: salt,
@@ -87,29 +93,79 @@ class Client implements EtebaseClient {
         ),
       );
 
-      print(response);
-      // TODO construct account from result
-      throw UnimplementedError();
-    } catch (_) {
-      // mainKey?.dispose();
-      // accountKey?.dispose();
-      rethrow;
+      return await _createAccount(mainCryptoManager, response);
+    } finally {
+      await arena.dispose();
     }
+  }
+
+  Future<EtebaseAccount> login(
+    String username,
+    String password,
+  ) async {
+    final challenge = await apiClient.authentication
+        .loginChallenge(ChallengeRequest(username: username));
+
+    final mainKey = await _cryptoService.keyDerivator(
+      password: password,
+      salt: challenge.salt,
+    );
+    final mainCryptoManager = await _cryptoService.createMainCryptoManager(
+      mainKey,
+      version: challenge.version,
+    );
+    final loginCryptoManager =
+        await mainCryptoManager.createLoginCryptoManager();
+
+    final response = ChallengeResponse.login(
+      username: username,
+      challenge: challenge.challenge,
+      host: apiClient.baseUrl.host,
+    );
+    final encodedResponse = msg_pack.serialize(response.toJson());
+    final signature = await loginCryptoManager.signDetached(encodedResponse);
+    final loginResponse = await apiClient.authentication.login(
+      LoginRequest(
+        response: encodedResponse,
+        signature: signature,
+      ),
+    );
+
+    return await _createAccount(mainCryptoManager, loginResponse);
+  }
+
+  Future<Account> _createAccount(
+    MainCryptoManager mainCryptoManager,
+    LoginResponse response,
+  ) async {
+    final (k1, k2) = CryptoUtils.split2(
+      await mainCryptoManager.decrypt(response.user.encryptedContent),
+      CryptoManager.keySize,
+    );
+    return Account(
+      this,
+      await mainCryptoManager
+          .createAccountCryptoManager(_cryptoService.secureCopy(k1)),
+      await mainCryptoManager
+          .createIdentityCryptoManager(_cryptoService.secureCopy(k2)),
+      response.token,
+    );
   }
 }
 
 void main(List<String> args) async {
-  final c = Client.create(
-    await SodiumSumoInit.init(
-      () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
-    ),
-    Uri.http('127.0.0.1:3735'),
+  final sodium = await SodiumSumoInit.init(
+    () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
   );
-  await c.signup(
-    const EtebaseUser(
-      username: 'thisisarandomusername5',
-      email: 'thisisarandomusername5@mail.de',
+  final userName = base64Url.encode(sodium.randombytes.buf(18));
+  print(userName);
+  final c = Client.create(sodium, Uri.http('127.0.0.1:3735'));
+  final account = await c.signup(
+    EtebaseUser(
+      username: userName,
+      email: '$userName@mail.de',
     ),
-    'skdhsjldfhsöhfelflsehfkjdsh',
+    userName,
   );
+  c.dispose();
 }
