@@ -26,7 +26,7 @@ final class MainCryptoManagerSync extends CryptoManagerSync
       AccountCryptoManagerSync(sodium, privKey, version);
 
   @override
-  BoxCryptoManagerSync createBoxCryptoManager(SecureKey privKey) =>
+  BoxCryptoManagerSync createIdentityCryptoManager(SecureKey privKey) =>
       BoxCryptoManagerSync(
         sodium,
         KeyPair(

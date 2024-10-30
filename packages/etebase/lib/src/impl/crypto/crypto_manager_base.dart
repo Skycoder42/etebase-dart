@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 @internal
-abstract interface class ICryptoManager {
+abstract interface class CryptoManagerBase {
   FutureOr<void> dispose();
 }
 
 @internal
-abstract interface class ICryptoManagerSync implements ICryptoManager {
+abstract interface class CryptoManagerBaseSync implements CryptoManagerBase {
   @override
   void dispose();
 }

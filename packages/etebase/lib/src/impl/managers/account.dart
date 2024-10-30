@@ -5,9 +5,25 @@ import 'package:meta/meta.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
 import '../../api/managers/etebase_collection_manager.dart';
+import '../crypto/account_crypto_manager.dart';
+import '../crypto/box_crypto_manager.dart';
+import '../rest/models/login_response.dart';
+import 'client.dart';
 
 @internal
 class Account implements EtebaseAccount {
+  final Client _client; // TODO ???
+  final AccountCryptoManager _accountCryptoManager;
+  final BoxCryptoManager _identityCryptoManager;
+  final String _authToken;
+
+  Account(
+    this._client,
+    this._accountCryptoManager,
+    this._identityCryptoManager,
+    this._authToken,
+  );
+
   @override
   Future<void> changePassword(String password) {
     // TODO: implement changePassword

@@ -4,13 +4,13 @@ import 'dart:isolate';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import '../i_crypto_manager.dart';
+import '../crypto_manager_base.dart';
 
 part 'isolated_crypto_manager.freezed.dart';
 
 @internal
 @Freezed(copyWith: false)
-sealed class CryptoManagerRef<TCryptoManager extends ICryptoManagerSync>
+sealed class CryptoManagerRef<TCryptoManager extends CryptoManagerBaseSync>
     with _$CryptoManagerRef<TCryptoManager> {
   const factory CryptoManagerRef(int id) = _CryptoManagerRef;
 }
@@ -25,7 +25,7 @@ sealed class _IsolateMessage with _$IsolateMessage {
 }
 
 @Freezed(copyWith: false, toStringOverride: false, equal: false)
-sealed class _CryptoJob<TCryptoManager extends ICryptoManagerSync>
+sealed class _CryptoJob<TCryptoManager extends CryptoManagerBaseSync>
     with _$CryptoJob<TCryptoManager> {
   const factory _CryptoJob.createCm({
     required int id,
@@ -42,7 +42,7 @@ sealed class _CryptoJob<TCryptoManager extends ICryptoManagerSync>
     required int id,
     required CryptoManagerRef parentRef,
     required TCryptoManager Function(
-      ICryptoManagerSync parent,
+      CryptoManagerBaseSync parent,
       List<SecureKey> secureKeys,
       List<KeyPair> keyPairs,
     ) cryptoManagerFactory,
@@ -126,7 +126,7 @@ class IsolatedCryptoManager {
   }
 
   Future<CryptoManagerRef<TCryptoManager>>
-      createCryptoManager<TCryptoManager extends ICryptoManagerSync>({
+      createCryptoManager<TCryptoManager extends CryptoManagerBaseSync>({
     required TCryptoManager Function(
       SodiumSumo sodium,
       List<SecureKey> secureKeys,
@@ -148,8 +148,8 @@ class IsolatedCryptoManager {
   }
 
   Future<CryptoManagerRef<TCryptoManager>> createCryptoManagerWithParent<
-      TCryptoManager extends ICryptoManagerSync,
-      TParent extends ICryptoManagerSync>({
+      TCryptoManager extends CryptoManagerBaseSync,
+      TParent extends CryptoManagerBaseSync>({
     required CryptoManagerRef<TParent> parentRef,
     required TCryptoManager Function(
       TParent cm,
@@ -173,7 +173,8 @@ class IsolatedCryptoManager {
     return CryptoManagerRef(refId);
   }
 
-  Future<void> disposeCryptoManager<TCryptoManager extends ICryptoManagerSync>(
+  Future<void>
+      disposeCryptoManager<TCryptoManager extends CryptoManagerBaseSync>(
     CryptoManagerRef<TCryptoManager> ref,
   ) {
     if (_disposed) {
@@ -188,7 +189,7 @@ class IsolatedCryptoManager {
     );
   }
 
-  Future<TResult> call<TResult, TCryptoManager extends ICryptoManagerSync>(
+  Future<TResult> call<TResult, TCryptoManager extends CryptoManagerBaseSync>(
     CryptoManagerRef<TCryptoManager> cmRef,
     FutureOr<TResult> Function(
       TCryptoManager cm,
@@ -239,9 +240,9 @@ class IsolatedCryptoManager {
 Future<void> _isolateMain(_IsolateMessage message) async {
   final sodium = await message.sodiumFactory();
   var refCtr = 0;
-  final cryptoManagers = <int, ICryptoManagerSync>{};
+  final cryptoManagers = <int, CryptoManagerBaseSync>{};
 
-  int addCm(ICryptoManagerSync cm) {
+  int addCm(CryptoManagerBaseSync cm) {
     final ref = refCtr++;
     cryptoManagers[ref] = cm;
     return ref;

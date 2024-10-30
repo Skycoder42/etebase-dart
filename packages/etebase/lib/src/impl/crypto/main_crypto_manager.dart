@@ -14,5 +14,5 @@ abstract interface class MainCryptoManager implements CryptoManager {
 
   FutureOr<AccountCryptoManager> createAccountCryptoManager(SecureKey privKey);
 
-  FutureOr<BoxCryptoManager> createBoxCryptoManager(SecureKey privKey);
+  FutureOr<BoxCryptoManager> createIdentityCryptoManager(SecureKey privKey);
 }

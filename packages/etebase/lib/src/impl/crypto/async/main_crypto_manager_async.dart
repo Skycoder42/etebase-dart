@@ -39,14 +39,14 @@ final class MainCryptoManagerAsync
   }
 
   @override
-  Future<BoxCryptoManagerAsync> createBoxCryptoManager(
+  Future<BoxCryptoManagerAsync> createIdentityCryptoManager(
     SecureKey privKey,
   ) async {
     final boxRef = await isolated.createCryptoManagerWithParent(
       parentRef: cmRef,
       secureKeys: [privKey],
       cryptoManagerFactory: (cm, secureKeys, __) =>
-          cm.createBoxCryptoManager(secureKeys[0]),
+          cm.createIdentityCryptoManager(secureKeys[0]),
     );
     return BoxCryptoManagerAsync(isolated, boxRef);
   }

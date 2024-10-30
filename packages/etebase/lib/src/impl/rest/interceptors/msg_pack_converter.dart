@@ -72,15 +72,17 @@ class MsgPackConverter implements Converter, ErrorConverter {
         body = _deserializeValue(response.bodyBytes, fromJson);
       }
       return response.copyWith(body: body);
-    } on InvalidMessagePackData {
-      rethrow;
-    } on CheckedFromJsonException catch (e, s) {
-      Error.throwWithStackTrace(
-        InvalidMessagePackData(e.message ?? e.toString(), e),
-        s,
+    } on InvalidMessagePackData catch (e) {
+      return response.copyWith(bodyError: e);
+    } on CheckedFromJsonException catch (e) {
+      return response.copyWith(
+        bodyError: InvalidMessagePackData(e.message ?? e.toString(), e),
       );
-    } catch (e, s) {
-      Error.throwWithStackTrace(InvalidMessagePackData(e.toString(), e), s);
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
+      return response.copyWith(
+        bodyError: InvalidMessagePackData(e.toString(), e),
+      );
     }
   }
 

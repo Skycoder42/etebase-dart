@@ -4,11 +4,11 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../box_crypto_manager.dart';
+import '../crypto_manager_base.dart';
 import '../crypto_utils.dart';
-import '../i_crypto_manager.dart';
 
 @internal
-class BoxCryptoManagerSync implements BoxCryptoManager, ICryptoManagerSync {
+class BoxCryptoManagerSync implements BoxCryptoManager, CryptoManagerBaseSync {
   final SodiumSumo _sodium;
   final KeyPair _keyPair;
 

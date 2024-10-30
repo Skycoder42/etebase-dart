@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import 'i_crypto_manager.dart';
+import 'crypto_manager_base.dart';
 
 @internal
-abstract interface class BoxCryptoManager implements ICryptoManager {
+abstract interface class BoxCryptoManager implements CryptoManagerBase {
   FutureOr<Uint8List> get pubKey;
 
   FutureOr<SecureKey> get privKey;
