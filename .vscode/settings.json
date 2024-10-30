@@ -8,6 +8,7 @@
     "etebase",
     "finalizer",
     "libetebase",
+    "missuse",
     "nullptr",
     "rollsum",
     "scalarmult",
