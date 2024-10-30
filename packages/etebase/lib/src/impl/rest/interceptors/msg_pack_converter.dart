@@ -2,20 +2,21 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:chopper/chopper.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
-import 'package:msgpack_dart/msgpack_dart.dart' as msgPack;
+import 'package:msgpack_dart/msgpack_dart.dart' as msg_pack;
 
-import '../../api/exceptions/conflict.dart';
-import '../../api/exceptions/http_error_content.dart';
-import '../../api/exceptions/http_failure.dart';
-import '../../api/exceptions/invalid_message_pack_data.dart';
-import '../../api/exceptions/not_found.dart';
-import '../../api/exceptions/permission_denied.dart';
-import '../../api/exceptions/server_problem.dart';
-import '../../api/exceptions/temporary_server_problem.dart';
-import '../../api/exceptions/unauthorized.dart';
-import 'models/login_response.dart';
-import 'models/signup_request.dart';
+import '../../../api/exceptions/conflict.dart';
+import '../../../api/exceptions/http_error_content.dart';
+import '../../../api/exceptions/http_failure.dart';
+import '../../../api/exceptions/invalid_message_pack_data.dart';
+import '../../../api/exceptions/not_found.dart';
+import '../../../api/exceptions/permission_denied.dart';
+import '../../../api/exceptions/server_problem.dart';
+import '../../../api/exceptions/temporary_server_problem.dart';
+import '../../../api/exceptions/unauthorized.dart';
+import '../models/login_response.dart';
+import '../models/signup_request.dart';
 
 typedef _FromJson<T> = T Function(Map<String, dynamic> json);
 
@@ -40,7 +41,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
     return applyHeader(
       request.copyWith(
         // ignore: avoid_dynamic_calls
-        body: msgPack.serialize(request.body.toJson()),
+        body: msg_pack.serialize(request.body.toJson()),
       ),
       contentTypeKey,
       _msgPackContentType,
@@ -71,10 +72,15 @@ class MsgPackConverter implements Converter, ErrorConverter {
         body = _deserializeValue(response.bodyBytes, fromJson);
       }
       return response.copyWith(body: body);
-    } on InvalidMessagePackData catch (_) {
+    } on InvalidMessagePackData {
       rethrow;
+    } on CheckedFromJsonException catch (e, s) {
+      Error.throwWithStackTrace(
+        InvalidMessagePackData(e.message ?? e.toString(), e),
+        s,
+      );
     } catch (e, s) {
-      Error.throwWithStackTrace(InvalidMessagePackData(e.toString()), s);
+      Error.throwWithStackTrace(InvalidMessagePackData(e.toString(), e), s);
     }
   }
 
@@ -131,7 +137,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
 
   T _deserialize<T>(Uint8List data) {
     try {
-      final jsonData = msgPack.deserialize(data);
+      final jsonData = msg_pack.deserialize(data);
       if (jsonData is! T) {
         throw InvalidMessagePackData(
           'Expected deserialized data to be of type $T, '
@@ -140,8 +146,8 @@ class MsgPackConverter implements Converter, ErrorConverter {
       }
 
       return jsonData;
-    } on msgPack.FormatError catch (e, s) {
-      Error.throwWithStackTrace(InvalidMessagePackData(e.message), s);
+    } on msg_pack.FormatError catch (e, s) {
+      Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
     }
   }
 
