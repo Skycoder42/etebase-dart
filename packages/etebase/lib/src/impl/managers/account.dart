@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
+import 'package:sodium/sodium.dart';
 
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
@@ -8,17 +9,16 @@ import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/models/etebase_user.dart';
 import '../crypto/crypto_arena.dart';
 import '../crypto/crypto_manager.dart';
+import '../crypto/crypto_service.dart';
 import '../crypto/crypto_utils.dart';
-import '../crypto/login_crypto_manager.dart';
 import '../crypto/main_crypto_manager.dart';
+import '../models/account_data.dart';
+import '../models/challenge_request.dart';
+import '../models/challenge_response.dart';
+import '../models/login_request.dart';
+import '../models/signup_request.dart';
+import '../models/user.dart';
 import '../rest/interceptors/auth_interceptor.dart';
-import '../rest/models/challenge_request.dart';
-import '../rest/models/challenge_response.dart';
-import '../rest/models/login_challenge.dart';
-import '../rest/models/login_request.dart';
-import '../rest/models/login_response.dart';
-import '../rest/models/signup_request.dart';
-import '../rest/models/user.dart';
 import '../rest/msg_pack_codec.dart';
 import 'client.dart';
 
@@ -220,30 +220,35 @@ class Account implements EtebaseAccount {
   }
 
   @override
+  Future<Uri> fetchDashboardUrl() async {
+    final response =
+        await _client.api.authentication.getDashboardUrl(_authToken);
+    return response.url;
+  }
+
+  @override
+  Future<String> save([SecureKey? encryptionKey]) async {
+    final cryptoManager = await _client.crypto.createStorageCryptoManager(
+      encryptionKey ??
+          _client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
+    );
+    final accountData = AccountData(
+      user: _user,
+      authToken: _authToken.value,
+      serverUrl: _client.api.baseUrl,
+      version: CryptoService.currentVersion,
+      key: null,
+    );
+  }
+
+  @override
   // TODO: implement collectionManager
   EtebaseCollectionManager get collectionManager => throw UnimplementedError();
-
-  @override
-  Future<Uri> fetchDashboardUrl() {
-    // TODO: implement fetchDashboardUrl
-    throw UnimplementedError();
-  }
-
-  @override
-  void forceServerUrl(Uri serverUrl) {
-    // TODO: implement forceServerUrl
-  }
 
   @override
   // TODO: implement invitationManager
   EtebaseCollectionInvitationManager get invitationManager =>
       throw UnimplementedError();
-
-  @override
-  String save([Uint8List? encryptionKey]) {
-    // TODO: implement save
-    throw UnimplementedError();
-  }
 
   Future<LoginRequest> _signChallenge(ChallengeResponse response) async =>
       await _signStaticChallenge(

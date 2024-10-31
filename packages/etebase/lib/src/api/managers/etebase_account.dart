@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:sodium/sodium.dart';
 
 import '../../impl/managers/account.dart';
 import '../../impl/managers/client.dart';
@@ -46,12 +46,6 @@ abstract interface class EtebaseAccount {
   /// @param this_ the object handle
   Future<Uri> fetchDashboardUrl();
 
-  /// Change the server URL for this account handle
-  ///
-  /// @param this_ the object handle
-  /// @param server_url the new server URL to be set
-  void forceServerUrl(Uri serverUrl);
-
   /// Change the user's login password
   ///
   /// @param this_ the object handle
@@ -78,7 +72,7 @@ abstract interface class EtebaseAccount {
   /// @param this_ the object handle
   /// @param encryption_key used to encrypt the returned account string to enhance security
   /// @param encryption_key_size size of the encryption_key
-  String save([Uint8List? encryptionKey]);
+  String save([SecureKey? encryptionKey]);
 
   /// Restore and return the account object from the string obtained using `etebase_account_save`
   ///
@@ -89,7 +83,7 @@ abstract interface class EtebaseAccount {
   static EtebaseAccount restore(
     EtebaseClient client,
     String accountDataStored, [
-    Uint8List? encryptionKey,
+    SecureKey? encryptionKey,
   ]) =>
       throw UnimplementedError();
 }

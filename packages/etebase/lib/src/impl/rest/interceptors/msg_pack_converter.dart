@@ -15,11 +15,11 @@ import '../../../api/exceptions/permission_denied.dart';
 import '../../../api/exceptions/server_problem.dart';
 import '../../../api/exceptions/temporary_server_problem.dart';
 import '../../../api/exceptions/unauthorized.dart';
-import '../models/challenge_request.dart';
-import '../models/login_challenge.dart';
-import '../models/login_request.dart';
-import '../models/login_response.dart';
-import '../models/signup_request.dart';
+import '../../models/challenge_request.dart';
+import '../../models/login_challenge.dart';
+import '../../models/login_request.dart';
+import '../../models/login_response.dart';
+import '../../models/signup_request.dart';
 import '../msg_pack_codec.dart';
 
 typedef _FromJson<T> = T Function(Map<String, dynamic> json);

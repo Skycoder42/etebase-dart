@@ -5,11 +5,11 @@ import 'package:meta/meta.dart';
 
 @internal
 class AuthToken {
-  final String _token;
+  final String value;
 
   static const empty = AuthToken('');
 
-  const AuthToken(this._token);
+  const AuthToken(this.value);
 }
 
 @internal
@@ -21,7 +21,7 @@ class AuthInterceptor implements Interceptor {
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) {
     final token = switch (chain.request.tag) {
-      AuthToken(:final _token) when _token.isNotEmpty => _token,
+      AuthToken(:final value) when value.isNotEmpty => value,
       _ => null,
     };
 
