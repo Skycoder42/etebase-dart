@@ -18,6 +18,9 @@ final class CryptoServiceSync implements CryptoService {
   late final keyDerivator = KeyDerivator(_sodium);
 
   @override
+  void dispose() {}
+
+  @override
   Uint8List randomBytes(int length) => _sodium.randombytes.buf(length);
 
   @override

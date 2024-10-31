@@ -14,6 +14,8 @@ abstract interface class CryptoService {
 
   KeyDerivator get keyDerivator;
 
+  FutureOr<void> dispose();
+
   Uint8List randomBytes(int length);
 
   SecureKey secureRandom(int length);

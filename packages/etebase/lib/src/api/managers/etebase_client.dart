@@ -16,4 +16,7 @@ abstract interface class EtebaseClient {
 
   /// Returns true if client is pointing an etebase server, false if not
   Future<bool> checkEtebaseServer();
+
+  /// Disposes of the instance and clear all cryptographic keys from memory.
+  Future<void> dispose();
 }

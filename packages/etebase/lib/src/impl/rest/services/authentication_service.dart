@@ -1,6 +1,7 @@
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 
+import '../interceptors/auth_interceptor.dart';
 import '../models/challenge_request.dart';
 import '../models/login_challenge.dart';
 import '../models/login_request.dart';
@@ -28,4 +29,13 @@ abstract class AuthenticationService extends ChopperService {
 
   @Post(path: 'login/')
   Future<LoginResponse> login(@Body() LoginRequest body);
+
+  @Post(path: 'logout/', optionalBody: true)
+  Future<void> logout(@Tag() AuthToken authToken);
+
+  @Post(path: 'change_password/')
+  Future<void> changePassword(
+    @Tag() AuthToken authToken,
+    @Body() LoginRequest body,
+  );
 }
