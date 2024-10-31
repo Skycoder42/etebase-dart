@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:chopper/chopper.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
-import 'package:msgpack_dart/msgpack_dart.dart' as msg_pack;
+import 'package:msgpack_dart/msgpack_dart.dart';
 
 import '../../../api/exceptions/conflict.dart';
 import '../../../api/exceptions/http_error_content.dart';
@@ -15,8 +15,12 @@ import '../../../api/exceptions/permission_denied.dart';
 import '../../../api/exceptions/server_problem.dart';
 import '../../../api/exceptions/temporary_server_problem.dart';
 import '../../../api/exceptions/unauthorized.dart';
+import '../models/challenge_request.dart';
+import '../models/login_challenge.dart';
+import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/signup_request.dart';
+import '../msg_pack_codec.dart';
 
 typedef _FromJson<T> = T Function(Map<String, dynamic> json);
 
@@ -29,6 +33,9 @@ class MsgPackConverter implements Converter, ErrorConverter {
   MsgPackConverter() {
     _add(SignupRequest.fromJson);
     _add(LoginResponse.fromJson);
+    _add(ChallengeRequest.fromJson);
+    _add(LoginChallenge.fromJson);
+    _add(LoginRequest.fromJson);
   }
 
   @override
@@ -39,10 +46,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
     }
 
     return applyHeader(
-      request.copyWith(
-        // ignore: avoid_dynamic_calls
-        body: msg_pack.serialize(request.body.toJson()),
-      ),
+      request.copyWith(body: msgPack.encode(body)),
       contentTypeKey,
       _msgPackContentType,
       override: false,
@@ -139,7 +143,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
 
   T _deserialize<T>(Uint8List data) {
     try {
-      final jsonData = msg_pack.deserialize(data);
+      final jsonData = msgPack.decode(data);
       if (jsonData is! T) {
         throw InvalidMessagePackData(
           'Expected deserialized data to be of type $T, '
@@ -148,7 +152,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
       }
 
       return jsonData;
-    } on msg_pack.FormatError catch (e, s) {
+    } on FormatError catch (e, s) {
       Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
     }
   }

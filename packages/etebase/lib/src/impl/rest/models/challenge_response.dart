@@ -18,8 +18,13 @@ sealed class ChallengeResponse with _$ChallengeResponse {
   }) = _LoginChallengeResponse;
 
   @msgPackBytes
-  const factory ChallengeResponse.changePassword() =
-      _ChangePasswordChallengeResponse;
+  const factory ChallengeResponse.changePassword({
+    required String username,
+    required Uint8List challenge,
+    required String host,
+    required Uint8List loginPubkey,
+    required Uint8List encryptedContent,
+  }) = _ChangePasswordChallengeResponse;
 
   factory ChallengeResponse.fromJson(Map<String, dynamic> json) =>
       _$ChallengeResponseFromJson(json);

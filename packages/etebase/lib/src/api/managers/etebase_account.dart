@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import '../../impl/managers/account.dart';
+import '../../impl/managers/client.dart';
 import '../models/etebase_user.dart';
 import 'etebase_client.dart';
 import 'etebase_collection_invitation_manager.dart';
@@ -17,7 +19,7 @@ abstract interface class EtebaseAccount {
     String username,
     String password,
   ) async =>
-      throw UnimplementedError();
+      await Account.login(client as Client, username, password);
 
   /// Signup a new user account and return a handle to it
   ///
@@ -29,7 +31,10 @@ abstract interface class EtebaseAccount {
     EtebaseUser user,
     String password,
   ) async =>
-      throw UnimplementedError();
+      await Account.signup(client as Client, user, password);
+
+  /// Disposes of the instance and clear all cryptographic keys from memory.
+  Future<void> dispose();
 
   /// Fetch a new auth token for the account and update the `EtebaseAccount` object with it
   ///

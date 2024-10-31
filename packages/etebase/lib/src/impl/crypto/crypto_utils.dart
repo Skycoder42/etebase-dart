@@ -1,29 +1,41 @@
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
+import 'package:sodium/sodium_sumo.dart';
+
+import 'crypto_service.dart';
 
 @internal
 abstract base class CryptoUtils {
   CryptoUtils._();
 
-  static Uint8List concat(List<Uint8List> chunks) {
-    if (chunks.length == 1) {
-      return chunks.single;
-    }
+  static Uint8List concat(Iterable<Uint8List> chunks) {
+    final buffer = BytesBuilder(copy: false);
+    chunks.forEach(buffer.add);
+    return buffer.takeBytes();
+  }
 
-    final result = Uint8List(chunks.map((c) => c.length).sum);
-    var offset = 0;
-    for (final chunk in chunks) {
-      result.setAll(offset, chunk);
-      offset += chunk.length;
+  static Uint8List concatSecure(Iterable<SecureKey> keys) {
+    final buffer = BytesBuilder();
+    for (final key in keys) {
+      key.runUnlockedSync(buffer.add);
     }
-    return result;
+    return buffer.takeBytes();
   }
 
   static (Uint8List, Uint8List) split2(Uint8List data, int split) => (
         Uint8List.sublistView(data, 0, split),
         Uint8List.sublistView(data, split)
+      );
+
+  static (SecureKey, SecureKey) split2Secure(
+    CryptoService service,
+    Uint8List data,
+    int split,
+  ) =>
+      (
+        service.secureCopy(Uint8List.sublistView(data, 0, split)),
+        service.secureCopy(Uint8List.sublistView(data, split)),
       );
 
   static Uint8List uint32ToUint8List(int value) {

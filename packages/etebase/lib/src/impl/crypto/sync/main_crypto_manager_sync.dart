@@ -31,7 +31,7 @@ final class MainCryptoManagerSync extends CryptoManagerSync
         sodium,
         KeyPair(
           publicKey: sodium.crypto.scalarmult.base(n: privKey),
-          secretKey: privKey,
+          secretKey: privKey.copy(),
         ),
       );
 }

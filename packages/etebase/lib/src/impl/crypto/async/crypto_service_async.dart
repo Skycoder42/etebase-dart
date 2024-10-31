@@ -25,6 +25,9 @@ final class CryptoServiceAsync implements CryptoService {
   late final keyDerivator = KeyDerivator(_isolated.sodium);
 
   @override
+  Future<void> dispose() async => _isolated.dispose();
+
+  @override
   Uint8List randomBytes(int length) => _isolated.sodium.randombytes.buf(length);
 
   @override

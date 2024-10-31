@@ -29,7 +29,7 @@ class BoxCryptoManagerSync implements BoxCryptoManager, CryptoManagerBaseSync {
   Uint8List get pubKey => _keyPair.publicKey;
 
   @override
-  SecureKey get privKey => _keyPair.secretKey;
+  SecureKey get privKey => _keyPair.secretKey.copy();
 
   @override
   void dispose() => _keyPair.dispose();

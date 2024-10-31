@@ -7,14 +7,17 @@ import 'crypto_manager_base.dart';
 
 @internal
 class CryptoArena {
-  final _disposables = <FutureOr<void> Function()>[];
+  final _disposables = <Object, FutureOr<void> Function()>{};
 
   T call<T>(T object) {
     switch (object) {
       case final SecureKey key:
-        _disposables.add(key.dispose);
+        _disposables[object] = key.dispose;
+      case (final SecureKey k1, final SecureKey k2):
+        _disposables[object] = k1.dispose;
+        _disposables[object] = k2.dispose;
       case final CryptoManagerBase cm:
-        _disposables.add(cm.dispose);
+        _disposables[object] = cm.dispose;
       default:
         throw UnsupportedError(
           'Cannot auto-dispose an instance of ${object.runtimeType}',
@@ -23,9 +26,13 @@ class CryptoArena {
     return object;
   }
 
-  Future<void> dispose() async {
-    for (final disposable in _disposables) {
-      await disposable();
-    }
+  T detach<T>(T object) {
+    final removed = _disposables.remove(object);
+    assert(removed != null, 'Tried to detach an unattached object');
+    return object;
   }
+
+  Future<void> dispose() async => await Future.wait(
+        _disposables.values.map((dispose) async => await dispose()),
+      );
 }
