@@ -58,7 +58,7 @@ sealed class _CryptoJob<TCryptoManager extends CryptoManagerBaseSync>
   const factory _CryptoJob.exec({
     required int id,
     required CryptoManagerRef<TCryptoManager> ref,
-    required FutureOr<dynamic> Function(
+    required dynamic Function(
       TCryptoManager cryptoManager,
       List<SecureKey> secureKeys,
       List<KeyPair> keyPairs,
@@ -191,7 +191,7 @@ class IsolatedCryptoManager {
 
   Future<TResult> call<TResult, TCryptoManager extends CryptoManagerBaseSync>(
     CryptoManagerRef<TCryptoManager> cmRef,
-    FutureOr<TResult> Function(
+    TResult Function(
       TCryptoManager cm,
       List<SecureKey> secureKeys,
       List<KeyPair> keyPairs,
@@ -242,6 +242,27 @@ Future<void> _isolateMain(_IsolateMessage message) async {
   var refCtr = 0;
   final cryptoManagers = <int, CryptoManagerBaseSync>{};
 
+  void withKeys(
+    void Function(List<SecureKey> secureKeys, List<KeyPair> keyPairs)
+        callback, {
+    required List<TransferrableSecureKey> secureKeys,
+    required List<TransferrableKeyPair> keyPairs,
+  }) {
+    final keys =
+        secureKeys.map(sodium.materializeTransferrableSecureKey).toList();
+    final pairs = keyPairs.map(sodium.materializeTransferrableKeyPair).toList();
+    try {
+      callback(keys, pairs);
+    } finally {
+      for (final key in keys) {
+        key.dispose();
+      }
+      for (final pair in pairs) {
+        pair.dispose();
+      }
+    }
+  }
+
   int addCm(CryptoManagerBaseSync cm) {
     final ref = refCtr++;
     cryptoManagers[ref] = cm;
@@ -259,43 +280,63 @@ Future<void> _isolateMain(_IsolateMessage message) async {
     try {
       switch (job) {
         case _CryptoJobCreateCm():
-          final cm = job.cryptoManagerFactory(
-            sodium,
-            job.secureKeys
-                .map(sodium.materializeTransferrableSecureKey)
-                .toList(),
-            job.keyPairs.map(sodium.materializeTransferrableKeyPair).toList(),
+          withKeys(
+            secureKeys: job.secureKeys,
+            keyPairs: job.keyPairs,
+            (secureKeys, keyPairs) => message.sendPort.send(
+              _CryptoJobResult.success(
+                job.id,
+                addCm(
+                  job.cryptoManagerFactory(
+                    sodium,
+                    secureKeys,
+                    keyPairs,
+                  ),
+                ),
+              ),
+            ),
           );
-          message.sendPort.send(_CryptoJobResult.success(job.id, addCm(cm)));
         case _CryptoJobCreateCmWithParent():
-          final cm = job.cryptoManagerFactory(
-            cryptoManagers[job.parentRef.id]!,
-            job.secureKeys
-                .map(sodium.materializeTransferrableSecureKey)
-                .toList(),
-            job.keyPairs.map(sodium.materializeTransferrableKeyPair).toList(),
+          withKeys(
+            secureKeys: job.secureKeys,
+            keyPairs: job.keyPairs,
+            (secureKeys, keyPairs) => message.sendPort.send(
+              _CryptoJobResult.success(
+                job.id,
+                addCm(
+                  job.cryptoManagerFactory(
+                    cryptoManagers[job.parentRef.id]!,
+                    secureKeys,
+                    keyPairs,
+                  ),
+                ),
+              ),
+            ),
           );
-          message.sendPort.send(_CryptoJobResult.success(job.id, addCm(cm)));
         case _CryptoJobDisposeCm():
           cryptoManagers.remove(job.ref.id)?.dispose();
           message.sendPort.send(_CryptoJobResult.success(job.id, null));
         case _CryptoJobExec():
-          final result = await job.callback(
-            cryptoManagers[job.ref.id]!,
-            job.secureKeys
-                .map(sodium.materializeTransferrableSecureKey)
-                .toList(),
-            job.keyPairs.map(sodium.materializeTransferrableKeyPair).toList(),
-          );
-          final jobResult = _CryptoJobResult.success(
-            job.id,
-            switch (result) {
-              SecureKey() => sodium.createTransferrableSecureKey(result),
-              KeyPair() => sodium.createTransferrableKeyPair(result),
-              _ => result,
+          withKeys(
+            secureKeys: job.secureKeys,
+            keyPairs: job.keyPairs,
+            (secureKeys, keyPairs) {
+              final result = job.callback(
+                cryptoManagers[job.ref.id]!,
+                secureKeys,
+                keyPairs,
+              );
+              final jobResult = _CryptoJobResult.success(
+                job.id,
+                switch (result) {
+                  SecureKey() => sodium.createTransferrableSecureKey(result),
+                  KeyPair() => sodium.createTransferrableKeyPair(result),
+                  _ => result,
+                },
+              );
+              message.sendPort.send(jobResult);
             },
           );
-          message.sendPort.send(jobResult);
         case _CryptoJobExit():
           tearDown();
           message.sendPort.send(_CryptoJobResult.success(job.id, null));

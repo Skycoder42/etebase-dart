@@ -8,9 +8,11 @@ import '../crypto_service.dart';
 import '../key_derivator.dart';
 import '../sync/box_crypto_manager_sync.dart';
 import '../sync/main_crypto_manager_sync.dart';
+import '../sync/storage_crypto_manager_sync.dart';
 import 'box_crypto_manager_async.dart';
 import 'isolated_crypto_manager.dart';
 import 'main_crypto_manager_async.dart';
+import 'storage_crypto_manager_async.dart';
 
 @internal
 final class CryptoServiceAsync implements CryptoService {
@@ -59,5 +61,18 @@ final class CryptoServiceAsync implements CryptoService {
           BoxCryptoManagerSync.fromSeed(sodium, secureKeys.firstOrNull),
     );
     return BoxCryptoManagerAsync(_isolated, cmRef);
+  }
+
+  @override
+  Future<StorageCryptoManagerAsync> createStorageCryptoManager(
+    SecureKey key, {
+    int version = CryptoService.currentVersion,
+  }) async {
+    final cmRef = await _isolated.createCryptoManager(
+      secureKeys: [key],
+      cryptoManagerFactory: (sodium, secureKeys, _) =>
+          StorageCryptoManagerSync(sodium, secureKeys[0], version),
+    );
+    return StorageCryptoManagerAsync(_isolated, cmRef, version);
   }
 }

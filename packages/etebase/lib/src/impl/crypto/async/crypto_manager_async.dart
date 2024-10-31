@@ -125,7 +125,7 @@ base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
 
   @protected
   Future<TResult> exec<TResult>(
-    FutureOr<TResult> Function(
+    TResult Function(
       TCryptoManager cryptoManager,
       List<SecureKey> secureKey,
       List<KeyPair> keyPairs,

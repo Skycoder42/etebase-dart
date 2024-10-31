@@ -7,6 +7,7 @@ import '../crypto_service.dart';
 import '../key_derivator.dart';
 import 'box_crypto_manager_sync.dart';
 import 'main_crypto_manager_sync.dart';
+import 'storage_crypto_manager_sync.dart';
 
 @internal
 final class CryptoServiceSync implements CryptoService {
@@ -39,4 +40,11 @@ final class CryptoServiceSync implements CryptoService {
   @override
   BoxCryptoManagerSync createIdentityCryptoManager([SecureKey? seed]) =>
       BoxCryptoManagerSync.fromSeed(_sodium, seed);
+
+  @override
+  StorageCryptoManagerSync createStorageCryptoManager(
+    SecureKey key, {
+    int version = CryptoService.currentVersion,
+  }) =>
+      StorageCryptoManagerSync(_sodium, key, version);
 }

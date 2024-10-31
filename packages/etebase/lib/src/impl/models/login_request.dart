@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../converters/msg_pack_converters.dart';
+import '../rest/converters/msg_pack_converters.dart';
 
 part 'login_request.freezed.dart';
 part 'login_request.g.dart';
