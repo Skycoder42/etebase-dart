@@ -47,24 +47,22 @@ class Account implements EtebaseAccount {
     final arena = CryptoArena();
     try {
       final salt = client.crypto.keyDerivator.randomSalt();
-      final mainKey = arena(
-        await client.crypto.keyDerivator(
-          password: password,
-          salt: salt,
-        ),
+      final mainKey = await client.crypto.keyDerivator(
+        password: password,
+        salt: salt,
       );
 
       final mainCryptoManager =
-          arena(await client.crypto.createMainCryptoManager(mainKey));
+          arena(client.crypto.createMainCryptoManager(mainKey));
       final loginCryptoManager =
           arena(await mainCryptoManager.createLoginCryptoManager());
       final identityCryptoManager =
-          arena(await client.crypto.createIdentityCryptoManager());
+          arena(client.crypto.createIdentityCryptoManager());
 
       final encryptedKeys = await mainCryptoManager.encrypt(
         CryptoUtils.concatSecure([
           arena(client.crypto.secureRandom(CryptoManager.keySize)),
-          arena(await identityCryptoManager.privKey),
+          identityCryptoManager.privKey,
         ]),
       );
 
@@ -72,8 +70,8 @@ class Account implements EtebaseAccount {
         SignupRequest(
           user: user,
           salt: salt,
-          loginPubkey: await loginCryptoManager.pubKey,
-          pubkey: await identityCryptoManager.pubKey,
+          loginPubkey: loginCryptoManager.pubKey,
+          pubkey: identityCryptoManager.pubKey,
           encryptedContent: encryptedKeys,
         ),
       );
@@ -99,14 +97,12 @@ class Account implements EtebaseAccount {
       final challenge = await client.api.authentication
           .loginChallenge(ChallengeRequest(username: username));
 
-      final mainKey = arena(
-        await client.crypto.keyDerivator(
-          password: password,
-          salt: challenge.salt,
-        ),
+      final mainKey = await client.crypto.keyDerivator(
+        password: password,
+        salt: challenge.salt,
       );
       final mainCryptoManager = arena(
-        await client.crypto.createMainCryptoManager(
+        client.crypto.createMainCryptoManager(
           mainKey,
           version: challenge.version,
         ),
@@ -150,25 +146,20 @@ class Account implements EtebaseAccount {
 
   @override
   Future<void> fetchToken() async {
-    final arena = CryptoArena();
-    try {
-      final challenge = await _client.api.authentication
-          .loginChallenge(ChallengeRequest(username: _user.username));
+    final challenge = await _client.api.authentication
+        .loginChallenge(ChallengeRequest(username: _user.username));
 
-      final loginResponse = await _client.api.authentication.login(
-        await _signChallenge(
-          ChallengeResponse.login(
-            username: _user.username,
-            challenge: challenge.challenge,
-            host: _client.api.baseUrl.host,
-          ),
+    final loginResponse = await _client.api.authentication.login(
+      await _signChallenge(
+        ChallengeResponse.login(
+          username: _user.username,
+          challenge: challenge.challenge,
+          host: _client.api.baseUrl.host,
         ),
-      );
+      ),
+    );
 
-      _authToken = AuthToken(loginResponse.token);
-    } finally {
-      await arena.dispose();
-    }
+    _authToken = AuthToken(loginResponse.token);
   }
 
   @override
@@ -184,14 +175,12 @@ class Account implements EtebaseAccount {
       final challenge = await _client.api.authentication
           .loginChallenge(ChallengeRequest(username: _user.username));
 
-      final newMainKey = arena(
-        await _client.crypto.keyDerivator(
-          password: password,
-          salt: challenge.salt,
-        ),
+      final newMainKey = await _client.crypto.keyDerivator(
+        password: password,
+        salt: challenge.salt,
       );
       final newMainCryptoManager =
-          arena(await _client.crypto.createMainCryptoManager(newMainKey));
+          arena(_client.crypto.createMainCryptoManager(newMainKey));
       final newLoginCryptoManager =
           arena(await newMainCryptoManager.createLoginCryptoManager());
 
@@ -202,7 +191,7 @@ class Account implements EtebaseAccount {
         username: _user.username,
         challenge: challenge.challenge,
         host: _client.api.baseUrl.host,
-        loginPubkey: await newLoginCryptoManager.pubKey,
+        loginPubkey: newLoginCryptoManager.pubKey,
         encryptedContent: newEncryptedContent,
       );
 
@@ -228,17 +217,33 @@ class Account implements EtebaseAccount {
 
   @override
   Future<String> save([SecureKey? encryptionKey]) async {
-    final cryptoManager = await _client.crypto.createStorageCryptoManager(
-      encryptionKey ??
-          _client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
-    );
-    final accountData = AccountData(
-      user: _user,
-      authToken: _authToken.value,
-      serverUrl: _client.api.baseUrl,
-      version: CryptoService.currentVersion,
-      key: null,
-    );
+    final arena = CryptoArena();
+    try {
+      final cryptoManager = arena(
+        _client.crypto.createStorageCryptoManager(
+          encryptionKey?.copy() ??
+              _client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
+        ),
+      );
+
+      final encryptedAccountData =
+          await _mainCryptoManager.mainKey.runUnlockedAsync(
+        (mainKeyData) => cryptoManager.encrypt(
+          msgPack.encode(
+            AccountData(
+              user: _user,
+              authToken: _authToken.value,
+              serverUrl: _client.api.baseUrl,
+              version: CryptoService.currentVersion,
+              key: mainKeyData,
+            ),
+          ),
+          CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
+        ),
+      );
+    } finally {
+      await arena.dispose();
+    }
   }
 
   @override

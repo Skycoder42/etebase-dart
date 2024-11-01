@@ -5,13 +5,13 @@ import '../sync/minimal_collection_crypto_manager_sync.dart';
 import 'crypto_manager_async.dart';
 
 @internal
-base class MinimalCollectionCryptoManagerAsync<
+abstract base class MinimalCollectionCryptoManagerAsync<
         TCryptoManager extends MinimalCollectionCryptoManagerSync>
     extends CryptoManagerAsync<TCryptoManager>
     implements MinimalCollectionCryptoManager {
   MinimalCollectionCryptoManagerAsync(
     super.isolated,
-    super.cmRef,
+    super.key,
     super.version,
   );
 }

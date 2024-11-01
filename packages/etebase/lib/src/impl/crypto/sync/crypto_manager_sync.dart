@@ -15,14 +15,17 @@ abstract base class CryptoManagerSync
   static const _hashSize = 32;
 
   final SodiumSumo sodium;
+  @protected
+  final SecureKey key;
   @override
   final int version;
 
-  late final SecureKey cipherKey;
-  late final SecureKey macKey;
-  late final SecureKey asymmetricKeySeed;
-  late final SecureKey subDerivationKey;
-  late final SecureKey deterministicEncryptionKey;
+  late final cipherKey = _keyGen(key, 1);
+  late final macKey = _keyGen(key, 2);
+  late final asymmetricKeySeed = _keyGen(key, 3);
+  late final subDerivationKey = _keyGen(key, 4);
+  late final deterministicEncryptionKey = _keyGen(key, 5);
+  final _disposables = <SecureKey>[];
 
   @protected
   String get context;
@@ -31,23 +34,18 @@ abstract base class CryptoManagerSync
 
   CryptoManagerSync(
     this.sodium,
-    SecureKey key,
+    this.key,
     this.version,
-  ) {
-    cipherKey = _keyGen(key, 1);
-    macKey = _keyGen(key, 2);
-    asymmetricKeySeed = _keyGen(key, 3);
-    subDerivationKey = _keyGen(key, 4);
-    deterministicEncryptionKey = _keyGen(key, 5);
-  }
+  );
 
   @override
   void dispose() {
     cipherKey.dispose();
-    macKey.dispose();
-    asymmetricKeySeed.dispose();
-    subDerivationKey.dispose();
-    deterministicEncryptionKey.dispose();
+    // using the list ensures that keys are not initialized in the dispose
+    // method. Each call to [_keyGen] adds the generated key to the list.
+    for (final key in _disposables) {
+      key.dispose();
+    }
   }
 
   @override
@@ -166,10 +164,12 @@ abstract base class CryptoManagerSync
   }
 
   @override
-  Uint8List deriveSubkey(Uint8List salt) => sodium.crypto.genericHash(
-        message: subDerivationKey.extractBytes(),
-        key: sodium.secureCopy(salt),
-        outLen: _hashSize,
+  SecureKey deriveSubkey(Uint8List salt) => sodium.secureCopy(
+        sodium.crypto.genericHash(
+          message: subDerivationKey.extractBytes(),
+          key: sodium.secureCopy(salt),
+          outLen: _hashSize,
+        ),
       );
 
   @override
@@ -197,13 +197,16 @@ abstract base class CryptoManagerSync
   ]) =>
       prettyFingerprintSync(sodium, content, delimiter);
 
-  SecureKey _keyGen(SecureKey key, int keyId) =>
-      sodium.crypto.kdf.deriveFromKey(
-        masterKey: key,
-        context: context.padRight(sodium.crypto.kdf.contextBytes),
-        subkeyId: BigInt.from(keyId),
-        subkeyLen: CryptoManager.keySize,
-      );
+  SecureKey _keyGen(SecureKey key, int keyId) {
+    final subKey = sodium.crypto.kdf.deriveFromKey(
+      masterKey: key,
+      context: context.padRight(sodium.crypto.kdf.contextBytes),
+      subkeyId: BigInt.from(keyId),
+      subkeyLen: CryptoManager.keySize,
+    );
+    _disposables.add(subKey);
+    return subKey;
+  }
 
   static String prettyFingerprintSync(
     SodiumSumo sodium,

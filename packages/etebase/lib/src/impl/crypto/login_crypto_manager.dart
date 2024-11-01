@@ -7,7 +7,7 @@ import 'crypto_manager_base.dart';
 
 @internal
 abstract interface class LoginCryptoManager implements CryptoManagerBase {
-  FutureOr<Uint8List> get pubKey;
+  Uint8List get pubKey;
 
   FutureOr<Uint8List> signDetached(Uint8List message);
 

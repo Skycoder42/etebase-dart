@@ -8,9 +8,9 @@ import 'crypto_manager_base.dart';
 
 @internal
 abstract interface class BoxCryptoManager implements CryptoManagerBase {
-  FutureOr<Uint8List> get pubKey;
+  Uint8List get pubKey;
 
-  FutureOr<SecureKey> get privKey;
+  SecureKey get privKey;
 
   FutureOr<Uint8List> encrypt({
     required Uint8List message,

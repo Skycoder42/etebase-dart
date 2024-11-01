@@ -2,16 +2,29 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
+import 'package:sodium/sodium_sumo.dart';
 
 import '../account_crypto_manager.dart';
 import '../sync/account_crypto_manager_sync.dart';
 import 'crypto_manager_async.dart';
+import 'isolated_crypto_manager.dart';
 
 @internal
 final class AccountCryptoManagerAsync
     extends CryptoManagerAsync<AccountCryptoManagerSync>
     implements AccountCryptoManager {
-  AccountCryptoManagerAsync(super.isolated, super.cmRef, super.version);
+  AccountCryptoManagerAsync(super.isolated, super.key, super.version);
+
+  @override
+  Future<CryptoManagerRef<AccountCryptoManagerSync>> initManagerSync(
+    SecureKey key,
+    int version,
+  ) =>
+      isolated.createCryptoManager(
+        secureKeys: [key],
+        cryptoManagerFactory: (sodium, secureKeys, _) =>
+            AccountCryptoManagerSync(sodium, secureKeys[0], version),
+      );
 
   @override
   Future<Uint8List> colTypeToUid(String colId) =>

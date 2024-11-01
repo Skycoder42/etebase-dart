@@ -6,9 +6,6 @@ import 'package:sodium/sodium_sumo.dart';
 
 import '../crypto_service.dart';
 import '../key_derivator.dart';
-import '../sync/box_crypto_manager_sync.dart';
-import '../sync/main_crypto_manager_sync.dart';
-import '../sync/storage_crypto_manager_sync.dart';
 import 'box_crypto_manager_async.dart';
 import 'isolated_crypto_manager.dart';
 import 'main_crypto_manager_async.dart';
@@ -27,7 +24,7 @@ final class CryptoServiceAsync implements CryptoService {
   late final keyDerivator = KeyDerivator(_isolated.sodium);
 
   @override
-  Future<void> dispose() async => _isolated.dispose();
+  Future<void> dispose() => _isolated.dispose();
 
   @override
   Uint8List randomBytes(int length) => _isolated.sodium.randombytes.buf(length);
@@ -39,40 +36,22 @@ final class CryptoServiceAsync implements CryptoService {
   SecureKey secureCopy(Uint8List bytes) => _isolated.sodium.secureCopy(bytes);
 
   @override
-  Future<MainCryptoManagerAsync> createMainCryptoManager(
+  MainCryptoManagerAsync createMainCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,
-  }) async {
-    final cmRef = await _isolated.createCryptoManager(
-      secureKeys: [key],
-      cryptoManagerFactory: (sodium, secureKeys, _) =>
-          MainCryptoManagerSync(sodium, secureKeys[0], version),
-    );
-    return MainCryptoManagerAsync(_isolated, cmRef, version);
-  }
+  }) =>
+      MainCryptoManagerAsync(_isolated, key, version);
 
   @override
-  Future<BoxCryptoManagerAsync> createIdentityCryptoManager([
+  BoxCryptoManagerAsync createIdentityCryptoManager([
     SecureKey? seed,
-  ]) async {
-    final cmRef = await _isolated.createCryptoManager(
-      secureKeys: [if (seed != null) seed],
-      cryptoManagerFactory: (sodium, secureKeys, _) =>
-          BoxCryptoManagerSync.fromSeed(sodium, secureKeys.firstOrNull),
-    );
-    return BoxCryptoManagerAsync(_isolated, cmRef);
-  }
+  ]) =>
+      BoxCryptoManagerAsync.fromSeed(_isolated, seed);
 
   @override
-  Future<StorageCryptoManagerAsync> createStorageCryptoManager(
+  StorageCryptoManagerAsync createStorageCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,
-  }) async {
-    final cmRef = await _isolated.createCryptoManager(
-      secureKeys: [key],
-      cryptoManagerFactory: (sodium, secureKeys, _) =>
-          StorageCryptoManagerSync(sodium, secureKeys[0], version),
-    );
-    return StorageCryptoManagerAsync(_isolated, cmRef, version);
-  }
+  }) =>
+      StorageCryptoManagerAsync(_isolated, key, version);
 }

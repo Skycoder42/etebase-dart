@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
+import 'package:sodium/sodium_sumo.dart';
 
 import 'crypto_mac.dart';
 import 'crypto_manager_base.dart';
@@ -51,7 +52,7 @@ abstract interface class CryptoManager implements CryptoManagerBase {
     Uint8List? additionalData,
   ]);
 
-  FutureOr<Uint8List> deriveSubkey(Uint8List salt);
+  FutureOr<SecureKey> deriveSubkey(Uint8List salt);
 
   FutureOr<CryptoMac> getCryptoMac({bool withKey = true});
 
