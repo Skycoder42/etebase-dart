@@ -10,9 +10,11 @@ import 'login_crypto_manager.dart';
 
 @internal
 abstract interface class MainCryptoManager implements CryptoManager {
+  SecureKey get mainKey;
+
   FutureOr<LoginCryptoManager> createLoginCryptoManager();
 
-  FutureOr<AccountCryptoManager> createAccountCryptoManager(SecureKey privKey);
+  AccountCryptoManager createAccountCryptoManager(SecureKey privKey);
 
-  FutureOr<BoxCryptoManager> createIdentityCryptoManager(SecureKey privKey);
+  BoxCryptoManager createIdentityCryptoManager(SecureKey privKey);
 }

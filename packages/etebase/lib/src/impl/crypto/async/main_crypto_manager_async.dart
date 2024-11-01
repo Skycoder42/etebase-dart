@@ -8,46 +8,52 @@ import '../sync/main_crypto_manager_sync.dart';
 import 'account_crypto_manager_async.dart';
 import 'box_crypto_manager_async.dart';
 import 'crypto_manager_async.dart';
+import 'isolated_crypto_manager.dart';
 import 'login_crypto_manager_async.dart';
 
 @internal
 final class MainCryptoManagerAsync
     extends CryptoManagerAsync<MainCryptoManagerSync>
     implements MainCryptoManager {
-  MainCryptoManagerAsync(super.isolated, super.cmRef, super.version);
+  MainCryptoManagerAsync(super.isolated, super.key, super.version);
+
+  @override
+  SecureKey get mainKey => super.key;
+
+  @override
+  Future<CryptoManagerRef<MainCryptoManagerSync>> initManagerSync(
+    SecureKey key,
+    int version,
+  ) =>
+      isolated.createCryptoManager(
+        secureKeys: [key],
+        cryptoManagerFactory: (sodium, secureKeys, _) =>
+            MainCryptoManagerSync(sodium, secureKeys[0], version),
+      );
 
   @override
   Future<LoginCryptoManagerAsync> createLoginCryptoManager() async {
-    final loginRef = await isolated.createCryptoManagerWithParent(
-      parentRef: cmRef,
-      cryptoManagerFactory: (cm, _, __) => cm.createLoginCryptoManager(),
+    final keyPair = await exec(
+      (cm, _, __) => cm.sodium.crypto.sign.seedKeyPair(cm.asymmetricKeySeed),
     );
-    return LoginCryptoManagerAsync(isolated, loginRef);
+    return LoginCryptoManagerAsync(isolated, keyPair);
   }
 
   @override
-  Future<AccountCryptoManagerAsync> createAccountCryptoManager(
+  AccountCryptoManagerAsync createAccountCryptoManager(
     SecureKey privKey,
-  ) async {
-    final accountRef = await isolated.createCryptoManagerWithParent(
-      parentRef: cmRef,
-      secureKeys: [privKey],
-      cryptoManagerFactory: (cm, secureKeys, __) =>
-          cm.createAccountCryptoManager(secureKeys[0]),
-    );
-    return AccountCryptoManagerAsync(isolated, accountRef, version);
-  }
+  ) =>
+      AccountCryptoManagerAsync(isolated, privKey, version);
 
   @override
-  Future<BoxCryptoManagerAsync> createIdentityCryptoManager(
+  BoxCryptoManagerAsync createIdentityCryptoManager(
     SecureKey privKey,
-  ) async {
-    final boxRef = await isolated.createCryptoManagerWithParent(
-      parentRef: cmRef,
-      secureKeys: [privKey],
-      cryptoManagerFactory: (cm, secureKeys, __) =>
-          cm.createIdentityCryptoManager(secureKeys[0]),
-    );
-    return BoxCryptoManagerAsync(isolated, boxRef);
-  }
+  ) =>
+      BoxCryptoManagerAsync(
+        isolated,
+        KeyPair(
+          publicKey: isolated.sodium.crypto.scalarmult.base(n: privKey),
+          secretKey: privKey,
+        ),
+      );
 }

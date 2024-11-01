@@ -23,14 +23,14 @@ abstract interface class CryptoService {
 
   SecureKey secureCopy(Uint8List bytes);
 
-  FutureOr<MainCryptoManager> createMainCryptoManager(
+  MainCryptoManager createMainCryptoManager(
     SecureKey key, {
     int version = currentVersion,
   });
 
-  FutureOr<BoxCryptoManager> createIdentityCryptoManager([SecureKey? seed]);
+  BoxCryptoManager createIdentityCryptoManager([SecureKey? seed]);
 
-  FutureOr<StorageCryptoManager> createStorageCryptoManager(
+  StorageCryptoManager createStorageCryptoManager(
     SecureKey key, {
     int version = currentVersion,
   });

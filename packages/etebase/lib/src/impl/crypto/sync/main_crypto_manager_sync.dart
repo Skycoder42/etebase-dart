@@ -16,6 +16,9 @@ final class MainCryptoManagerSync extends CryptoManagerSync
   String get context => 'Main';
 
   @override
+  SecureKey get mainKey => super.key;
+
+  @override
   LoginCryptoManagerSync createLoginCryptoManager() => LoginCryptoManagerSync(
         sodium,
         sodium.crypto.sign.seedKeyPair(asymmetricKeySeed),
@@ -31,7 +34,7 @@ final class MainCryptoManagerSync extends CryptoManagerSync
         sodium,
         KeyPair(
           publicKey: sodium.crypto.scalarmult.base(n: privKey),
-          secretKey: privKey.copy(),
+          secretKey: privKey,
         ),
       );
 }

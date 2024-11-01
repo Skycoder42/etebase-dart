@@ -8,25 +8,39 @@ import '../crypto_mac.dart';
 import '../crypto_manager.dart';
 import '../rollsum.dart';
 import '../sync/crypto_manager_sync.dart';
+import 'crypto_manager_base_async.dart';
 import 'isolated_crypto_manager.dart';
 
 @internal
-base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
-    implements CryptoManager {
+abstract base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
+    extends CryptoManagerBaseAsync<TCryptoManager> implements CryptoManager {
+  @protected
+  final SecureKey key;
   @override
   final int version;
 
   @protected
-  final IsolatedCryptoManager isolated;
+  CryptoManagerAsync(super.isolated, this.key, this.version);
 
-  @protected
-  final CryptoManagerRef<TCryptoManager> cmRef;
-
-  @protected
-  CryptoManagerAsync(this.isolated, this.cmRef, this.version);
+  // more specialized method ensures key/version are always copied,
+  // without class references
+  @visibleForOverriding
+  Future<CryptoManagerRef<TCryptoManager>> initManagerSync(
+    SecureKey key,
+    int version,
+  );
 
   @override
-  Future<void> dispose() => isolated.disposeCryptoManager(cmRef);
+  @nonVirtual
+  Future<CryptoManagerRef<TCryptoManager>> initSync() =>
+      initManagerSync(key, version);
+
+  @override
+  @mustCallSuper
+  Future<void> dispose() {
+    key.dispose();
+    return super.dispose();
+  }
 
   @override
   Future<Uint8List> encrypt(
@@ -84,7 +98,7 @@ base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
       );
 
   @override
-  Future<Uint8List> deriveSubkey(Uint8List salt) =>
+  Future<SecureKey> deriveSubkey(Uint8List salt) =>
       exec((cm, _, __) => cm.deriveSubkey(salt));
 
   @override
@@ -93,13 +107,16 @@ base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
       return CryptoMac(isolated.sodium);
     }
 
-    final key = await exec(
-      (cm, _, __) => cm.sodium.createTransferrableSecureKey(cm.macKey),
+    final key = isolated.sodium.materializeTransferrableSecureKey(
+      await exec(
+        (cm, _, __) => cm.sodium.createTransferrableSecureKey(cm.macKey),
+      ),
     );
-    return CryptoMac(
-      isolated.sodium,
-      key: isolated.sodium.materializeTransferrableSecureKey(key),
-    );
+    try {
+      return CryptoMac(isolated.sodium, key: key);
+    } finally {
+      key.dispose();
+    }
   }
 
   @override
@@ -122,16 +139,4 @@ base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
         content,
         delimiter,
       );
-
-  @protected
-  Future<TResult> exec<TResult>(
-    TResult Function(
-      TCryptoManager cryptoManager,
-      List<SecureKey> secureKey,
-      List<KeyPair> keyPairs,
-    ) callback, {
-    List<SecureKey> secureKey = const [],
-    List<KeyPair> keyPairs = const [],
-  }) =>
-      isolated(cmRef, callback, secureKeys: secureKey, keyPairs: keyPairs);
 }

@@ -17,19 +17,22 @@ class BoxCryptoManagerSync implements BoxCryptoManager, CryptoManagerBaseSync {
   factory BoxCryptoManagerSync.fromSeed(
     SodiumSumo sodium, [
     SecureKey? seed,
-  ]) =>
-      BoxCryptoManagerSync(
-        sodium,
-        seed != null
-            ? sodium.crypto.box.seedKeyPair(seed)
-            : sodium.crypto.box.keyPair(),
-      );
+  ]) {
+    final cm = BoxCryptoManagerSync(
+      sodium,
+      seed != null
+          ? sodium.crypto.box.seedKeyPair(seed)
+          : sodium.crypto.box.keyPair(),
+    );
+    seed?.dispose();
+    return cm;
+  }
 
   @override
   Uint8List get pubKey => _keyPair.publicKey;
 
   @override
-  SecureKey get privKey => _keyPair.secretKey.copy();
+  SecureKey get privKey => _keyPair.secretKey;
 
   @override
   void dispose() => _keyPair.dispose();
