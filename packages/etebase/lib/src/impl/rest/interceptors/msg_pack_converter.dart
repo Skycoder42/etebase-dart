@@ -15,12 +15,12 @@ import '../../../api/exceptions/permission_denied.dart';
 import '../../../api/exceptions/server_problem.dart';
 import '../../../api/exceptions/temporary_server_problem.dart';
 import '../../../api/exceptions/unauthorized.dart';
+import '../../codec/message_pack_converter.dart';
 import '../../models/challenge_request.dart';
 import '../../models/login_challenge.dart';
 import '../../models/login_request.dart';
 import '../../models/login_response.dart';
 import '../../models/signup_request.dart';
-import '../msg_pack_codec.dart';
 
 typedef _FromJson<T> = T Function(Map<String, dynamic> json);
 
@@ -28,9 +28,11 @@ typedef _FromJson<T> = T Function(Map<String, dynamic> json);
 class MsgPackConverter implements Converter, ErrorConverter {
   static const _msgPackContentType = 'application/msgpack';
 
+  final MessagePackConverter _converter;
+
   final _factories = <Type, _FromJson<dynamic>>{};
 
-  MsgPackConverter() {
+  MsgPackConverter(this._converter) {
     _add(SignupRequest.fromJson);
     _add(LoginResponse.fromJson);
     _add(ChallengeRequest.fromJson);
@@ -46,7 +48,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
     }
 
     return applyHeader(
-      request.copyWith(body: msgPack.encode(body)),
+      request.copyWith(body: _converter.encode(body)),
       contentTypeKey,
       _msgPackContentType,
       override: false,
@@ -143,7 +145,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
 
   T _deserialize<T>(Uint8List data) {
     try {
-      final jsonData = msgPack.decode(data);
+      final jsonData = _converter.decodeRaw(data);
       if (jsonData is! T) {
         throw InvalidMessagePackData(
           'Expected deserialized data to be of type $T, '

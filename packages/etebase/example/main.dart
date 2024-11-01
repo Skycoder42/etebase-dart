@@ -10,7 +10,8 @@ import 'package:sodium/sodium_sumo.dart';
 
 void main(List<String> args) async {
   final sodium = await SodiumSumoInit.init(
-    () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
+    // () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
+    () => DynamicLibrary.open('/usr/lib/libsodium.so'),
   );
   final userName = base64Url.encode(sodium.randombytes.buf(18));
   print(userName);
@@ -41,9 +42,26 @@ void main(List<String> args) async {
     await account.dispose();
   }
 
-  final account = await EtebaseAccount.login(client, userName, userName * 2);
-  print('second login successful');
+  final encryptionKey = sodium.secureRandom(32);
+  String storedData;
+  {
+    final account = await EtebaseAccount.login(client, userName, userName * 2);
+    print('second login successful');
+    storedData = await account.save(encryptionKey);
+    print('save successful: $storedData');
+    await account.dispose();
+  }
+
+  final account = await EtebaseAccount.restore(
+    client,
+    storedData,
+    encryptionKey,
+  );
+  print('restore successful');
+  await account.fetchToken();
+  print('fetchToken successful');
   await account.dispose();
+  encryptionKey.dispose();
 
   await client.dispose();
 }

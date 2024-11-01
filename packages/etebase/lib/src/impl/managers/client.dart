@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/managers/etebase_client.dart';
+import '../codec/message_pack_converter.dart';
 import '../crypto/crypto_service.dart';
 import '../crypto/sync/crypto_service_sync.dart';
 import '../rest/etebase_api_client.dart';
@@ -10,10 +11,12 @@ import '../rest/etebase_api_client.dart';
 class Client implements EtebaseClient {
   final EtebaseApiClient api;
   final CryptoService crypto;
+  final MessagePackConverter msgPack;
 
   Client(
     this.api,
     this.crypto,
+    this.msgPack,
   );
 
   factory Client.create(
@@ -23,6 +26,7 @@ class Client implements EtebaseClient {
       Client(
         EtebaseApiClient(baseUrl: serverUrl),
         CryptoServiceSync(sodium), // TODO allow async
+        const MessagePackConverter(),
       );
 
   @override

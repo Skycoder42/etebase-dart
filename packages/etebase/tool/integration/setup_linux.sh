@@ -4,13 +4,13 @@ set -e
 
 function startServer {
   echo "::group::Start etesync server"
-  docker run -d --rm \
+  podman run -d --rm \
     --pull always \
     -e SUPER_USER=admin \
     -e AUTO_SIGNUP=true \
     -e 'ALLOWED_HOSTS=localhost,127.0.0.1,[::1]' \
     -p 127.0.0.1:3735:3735 \
-    victorrds/etesync
+    docker.io/victorrds/etesync
   echo ::endgroup::
 }
 

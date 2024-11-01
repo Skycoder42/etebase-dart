@@ -72,7 +72,7 @@ abstract interface class EtebaseAccount {
   /// @param this_ the object handle
   /// @param encryption_key used to encrypt the returned account string to enhance security
   /// @param encryption_key_size size of the encryption_key
-  String save([SecureKey? encryptionKey]);
+  Future<String> save([SecureKey? encryptionKey]);
 
   /// Restore and return the account object from the string obtained using `etebase_account_save`
   ///
@@ -80,10 +80,10 @@ abstract interface class EtebaseAccount {
   /// @param account_data_stored the stored account string
   /// @param encryption_key the same encryption key passed to `etebase_account_save` while saving the account
   /// @param encryption_key_size size of the encryption_key
-  static EtebaseAccount restore(
+  static Future<EtebaseAccount> restore(
     EtebaseClient client,
     String accountDataStored, [
     SecureKey? encryptionKey,
   ]) =>
-      throw UnimplementedError();
+      Account.restore(client as Client, accountDataStored, encryptionKey);
 }
