@@ -1,6 +1,7 @@
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 
+import '../codec/message_pack_converter.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/msg_pack_converter.dart';
 import 'services/authentication_service.dart';
@@ -9,8 +10,11 @@ import 'services/authentication_service.dart';
 final class EtebaseApiClient extends ChopperClient {
   static final defaultUrl = Uri.https('api.etebase.com');
 
-  factory EtebaseApiClient({Uri? baseUrl}) =>
-      EtebaseApiClient._(baseUrl, MsgPackConverter());
+  factory EtebaseApiClient({
+    Uri? baseUrl,
+    MessagePackConverter converter = const MessagePackConverter(),
+  }) =>
+      EtebaseApiClient._(baseUrl, MsgPackConverter(converter));
 
   EtebaseApiClient._(
     Uri? baseUrl,

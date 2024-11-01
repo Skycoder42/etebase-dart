@@ -40,7 +40,7 @@ abstract base class CryptoManagerSync
 
   @override
   void dispose() {
-    cipherKey.dispose();
+    key.dispose();
     // using the list ensures that keys are not initialized in the dispose
     // method. Each call to [_keyGen] adds the generated key to the list.
     for (final key in _disposables) {

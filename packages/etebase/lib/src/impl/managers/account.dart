@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
+import '../../api/exceptions/api_missue.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
 import '../../api/managers/etebase_collection_manager.dart';
@@ -13,13 +14,13 @@ import '../crypto/crypto_service.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/main_crypto_manager.dart';
 import '../models/account_data.dart';
+import '../models/account_data_stored.dart';
 import '../models/challenge_request.dart';
 import '../models/challenge_response.dart';
 import '../models/login_request.dart';
 import '../models/signup_request.dart';
 import '../models/user.dart';
 import '../rest/interceptors/auth_interceptor.dart';
-import '../rest/msg_pack_codec.dart';
 import 'client.dart';
 
 @internal
@@ -226,20 +227,76 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      final encryptedAccountData =
-          await _mainCryptoManager.mainKey.runUnlockedAsync(
-        (mainKeyData) => cryptoManager.encrypt(
-          msgPack.encode(
-            AccountData(
-              user: _user,
-              authToken: _authToken.value,
-              serverUrl: _client.api.baseUrl,
-              version: CryptoService.currentVersion,
-              key: mainKeyData,
-            ),
-          ),
-          CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
+      final accountData = AccountData(
+        user: _user,
+        authToken: _authToken.value,
+        serverUrl: _client.api.baseUrl,
+        version: CryptoService.currentVersion,
+        key: await _mainCryptoManager.mainKey
+            .runUnlockedAsync(cryptoManager.encrypt),
+      );
+
+      final encryptedAccountData = await cryptoManager.encrypt(
+        _client.msgPack.encode(accountData),
+        CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
+      );
+
+      return _client.msgPack.encode64(
+        AccountDataStored(
+          version: CryptoService.currentVersion,
+          encryptedData: encryptedAccountData,
         ),
+      );
+    } finally {
+      await arena.dispose();
+    }
+  }
+
+  static Future<Account> restore(
+    Client client,
+    String accountDataStored, [
+    SecureKey? encryptionKey,
+  ]) async {
+    final arena = CryptoArena();
+    try {
+      final decodedStoredData = client.msgPack.decode64(
+        accountDataStored,
+        AccountDataStored.fromJson,
+      );
+
+      final cryptoManager = arena(
+        client.crypto.createStorageCryptoManager(
+          encryptionKey?.copy() ??
+              client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
+          version: decodedStoredData.version,
+        ),
+      );
+
+      final accountData = client.msgPack.decode(
+        await cryptoManager.decrypt(
+          decodedStoredData.encryptedData,
+          CryptoUtils.uint32ToUint8List(decodedStoredData.version),
+        ),
+        AccountData.fromJson,
+      );
+
+      if (accountData.serverUrl != client.api.baseUrl) {
+        throw ApiMissuse(
+          'The account data belongs to ${accountData.serverUrl}, but the '
+          'current client used to restore it uses ${client.api.baseUrl}',
+        );
+      }
+
+      return Account(
+        client,
+        client.crypto.createMainCryptoManager(
+          client.crypto.secureCopy(
+            await cryptoManager.decrypt(accountData.key),
+          ),
+          version: accountData.version,
+        ),
+        accountData.user,
+        accountData.authToken,
       );
     } finally {
       await arena.dispose();
@@ -272,7 +329,7 @@ class Account implements EtebaseAccount {
     final loginCryptoManager =
         await mainCryptoManager.createLoginCryptoManager();
     try {
-      final encodedResponse = msgPack.encode(response);
+      final encodedResponse = client.msgPack.encode(response);
       final signature = await loginCryptoManager.signDetached(encodedResponse);
       return LoginRequest(
         response: encodedResponse,
