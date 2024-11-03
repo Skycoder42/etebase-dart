@@ -36,6 +36,10 @@ final class CryptoServiceAsync implements CryptoService {
   SecureKey secureCopy(Uint8List bytes) => _isolated.sodium.secureCopy(bytes);
 
   @override
+  Uint8List bufferPadSmall(Uint8List buffer) =>
+      _isolated.sodium.pad(buffer, buffer.length + 1);
+
+  @override
   MainCryptoManagerAsync createMainCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,

@@ -4,6 +4,8 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../account_crypto_manager.dart';
+import '../crypto_service.dart';
+import 'collection_crypto_manager_sync.dart';
 import 'crypto_manager_sync.dart';
 
 @internal
@@ -26,4 +28,11 @@ final class AccountCryptoManagerSync extends CryptoManagerSync
       .unpad(deterministicDecrypt(uid), _colTypePadSize)
       .signedView()
       .toDartString();
+
+  @override
+  CollectionCryptoManagerSync createCollectionCryptoManager(
+    SecureKey key, {
+    int version = CryptoService.currentVersion,
+  }) =>
+      CollectionCryptoManagerSync(sodium, this, key, version);
 }

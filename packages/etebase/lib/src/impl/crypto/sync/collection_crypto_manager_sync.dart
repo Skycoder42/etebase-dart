@@ -17,6 +17,4 @@ final class CollectionCryptoManagerSync
     super.key,
     super.version,
   );
-
-  // TODO dispose account manager?
 }

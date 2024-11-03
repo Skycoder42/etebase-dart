@@ -8,6 +8,8 @@ import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
 import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/models/etebase_user.dart';
+import '../crypto/account_crypto_manager.dart';
+import '../crypto/box_crypto_manager.dart';
 import '../crypto/crypto_arena.dart';
 import '../crypto/crypto_manager.dart';
 import '../crypto/crypto_service.dart';
@@ -18,10 +20,12 @@ import '../models/account_data_stored.dart';
 import '../models/challenge_request.dart';
 import '../models/challenge_response.dart';
 import '../models/login_request.dart';
+import '../models/login_response.dart';
 import '../models/signup_request.dart';
 import '../models/user.dart';
 import '../rest/interceptors/auth_interceptor.dart';
 import 'client.dart';
+import 'collection_manager.dart';
 
 @internal
 class Account implements EtebaseAccount {
@@ -31,6 +35,9 @@ class Account implements EtebaseAccount {
   User _user;
   AuthToken _authToken;
 
+  final AccountCryptoManager _accountCryptoManager;
+  final BoxCryptoManager _identityCryptoManager;
+
   var _disposed = false;
 
   Account(
@@ -38,6 +45,8 @@ class Account implements EtebaseAccount {
     this._mainCryptoManager,
     this._user,
     String authToken,
+    this._accountCryptoManager,
+    this._identityCryptoManager,
   ) : _authToken = AuthToken(authToken);
 
   static Future<Account> signup(
@@ -77,11 +86,11 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      return Account(
+      return await _createAccount(
+        arena,
         client,
-        arena.detach(mainCryptoManager),
-        response.user,
-        response.token,
+        mainCryptoManager,
+        response,
       );
     } finally {
       await arena.dispose();
@@ -122,16 +131,83 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      return Account(
+      return await _createAccount(
+        arena,
         client,
-        arena.detach(mainCryptoManager),
-        loginResponse.user,
-        loginResponse.token,
+        mainCryptoManager,
+        loginResponse,
       );
     } finally {
       await arena.dispose();
     }
   }
+
+  static Future<Account> restore(
+    Client client,
+    String accountDataStored, [
+    SecureKey? encryptionKey,
+  ]) async {
+    final arena = CryptoArena();
+    try {
+      final decodedStoredData = client.msgPack.decode64(
+        accountDataStored,
+        AccountDataStored.fromJson,
+      );
+
+      final cryptoManager = arena(
+        client.crypto.createStorageCryptoManager(
+          encryptionKey?.copy() ??
+              client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
+          version: decodedStoredData.version,
+        ),
+      );
+
+      final accountData = client.msgPack.decode(
+        await cryptoManager.decrypt(
+          decodedStoredData.encryptedData,
+          CryptoUtils.uint32ToUint8List(decodedStoredData.version),
+        ),
+        AccountData.fromJson,
+      );
+
+      if (accountData.serverUrl != client.api.baseUrl) {
+        throw ApiMissuse(
+          'The account data belongs to ${accountData.serverUrl}, but the '
+          'current client used to restore it uses ${client.api.baseUrl}',
+        );
+      }
+
+      final mainCryptoManager = arena(
+        client.crypto.createMainCryptoManager(
+          client.crypto.secureCopy(
+            await cryptoManager.decrypt(accountData.key),
+          ),
+          version: accountData.version,
+        ),
+      );
+
+      return await _createAccount(
+        arena,
+        client,
+        mainCryptoManager,
+        LoginResponse(
+          token: accountData.authToken,
+          user: accountData.user,
+        ),
+      );
+    } finally {
+      await arena.dispose();
+    }
+  }
+
+  @override
+  CollectionManager get collectionManager =>
+      CollectionManager(_client, _accountCryptoManager);
+
+  @override
+  // TODO: implement invitationManager
+  EtebaseCollectionInvitationManager get invitationManager =>
+      throw UnimplementedError();
 
   @override
   Future<void> dispose() async {
@@ -143,6 +219,8 @@ class Account implements EtebaseAccount {
 
     _disposed = true;
     await _mainCryptoManager.dispose();
+    await _accountCryptoManager.dispose();
+    await _identityCryptoManager.dispose();
   }
 
   @override
@@ -252,66 +330,6 @@ class Account implements EtebaseAccount {
     }
   }
 
-  static Future<Account> restore(
-    Client client,
-    String accountDataStored, [
-    SecureKey? encryptionKey,
-  ]) async {
-    final arena = CryptoArena();
-    try {
-      final decodedStoredData = client.msgPack.decode64(
-        accountDataStored,
-        AccountDataStored.fromJson,
-      );
-
-      final cryptoManager = arena(
-        client.crypto.createStorageCryptoManager(
-          encryptionKey?.copy() ??
-              client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
-          version: decodedStoredData.version,
-        ),
-      );
-
-      final accountData = client.msgPack.decode(
-        await cryptoManager.decrypt(
-          decodedStoredData.encryptedData,
-          CryptoUtils.uint32ToUint8List(decodedStoredData.version),
-        ),
-        AccountData.fromJson,
-      );
-
-      if (accountData.serverUrl != client.api.baseUrl) {
-        throw ApiMissuse(
-          'The account data belongs to ${accountData.serverUrl}, but the '
-          'current client used to restore it uses ${client.api.baseUrl}',
-        );
-      }
-
-      return Account(
-        client,
-        client.crypto.createMainCryptoManager(
-          client.crypto.secureCopy(
-            await cryptoManager.decrypt(accountData.key),
-          ),
-          version: accountData.version,
-        ),
-        accountData.user,
-        accountData.authToken,
-      );
-    } finally {
-      await arena.dispose();
-    }
-  }
-
-  @override
-  // TODO: implement collectionManager
-  EtebaseCollectionManager get collectionManager => throw UnimplementedError();
-
-  @override
-  // TODO: implement invitationManager
-  EtebaseCollectionInvitationManager get invitationManager =>
-      throw UnimplementedError();
-
   Future<LoginRequest> _signChallenge(ChallengeResponse response) async =>
       await _signStaticChallenge(
         _client,
@@ -340,33 +358,24 @@ class Account implements EtebaseAccount {
     }
   }
 
-  // static Future<Account> _createAccount(
-  //   Client client,
-  //   CryptoArena arena,
-  //   MainCryptoManager mainCryptoManager,
-  //   LoginResponse response,
-  // ) async {
-  //   final (accountKey, identityKey) = arena(
-  //     CryptoUtils.split2Secure(
-  //       client.crypto,
-  //       await mainCryptoManager.decrypt(response.user.encryptedContent),
-  //       CryptoManager.keySize,
-  //     ),
-  //   );
-  //   final accountCryptoManager = arena(
-  //     await mainCryptoManager.createAccountCryptoManager(accountKey),
-  //   );
-  //   final identityCryptoManager = arena(
-  //     await mainCryptoManager.createIdentityCryptoManager(identityKey),
-  //   );
-
-  //   return Account(
-  //     client,
-  //     arena.detach(mainCryptoManager),
-  //     arena.detach(accountCryptoManager),
-  //     arena.detach(identityCryptoManager),
-  //     response.user.username,
-  //     response.token,
-  //   );
-  // }
+  static Future<Account> _createAccount(
+    CryptoArena arena,
+    Client client,
+    MainCryptoManager mainCryptoManager,
+    LoginResponse response,
+  ) async {
+    final (accountKey, identityKey) = CryptoUtils.split2Secure(
+      client.crypto,
+      await mainCryptoManager.decrypt(response.user.encryptedContent),
+      CryptoManager.keySize,
+    );
+    return Account(
+      client,
+      arena.detach(mainCryptoManager),
+      response.user,
+      response.token,
+      mainCryptoManager.createAccountCryptoManager(accountKey),
+      mainCryptoManager.createIdentityCryptoManager(identityKey),
+    );
+  }
 }
