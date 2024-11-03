@@ -11,12 +11,12 @@ import '../rest/etebase_api_client.dart';
 class Client implements EtebaseClient {
   final EtebaseApiClient api;
   final CryptoService crypto;
-  final MessagePackConverter msgPack;
+  final MessagePackConverter coder;
 
   Client(
     this.api,
     this.crypto,
-    this.msgPack,
+    this.coder,
   );
 
   factory Client.create(

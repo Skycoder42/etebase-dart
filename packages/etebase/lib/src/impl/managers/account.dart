@@ -149,7 +149,7 @@ class Account implements EtebaseAccount {
   ]) async {
     final arena = CryptoArena();
     try {
-      final decodedStoredData = client.msgPack.decode64(
+      final decodedStoredData = client.coder.decode64(
         accountDataStored,
         AccountDataStored.fromJson,
       );
@@ -162,7 +162,7 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      final accountData = client.msgPack.decode(
+      final accountData = client.coder.decode(
         await cryptoManager.decrypt(
           decodedStoredData.encryptedData,
           CryptoUtils.uint32ToUint8List(decodedStoredData.version),
@@ -315,11 +315,11 @@ class Account implements EtebaseAccount {
       );
 
       final encryptedAccountData = await cryptoManager.encrypt(
-        _client.msgPack.encode(accountData),
+        _client.coder.encode(accountData),
         CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
       );
 
-      return _client.msgPack.encode64(
+      return _client.coder.encode64(
         AccountDataStored(
           version: CryptoService.currentVersion,
           encryptedData: encryptedAccountData,
@@ -347,7 +347,7 @@ class Account implements EtebaseAccount {
     final loginCryptoManager =
         await mainCryptoManager.createLoginCryptoManager();
     try {
-      final encodedResponse = client.msgPack.encode(response);
+      final encodedResponse = client.coder.encode(response);
       final signature = await loginCryptoManager.signDetached(encodedResponse);
       return LoginRequest(
         response: encodedResponse,

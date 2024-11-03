@@ -35,22 +35,45 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     // TODO set content
   }
 
+  Future<EtebaseItemMetadata> _getMeta(
+    Client client,
+    TCryptoManager cryptoManager,
+    Uint8List additionalData,
+  ) async {
+    final mac = client.coder.base64Decode(_uid);
+    final adHash =
+        await _calculateAdHash(client, cryptoManager, additionalData);
+    return client.coder.decode(
+      data,
+      EtebaseItemMetadata.fromJson,
+    );
+  }
+
   Future<void> _setMeta(
     Client client,
     TCryptoManager cryptoManager,
     Uint8List additionalData,
     EtebaseItemMetadata meta,
   ) async {
-    final adHash = await _calculateAdHash(cryptoManager, additionalData);
+    final adHash =
+        await _calculateAdHash(client, cryptoManager, additionalData);
     final encMeta = await cryptoManager.encryptDetached(
-      client.crypto.bufferPadSmall(client.msgPack.encode(meta)),
+      client.crypto.bufferPadSmall(client.coder.encode(meta)),
       adHash,
     );
     _meta = encMeta.nonceCipherText;
-    _uid = base64.encode(encMeta.mac);
+    _uid = client.coder.base64Encode(encMeta.mac);
   }
 
+  Future<void> _setContent(
+    Client client,
+    TCryptoManager cryptoManager,
+    Uint8List additionalData,
+    Uint8List content,
+  ) async {}
+
   Future<Uint8List> _calculateAdHash(
+    Client client,
     TCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
@@ -61,7 +84,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
 
     final chunksHash = await cryptoManager.getCryptoMac(withKey: false);
     for (final (chunk, _) in _chunks) {
-      chunksHash.update(base64.decode(chunk));
+      chunksHash.update(client.coder.base64Decode(chunk));
     }
     cryptoMac.update(await chunksHash.finalize());
 
