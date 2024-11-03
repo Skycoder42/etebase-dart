@@ -25,6 +25,8 @@ abstract interface class CryptoService {
 
   Uint8List bufferPadSmall(Uint8List buffer);
 
+  Uint8List bufferUnpad(Uint8List buffer);
+
   MainCryptoManager createMainCryptoManager(
     SecureKey key, {
     int version = currentVersion,

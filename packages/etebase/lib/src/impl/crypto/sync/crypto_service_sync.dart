@@ -35,6 +35,10 @@ final class CryptoServiceSync implements CryptoService {
       _sodium.pad(buffer, buffer.length + 1);
 
   @override
+  Uint8List bufferUnpad(Uint8List buffer) =>
+      buffer.isEmpty ? buffer : _sodium.unpad(buffer, buffer.length);
+
+  @override
   MainCryptoManagerSync createMainCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,

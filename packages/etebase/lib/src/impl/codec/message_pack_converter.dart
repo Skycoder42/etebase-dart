@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
@@ -12,6 +13,8 @@ class MessagePackConverter {
 
   String encode64(dynamic data) => msgPack64.encode(data);
 
+  String base64Encode(Uint8List data) => base64.encode(data);
+
   dynamic decodeRaw(Uint8List data) => msgPack.decode(data);
 
   dynamic decode64Raw(String data) => msgPack64.decode(data);
@@ -25,4 +28,6 @@ class MessagePackConverter {
     final rawData = decode64Raw(data);
     return fromJson((rawData as Map).cast());
   }
+
+  Uint8List base64Decode(String data) => base64.decode(data);
 }
