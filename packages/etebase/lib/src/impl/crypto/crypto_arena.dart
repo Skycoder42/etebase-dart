@@ -32,7 +32,10 @@ class CryptoArena {
     return object;
   }
 
-  Future<void> dispose() async => await Future.wait(
-        _disposables.values.map((dispose) async => await dispose()),
-      );
+  Future<void> dispose() {
+    final disposeCalls =
+        _disposables.values.map((dispose) async => await dispose());
+    _disposables.clear();
+    return Future.wait(disposeCalls);
+  }
 }

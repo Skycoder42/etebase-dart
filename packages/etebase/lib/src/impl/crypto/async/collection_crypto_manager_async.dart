@@ -21,8 +21,6 @@ final class CollectionCryptoManagerAsync
     super.version,
   );
 
-  // TODO dispose account manager?
-
   @override
   Future<CryptoManagerRef<CollectionCryptoManagerSync>> initManagerSync(
     SecureKey key,

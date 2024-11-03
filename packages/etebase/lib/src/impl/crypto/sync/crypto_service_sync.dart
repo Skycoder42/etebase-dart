@@ -31,6 +31,10 @@ final class CryptoServiceSync implements CryptoService {
   SecureKey secureCopy(Uint8List bytes) => _sodium.secureCopy(bytes);
 
   @override
+  Uint8List bufferPadSmall(Uint8List buffer) =>
+      _sodium.pad(buffer, buffer.length + 1);
+
+  @override
   MainCryptoManagerSync createMainCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,
