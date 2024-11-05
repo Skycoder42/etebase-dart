@@ -1,58 +1,38 @@
-import 'dart:typed_data';
-
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../crypto_service.dart';
-import '../key_derivator.dart';
 import 'box_crypto_manager_sync.dart';
 import 'main_crypto_manager_sync.dart';
 import 'storage_crypto_manager_sync.dart';
 
 @internal
-final class CryptoServiceSync implements CryptoService {
-  final SodiumSumo _sodium;
-
-  CryptoServiceSync(this._sodium);
-
+final class CryptoServiceSync
+    with CryptoServiceCommon
+    implements CryptoService {
   @override
-  late final keyDerivator = KeyDerivator(_sodium);
+  final SodiumSumo sodium;
+
+  CryptoServiceSync(this.sodium);
 
   @override
   void dispose() {}
-
-  @override
-  Uint8List randomBytes(int length) => _sodium.randombytes.buf(length);
-
-  @override
-  SecureKey secureRandom(int length) => _sodium.secureRandom(length);
-
-  @override
-  SecureKey secureCopy(Uint8List bytes) => _sodium.secureCopy(bytes);
-
-  @override
-  Uint8List bufferPadSmall(Uint8List buffer) =>
-      _sodium.pad(buffer, buffer.length + 1);
-
-  @override
-  Uint8List bufferUnpad(Uint8List buffer) =>
-      buffer.isEmpty ? buffer : _sodium.unpad(buffer, buffer.length);
 
   @override
   MainCryptoManagerSync createMainCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,
   }) =>
-      MainCryptoManagerSync(_sodium, key, version);
+      MainCryptoManagerSync(sodium, key, version);
 
   @override
   BoxCryptoManagerSync createIdentityCryptoManager([SecureKey? seed]) =>
-      BoxCryptoManagerSync.fromSeed(_sodium, seed);
+      BoxCryptoManagerSync.fromSeed(sodium, seed);
 
   @override
   StorageCryptoManagerSync createStorageCryptoManager(
     SecureKey key, {
     int version = CryptoService.currentVersion,
   }) =>
-      StorageCryptoManagerSync(_sodium, key, version);
+      StorageCryptoManagerSync(sodium, key, version);
 }
