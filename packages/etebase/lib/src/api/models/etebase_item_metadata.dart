@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'etebase_item_metadata.freezed.dart';
+part 'etebase_item_metadata.g.dart';
 
 /// The dart binding of the EtebaseItemMetadata rust class
 @freezed
@@ -34,4 +35,7 @@ sealed class EtebaseItemMetadata with _$EtebaseItemMetadata {
     /// @param this_ the object handle
     String? itemType,
   }) = _EtebaseItemMetadata;
+
+  factory EtebaseItemMetadata.fromJson(Map<String, dynamic> json) =>
+      _$EtebaseItemMetadataFromJson(json);
 }

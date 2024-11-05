@@ -10,8 +10,8 @@ import 'package:sodium/sodium_sumo.dart';
 
 void main(List<String> args) async {
   final sodium = await SodiumSumoInit.init(
-    // () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
-    () => DynamicLibrary.open('/usr/lib/libsodium.so'),
+    () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so.23'),
+    // () => DynamicLibrary.open('/usr/lib/libsodium.so'),
   );
   final userName = base64Url.encode(sodium.randombytes.buf(18));
   print(userName);
