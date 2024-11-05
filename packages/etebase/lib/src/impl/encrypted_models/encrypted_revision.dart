@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:meta/meta.dart';
 
 import '../../api/exceptions/integrity_compromised.dart';
 import '../../api/exceptions/missing_content.dart';
@@ -11,11 +9,9 @@ import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../managers/client.dart';
 import '../rest/converters/msg_pack_converters.dart';
+import 'chunk.dart';
 
 part 'encrypted_revision.g.dart';
-
-@internal
-typedef Chunk = (String, Uint8List?);
 
 @internal
 @JsonSerializable()
@@ -104,7 +100,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
             final hash = client.coder.base64Encode(
               await cryptoManager.calculateMac(buf),
             );
-            chunks.add((hash, buf));
+            chunks.add(Chunk(hash, buf));
             chunkStart = pos;
           }
         }
@@ -117,7 +113,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       final hash = client.coder.base64Encode(
         await cryptoManager.calculateMac(buf),
       );
-      chunks.add((hash, buf));
+      chunks.add(Chunk(hash, buf));
     }
 
     // Shuffle the items and save the ordering if we have more than one
@@ -127,7 +123,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       // Filter duplicates and construct the indice list.
       final uidIndices = <String, int>{};
       chunks = chunks.whereIndexed((i, chunk) {
-        final (uid, _) = chunk;
+        final Chunk(:uid) = chunk;
         final previousIndex = uidIndices[uid];
         if (previousIndex != null) {
           indices[i] = previousIndex;
@@ -145,16 +141,16 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
         final hash = client.coder.base64Encode(
           await cryptoManager.calculateMac(buf),
         );
-        chunks.add((hash, buf));
+        chunks.add(Chunk(hash, buf));
       }
     }
 
     // Encrypt all of the chunks
     this.chunks = await Stream.fromIterable(chunks)
         .asyncMap(
-          (chunk) async => (
-            chunk.$1,
-            await cryptoManager.encrypt(client.crypto.bufferPad(chunk.$2!)),
+          (chunk) async => Chunk(
+            chunk.uid,
+            await cryptoManager.encrypt(client.crypto.bufferPad(chunk.data!)),
           ),
         )
         .toList();
@@ -169,7 +165,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     var indices = [0];
     final decryptedChunks =
         await Stream.fromIterable(this.chunks).asyncMap((chunk) async {
-      final (uid, data) = chunk;
+      final Chunk(:uid, :data) = chunk;
       if (data == null) {
         throw MissingContent(
           'Missing content for item. Please download it using `downloadContent`',
@@ -220,8 +216,8 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       ..updateWithLenPrefix(additionalData);
 
     final chunksHash = await cryptoManager.getCryptoMac(withKey: false);
-    for (final (chunk, _) in this.chunks) {
-      chunksHash.update(client.coder.base64Decode(chunk));
+    for (final Chunk(:uid) in this.chunks) {
+      chunksHash.update(client.coder.base64Decode(uid));
     }
     cryptoMac.update(await chunksHash.finalize());
 
