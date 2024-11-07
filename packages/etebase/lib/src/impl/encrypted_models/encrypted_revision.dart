@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/exceptions/integrity_compromised.dart';
 import '../../api/exceptions/missing_content.dart';
@@ -17,15 +18,19 @@ part 'encrypted_revision.g.dart';
 @JsonSerializable()
 @msgPackBytes
 class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
-  @JsonKey(name: 'uid')
-  late String uid;
-  late Uint8List meta;
-  List<Chunk> chunks = [];
-  final bool deleted;
+  @JsonKey(name: 'uid', includeFromJson: true, includeToJson: true)
+  late String _uid;
+  @JsonKey(name: 'meta', includeFromJson: true, includeToJson: true)
+  late Uint8List _meta;
+  @JsonKey(name: 'deleted', includeFromJson: true, includeToJson: true)
+  bool _deleted = false;
+  @JsonKey(name: 'chunks', includeFromJson: true, includeToJson: true)
+  List<Chunk> _chunks = [];
 
-  EncryptedRevision({
-    this.deleted = false,
-  });
+  EncryptedRevision();
+
+  factory EncryptedRevision.fromJson(Map<String, dynamic> json) =>
+      _$EncryptedRevisionFromJson<TCryptoManager>(json);
 
   static Future<EncryptedRevision<TCryptoManager>>
       create<TCryptoManager extends CollectionItemCryptoManager>(
@@ -36,28 +41,69 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     Uint8List content,
   ) async {
     final revision = EncryptedRevision<TCryptoManager>();
-    await revision._setMeta(client, cryptoManager, additionalData, meta);
-    await revision._setContent(client, cryptoManager, additionalData, content);
+    await revision.setMeta(client, cryptoManager, additionalData, meta);
+    await revision.setContent(client, cryptoManager, additionalData, content);
     return revision;
   }
 
-  Future<EtebaseItemMetadata> _getMeta(
+  static EncryptedRevision<TCryptoManager>
+      cacheLoad<TCryptoManager extends CollectionItemCryptoManager>(
+    Client client,
+    Uint8List cachedData,
+  ) {
+    final [
+      Uint8List uid,
+      Uint8List meta,
+      bool deleted,
+      List<List<Uint8List?>> chunks
+    ] = client.coder.decodeRaw(cachedData) as List;
+    return EncryptedRevision<TCryptoManager>()
+      .._uid = client.coder.base64Encode(uid)
+      .._meta = meta
+      .._deleted = deleted
+      .._chunks = chunks
+          .map(
+            (chunk) => Chunk(
+              client.coder.base64Encode(chunk[0]!),
+              chunk.length > 1 ? chunk[1] : null,
+            ),
+          )
+          .toList();
+  }
+
+  Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
+
+  Uint8List cacheSave(Client client, {required bool saveContent}) =>
+      client.coder.encode([
+        client.coder.base64Decode(_uid),
+        _meta,
+        _deleted,
+        _chunks
+            .map(
+              (chunk) => [
+                client.coder.base64Decode(chunk.uid),
+                if (saveContent) chunk.data,
+              ],
+            )
+            .toList(),
+      ]);
+
+  Future<bool> verify(
     Client client,
     TCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
-    final mac = client.coder.base64Decode(uid);
+    final mac = client.coder.base64Decode(_uid);
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
-    return client.coder.decode(
-      client.crypto.bufferUnpad(
-        await cryptoManager.decryptDetached(this.meta, mac, adHash),
-      ),
-      EtebaseItemMetadata.fromJson,
-    );
+    try {
+      return await cryptoManager.verify(_meta, mac, adHash);
+    } on SodiumException {
+      throw IntegrityCompromised('mac verification failed');
+    }
   }
 
-  Future<void> _setMeta(
+  Future<void> setMeta(
     Client client,
     TCryptoManager cryptoManager,
     Uint8List additionalData,
@@ -69,17 +115,33 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       client.crypto.bufferPadSmall(client.coder.encode(meta)),
       adHash,
     );
-    this.meta = encMeta.nonceCipherText;
-    uid = client.coder.base64Encode(encMeta.mac);
+    this._meta = encMeta.nonceCipherText;
+    _uid = client.coder.base64Encode(encMeta.mac);
   }
 
-  Future<void> _setContent(
+  Future<EtebaseItemMetadata> getMeta(
+    Client client,
+    TCryptoManager cryptoManager,
+    Uint8List additionalData,
+  ) async {
+    final mac = client.coder.base64Decode(_uid);
+    final adHash =
+        await _calculateAdHash(client, cryptoManager, additionalData);
+    return client.coder.decode(
+      client.crypto.bufferUnpad(
+        await cryptoManager.decryptDetached(this._meta, mac, adHash),
+      ),
+      EtebaseItemMetadata.fromJson,
+    );
+  }
+
+  Future<void> setContent(
     Client client,
     TCryptoManager cryptoManager,
     Uint8List additionalData,
     Uint8List content,
   ) async {
-    final meta = await _getMeta(client, cryptoManager, additionalData);
+    final meta = await getMeta(client, cryptoManager, additionalData);
 
     var chunks = <Chunk>[];
     const minChunk = 1 << 14;
@@ -146,7 +208,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     }
 
     // Encrypt all of the chunks
-    this.chunks = await Stream.fromIterable(chunks)
+    this._chunks = await Stream.fromIterable(chunks)
         .asyncMap(
           (chunk) async => Chunk(
             chunk.uid,
@@ -155,16 +217,16 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
         )
         .toList();
 
-    await _setMeta(client, cryptoManager, additionalData, meta);
+    await setMeta(client, cryptoManager, additionalData, meta);
   }
 
-  Future<Uint8List> _getContent(
+  Future<Uint8List> getContent(
     Client client,
     TCryptoManager cryptoManager,
   ) async {
     var indices = [0];
     final decryptedChunks =
-        await Stream.fromIterable(this.chunks).asyncMap((chunk) async {
+        await Stream.fromIterable(this._chunks).asyncMap((chunk) async {
       final Chunk(:uid, :data) = chunk;
       if (data == null) {
         throw MissingContent(
@@ -185,7 +247,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     }).toList();
 
     // If we have more than one chunk we have the mapping header in the last chunk
-    if (this.chunks.length > 1) {
+    if (this._chunks.length > 1) {
       final lastChunk = client.coder.decodeRaw(decryptedChunks.removeLast())
           as List<List<int>>;
       indices = lastChunk[0];
@@ -205,6 +267,33 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     }
   }
 
+  Future<void> delete(
+    Client client,
+    TCryptoManager cryptoManager,
+    Uint8List additionalData, {
+    required bool preserveContent,
+  }) async {
+    final meta = await getMeta(client, cryptoManager, additionalData);
+
+    if (!preserveContent) {
+      _chunks = [];
+    }
+    _deleted = true;
+
+    await setMeta(client, cryptoManager, additionalData, meta);
+  }
+
+  EncryptedRevision<TCryptoManager> clone(
+    Client client,
+    TCryptoManager cryptoManager,
+    Uint8List additionalData,
+  ) =>
+      EncryptedRevision<TCryptoManager>()
+        .._uid = _uid
+        .._meta = _meta
+        .._deleted = _deleted
+        .._chunks = _chunks;
+
   Future<Uint8List> _calculateAdHash(
     Client client,
     TCryptoManager cryptoManager,
@@ -212,11 +301,11 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
   ) async {
     final cryptoMac = await cryptoManager.getCryptoMac();
     cryptoMac
-      ..update(Uint8List.fromList([if (deleted) 1 else 0]))
+      ..update(Uint8List.fromList([if (_deleted) 1 else 0]))
       ..updateWithLenPrefix(additionalData);
 
     final chunksHash = await cryptoManager.getCryptoMac(withKey: false);
-    for (final Chunk(:uid) in this.chunks) {
+    for (final Chunk(:uid) in this._chunks) {
       chunksHash.update(client.coder.base64Decode(uid));
     }
     cryptoMac.update(await chunksHash.finalize());
