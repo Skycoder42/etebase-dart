@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
+import 'account_crypto_manager.dart';
 import 'box_crypto_manager.dart';
+import 'collection_crypto_manager.dart';
+import 'collection_item_crypto_manager.dart';
 import 'key_derivator.dart';
 import 'main_crypto_manager.dart';
+import 'minimal_collection_crypto_manager.dart';
 import 'storage_crypto_manager.dart';
 
 @internal
@@ -19,6 +24,8 @@ abstract interface class CryptoService {
   FutureOr<void> dispose();
 
   Uint8List randomBytes(int length);
+
+  String genUidBase64();
 
   SecureKey secureRandom(int length);
 
@@ -43,6 +50,22 @@ abstract interface class CryptoService {
     SecureKey key, {
     int version = currentVersion,
   });
+
+  CollectionItemCryptoManager createCollectionItemCryptoManager(
+    SecureKey key, {
+    int version = currentVersion,
+  });
+
+  MinimalCollectionCryptoManager createMinimalCollectionCryptoManager(
+    SecureKey key, {
+    int version = currentVersion,
+  });
+
+  CollectionCryptoManager createCollectionCryptoManager(
+    AccountCryptoManager parentCryptoManager,
+    SecureKey key, {
+    int version = currentVersion,
+  });
 }
 
 @internal
@@ -55,6 +78,9 @@ mixin CryptoServiceCommon implements CryptoService {
 
   @override
   Uint8List randomBytes(int length) => sodium.randombytes.buf(length);
+
+  @override
+  String genUidBase64() => base64.encode(randomBytes(24));
 
   @override
   SecureKey secureRandom(int length) => sodium.secureRandom(length);

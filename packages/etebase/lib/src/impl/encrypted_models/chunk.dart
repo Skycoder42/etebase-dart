@@ -9,6 +9,8 @@ part 'chunk.freezed.dart';
 sealed class Chunk with _$Chunk {
   const factory Chunk(String uid, Uint8List? data) = _Chunk;
 
+  const Chunk._();
+
   factory Chunk.fromJson(List<dynamic> json) =>
       Chunk(json[0] as String, json[1] as Uint8List?);
 
