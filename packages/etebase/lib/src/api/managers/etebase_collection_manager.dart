@@ -28,7 +28,7 @@ abstract class EtebaseCollectionManager {
   /// @param meta the [ItemMetadata] for the collection
   /// @param content the collection's content as a byte array. This is unrelated to the [Item]s in the collection.
   /// @param content_size the content size
-  EtebaseCollection create(
+  Future<EtebaseCollection> create(
     String collectionType,
     EtebaseItemMetadata meta,
     Uint8List content,
@@ -107,7 +107,7 @@ abstract class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param cached the byte buffer holding the cached collection obtained using [cache_save]
   /// @param cached_size size of the buffer
-  EtebaseCollection cacheLoad(Uint8List cached);
+  Future<EtebaseCollection> cacheLoad(Uint8List cached);
 
   /// Save the collection object to a byte buffer for caching
   ///

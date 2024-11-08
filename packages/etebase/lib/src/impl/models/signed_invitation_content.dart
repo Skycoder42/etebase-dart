@@ -9,7 +9,7 @@ part 'signed_invitation_content.g.dart';
 
 @freezed
 @internal
-class SignedInvitationContent with _$SignedInvitationContent {
+sealed class SignedInvitationContent with _$SignedInvitationContent {
   @msgPackBytes
   const factory SignedInvitationContent({
     required Uint8List encryptionKey,

@@ -1,18 +1,18 @@
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 
-import '../interceptors/auth_interceptor.dart';
 import '../../models/challenge_request.dart';
 import '../../models/dashboard_url.dart';
 import '../../models/login_challenge.dart';
 import '../../models/login_request.dart';
 import '../../models/login_response.dart';
 import '../../models/signup_request.dart';
+import '../interceptors/auth_interceptor.dart';
 
 part 'authentication_service.chopper.dart';
 
 @internal
-@ChopperApi(baseUrl: '/api/v1/authentication')
+@ChopperApi(baseUrl: '/api/v1/authentication/')
 abstract class AuthenticationService extends ChopperService {
   AuthenticationService();
 

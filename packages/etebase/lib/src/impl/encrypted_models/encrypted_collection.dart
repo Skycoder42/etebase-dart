@@ -26,6 +26,7 @@ part 'encrypted_collection.g.dart';
 @msgPackBytes
 class EncryptedCollection {
   static const _cacheFormatVersion = 1;
+  static const _invitationUidSize = 32;
 
   @JsonKey(name: 'collectionKey', includeFromJson: true, includeToJson: true)
   late Uint8List _collectionKey;
@@ -51,7 +52,7 @@ class EncryptedCollection {
 
   EncryptedCollection();
 
-  static Future<EncryptedCollection> create(
+  static Future<(EncryptedCollection, CollectionCryptoManager)> create(
     Client client,
     AccountCryptoManager parentCm,
     String collectionTypeName,
@@ -60,22 +61,30 @@ class EncryptedCollection {
   ) async {
     final col = EncryptedCollection()
       .._collectionType = await parentCm.colTypeToUid(collectionTypeName);
-    col._collectionKey = await parentCm.encrypt(
-      client.crypto.randomBytes(CryptoManager.keySize),
-      col._collectionType,
-    );
 
-    return col.withCm(
-      client,
-      parentCm,
-      (cm) async => col
-        .._item = await EncryptedCollectionItem.create(
-          client,
-          cm,
-          meta,
-          content,
-        ),
-    );
+    final collectionKey = client.crypto.secureRandom(CryptoManager.keySize);
+    try {
+      col._collectionKey = await parentCm.encryptKey(
+        collectionKey,
+        col._collectionType,
+      );
+    } finally {
+      collectionKey.dispose();
+    }
+
+    final cm = await col.getCryptoManager(client, parentCm);
+    try {
+      col._item = await EncryptedCollectionItem.create(
+        client,
+        cm,
+        meta,
+        content,
+      );
+      return (col, cm);
+    } catch (_) {
+      await cm.dispose();
+      rethrow;
+    }
   }
 
   factory EncryptedCollection.fromJson(Map<String, dynamic> json) =>
@@ -171,7 +180,7 @@ class EncryptedCollection {
   ) async {
     final encryptionKey = await _getCollectionKey(client, parentCm);
     try {
-      final uid = client.crypto.randomBytes(32);
+      final uid = client.crypto.randomBytes(_invitationUidSize);
       final collectionType = await getCollectionType(client, parentCm);
       final signedEncryptionKey =
           await encryptionKey.runUnlockedAsync((encryptionKeyBytes) async {
@@ -198,20 +207,7 @@ class EncryptedCollection {
     }
   }
 
-  Future<T> withCm<T>(
-    Client client,
-    AccountCryptoManager parentCm,
-    FutureOr<T> Function(CollectionCryptoManager cm) callback,
-  ) async {
-    final cm = await _getCryptoManager(client, parentCm);
-    try {
-      return await callback(cm);
-    } finally {
-      await cm.dispose();
-    }
-  }
-
-  Future<CollectionCryptoManager> _getCryptoManager(
+  Future<CollectionCryptoManager> getCryptoManager(
     Client client,
     AccountCryptoManager parentCm, {
     int? version,
@@ -226,11 +222,9 @@ class EncryptedCollection {
     Client client,
     AccountCryptoManager parentCm,
   ) async =>
-      client.crypto.secureCopy(
-        Uint8List.sublistView(
-          await parentCm.decrypt(_collectionKey, _collectionType),
-          0,
-          CryptoManager.keySize,
-        ),
+      parentCm.decryptKey(
+        _collectionKey,
+        _collectionType,
+        CryptoManager.keySize,
       );
 }

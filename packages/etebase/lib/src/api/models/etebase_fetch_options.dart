@@ -1,8 +1,11 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'etebase_prefetch_option.dart';
 
 part 'etebase_fetch_options.freezed.dart';
+part 'etebase_fetch_options.g.dart';
 
 /// The dart binding of the EtebaseFetchOptions rust class
 @freezed
@@ -10,6 +13,7 @@ sealed class EtebaseFetchOptions with _$EtebaseFetchOptions {
   /// Return a new fetch options object
   ///
   /// Should be destroyed with `etebase_fetch_options_destroy`
+  @JsonSerializable(includeIfNull: false)
   const factory EtebaseFetchOptions({
     /// The sync token to fetch with
     ///
@@ -41,4 +45,7 @@ sealed class EtebaseFetchOptions with _$EtebaseFetchOptions {
     /// @param limit the limit to set
     int? limit,
   }) = _EtebaseFetchOptions;
+
+  factory EtebaseFetchOptions.fromJson(Map<String, dynamic> json) =>
+      _$EtebaseFetchOptionsFromJson(json);
 }
