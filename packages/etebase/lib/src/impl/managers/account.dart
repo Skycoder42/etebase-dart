@@ -6,7 +6,6 @@ import 'package:sodium/sodium.dart';
 import '../../api/exceptions/api_missue.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
-import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/models/etebase_user.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
