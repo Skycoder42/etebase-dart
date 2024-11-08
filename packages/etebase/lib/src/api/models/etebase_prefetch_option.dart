@@ -3,8 +3,8 @@
 /// Dictates how much data to prefetch when passed to `EtebaseFetchOptions`.
 enum EtebasePrefetchOption {
   /// Automatically decide based on the size of the data fetched.
-  optionAuto,
+  auto,
 
   /// Attempt to fetch a more lightweight (medium) amount of data.
-  optionMedium,
+  medium,
 }

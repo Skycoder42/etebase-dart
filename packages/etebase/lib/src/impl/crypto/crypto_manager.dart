@@ -20,9 +20,20 @@ abstract interface class CryptoManager implements CryptoManagerBase {
     Uint8List? additionalData,
   ]);
 
+  FutureOr<Uint8List> encryptKey(
+    SecureKey key, [
+    Uint8List? additionalData,
+  ]);
+
   FutureOr<Uint8List> decrypt(
     Uint8List nonceCipherText, [
     Uint8List? additionalData,
+  ]);
+
+  FutureOr<SecureKey> decryptKey(
+    Uint8List nonceCipherText, [
+    Uint8List? additionalData,
+    int? keySize,
   ]);
 
   FutureOr<({Uint8List mac, Uint8List nonceCipherText})> encryptDetached(

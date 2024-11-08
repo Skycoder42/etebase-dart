@@ -8,6 +8,7 @@ part 'account_data_stored.freezed.dart';
 part 'account_data_stored.g.dart';
 
 @freezed
+@internal
 sealed class AccountDataStored with _$AccountDataStored {
   @msgPackBytes
   const factory AccountDataStored({

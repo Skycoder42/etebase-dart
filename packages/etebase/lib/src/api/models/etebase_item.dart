@@ -5,6 +5,8 @@ import 'etebase_item_metadata.dart';
 
 /// The dart binding of the EtebaseItem rust class
 abstract class EtebaseItem implements EtebaseCloneable<EtebaseItem> {
+  Future<void> dispose();
+
   /// Clone an item object
   ///
   /// @param this_ the object handle
