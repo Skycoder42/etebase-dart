@@ -27,6 +27,8 @@ abstract interface class CryptoService {
 
   String genUidBase64();
 
+  SecureKey secureAlloc(int length);
+
   SecureKey secureRandom(int length);
 
   SecureKey secureCopy(Uint8List bytes);
@@ -81,6 +83,9 @@ mixin CryptoServiceCommon implements CryptoService {
 
   @override
   String genUidBase64() => base64.encode(randomBytes(24));
+
+  @override
+  SecureKey secureAlloc(int length) => sodium.secureAlloc(length);
 
   @override
   SecureKey secureRandom(int length) => sodium.secureRandom(length);
@@ -147,8 +152,8 @@ mixin CryptoServiceCommon implements CryptoService {
     final bitMask = (math.pow(2, lastBits) - 1).toInt();
     return (length + bitMask) & ~bitMask;
   }
+
+  double _logBase(num x, num base) => math.log(x) / math.log(base);
+
+  double _log2(num x) => _logBase(x, 2);
 }
-
-double _logBase(num x, num base) => math.log(x) / math.log(base);
-
-double _log2(num x) => _logBase(x, 2);

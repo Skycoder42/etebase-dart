@@ -50,11 +50,36 @@ abstract base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
       exec((cm, _, __) => cm.encrypt(message, additionalData));
 
   @override
+  Future<Uint8List> encryptKey(
+    SecureKey key, [
+    Uint8List? additionalData,
+  ]) =>
+      exec(
+        secureKey: [key],
+        disposeIsolateKeys: true,
+        (cm, secureKeys, __) => cm.encryptKey(secureKeys[0], additionalData),
+      );
+
+  @override
   Future<Uint8List> decrypt(
     Uint8List nonceCipherText, [
     Uint8List? additionalData,
   ]) =>
       exec((cm, _, __) => cm.decrypt(nonceCipherText, additionalData));
+
+  @override
+  Future<SecureKey> decryptKey(
+    Uint8List nonceCipherText, [
+    Uint8List? additionalData,
+    int? keySize,
+  ]) =>
+      exec(
+        (cm, _, __) => cm.decryptKey(
+          nonceCipherText,
+          additionalData,
+          keySize,
+        ),
+      );
 
   @override
   Future<({Uint8List mac, Uint8List nonceCipherText})> encryptDetached(
