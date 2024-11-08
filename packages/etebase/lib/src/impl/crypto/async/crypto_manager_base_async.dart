@@ -40,16 +40,18 @@ abstract base class CryptoManagerBaseAsync<
   Future<TResult> exec<TResult>(
     TResult Function(
       TCryptoManager cm,
-      List<SecureKey> secureKey,
+      List<SecureKey> secureKeys,
       List<KeyPair> keyPairs,
     ) callback, {
     List<SecureKey> secureKey = const [],
     List<KeyPair> keyPairs = const [],
+    bool disposeIsolateKeys = false,
   }) async =>
       isolated(
         await cmRef,
         callback,
         secureKeys: secureKey,
         keyPairs: keyPairs,
+        disposeIsolateKeys: disposeIsolateKeys,
       );
 }

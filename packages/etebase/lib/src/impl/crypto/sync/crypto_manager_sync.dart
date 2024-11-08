@@ -64,6 +64,13 @@ abstract base class CryptoManagerSync
   }
 
   @override
+  Uint8List encryptKey(
+    SecureKey key, [
+    Uint8List? additionalData,
+  ]) =>
+      key.runUnlockedSync((keyData) => encrypt(keyData, additionalData));
+
+  @override
   Uint8List decrypt(
     Uint8List nonceCipherText, [
     Uint8List? additionalData,
@@ -75,6 +82,20 @@ abstract base class CryptoManagerSync
       nonce: nonce,
       cipherText: cipherText,
       additionalData: additionalData,
+    );
+  }
+
+  @override
+  SecureKey decryptKey(
+    Uint8List nonceCipherText, [
+    Uint8List? additionalData,
+    int? keySize,
+  ]) {
+    final decrypted = decrypt(nonceCipherText, additionalData);
+    return sodium.secureCopy(
+      keySize != null
+          ? Uint8List.sublistView(decrypted, 0, keySize)
+          : decrypted,
     );
   }
 
@@ -165,10 +186,19 @@ abstract base class CryptoManagerSync
 
   @override
   SecureKey deriveSubkey(Uint8List salt) => sodium.secureCopy(
-        sodium.crypto.genericHash(
-          message: subDerivationKey.extractBytes(),
-          key: sodium.secureCopy(salt),
-          outLen: _hashSize,
+        subDerivationKey.runUnlockedSync(
+          (subDerivationKeyBytes) {
+            final key = sodium.secureCopy(salt);
+            try {
+              return sodium.crypto.genericHash(
+                message: subDerivationKeyBytes,
+                key: key,
+                outLen: _hashSize,
+              );
+            } finally {
+              key.dispose();
+            }
+          },
         ),
       );
 

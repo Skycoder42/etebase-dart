@@ -10,6 +10,7 @@ import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
 import '../crypto/collection_crypto_manager.dart';
+import '../crypto/crypto_arena.dart';
 import '../crypto/crypto_manager.dart';
 import '../crypto/crypto_service.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
@@ -59,31 +60,26 @@ class EncryptedCollection {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) async {
-    final col = EncryptedCollection()
-      .._collectionType = await parentCm.colTypeToUid(collectionTypeName);
-
-    final collectionKey = client.crypto.secureRandom(CryptoManager.keySize);
+    final arena = CryptoArena();
     try {
+      final col = EncryptedCollection()
+        .._collectionType = await parentCm.colTypeToUid(collectionTypeName);
+
       col._collectionKey = await parentCm.encryptKey(
-        collectionKey,
+        arena(client.crypto.secureRandom(CryptoManager.keySize)),
         col._collectionType,
       );
-    } finally {
-      collectionKey.dispose();
-    }
 
-    final cm = await col.getCryptoManager(client, parentCm);
-    try {
+      final cm = arena(await col.getCryptoManager(client, parentCm));
       col._item = await EncryptedCollectionItem.create(
         client,
         cm,
         meta,
         content,
       );
-      return (col, cm);
-    } catch (_) {
-      await cm.dispose();
-      rethrow;
+      return (col, arena.detach(cm));
+    } finally {
+      await arena.dispose();
     }
   }
 

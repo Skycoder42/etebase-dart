@@ -68,11 +68,13 @@ class Account implements EtebaseAccount {
       final identityCryptoManager =
           arena(client.crypto.createIdentityCryptoManager());
 
-      final encryptedKeys = await mainCryptoManager.encrypt(
-        CryptoUtils.concatSecure([
-          arena(client.crypto.secureRandom(CryptoManager.keySize)),
-          identityCryptoManager.privKey,
-        ]),
+      final encryptedKeys = await mainCryptoManager.encryptKey(
+        arena(
+          CryptoUtils.concatSecure(client.crypto, [
+            arena(client.crypto.secureRandom(CryptoManager.keySize)),
+            identityCryptoManager.privKey,
+          ]),
+        ),
       );
 
       final response = await client.api.authentication.signup(
@@ -178,9 +180,7 @@ class Account implements EtebaseAccount {
 
       final mainCryptoManager = arena(
         client.crypto.createMainCryptoManager(
-          client.crypto.secureCopy(
-            await cryptoManager.decrypt(accountData.key),
-          ),
+          await cryptoManager.decryptKey(accountData.key),
           version: accountData.version,
         ),
       );
@@ -309,8 +309,7 @@ class Account implements EtebaseAccount {
         authToken: _authToken.value,
         serverUrl: _client.api.baseUrl,
         version: CryptoService.currentVersion,
-        key: await _mainCryptoManager.mainKey
-            .runUnlockedAsync(cryptoManager.encrypt),
+        key: await cryptoManager.encryptKey(_mainCryptoManager.mainKey),
       );
 
       final encryptedAccountData = await cryptoManager.encrypt(
@@ -365,7 +364,7 @@ class Account implements EtebaseAccount {
   ) async {
     final (accountKey, identityKey) = CryptoUtils.split2Secure(
       client.crypto,
-      await mainCryptoManager.decrypt(response.user.encryptedContent),
+      arena(await mainCryptoManager.decryptKey(response.user.encryptedContent)),
       CryptoManager.keySize,
     );
     return Account(

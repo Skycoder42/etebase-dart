@@ -65,6 +65,7 @@ sealed class _CryptoJob<TCryptoManager extends CryptoManagerBaseSync>
     ) callback,
     required List<TransferrableSecureKey> secureKeys,
     required List<TransferrableKeyPair> keyPairs,
+    required bool disposeIsolateKeys,
   }) = _CryptoJobExec;
 
   const factory _CryptoJob.exit(int id) = _CryptoJobExit;
@@ -198,6 +199,7 @@ class IsolatedCryptoManager {
     ) callback, {
     List<SecureKey> secureKeys = const [],
     List<KeyPair> keyPairs = const [],
+    bool disposeIsolateKeys = false,
   }) =>
       _exec<TResult>(
         _CryptoJob<TCryptoManager>.exec(
@@ -207,6 +209,7 @@ class IsolatedCryptoManager {
           secureKeys:
               secureKeys.map(sodium.createTransferrableSecureKey).toList(),
           keyPairs: keyPairs.map(sodium.createTransferrableKeyPair).toList(),
+          disposeIsolateKeys: disposeIsolateKeys,
         ),
       );
 
@@ -247,11 +250,23 @@ Future<void> _isolateMain(_IsolateMessage message) async {
         callback, {
     required List<TransferrableSecureKey> secureKeys,
     required List<TransferrableKeyPair> keyPairs,
+    bool disposeIsolateKeys = false,
   }) {
     final keys =
         secureKeys.map(sodium.materializeTransferrableSecureKey).toList();
     final pairs = keyPairs.map(sodium.materializeTransferrableKeyPair).toList();
-    callback(keys, pairs);
+    try {
+      callback(keys, pairs);
+    } finally {
+      if (disposeIsolateKeys) {
+        for (final key in keys) {
+          key.dispose();
+        }
+        for (final pair in pairs) {
+          pair.dispose();
+        }
+      }
+    }
   }
 
   int addCm(CryptoManagerBaseSync cm) {
@@ -311,6 +326,7 @@ Future<void> _isolateMain(_IsolateMessage message) async {
           withKeys(
             secureKeys: job.secureKeys,
             keyPairs: job.keyPairs,
+            disposeIsolateKeys: job.disposeIsolateKeys,
             (secureKeys, keyPairs) {
               final result = job.callback(
                 cryptoManagers[job.ref.id]!,

@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
@@ -15,13 +17,18 @@ abstract base class CryptoUtils {
     return buffer.takeBytes();
   }
 
-  static Uint8List concatSecure(Iterable<SecureKey> keys) {
-    final buffer = BytesBuilder();
-    for (final key in keys) {
-      key.runUnlockedSync(buffer.add);
-    }
-    return buffer.takeBytes();
-  }
+  static SecureKey concatSecure(CryptoService crypto, List<SecureKey> keys) =>
+      crypto.secureAlloc(keys.map((k) => k.length).sum)
+        ..runUnlockedSync(writable: true, (resultBytes) {
+          var offset = 0;
+          for (final key in keys) {
+            key.runUnlockedSync((keyBytes) {
+              final end = offset + keyBytes.length;
+              resultBytes.setRange(offset, end, keyBytes);
+              offset = end;
+            });
+          }
+        });
 
   static (Uint8List, Uint8List) split2(Uint8List data, int split) => (
         Uint8List.sublistView(data, 0, split),
@@ -30,12 +37,14 @@ abstract base class CryptoUtils {
 
   static (SecureKey, SecureKey) split2Secure(
     CryptoService service,
-    Uint8List data,
+    SecureKey key,
     int split,
   ) =>
-      (
-        service.secureCopy(Uint8List.sublistView(data, 0, split)),
-        service.secureCopy(Uint8List.sublistView(data, split)),
+      key.runUnlockedSync(
+        (data) => (
+          service.secureCopy(Uint8List.sublistView(data, 0, split)),
+          service.secureCopy(Uint8List.sublistView(data, split)),
+        ),
       );
 
   static Uint8List uint32ToUint8List(int value) {
