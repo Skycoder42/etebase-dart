@@ -3,10 +3,10 @@ import 'dart:typed_data';
 import 'package:chopper/chopper.dart';
 import 'package:meta/meta.dart';
 
+import '../../../api/models/etebase_collection_list_response.dart';
 import '../../../api/models/etebase_fetch_options.dart';
 import '../../encrypted_models/encrypted_collection.dart';
 import '../../models/collection_list_request.dart';
-import '../../models/collection_list_response.dart';
 
 part 'collection_service.chopper.dart';
 
@@ -31,12 +31,12 @@ abstract class CollectionService extends ChopperService {
       _fetch(colUid, options?.toJson() ?? const {});
 
   @Post(path: 'list_multi/')
-  Future<CollectionListResponse> _list(
+  Future<EtebaseCollectionListResponse<EncryptedCollection>> _list(
     @Body() CollectionListRequest collectionTypes,
     @QueryMap() Map<String, dynamic> options,
   );
 
-  Future<CollectionListResponse> list(
+  Future<EtebaseCollectionListResponse<EncryptedCollection>> list(
     List<Uint8List> collectionTypes,
     EtebaseFetchOptions? options,
   ) =>

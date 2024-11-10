@@ -10,9 +10,9 @@ import 'crypto_service.dart';
 
 @internal
 abstract interface class AccountCryptoManager implements CryptoManager {
-  FutureOr<Uint8List> colTypeToUid(String colId);
+  FutureOr<Uint8List> colTypeToUid(String colId); // TODO make sync
 
-  FutureOr<String> colTypeFromUid(Uint8List uid);
+  FutureOr<String> colTypeFromUid(Uint8List uid); // TODO make sync
 
   CollectionCryptoManager createCollectionCryptoManager(
     SecureKey key, {

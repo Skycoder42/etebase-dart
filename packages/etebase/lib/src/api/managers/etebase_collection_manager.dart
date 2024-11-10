@@ -64,7 +64,7 @@ abstract class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection_type the type of items stored in the collection
   /// @param fetch_options the `EtebaseFetchOptions` to fetch with
-  Future<EtebaseCollectionListResponse> list(
+  Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
     String collectionType, [
     EtebaseFetchOptions? fetchOptions,
   ]);
@@ -75,7 +75,7 @@ abstract class EtebaseCollectionManager {
   /// @param collection_types array of strings denoting the collection types
   /// @param collection_types_size size of the collection_types array
   /// @param fetch_options the `EtebaseFetchOptions` to fetch with
-  Future<EtebaseCollectionListResponse> listMulti(
+  Future<EtebaseCollectionListResponse<EtebaseCollection>> listMulti(
     List<String> collectionTypes, [
     EtebaseFetchOptions? fetchOptions,
   ]);
