@@ -15,22 +15,25 @@ import '../../../api/exceptions/permission_denied.dart';
 import '../../../api/exceptions/server_problem.dart';
 import '../../../api/exceptions/temporary_server_problem.dart';
 import '../../../api/exceptions/unauthorized.dart';
+import '../../../api/models/etebase_collection_list_response.dart';
 import '../../codec/message_pack_converter.dart';
+import '../../encrypted_models/encrypted_collection.dart';
 import '../../models/challenge_request.dart';
 import '../../models/login_challenge.dart';
 import '../../models/login_request.dart';
 import '../../models/login_response.dart';
 import '../../models/signup_request.dart';
-
-typedef _FromJson<T> = T Function(Map<String, dynamic> json);
+import 'type_converter.dart';
 
 @internal
 class MsgPackConverter implements Converter, ErrorConverter {
   static const _msgPackContentType = 'application/msgpack';
 
+  static const _errorTypeConverter = TypeConverter(HttpErrorContent.fromJson);
+
   final MessagePackConverter _converter;
 
-  final _factories = <Type, _FromJson<dynamic>>{};
+  final _factories = <Type, TypeConverter<dynamic>>{};
 
   MsgPackConverter(this._converter) {
     _add(SignupRequest.fromJson);
@@ -38,6 +41,11 @@ class MsgPackConverter implements Converter, ErrorConverter {
     _add(ChallengeRequest.fromJson);
     _add(LoginChallenge.fromJson);
     _add(LoginRequest.fromJson);
+    _add(EncryptedCollection.fromJson);
+    _addGeneric(
+      EtebaseCollectionListResponse<EncryptedCollection>.fromJson,
+      EncryptedCollection.fromJson,
+    );
   }
 
   @override
@@ -63,19 +71,19 @@ class MsgPackConverter implements Converter, ErrorConverter {
       return response.copyWith();
     }
 
-    final fromJson = _factories[InnerType] as _FromJson<InnerType>?;
-    if (fromJson == null) {
+    final innerConverter = _getConverter<InnerType>();
+    if (innerConverter == null) {
       throw UnsupportedError('Cannot convert a response of type $BodyType');
     }
 
     try {
       BodyType body;
       if (isTypeOf<BodyType, Iterable<InnerType>>()) {
-        body = _deserializeList(response.bodyBytes, fromJson);
+        body = _deserializeList(response.bodyBytes, innerConverter);
       } else if (isTypeOf<BodyType, Map<String, InnerType>>()) {
-        body = _deserializeMap(response.bodyBytes, fromJson);
+        body = _deserializeMap(response.bodyBytes, innerConverter);
       } else {
-        body = _deserializeValue(response.bodyBytes, fromJson);
+        body = _deserializeValue(response.bodyBytes, innerConverter);
       }
       return response.copyWith(body: body);
     } on InvalidMessagePackData catch (e) {
@@ -113,7 +121,15 @@ class MsgPackConverter implements Converter, ErrorConverter {
     );
   }
 
-  void _add<T>(_FromJson<T> fromJson) => _factories[T] = fromJson;
+  void _add<T>(FromJson<T> fromJson) =>
+      _factories[T] = TypeConverter<T>(fromJson);
+
+  void _addGeneric<TContainer, TData>(
+    ContainerFromJson<TContainer, TData> containerFromJson,
+    FromJson<TData> fromJson,
+  ) =>
+      _factories[TContainer] =
+          TypeConverter.generic<TContainer, TData>(containerFromJson, fromJson);
 
   bool _checkContentType(Response<dynamic> response) {
     final contentType = response.headers[contentTypeKey];
@@ -122,26 +138,26 @@ class MsgPackConverter implements Converter, ErrorConverter {
 
   BodyType _deserializeList<BodyType, InnerType>(
     Uint8List data,
-    _FromJson<InnerType> fromJson,
+    TypeConverter<InnerType> converter,
   ) =>
       _deserialize<Iterable<dynamic>>(data)
           .cast<Map<String, dynamic>>()
-          .map(fromJson)
+          .map(converter.call)
           .toList() as BodyType;
 
   BodyType _deserializeMap<BodyType, InnerType>(
     Uint8List data,
-    _FromJson<InnerType> fromJson,
+    TypeConverter<InnerType> converter,
   ) =>
       _deserialize<Map<dynamic, dynamic>>(data)
           .cast<String, Map<String, dynamic>>()
-          .map((k, v) => MapEntry(k, fromJson(v))) as BodyType;
+          .map((k, v) => MapEntry(k, converter(v))) as BodyType;
 
   BodyType _deserializeValue<BodyType, InnerType>(
     Uint8List data,
-    _FromJson<InnerType> fromJson,
+    TypeConverter<InnerType> converter,
   ) =>
-      fromJson(_deserialize<Map<dynamic, dynamic>>(data).cast()) as BodyType;
+      converter(_deserialize<Map<dynamic, dynamic>>(data).cast()) as BodyType;
 
   T _deserialize<T>(Uint8List data) {
     try {
@@ -173,7 +189,7 @@ class MsgPackConverter implements Converter, ErrorConverter {
     try {
       final error = _deserializeValue<HttpErrorContent, HttpErrorContent>(
         response.bodyBytes,
-        HttpErrorContent.fromJson,
+        _errorTypeConverter,
       );
       final message = error.toString(withErrors: false);
       return (message, error);
@@ -191,4 +207,6 @@ class MsgPackConverter implements Converter, ErrorConverter {
 
     return (fallbackMessage, null);
   }
+
+  TypeConverter<T>? _getConverter<T>() => _factories[T] as TypeConverter<T>?;
 }

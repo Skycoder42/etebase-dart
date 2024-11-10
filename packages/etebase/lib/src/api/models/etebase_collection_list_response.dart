@@ -1,32 +1,53 @@
-import 'base/etebase_stoken_response.dart';
-import 'etebase_collection.dart';
+// ignore_for_file: invalid_annotation_target
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import 'base/etebase_collection_item_list_response.dart';
 import 'etebase_removed_collection.dart';
 
+part 'etebase_collection_list_response.freezed.dart';
+part 'etebase_collection_list_response.g.dart';
+
 /// The dart binding of the EtebaseCollectionListResponse rust class
-abstract class EtebaseCollectionListResponse
-    implements EtebaseStokenResponse<EtebaseCollection> {
-  /// Sync token for the list response
-  ///
-  /// @param this_ the object handle
-  @override
-  String? get stoken;
+@Freezed(fromJson: false, toJson: false)
+sealed class EtebaseCollectionListResponse<T>
+    with _$EtebaseCollectionListResponse<T>
+    implements EtebaseCollectionItemListResponse<T> {
+  @JsonSerializable(genericArgumentFactories: true)
+  const factory EtebaseCollectionListResponse({
+    required List<T> data,
+    @JsonKey(name: 'done') required bool isDone,
+    required String? stoken,
+    @JsonKey(includeIfNull: false)
+    required List<EtebaseRemovedCollection>? removedMemberships,
+  }) = _EtebaseCollectionListResponse<T>;
 
-  /// List of collections included in the response
-  ///
-  /// @param this_ the object handle
-  /// @param[out] data the array to store the collections in
-  @override
-  List<EtebaseCollection> get data;
+  factory EtebaseCollectionListResponse.fromJson(
+    Map<String, dynamic> json,
+    T Function(Object? json) fromJsonT,
+  ) =>
+      _$$EtebaseCollectionListResponseImplFromJson<T>(json, fromJsonT);
 
-  /// Indicates whether there are no more collections to fetch
-  ///
-  /// @param this_ the object handle
-  @override
-  bool get isDone;
+  const EtebaseCollectionListResponse._();
 
-  /// The list of collections to which the user lost access
-  ///
-  /// @param this_ the object handle
-  /// @param[out] data the array to store the collections in
-  List<EtebaseRemovedCollection> get removedMemberships;
+  /// @nodoc
+  @internal
+  Map<String, dynamic> toJson() => _$$EtebaseCollectionListResponseImplToJson(
+        this as _$EtebaseCollectionListResponseImpl<T>,
+        (dynamic i) => i.toJson(),
+      );
+
+  /// @nodoc
+  @internal
+  Future<EtebaseCollectionListResponse<TOther>> mapAsync<TOther>(
+    Future<TOther> Function(T) map,
+  ) async =>
+      EtebaseCollectionListResponse(
+        data: [
+          for (final item in data) await map(item),
+        ],
+        isDone: isDone,
+        stoken: stoken,
+        removedMemberships: removedMemberships,
+      );
 }

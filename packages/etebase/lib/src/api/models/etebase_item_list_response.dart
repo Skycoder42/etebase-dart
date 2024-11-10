@@ -1,9 +1,9 @@
-import 'base/etebase_stoken_response.dart';
+import 'base/etebase_collection_item_list_response.dart';
 import 'etebase_item.dart';
 
 /// The dart binding of the EtebaseItemListResponse rust class
 abstract class EtebaseItemListResponse
-    implements EtebaseStokenResponse<EtebaseItem> {
+    implements EtebaseCollectionItemListResponse<EtebaseItem> {
   /// Sync token for the list response
   ///
   /// @param this_ the object handle

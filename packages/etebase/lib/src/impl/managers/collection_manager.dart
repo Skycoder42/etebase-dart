@@ -51,6 +51,31 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
+  Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
+    String collectionType, [
+    EtebaseFetchOptions? fetchOptions,
+  ]) =>
+      listMulti([collectionType], fetchOptions);
+
+  @override
+  Future<EtebaseCollectionListResponse<EtebaseCollection>> listMulti(
+    List<String> collectionTypes, [
+    EtebaseFetchOptions? fetchOptions,
+  ]) async {
+    final colTypes = [
+      for (final collectionType in collectionTypes)
+        await _cryptoManager.colTypeToUid(collectionType),
+    ];
+    final result = await _client.api.collection.list(colTypes, fetchOptions);
+    return result.mapAsync(
+      (c) async => Collection(
+        c,
+        await c.getCryptoManager(_client, _cryptoManager),
+      ),
+    );
+  }
+
+  @override
   Future<EtebaseCollection> cacheLoad(Uint8List cached) async {
     final encryptedCollection = EncryptedCollection.cacheLoad(_client, cached);
     return Collection(
@@ -88,24 +113,6 @@ class CollectionManager implements EtebaseCollectionManager {
   @override
   EtebaseCollectionMemberManager getMemberManager(EtebaseCollection col) {
     // TODO: implement getMemberManager
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<EtebaseCollectionListResponse> list(
-    String collectionType, [
-    EtebaseFetchOptions? fetchOptions,
-  ]) {
-    // TODO: implement list
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<EtebaseCollectionListResponse> listMulti(
-    List<String> collectionTypes, [
-    EtebaseFetchOptions? fetchOptions,
-  ]) {
-    // TODO: implement listMulti
     throw UnimplementedError();
   }
 
