@@ -15,10 +15,12 @@ import '../../../api/exceptions/permission_denied.dart';
 import '../../../api/exceptions/server_problem.dart';
 import '../../../api/exceptions/temporary_server_problem.dart';
 import '../../../api/exceptions/unauthorized.dart';
-import '../../../api/models/etebase_collection_list_response.dart';
 import '../../codec/message_pack_converter.dart';
 import '../../encrypted_models/encrypted_collection.dart';
+import '../../encrypted_models/encrypted_collection_item.dart';
 import '../../models/challenge_request.dart';
+import '../../models/collection_item_list_response.dart';
+import '../../models/collection_list_response.dart';
 import '../../models/login_challenge.dart';
 import '../../models/login_request.dart';
 import '../../models/login_response.dart';
@@ -43,8 +45,13 @@ class MsgPackConverter implements Converter, ErrorConverter {
     _add(LoginRequest.fromJson);
     _add(EncryptedCollection.fromJson);
     _addGeneric(
-      EtebaseCollectionListResponse<EncryptedCollection>.fromJson,
+      CollectionListResponse<EncryptedCollection>.fromJson,
       EncryptedCollection.fromJson,
+    );
+    _add(EncryptedCollectionItem.fromJson);
+    _addGeneric(
+      CollectionItemListResponse<EncryptedCollectionItem>.fromJson,
+      EncryptedCollectionItem.fromJson,
     );
   }
 

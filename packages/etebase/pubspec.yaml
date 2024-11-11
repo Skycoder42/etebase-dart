@@ -13,7 +13,7 @@ dependencies:
   json_annotation: ^4.9.0
   meta: ^1.15.0
   msgpack_dart: ^1.0.1
-  sodium: ^3.4.0
+  sodium: ^3.4.1
   synchronized: ^3.3.0+3
 
 dev_dependencies:
