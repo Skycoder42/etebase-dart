@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../models/etebase_collection.dart';
-import '../models/etebase_collection_list_response.dart';
+import '../models/base/etebase_collection_list_response.dart';
 import '../models/etebase_fetch_options.dart';
 import '../models/etebase_item_metadata.dart';
 import 'etebase_collection_member_manager.dart';
@@ -31,25 +31,6 @@ abstract class EtebaseCollectionManager {
   Future<EtebaseCollection> create(
     String collectionType,
     EtebaseItemMetadata meta,
-    Uint8List content,
-  );
-
-  /// Create a new collection using raw metadata
-  ///
-  /// Unlike `etebase_collection_manager_create`, this receives the metadata as valid `EtebaseItemMetadata`-like struct encoded using `msgpack`.
-  /// This can be used to create collections with custom metadata types.
-  ///
-  /// Should be destroyed with `etebase_collection_destroy`
-  ///
-  /// @param this_ the object handle
-  /// @param collection_type the type of [Item]s stored in the collection
-  /// @param meta the metadata for the collection as a byte array
-  /// @param meta_size the metadata size
-  /// @param content the collection's content as a byte array. This is unrelated to the [Item]s in the collection.
-  /// @param content_size the content size
-  EtebaseCollection createRaw(
-    String collectionType,
-    Uint8List meta,
     Uint8List content,
   );
 
@@ -117,15 +98,6 @@ abstract class EtebaseCollectionManager {
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
   Uint8List cacheSave(EtebaseCollection collection);
-
-  /// Save the collection object and its content to a byte buffer for caching
-  ///
-  /// The collection can later be loaded using `etebase_collection_manager_cache_load`
-  ///
-  /// @param this_ the object handle
-  /// @param collection the collection object to be cached
-  /// @param[out] ret_size to hold the size of the returned buffer
-  Uint8List cacheSaveWithContent(EtebaseCollection collection);
 
   /// Return the collection member manager for the supplied collection
   ///
