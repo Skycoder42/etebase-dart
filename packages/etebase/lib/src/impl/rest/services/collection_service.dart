@@ -7,6 +7,7 @@ import '../../../api/models/etebase_fetch_options.dart';
 import '../../encrypted_models/encrypted_collection.dart';
 import '../../models/collection_list_request.dart';
 import '../../models/collection_list_response.dart';
+import '../../models/fetch_options.dart';
 
 part 'collection_service.chopper.dart';
 
@@ -28,7 +29,7 @@ abstract class CollectionService extends ChopperService {
     String colUid,
     EtebaseFetchOptions? options,
   ) =>
-      _fetch(colUid, options?.toJson() ?? const {});
+      _fetch(colUid, options.toQuery());
 
   @Post(path: 'list_multi/')
   Future<CollectionListResponse<EncryptedCollection>> _list(
@@ -40,10 +41,7 @@ abstract class CollectionService extends ChopperService {
     List<Uint8List> collectionTypes,
     EtebaseFetchOptions? options,
   ) =>
-      _list(
-        CollectionListRequest(collectionTypes),
-        options?.toJson() ?? const {},
-      );
+      _list(CollectionListRequest(collectionTypes), options.toQuery());
 
   @Post()
   Future<void> _create(
@@ -55,5 +53,5 @@ abstract class CollectionService extends ChopperService {
     EncryptedCollection collection,
     EtebaseFetchOptions? options,
   ) =>
-      _create(collection, options?.toJson() ?? const {});
+      _create(collection, options.toQuery());
 }

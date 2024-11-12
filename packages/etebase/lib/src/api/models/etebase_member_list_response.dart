@@ -1,9 +1,9 @@
-import 'base/etebase_iterable_response.dart';
+import 'base/etebase_iterator_list_response.dart';
 import 'etebase_collection_member.dart';
 
 /// The dart binding of the EtebaseMemberListResponse rust class
 abstract class EtebaseMemberListResponse
-    implements EtebaseIterableResponse<EtebaseCollectionMember> {
+    implements EtebaseIteratorListResponse<EtebaseCollectionMember> {
   /// Iterator for the list response
   ///
   /// @param this_ the object handle

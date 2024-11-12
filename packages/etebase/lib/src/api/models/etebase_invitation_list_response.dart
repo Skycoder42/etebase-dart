@@ -1,9 +1,9 @@
-import 'base/etebase_iterable_response.dart';
+import 'base/etebase_iterator_list_response.dart';
 import 'etebase_signed_invitation.dart';
 
 /// The dart binding of the EtebaseInvitationListResponse rust class
 abstract class EtebaseInvitationListResponse
-    implements EtebaseIterableResponse<EtebaseSignedInvitation> {
+    implements EtebaseIteratorListResponse<EtebaseSignedInvitation> {
   /// Iterator for the list response
   ///
   /// @param this_ the object handle

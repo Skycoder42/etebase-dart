@@ -1,51 +1,62 @@
-// ignore_for_file: invalid_annotation_target
+// ignore_for_file: invalid_annotation_target, unused_element
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'etebase_prefetch_option.dart';
 
 part 'etebase_fetch_options.freezed.dart';
-part 'etebase_fetch_options.g.dart';
 
 /// The dart binding of the EtebaseFetchOptions rust class
 @freezed
-sealed class EtebaseFetchOptions with _$EtebaseFetchOptions {
-  /// Return a new fetch options object
-  ///
-  /// Should be destroyed with `etebase_fetch_options_destroy`
-  @JsonSerializable(includeIfNull: false)
-  const factory EtebaseFetchOptions({
+sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
+  const factory EtebaseFetchOptionsBase({
+    /// Limit the amount of items returned
+    int? limit,
+
     /// The sync token to fetch with
-    ///
-    /// @param this_ the object handle
-    /// @param stoken the sync token to set
     String? stoken,
 
-    /// The current iterator to start from (when iterating lists)
-    ///
-    /// @param this_ the object handle
-    /// @param iterator the iterator to start from
-    String? iterator,
+    /// How much data to prefetch
+    EtebasePrefetchOption? prefetch,
+  }) = EtebaseFetchOptions;
 
-    /// Toggle fetching the collection's item
-    ///
-    /// @param this_ the object handle
-    /// @param with_collection set whether to fetch the collection's item
-    bool? withCollection,
+  const factory EtebaseFetchOptionsBase.list({
+    /// Limit the amount of items returned
+    int? limit,
+  }) = EtebaseListFetchOptions;
 
-    /// How much data to prefetech
-    ///
-    /// @param this_ the object handle
-    /// @param prefetch the prefetch option to set
+  const factory EtebaseFetchOptionsBase.item({
+    /// Limit the amount of items returned
+    int? limit,
+
+    /// The sync token to fetch with
+    String? stoken,
+
+    /// How much data to prefetch
     EtebasePrefetchOption? prefetch,
 
-    /// Limit the amount of items returned
-    ///
-    /// @param this_ the object handle
-    /// @param limit the limit to set
-    int? limit,
-  }) = _EtebaseFetchOptions;
+    /// Toggle fetching the collection's item
+    bool? withCollection,
+  }) = EtebaseItemFetchOptions;
 
-  factory EtebaseFetchOptions.fromJson(Map<String, dynamic> json) =>
-      _$EtebaseFetchOptionsFromJson(json);
+  const factory EtebaseFetchOptionsBase.iterator({
+    /// Limit the amount of items returned
+    int? limit,
+
+    /// The current iterator to start from (when iterating lists)
+    String? iterator,
+  }) = EtebaseIteratorFetchOptions;
+
+  const factory EtebaseFetchOptionsBase.revision({
+    /// Limit the amount of items returned
+    int? limit,
+
+    /// The current iterator to start from (when iterating lists)
+    String? iterator,
+
+    /// How much data to prefetch
+    EtebasePrefetchOption? prefetch,
+  }) = EtebaseRevisionFetchOptions;
+
+  const EtebaseFetchOptionsBase._();
 }
