@@ -1,9 +1,9 @@
-import 'base/etebase_iterable_response.dart';
+import 'base/etebase_iterator_list_response.dart';
 import 'etebase_item.dart';
 
 /// The dart binding of the EtebaseItemRevisionsListResponse rust class
 abstract class EtebaseItemRevisionsListResponse
-    implements EtebaseIterableResponse<EtebaseItem> {
+    implements EtebaseIteratorListResponse<EtebaseItem> {
   /// Iterator for the list response
   ///
   /// @param this_ the object handle

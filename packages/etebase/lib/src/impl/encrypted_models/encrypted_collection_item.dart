@@ -31,13 +31,15 @@ class EncryptedCollectionItem {
     includeIfNull: false,
   )
   Uint8List? _encryptionKey; //  TODO make secure key
-  @JsonKey(name: 'content', includeFromJson: true, includeToJson: true)
-  late EncryptedRevision<CollectionItemCryptoManager> _content;
-  String? lastEtag;
+  late EncryptedRevision<CollectionItemCryptoManager> content;
+  @JsonKey(name: 'etag', includeFromJson: false, includeToJson: true)
+  String? _etag;
 
-  bool get isDeleted => _content.deleted;
+  bool get isDeleted => content.deleted;
 
-  String get etag => _content.uid;
+  String get etag => content.uid;
+
+  String? get lastEtag => _etag;
 
   bool get isMissingContent => _missingChunks.isNotEmpty;
 
@@ -54,7 +56,7 @@ class EncryptedCollectionItem {
       client,
       parentCm,
       (cm) async => item
-        .._content = await EncryptedRevision.create(
+        ..content = await EncryptedRevision.create(
           client: client,
           cryptoManager: cm,
           additionalData: item._getAdditionalMacData(),
@@ -65,7 +67,7 @@ class EncryptedCollectionItem {
   }
 
   factory EncryptedCollectionItem.fromJson(Map<String, dynamic> json) =>
-      _$EncryptedCollectionItemFromJson(json);
+      _$EncryptedCollectionItemFromJson(json)..markSaved();
 
   factory EncryptedCollectionItem.cacheLoad(
     Client client,
@@ -76,15 +78,15 @@ class EncryptedCollectionItem {
       Uint8List uid,
       int version,
       Uint8List? encryptionKey,
-      Uint8List? lastEtag,
+      Uint8List? etag,
       Uint8List content,
     ] = client.coder.decodeRaw(cachedData) as List;
     return EncryptedCollectionItem()
       ..uid = client.coder.base64Encode(uid)
       ..version = version
       .._encryptionKey = encryptionKey
-      ..lastEtag = lastEtag != null ? client.coder.base64Encode(lastEtag) : null
-      .._content = EncryptedRevision.cacheLoad(
+      .._etag = etag != null ? client.coder.base64Encode(etag) : null
+      ..content = EncryptedRevision.cacheLoad(
         client,
         content,
       );
@@ -98,20 +100,30 @@ class EncryptedCollectionItem {
         client.coder.base64Decode(uid),
         version,
         _encryptionKey,
-        if (lastEtag case final String etag)
+        if (_etag case final String etag)
           client.coder.base64Decode(etag)
         else
           null,
-        _content.cacheSave(client, saveContent: saveContent),
+        content.cacheSave(client, saveContent: saveContent),
       ]);
 
-  void markSaved() => lastEtag = _content.uid;
+  EncryptedCollectionItem cloneWithRevision(
+    EncryptedRevision revision,
+  ) =>
+      EncryptedCollectionItem()
+        ..uid = uid
+        .._encryptionKey = _encryptionKey
+        ..version = version
+        ..content = revision
+        ..markSaved();
+
+  void markSaved() => _etag = content.uid;
 
   Future<bool> verify(
     Client client,
     CollectionItemCryptoManager cm,
   ) =>
-      _content.verify(client, cm, _getAdditionalMacData());
+      content.verify(client, cm, _getAdditionalMacData());
 
   Future<void> setMeta(
     Client client,
@@ -132,7 +144,7 @@ class EncryptedCollectionItem {
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
-    return _content.getMeta(client, cm, _getAdditionalMacData());
+    return content.getMeta(client, cm, _getAdditionalMacData());
   }
 
   Future<void> setContent(
@@ -154,7 +166,7 @@ class EncryptedCollectionItem {
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
-    return _content.getContent(client, cm);
+    return content.getContent(client, cm);
   }
 
   Future<void> delete(
@@ -184,21 +196,21 @@ class EncryptedCollectionItem {
     }
   }
 
-  Iterable<Chunk> get _pendingChunks => _content.chunks;
+  Iterable<Chunk> get _pendingChunks => content.chunks;
 
   Iterable<Chunk> get _missingChunks =>
-      _content.chunks.where((c) => c.data == null);
+      content.chunks.where((c) => c.data == null);
 
-  bool _isLocallyChanged() => lastEtag != _content.uid;
+  bool _isLocallyChanged() => _etag != content.uid;
 
   Future<void> _cloneOrUpdateRevision(
     FutureOr<void> Function(
       EncryptedRevision<CollectionItemCryptoManager> rev,
     ) callback,
   ) async {
-    final rev = _isLocallyChanged() ? _content : _content.clone();
+    final rev = _isLocallyChanged() ? content : content.clone();
     await callback(rev);
-    _content = rev;
+    content = rev;
   }
 
   Uint8List _getAdditionalMacData() => uid.toCharArray().unsignedView();

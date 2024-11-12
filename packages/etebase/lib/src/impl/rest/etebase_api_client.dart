@@ -5,6 +5,7 @@ import '../codec/message_pack_converter.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/msg_pack_converter.dart';
 import 'services/authentication_service.dart';
+import 'services/collection_item_service.dart';
 import 'services/collection_service.dart';
 
 @internal
@@ -30,6 +31,7 @@ final class EtebaseApiClient extends ChopperClient {
           services: [
             AuthenticationService.create(),
             CollectionService.create(),
+            RawCollectionItemService.create(),
           ],
         );
 
@@ -37,4 +39,7 @@ final class EtebaseApiClient extends ChopperClient {
       getService<AuthenticationService>();
 
   CollectionService get collection => getService<CollectionService>();
+
+  CollectionItemService collectionItem(String colUid) =>
+      CollectionItemService(getService<RawCollectionItemService>(), colUid);
 }

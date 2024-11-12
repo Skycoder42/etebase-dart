@@ -33,23 +33,22 @@ class EncryptedCollection {
   late Uint8List _collectionKey;
   @JsonKey(name: 'collectionType', includeFromJson: true, includeToJson: true)
   late Uint8List _collectionType;
-  @JsonKey(name: 'item', includeFromJson: true, includeToJson: true)
-  late EncryptedCollectionItem _item;
+  late EncryptedCollectionItem item;
   @JsonKey(name: 'accessLevel', includeFromJson: true, includeToJson: true)
   EtebaseCollectionAccessLevel _accessLevel =
       EtebaseCollectionAccessLevel.admin;
   @JsonKey(name: 'stoken', includeFromJson: true, includeToJson: true)
   String? _stoken;
 
-  String get uid => _item.uid;
+  String get uid => item.uid;
 
-  String get etag => _item.etag;
+  String get etag => item.etag;
 
-  String? get lastEtag => _item.lastEtag;
+  String? get lastEtag => item.lastEtag;
 
-  int get version => _item.version;
+  int get version => item.version;
 
-  bool get isDeleted => _item.isDeleted;
+  bool get isDeleted => item.isDeleted;
 
   EncryptedCollection();
 
@@ -71,7 +70,7 @@ class EncryptedCollection {
       );
 
       final cm = arena(await col.getCryptoManager(client, parentCm));
-      col._item = await EncryptedCollectionItem.create(
+      col.item = await EncryptedCollectionItem.create(
         client,
         cm,
         meta,
@@ -98,7 +97,7 @@ class EncryptedCollection {
     return EncryptedCollection()
       .._collectionKey = collectionKey
       .._collectionType = collectionType
-      .._item = EncryptedCollectionItem.cacheLoad(client, item)
+      ..item = EncryptedCollectionItem.cacheLoad(client, item)
       .._accessLevel = accessLevel
       .._stoken = stoken;
   }
@@ -111,53 +110,53 @@ class EncryptedCollection {
         _collectionKey,
         _accessLevel,
         _stoken,
-        _item.cacheSave(client, saveContent: saveContent),
+        item.cacheSave(client, saveContent: saveContent),
         _collectionType,
       ]);
 
-  void markSaved() => _item.markSaved();
+  void markSaved() => item.markSaved();
 
   Future<bool> verify(
     Client client,
     MinimalCollectionCryptoManager cm,
   ) =>
-      _item.withCm(client, cm, (cm) => _item.verify(client, cm));
+      item.withCm(client, cm, (cm) => item.verify(client, cm));
 
   Future<void> setMeta(
     Client client,
     MinimalCollectionCryptoManager cm,
     EtebaseItemMetadata meta,
   ) =>
-      _item.withCm(client, cm, (cm) => _item.setMeta(client, cm, meta));
+      item.withCm(client, cm, (cm) => item.setMeta(client, cm, meta));
 
   Future<EtebaseItemMetadata> getMeta(
     Client client,
     MinimalCollectionCryptoManager cm,
   ) =>
-      _item.withCm(client, cm, (cm) => _item.getMeta(client, cm));
+      item.withCm(client, cm, (cm) => item.getMeta(client, cm));
 
   Future<void> setContent(
     Client client,
     MinimalCollectionCryptoManager cm,
     Uint8List content,
   ) =>
-      _item.withCm(client, cm, (cm) => _item.setContent(client, cm, content));
+      item.withCm(client, cm, (cm) => item.setContent(client, cm, content));
 
   Future<Uint8List> getContent(
     Client client,
     MinimalCollectionCryptoManager cm,
   ) =>
-      _item.withCm(client, cm, (cm) => _item.getContent(client, cm));
+      item.withCm(client, cm, (cm) => item.getContent(client, cm));
 
   Future<void> delete(
     Client client,
     MinimalCollectionCryptoManager cm, {
     required bool preserveContent,
   }) =>
-      _item.withCm(
+      item.withCm(
         client,
         cm,
-        (cm) => _item.delete(client, cm, preserveContent: preserveContent),
+        (cm) => item.delete(client, cm, preserveContent: preserveContent),
       );
 
   Future<String> getCollectionType(

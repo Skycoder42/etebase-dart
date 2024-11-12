@@ -5,8 +5,8 @@ import 'package:meta/meta.dart';
 import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/managers/etebase_collection_member_manager.dart';
 import '../../api/managers/etebase_item_manager.dart';
-import '../../api/models/etebase_collection.dart';
 import '../../api/models/base/etebase_collection_list_response.dart';
+import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/account_crypto_manager.dart';
@@ -83,7 +83,9 @@ class CollectionManager implements EtebaseCollectionManager {
   ]) async {
     final col = collection.encryptedCollection;
     if (col.lastEtag != null) {
-      // TODO item batch
+      await _client.api
+          .collectionItem(col.uid)
+          .batch([col.item], null, fetchOptions);
     } else {
       await _client.api.collection.create(col, fetchOptions);
     }

@@ -19,17 +19,21 @@ import '../../codec/message_pack_converter.dart';
 import '../../encrypted_models/encrypted_collection.dart';
 import '../../encrypted_models/encrypted_collection_item.dart';
 import '../../models/challenge_request.dart';
+import '../../models/collection_item_fetch_info.dart';
 import '../../models/collection_item_list_response.dart';
 import '../../models/collection_list_response.dart';
+import '../../models/item_batch_request.dart';
 import '../../models/login_challenge.dart';
 import '../../models/login_request.dart';
 import '../../models/login_response.dart';
 import '../../models/signup_request.dart';
+import '../../models/web_socket_ticket_response.dart';
 import 'type_converter.dart';
 
 @internal
 class MsgPackConverter implements Converter, ErrorConverter {
   static const _msgPackContentType = 'application/msgpack';
+  static const _binaryContentType = 'application/octet-stream';
 
   static const _errorTypeConverter = TypeConverter(HttpErrorContent.fromJson);
 
@@ -53,13 +57,28 @@ class MsgPackConverter implements Converter, ErrorConverter {
       CollectionItemListResponse<EncryptedCollectionItem>.fromJson,
       EncryptedCollectionItem.fromJson,
     );
+    _add(CollectionItemFetchInfo.fromJson);
+    _add(ItemBatchRequest.fromJson);
+    _add(WebSocketTicketResponse.fromJson);
   }
+
+  T convertKnownType<T>(Uint8List body) =>
+      _getConverter<T>()!(_converter.decodeRaw(body) as Map<String, dynamic>);
 
   @override
   Request convertRequest(Request request) {
     final body = request.body;
-    if (body case null || Uint8List() || String()) {
+    if (body case null || String()) {
       return request;
+    }
+
+    if (body case Uint8List()) {
+      return applyHeader(
+        request,
+        contentTypeKey,
+        _binaryContentType,
+        override: false,
+      );
     }
 
     return applyHeader(
