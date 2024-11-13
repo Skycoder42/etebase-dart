@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -8,19 +10,40 @@ import '../codec/msg_pack_converters.dart';
 part 'signed_invitation.freezed.dart';
 part 'signed_invitation.g.dart';
 
-@freezed
+@Freezed(fromJson: true, toJson: false)
 @internal
 sealed class SignedInvitation with _$SignedInvitation {
+  @JsonSerializable(createToJson: true)
   @msgPackBytes
-  const factory SignedInvitation({
+  const factory SignedInvitation.write({
     required String uid,
     required int version,
     required String username,
     required String collection,
     required EtebaseCollectionAccessLevel accessLevel,
     required Uint8List signedEncryptionKey,
-  }) = _SignedInvitation;
+  }) = SignedInvitationWrite;
 
-  factory SignedInvitation.fromJson(Map<String, dynamic> json) =>
-      _$SignedInvitationFromJson(json);
+  @JsonSerializable(createToJson: true)
+  @msgPackBytes
+  const factory SignedInvitation.read({
+    required String uid,
+    required int version,
+    required String username,
+    required String collection,
+    required EtebaseCollectionAccessLevel accessLevel,
+    required Uint8List signedEncryptionKey,
+    String? fromUsername,
+    required Uint8List fromPubkey,
+  }) = SignedInvitationRead;
+
+  const SignedInvitation._();
+
+  Map<String, dynamic> toJson() => switch (this) {
+        final SignedInvitationWrite w =>
+          _$$SignedInvitationWriteImplToJson(w as _$SignedInvitationWriteImpl),
+        final SignedInvitationRead r =>
+          _$$SignedInvitationReadImplToJson(r as _$SignedInvitationReadImpl),
+      }
+        ..remove('runtimeType');
 }

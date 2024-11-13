@@ -8,7 +8,7 @@ part 'user.freezed.dart';
 part 'user.g.dart';
 
 @internal
-@freezed
+@Freezed(copyWith: true)
 sealed class User with _$User {
   @msgPackBytes
   const factory User({

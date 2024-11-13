@@ -7,7 +7,9 @@ import 'package:msgpack_dart/msgpack_dart.dart';
 
 import '../../api/exceptions/http_error_content.dart';
 import '../../api/exceptions/invalid_message_pack_data.dart';
+import '../../api/models/etebase_collection_member.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/etebase_user_profile.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
 import '../models/account_data.dart';
@@ -16,10 +18,14 @@ import '../models/challenge_request.dart';
 import '../models/collection_item_fetch_info.dart';
 import '../models/collection_item_list_response.dart';
 import '../models/collection_list_response.dart';
+import '../models/invitation_accept_request.dart';
 import '../models/item_batch_request.dart';
+import '../models/iterator_list_response.dart';
 import '../models/login_challenge.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
+import '../models/modify_access_level_request.dart';
+import '../models/signed_invitation.dart';
 import '../models/signup_request.dart';
 import '../models/web_socket_ticket_response.dart';
 import 'msg_pack_codec.dart';
@@ -35,6 +41,11 @@ class MessagePackConverter {
     _addRaw<String>();
 
     _add(EtebaseItemMetadata.fromJson);
+    _add(EtebaseUserProfile.fromJson);
+    _addWithContainer(
+      EtebaseCollectionMember.fromJson,
+      IteratorListResponse<EtebaseCollectionMember>.fromJson,
+    );
     _add(AccountDataStored.fromJson);
     _add(AccountData.fromJson);
 
@@ -44,19 +55,24 @@ class MessagePackConverter {
     _add(ChallengeRequest.fromJson);
     _add(LoginChallenge.fromJson);
     _add(LoginRequest.fromJson);
-    _add(EncryptedCollection.fromJson);
-    _addGeneric(
-      CollectionListResponse<EncryptedCollection>.fromJson,
+    _addWithContainer(
       EncryptedCollection.fromJson,
+      CollectionListResponse<EncryptedCollection>.fromJson,
     );
-    _add(EncryptedCollectionItem.fromJson);
-    _addGeneric(
-      CollectionItemListResponse<EncryptedCollectionItem>.fromJson,
+    _addWithContainer(
       EncryptedCollectionItem.fromJson,
+      CollectionItemListResponse<EncryptedCollectionItem>.fromJson,
     );
     _add(CollectionItemFetchInfo.fromJson);
     _add(ItemBatchRequest.fromJson);
     _add(WebSocketTicketResponse.fromJson);
+    _addWithContainer(
+      SignedInvitationRead.fromJson,
+      IteratorListResponse<SignedInvitationRead>.fromJson,
+    );
+    _add(InvitationAcceptRequest.fromJson);
+    _add(SignedInvitationWrite.fromJson);
+    _add(ModifyAccessLevelRequest.fromJson);
   }
 
   Uint8List encode(dynamic data) => msgPack.encode(data);
@@ -94,12 +110,16 @@ class MessagePackConverter {
     }
   }
 
-  void _addGeneric<TContainer, TData>(
-    ContainerFromJson<TContainer, TData> containerFromJson,
+  void _addWithContainer<TContainer, TData>(
     FromJson<TData> fromJson,
-  ) =>
-      _factories[TContainer] =
-          TypeConverter.generic<TContainer, TData>(containerFromJson, fromJson);
+    ContainerFromJson<TContainer, TData> containerFromJson,
+  ) {
+    _add<TData>(fromJson);
+    _factories[TContainer] = TypeConverter.generic<TContainer, TData>(
+      containerFromJson,
+      fromJson,
+    );
+  }
 
   T _fromJson<T>(dynamic data) {
     final converter = _factories[T] as TypeConverter<T>?;

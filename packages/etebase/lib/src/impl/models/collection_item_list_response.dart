@@ -8,7 +8,7 @@ part 'collection_item_list_response.freezed.dart';
 part 'collection_item_list_response.g.dart';
 
 @internal
-@Freezed(fromJson: false, toJson: false)
+@Freezed(fromJson: false, toJson: false, copyWith: true)
 sealed class CollectionItemListResponse<T>
     with _$CollectionItemListResponse<T>
     implements EtebaseCollectionItemListResponse<T> {

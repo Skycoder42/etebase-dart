@@ -1,0 +1,21 @@
+import 'dart:typed_data';
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../codec/msg_pack_converters.dart';
+
+part 'invitation_accept_request.freezed.dart';
+part 'invitation_accept_request.g.dart';
+
+@internal
+@freezed
+class InvitationAcceptRequest with _$InvitationAcceptRequest {
+  @msgPackBytes
+  const factory InvitationAcceptRequest({
+    required Uint8List collectionType,
+    required Uint8List encryptionKey,
+  }) = _InvitationAcceptRequest;
+
+  factory InvitationAcceptRequest.fromJson(Map<String, dynamic> json) =>
+      _$InvitationAcceptRequestFromJson(json);
+}

@@ -8,7 +8,7 @@ part 'iterator_list_response.freezed.dart';
 part 'iterator_list_response.g.dart';
 
 @internal
-@Freezed(fromJson: false, toJson: false)
+@Freezed(fromJson: false, toJson: false, copyWith: true)
 sealed class IteratorListResponse<T>
     with _$IteratorListResponse<T>
     implements EtebaseIteratorListResponse<T> {
