@@ -45,7 +45,7 @@ class CollectionManager implements EtebaseCollectionManager {
       meta,
       content,
     );
-    return Collection(encryptedCollection, cm);
+    return Collection(_client, cm, encryptedCollection);
   }
 
   @override
@@ -55,8 +55,9 @@ class CollectionManager implements EtebaseCollectionManager {
   ]) async {
     final encryptedCollection = await _online.fetch(colUid, fetchOptions);
     return Collection(
-      encryptedCollection,
+      _client,
       await encryptedCollection.getCryptoManager(_client, _cryptoManager),
+      encryptedCollection,
     );
   }
 
@@ -78,9 +79,10 @@ class CollectionManager implements EtebaseCollectionManager {
     ];
     final result = await _online.list(colTypes, fetchOptions);
     return result.mapAsync(
-      (c) async => Collection(
-        c,
-        await c.getCryptoManager(_client, _cryptoManager),
+      (encrypted) async => Collection(
+        _client,
+        await encrypted.getCryptoManager(_client, _cryptoManager),
+        encrypted,
       ),
     );
   }
@@ -90,7 +92,7 @@ class CollectionManager implements EtebaseCollectionManager {
     covariant Collection collection, [
     EtebaseFetchOptions? fetchOptions,
   ]) async {
-    final col = collection.encryptedCollection;
+    final col = collection.encrypted;
     if (col.lastEtag != null) {
       await _online.itemManager(col.uid).batch([col.item], null, fetchOptions);
     } else {
@@ -104,9 +106,11 @@ class CollectionManager implements EtebaseCollectionManager {
     covariant Collection collection, [
     EtebaseFetchOptions? fetchOptions,
   ]) async {
-    final col = collection.encryptedCollection;
+    final col = collection.encrypted;
     if (col.lastEtag != null) {
-      // TODO item transaction
+      await _online
+          .itemManager(col.uid)
+          .transaction([col.item], null, fetchOptions);
     } else {
       await _online.create(col, fetchOptions);
     }
@@ -118,15 +122,15 @@ class CollectionManager implements EtebaseCollectionManager {
     covariant Collection collection, {
     bool saveContent = false,
   }) =>
-      collection.encryptedCollection
-          .cacheSave(_client, saveContent: saveContent);
+      collection.encrypted.cacheSave(_client, saveContent: saveContent);
 
   @override
   Future<EtebaseCollection> cacheLoad(Uint8List cached) async {
     final encryptedCollection = EncryptedCollection.cacheLoad(_client, cached);
     return Collection(
-      encryptedCollection,
+      _client,
       await encryptedCollection.getCryptoManager(_client, _cryptoManager),
+      encryptedCollection,
     );
   }
 

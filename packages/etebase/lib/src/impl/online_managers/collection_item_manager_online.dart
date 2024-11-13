@@ -101,7 +101,7 @@ final class CollectionItemManagerOnline extends BaseManager {
   Future<void> transaction(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
-    EtebaseItemFetchOptions? options,
+    /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
   ) =>
       invokeApi<void>(
         method: HttpMethod.post,

@@ -7,6 +7,7 @@ import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../codec/msg_pack_converters.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
 import '../crypto/collection_crypto_manager.dart';
@@ -17,7 +18,6 @@ import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
 import '../models/signed_invitation.dart';
 import '../models/signed_invitation_content.dart';
-import '../codec/msg_pack_converters.dart';
 import 'encrypted_collection_item.dart';
 
 part 'encrypted_collection.g.dart';
@@ -34,11 +34,8 @@ class EncryptedCollection {
   @JsonKey(name: 'collectionType', includeFromJson: true, includeToJson: true)
   late Uint8List _collectionType;
   late EncryptedCollectionItem item;
-  @JsonKey(name: 'accessLevel', includeFromJson: true, includeToJson: true)
-  EtebaseCollectionAccessLevel _accessLevel =
-      EtebaseCollectionAccessLevel.admin;
-  @JsonKey(name: 'stoken', includeFromJson: true, includeToJson: true)
-  String? _stoken;
+  EtebaseCollectionAccessLevel accessLevel = EtebaseCollectionAccessLevel.admin;
+  String? stoken;
 
   String get uid => item.uid;
 
@@ -49,6 +46,8 @@ class EncryptedCollection {
   int get version => item.version;
 
   bool get isDeleted => item.isDeleted;
+
+  bool get isMissingContent => item.isMissingContent;
 
   EncryptedCollection();
 
@@ -98,8 +97,8 @@ class EncryptedCollection {
       .._collectionKey = collectionKey
       .._collectionType = collectionType
       ..item = EncryptedCollectionItem.cacheLoad(client, item)
-      .._accessLevel = accessLevel
-      .._stoken = stoken;
+      ..accessLevel = accessLevel
+      ..stoken = stoken;
   }
 
   Map<String, dynamic> toJson() => _$EncryptedCollectionToJson(this);
@@ -108,8 +107,8 @@ class EncryptedCollection {
       client.converter.encode([
         _cacheFormatVersion,
         _collectionKey,
-        _accessLevel,
-        _stoken,
+        accessLevel,
+        stoken,
         item.cacheSave(client, saveContent: saveContent),
         _collectionType,
       ]);

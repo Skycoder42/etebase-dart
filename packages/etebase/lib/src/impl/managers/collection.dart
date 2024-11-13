@@ -7,66 +7,63 @@ import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/collection_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection.dart';
+import 'client.dart';
 
 @internal
 class Collection implements EtebaseCollection {
-  final EncryptedCollection encryptedCollection;
-  final CollectionCryptoManager collectionCryptoManager;
+  final Client _client;
+  final CollectionCryptoManager _cm;
+  final EncryptedCollection encrypted;
+
+  Collection(
+    this._client,
+    this._cm,
+    this.encrypted,
+  );
 
   @override
-  Uint8List content;
+  String get uid => encrypted.uid;
 
   @override
-  EtebaseItemMetadata meta;
+  String get etag => encrypted.etag;
 
   @override
-  Uint8List metaRaw;
-
-  Collection(this.encryptedCollection, this.collectionCryptoManager);
+  bool get isDeleted => encrypted.isDeleted;
 
   @override
-  // TODO: implement accessLevel
-  EtebaseCollectionAccessLevel get accessLevel => throw UnimplementedError();
+  bool get isMissingContent => encrypted.isMissingContent;
 
   @override
-  EtebaseCollection clone() {
-    // TODO: implement clone
-    throw UnimplementedError();
-  }
+  String? get stoken => encrypted.stoken;
 
   @override
-  // TODO: implement collectionType
-  String get collectionType => throw UnimplementedError();
+  Future<String> get collectionType =>
+      encrypted.getCollectionType(_client, _cm.accountCryptoManager);
 
   @override
-  void delete() {
-    // TODO: implement delete
-  }
+  EtebaseCollectionAccessLevel get accessLevel => encrypted.accessLevel;
 
   @override
-  // TODO: implement etag
-  String get etag => throw UnimplementedError();
+  Future<void> dispose() async => _cm.dispose();
 
   @override
-  // TODO: implement isDeleted
-  bool get isDeleted => throw UnimplementedError();
+  Future<bool> verify() => encrypted.verify(_client, _cm);
 
   @override
-  // TODO: implement stoken
-  String? get stoken => throw UnimplementedError();
+  Future<void> setMeta(EtebaseItemMetadata meta) =>
+      encrypted.setMeta(_client, _cm, meta);
 
   @override
-  // TODO: implement uid
-  String get uid => throw UnimplementedError();
+  Future<EtebaseItemMetadata> getMeta() => encrypted.getMeta(_client, _cm);
 
   @override
-  bool verify() {
-    // TODO: implement verify
-    throw UnimplementedError();
-  }
+  Future<void> setContent(Uint8List content) =>
+      encrypted.setContent(_client, _cm, content);
 
   @override
-  Future<void> dispose() async {
-    await collectionCryptoManager.dispose();
-  }
+  Future<Uint8List> getContent() => encrypted.getContent(_client, _cm);
+
+  @override
+  Future<void> delete({bool preserveContent = false}) =>
+      encrypted.delete(_client, _cm, preserveContent: preserveContent);
 }
