@@ -13,7 +13,7 @@ abstract class EtebaseCollection implements EtebaseItem {
   /// The type of the collection
   ///
   /// @param this_ the object handle
-  String get collectionType;
+  Future<String> get collectionType; // TODO make sync
 
   /// Return the access level of the collection for the current user
   ///
