@@ -1,12 +1,11 @@
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../impl/managers/client.dart';
-import '../../impl/rest/etebase_api_client.dart';
 
 /// The dart binding of the EtebaseClient rust class
 abstract interface class EtebaseClient {
   /// The URL of the main hosted server
-  static Uri get defaultServerUrl => EtebaseApiClient.defaultUrl;
+  static Uri get defaultServerUrl => Client.defaultUrl;
 
   /// Creates a new etebase client.
   factory EtebaseClient.create(

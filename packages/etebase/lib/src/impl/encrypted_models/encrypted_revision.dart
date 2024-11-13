@@ -10,7 +10,7 @@ import '../../api/exceptions/missing_content.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../managers/client.dart';
-import '../rest/converters/msg_pack_converters.dart';
+import '../codec/msg_pack_converters.dart';
 import 'chunk.dart';
 
 part 'encrypted_revision.g.dart';
@@ -57,15 +57,15 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       Uint8List meta,
       bool deleted,
       List<List<Uint8List?>> chunks
-    ] = client.coder.decodeRaw(cachedData) as List;
+    ] = client.converter.decodeRaw(cachedData) as List;
     return EncryptedRevision<TCryptoManager>()
-      ..uid = client.coder.base64Encode(uid)
+      ..uid = client.converter.base64Encode(uid)
       ..meta = meta
       ..deleted = deleted
       ..chunks = chunks
           .map(
             (chunk) => Chunk(
-              client.coder.base64Encode(chunk[0]!),
+              client.converter.base64Encode(chunk[0]!),
               chunk.length > 1 ? chunk[1] : null,
             ),
           )
@@ -75,14 +75,14 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
   Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
 
   Uint8List cacheSave(Client client, {required bool saveContent}) =>
-      client.coder.encode([
-        client.coder.base64Decode(uid),
+      client.converter.encode([
+        client.converter.base64Decode(uid),
         meta,
         deleted,
         chunks
             .map(
               (chunk) => [
-                client.coder.base64Decode(chunk.uid),
+                client.converter.base64Decode(chunk.uid),
                 if (saveContent) chunk.data,
               ],
             )
@@ -94,7 +94,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     TCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
-    final mac = client.coder.base64Decode(uid);
+    final mac = client.converter.base64Decode(uid);
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
     try {
@@ -113,11 +113,11 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
     final encMeta = await cryptoManager.encryptDetached(
-      client.crypto.bufferPadSmall(client.coder.encode(meta)),
+      client.crypto.bufferPadSmall(client.converter.encode(meta)),
       adHash,
     );
     this.meta = encMeta.nonceCipherText;
-    uid = client.coder.base64Encode(encMeta.mac);
+    uid = client.converter.base64Encode(encMeta.mac);
   }
 
   Future<EtebaseItemMetadata> getMeta(
@@ -125,14 +125,13 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     TCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
-    final mac = client.coder.base64Decode(uid);
+    final mac = client.converter.base64Decode(uid);
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
-    return client.coder.decode(
+    return client.converter.decode(
       client.crypto.bufferUnpad(
         await cryptoManager.decryptDetached(this.meta, mac, adHash),
       ),
-      EtebaseItemMetadata.fromJson,
     );
   }
 
@@ -160,7 +159,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
         if (pos - chunkStart >= minChunk) {
           if ((pos - chunkStart >= maxChunk) || (buzhash.split(mask))) {
             final buf = content.sublist(chunkStart, pos);
-            final hash = client.coder.base64Encode(
+            final hash = client.converter.base64Encode(
               await cryptoManager.calculateMac(buf),
             );
             chunks.add(Chunk(hash, buf));
@@ -173,7 +172,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
 
     if (chunkStart < content.length) {
       final buf = content.sublist(chunkStart);
-      final hash = client.coder.base64Encode(
+      final hash = client.converter.base64Encode(
         await cryptoManager.calculateMac(buf),
       );
       chunks.add(Chunk(hash, buf));
@@ -200,8 +199,8 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       // If we have more than one chunk we need to encode the mapping header in the last chunk
       if (indices.length > 1) {
         // We encode it in an array so we can extend it later on if needed
-        final buf = client.coder.encode([indices]);
-        final hash = client.coder.base64Encode(
+        final buf = client.converter.encode([indices]);
+        final hash = client.converter.base64Encode(
           await cryptoManager.calculateMac(buf),
         );
         chunks.add(Chunk(hash, buf));
@@ -239,7 +238,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       final hash = await cryptoManager.calculateMac(buf);
 
       if (!const ListEquality<int>()
-          .equals(hash, client.coder.base64Decode(uid))) {
+          .equals(hash, client.converter.base64Decode(uid))) {
         throw IntegrityCompromised(
           "The content's mac is different to the expected mac ($uid)",
         );
@@ -249,7 +248,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
 
     // If we have more than one chunk we have the mapping header in the last chunk
     if (this.chunks.length > 1) {
-      final lastChunk = client.coder.decodeRaw(decryptedChunks.removeLast())
+      final lastChunk = client.converter.decodeRaw(decryptedChunks.removeLast())
           as List<List<int>>;
       indices = lastChunk[0];
     }
@@ -303,7 +302,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
 
     final chunksHash = await cryptoManager.getCryptoMac(withKey: false);
     for (final Chunk(:uid) in this.chunks) {
-      chunksHash.update(client.coder.base64Decode(uid));
+      chunksHash.update(client.converter.base64Decode(uid));
     }
     cryptoMac.update(await chunksHash.finalize());
 

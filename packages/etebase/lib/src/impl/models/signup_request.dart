@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../api/models/etebase_user.dart';
-import '../rest/converters/msg_pack_converters.dart';
+import '../codec/msg_pack_converters.dart';
 
 part 'signup_request.freezed.dart';
 part 'signup_request.g.dart';

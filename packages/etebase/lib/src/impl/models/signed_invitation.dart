@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../api/models/etebase_collection_access_level.dart';
-import '../rest/converters/msg_pack_converters.dart';
+import '../codec/msg_pack_converters.dart';
 
 part 'signed_invitation.freezed.dart';
 part 'signed_invitation.g.dart';

@@ -1,22 +1,20 @@
 import 'package:meta/meta.dart';
 
 import '../../api/exceptions/not_found.dart';
+import '../models/auth_token.dart';
 import '../models/challenge_request.dart';
 import '../models/dashboard_url.dart';
 import '../models/login_challenge.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/signup_request.dart';
-import '../rest/interceptors/auth_interceptor.dart';
 import 'base_network.dart';
 
 @internal
 final class Authenticator extends BaseNetwork {
   Authenticator({
     required super.client,
-    required super.converter,
-    required Uri baseUri,
-  }) : super(baseUri: baseUri.resolve('api/v1/authentication/'));
+  }) : super(path: const ['api', 'v1', 'authentication']);
 
   Future<bool> isEtebase() async {
     try {
@@ -60,10 +58,9 @@ final class Authenticator extends BaseNetwork {
         body: body,
       );
 
-  Future<DashboardUrl> getDashboardUrl(AuthToken authToken) =>
-      invoke<DashboardUrl>(
+  Future<Uri> getDashboardUrl(AuthToken authToken) => invoke<DashboardUrl>(
         method: HttpMethod.post,
         authToken: authToken,
         path: ['dashboard_url'],
-      );
+      ).then((r) => r.url);
 }

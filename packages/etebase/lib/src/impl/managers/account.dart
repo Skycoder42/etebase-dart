@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
-import '../../api/exceptions/api_missue.dart';
+import '../../api/exceptions/api_missuse.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
 import '../../api/models/etebase_user.dart';
@@ -16,18 +16,19 @@ import '../crypto/crypto_utils.dart';
 import '../crypto/main_crypto_manager.dart';
 import '../models/account_data.dart';
 import '../models/account_data_stored.dart';
+import '../models/auth_token.dart';
 import '../models/challenge_request.dart';
 import '../models/challenge_response.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/signup_request.dart';
 import '../models/user.dart';
-import '../rest/interceptors/auth_interceptor.dart';
+import '../online_managers/base_manager.dart';
 import 'client.dart';
 import 'collection_manager.dart';
 
 @internal
-class Account implements EtebaseAccount {
+class Account implements EtebaseAccount, AuthTokenSource {
   final Client _client;
 
   MainCryptoManager _mainCryptoManager;
@@ -38,6 +39,9 @@ class Account implements EtebaseAccount {
   final BoxCryptoManager _identityCryptoManager;
 
   var _disposed = false;
+
+  @override
+  AuthToken get authToken => _authToken;
 
   Account(
     this._client,
@@ -77,7 +81,7 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      final response = await client.api.authentication.signup(
+      final response = await client.authenticator.signup(
         SignupRequest(
           user: user,
           salt: salt,
@@ -105,7 +109,7 @@ class Account implements EtebaseAccount {
   ) async {
     final arena = CryptoArena();
     try {
-      final challenge = await client.api.authentication
+      final challenge = await client.authenticator
           .loginChallenge(ChallengeRequest(username: username));
 
       final mainKey = await client.crypto.keyDerivator(
@@ -119,7 +123,7 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      final loginResponse = await client.api.authentication.login(
+      final loginResponse = await client.authenticator.login(
         await _signStaticChallenge(
           client,
           mainCryptoManager,
@@ -127,7 +131,7 @@ class Account implements EtebaseAccount {
           ChallengeResponse.login(
             username: username,
             challenge: challenge.challenge,
-            host: client.api.baseUrl.host,
+            host: client.baseUri.host,
           ),
         ),
       );
@@ -150,9 +154,8 @@ class Account implements EtebaseAccount {
   ]) async {
     final arena = CryptoArena();
     try {
-      final decodedStoredData = client.coder.decode64(
+      final decodedStoredData = client.converter.decode64<AccountDataStored>(
         accountDataStored,
-        AccountDataStored.fromJson,
       );
 
       final cryptoManager = arena(
@@ -163,18 +166,17 @@ class Account implements EtebaseAccount {
         ),
       );
 
-      final accountData = client.coder.decode(
+      final accountData = client.converter.decode<AccountData>(
         await cryptoManager.decrypt(
           decodedStoredData.encryptedData,
           CryptoUtils.uint32ToUint8List(decodedStoredData.version),
         ),
-        AccountData.fromJson,
       );
 
-      if (accountData.serverUrl != client.api.baseUrl) {
+      if (accountData.serverUrl != client.baseUri) {
         throw ApiMissuse(
           'The account data belongs to ${accountData.serverUrl}, but the '
-          'current client used to restore it uses ${client.api.baseUrl}',
+          'current client used to restore it uses ${client.baseUri}',
         );
       }
 
@@ -201,7 +203,7 @@ class Account implements EtebaseAccount {
 
   @override
   CollectionManager get collectionManager =>
-      CollectionManager(_client, _accountCryptoManager);
+      CollectionManager(_client, this, _accountCryptoManager);
 
   @override
   // TODO: implement invitationManager
@@ -224,15 +226,15 @@ class Account implements EtebaseAccount {
 
   @override
   Future<void> fetchToken() async {
-    final challenge = await _client.api.authentication
+    final challenge = await _client.authenticator
         .loginChallenge(ChallengeRequest(username: _user.username));
 
-    final loginResponse = await _client.api.authentication.login(
+    final loginResponse = await _client.authenticator.login(
       await _signChallenge(
         ChallengeResponse.login(
           username: _user.username,
           challenge: challenge.challenge,
-          host: _client.api.baseUrl.host,
+          host: _client.baseUri.host,
         ),
       ),
     );
@@ -242,7 +244,7 @@ class Account implements EtebaseAccount {
 
   @override
   Future<void> logout() async {
-    await _client.api.authentication.logout(_authToken);
+    await _client.authenticator.logout(_authToken);
     await dispose();
   }
 
@@ -250,7 +252,7 @@ class Account implements EtebaseAccount {
   Future<void> changePassword(String password) async {
     final arena = CryptoArena();
     try {
-      final challenge = await _client.api.authentication
+      final challenge = await _client.authenticator
           .loginChallenge(ChallengeRequest(username: _user.username));
 
       final newMainKey = await _client.crypto.keyDerivator(
@@ -268,12 +270,12 @@ class Account implements EtebaseAccount {
       final response = ChallengeResponse.changePassword(
         username: _user.username,
         challenge: challenge.challenge,
-        host: _client.api.baseUrl.host,
+        host: _client.baseUri.host,
         loginPubkey: newLoginCryptoManager.pubKey,
         encryptedContent: newEncryptedContent,
       );
 
-      await _client.api.authentication.changePassword(
+      await _client.authenticator.changePassword(
         _authToken,
         await _signChallenge(response),
       );
@@ -287,11 +289,8 @@ class Account implements EtebaseAccount {
   }
 
   @override
-  Future<Uri> fetchDashboardUrl() async {
-    final response =
-        await _client.api.authentication.getDashboardUrl(_authToken);
-    return response.url;
-  }
+  Future<Uri> fetchDashboardUrl() =>
+      _client.authenticator.getDashboardUrl(_authToken);
 
   @override
   Future<String> save([SecureKey? encryptionKey]) async {
@@ -307,17 +306,17 @@ class Account implements EtebaseAccount {
       final accountData = AccountData(
         user: _user,
         authToken: _authToken.value,
-        serverUrl: _client.api.baseUrl,
+        serverUrl: _client.baseUri,
         version: CryptoService.currentVersion,
         key: await cryptoManager.encryptKey(_mainCryptoManager.mainKey),
       );
 
       final encryptedAccountData = await cryptoManager.encrypt(
-        _client.coder.encode(accountData),
+        _client.converter.encode(accountData),
         CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
       );
 
-      return _client.coder.encode64(
+      return _client.converter.encode64(
         AccountDataStored(
           version: CryptoService.currentVersion,
           encryptedData: encryptedAccountData,
@@ -345,7 +344,7 @@ class Account implements EtebaseAccount {
     final loginCryptoManager =
         await mainCryptoManager.createLoginCryptoManager();
     try {
-      final encodedResponse = client.coder.encode(response);
+      final encodedResponse = client.converter.encode(response);
       final signature = await loginCryptoManager.signDetached(encodedResponse);
       return LoginRequest(
         response: encodedResponse,
