@@ -17,7 +17,7 @@ import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
 import '../models/signed_invitation.dart';
 import '../models/signed_invitation_content.dart';
-import '../rest/converters/msg_pack_converters.dart';
+import '../codec/msg_pack_converters.dart';
 import 'encrypted_collection_item.dart';
 
 part 'encrypted_collection.g.dart';
@@ -93,7 +93,7 @@ class EncryptedCollection {
       String? stoken,
       Uint8List item,
       Uint8List collectionType,
-    ] = client.coder.decodeRaw(cachedData) as List;
+    ] = client.converter.decodeRaw(cachedData) as List;
     return EncryptedCollection()
       .._collectionKey = collectionKey
       .._collectionType = collectionType
@@ -105,7 +105,7 @@ class EncryptedCollection {
   Map<String, dynamic> toJson() => _$EncryptedCollectionToJson(this);
 
   Uint8List cacheSave(Client client, {required bool saveContent}) =>
-      client.coder.encode([
+      client.converter.encode([
         _cacheFormatVersion,
         _collectionKey,
         _accessLevel,
@@ -180,7 +180,7 @@ class EncryptedCollection {
       final signedEncryptionKey =
           await encryptionKey.runUnlockedAsync((encryptionKeyBytes) async {
         final rawContent = client.crypto.bufferPadSmall(
-          client.coder.encode(
+          client.converter.encode(
             SignedInvitationContent(
               encryptionKey: encryptionKeyBytes,
               collectionType: collectionType,
@@ -190,7 +190,7 @@ class EncryptedCollection {
         return identityCm.encrypt(message: rawContent, pubKey: pubkey);
       });
       return SignedInvitation(
-        uid: client.coder.base64Encode(uid),
+        uid: client.converter.base64Encode(uid),
         version: CryptoService.currentVersion,
         username: username,
         collection: this.uid,

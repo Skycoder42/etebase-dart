@@ -14,7 +14,7 @@ import '../../api/exceptions/server_problem.dart';
 import '../../api/exceptions/temporary_server_problem.dart';
 import '../../api/exceptions/unauthorized.dart';
 import '../codec/message_pack_converter.dart';
-import '../rest/interceptors/auth_interceptor.dart';
+import '../models/auth_token.dart';
 
 @internal
 enum HttpMethod {
@@ -27,6 +27,12 @@ enum HttpMethod {
   const HttpMethod(this.verb);
 }
 
+abstract interface class NetworkClient {
+  http.Client get httpClient;
+  MessagePackConverter get converter;
+  Uri get baseUri;
+}
+
 @internal
 base class BaseNetwork {
   static const _acceptHeader = 'Accept';
@@ -37,18 +43,23 @@ base class BaseNetwork {
   static const _binaryContentType = 'application/octet-stream';
   static const _plainTextContentType = 'text/plain';
 
-  final http.Client _client;
-  final MessagePackConverter _converter;
-  final Uri _baseUri;
+  @protected
+  final NetworkClient client;
+  final Uri _apiUri;
+
+  @protected
+  MessagePackConverter get converter => client.converter;
+  @protected
+  Uri get baseUri => client.baseUri;
 
   BaseNetwork({
-    required http.Client client,
-    required MessagePackConverter converter,
-    required Uri baseUri,
-  })  : _client = client,
-        _converter = converter,
-        _baseUri = baseUri;
+    required this.client,
+    Iterable<String> path = const [],
+  }) : _apiUri = client.baseUri.replace(
+          pathSegments: client.baseUri.pathSegments.followedBy(path),
+        );
 
+  @nonVirtual
   Future<T> invoke<T>({
     HttpMethod method = HttpMethod.get,
     List<String> path = const [],
@@ -68,7 +79,7 @@ base class BaseNetwork {
 
     http.Response response;
     try {
-      final streamResponse = await _client.send(request);
+      final streamResponse = await client.httpClient.send(request);
       response = await http.Response.fromStream(streamResponse);
     } on Exception catch (e, s) {
       Error.throwWithStackTrace(ConnectionProblem(e), s);
@@ -91,14 +102,14 @@ base class BaseNetwork {
     required dynamic body,
     required AuthToken? authToken,
   }) {
-    final requestUri = _baseUri.replace(
+    final requestUri = _apiUri.replace(
       pathSegments: [
-        ..._baseUri.pathSegments,
+        ..._apiUri.pathSegments,
         ...path,
         '', // ensures the path has a trailing /
       ],
       queryParameters: {
-        ..._baseUri.queryParametersAll,
+        ..._apiUri.queryParametersAll,
         ...query,
       },
     );
@@ -107,7 +118,7 @@ base class BaseNetwork {
       ..headers[_acceptHeader] = _msgPackContentType
       ..headers.addAll(headers);
     if (authToken != null) {
-      headers[_authorizationHeader] = 'Token ${authToken.value}';
+      headers[_authorizationHeader] = authToken.header;
     }
 
     switch (body) {
@@ -122,7 +133,7 @@ base class BaseNetwork {
         request.bodyBytes = body;
       default:
         request.headers[_contentTypeHeader] = _msgPackContentType;
-        request.bodyBytes = _converter.encode(body);
+        request.bodyBytes = converter.encode(body);
     }
     return request;
   }
@@ -132,7 +143,7 @@ base class BaseNetwork {
 
   T _convertResponse<T>(http.Response response) =>
       switch (_getContentType(response)) {
-        _msgPackContentType => _converter.decode<T>(response.bodyBytes),
+        _msgPackContentType => converter.decode<T>(response.bodyBytes),
         _binaryContentType => response.bodyBytes as T,
         _plainTextContentType => response.body as T,
         final contentType => throw InvalidMessagePackData(
@@ -169,7 +180,7 @@ base class BaseNetwork {
     }
 
     try {
-      final error = _converter.decode<HttpErrorContent>(response.bodyBytes);
+      final error = converter.decode<HttpErrorContent>(response.bodyBytes);
       final message = error.toString(withErrors: false);
       return (message, error);
       // ignore: avoid_catches_without_on_clauses

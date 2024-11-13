@@ -11,6 +11,8 @@ import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection.dart';
+import '../online_managers/base_manager.dart';
+import '../online_managers/collection_manager_online.dart';
 import 'client.dart';
 import 'collection.dart';
 
@@ -18,8 +20,16 @@ import 'collection.dart';
 class CollectionManager implements EtebaseCollectionManager {
   final Client _client;
   final AccountCryptoManager _cryptoManager;
+  final CollectionManagerOnline _online;
 
-  CollectionManager(this._client, this._cryptoManager);
+  CollectionManager(
+    this._client,
+    AuthTokenSource authTokenSource,
+    this._cryptoManager,
+  ) : _online = CollectionManagerOnline(
+          client: _client,
+          authTokenSource: authTokenSource,
+        );
 
   @override
   Future<Collection> create(
@@ -43,8 +53,7 @@ class CollectionManager implements EtebaseCollectionManager {
     String colUid, [
     EtebaseFetchOptions? fetchOptions,
   ]) async {
-    final encryptedCollection =
-        await _client.api.collection.fetch(colUid, fetchOptions);
+    final encryptedCollection = await _online.fetch(colUid, fetchOptions);
     return Collection(
       encryptedCollection,
       await encryptedCollection.getCryptoManager(_client, _cryptoManager),
@@ -67,7 +76,7 @@ class CollectionManager implements EtebaseCollectionManager {
       for (final collectionType in collectionTypes)
         await _cryptoManager.colTypeToUid(collectionType),
     ];
-    final result = await _client.api.collection.list(colTypes, fetchOptions);
+    final result = await _online.list(colTypes, fetchOptions);
     return result.mapAsync(
       (c) async => Collection(
         c,
@@ -83,11 +92,9 @@ class CollectionManager implements EtebaseCollectionManager {
   ]) async {
     final col = collection.encryptedCollection;
     if (col.lastEtag != null) {
-      await _client.api
-          .collectionItem(col.uid)
-          .batch([col.item], null, fetchOptions);
+      await _online.itemManager(col.uid).batch([col.item], null, fetchOptions);
     } else {
-      await _client.api.collection.create(col, fetchOptions);
+      await _online.create(col, fetchOptions);
     }
     col.markSaved();
   }
@@ -101,7 +108,7 @@ class CollectionManager implements EtebaseCollectionManager {
     if (col.lastEtag != null) {
       // TODO item transaction
     } else {
-      await _client.api.collection.create(col, fetchOptions);
+      await _online.create(col, fetchOptions);
     }
     col.markSaved();
   }

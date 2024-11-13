@@ -6,66 +6,44 @@ import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_prefetch_option.dart';
 
 part 'fetch_options.freezed.dart';
-part 'fetch_options.g.dart';
 
+@internal
 @freezed
-sealed class _FetchOptionsImpl with _$FetchOptionsImpl {
-  @JsonSerializable(includeIfNull: false)
-  const factory _FetchOptionsImpl({
+sealed class FetchOptions with _$FetchOptions {
+  const factory FetchOptions({
     int? limit,
     String? iterator,
     String? stoken,
     EtebasePrefetchOption? prefetch,
     bool? withCollection,
-  }) = __FetchOptionsImpl;
-
-  // ignore: unused_element
-  factory _FetchOptionsImpl.fromJson(Map<String, dynamic> json) =>
-      _$FetchOptionsImplFromJson(json);
-
-  const _FetchOptionsImpl._();
-
-  Map<String, dynamic> toQuery({bool stringify = false}) {
-    final map = toJson();
-    if (map case {'limit': <= 0}) {
-      map.remove('limit');
-    }
-    if (map case {'prefetch': final String value}) {
-      map.remove('prefetch');
-      map[value] = '';
-    }
-    return stringify
-        ? map.map((k, dynamic v) => MapEntry(k, v.toString()))
-        : map;
-  }
+  }) = _FetchOptions;
 }
 
 @internal
-extension EtebaseFetchOptionsX on EtebaseFetchOptionsBase? {
-  Map<String, dynamic> toQuery() => switch (this) {
-        null => const {},
-        final EtebaseListFetchOptions o => _FetchOptionsImpl(
+extension EtebaseFetchOptionsX on EtebaseFetchOptionsBase {
+  FetchOptions asFetchOptions() => switch (this) {
+        final EtebaseListFetchOptions o => FetchOptions(
             limit: o.limit,
-          ).toQuery(),
-        final EtebaseFetchOptions o => _FetchOptionsImpl(
+          ),
+        final EtebaseFetchOptions o => FetchOptions(
             limit: o.limit,
             stoken: o.stoken,
             prefetch: o.prefetch,
-          ).toQuery(),
-        final EtebaseItemFetchOptions o => _FetchOptionsImpl(
+          ),
+        final EtebaseItemFetchOptions o => FetchOptions(
             limit: o.limit,
             stoken: o.stoken,
             prefetch: o.prefetch,
             withCollection: o.withCollection,
-          ).toQuery(),
-        final EtebaseIteratorFetchOptions o => _FetchOptionsImpl(
+          ),
+        final EtebaseIteratorFetchOptions o => FetchOptions(
             limit: o.limit,
             iterator: o.iterator,
-          ).toQuery(),
-        final EtebaseRevisionFetchOptions o => _FetchOptionsImpl(
+          ),
+        final EtebaseRevisionFetchOptions o => FetchOptions(
             limit: o.limit,
             iterator: o.iterator,
             prefetch: o.prefetch,
-          ).toQuery(),
+          ),
       };
 }

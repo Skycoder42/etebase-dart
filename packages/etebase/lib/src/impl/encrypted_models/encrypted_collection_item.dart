@@ -10,7 +10,7 @@ import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_service.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
-import '../rest/converters/msg_pack_converters.dart';
+import '../codec/msg_pack_converters.dart';
 import 'chunk.dart';
 import 'encrypted_revision.dart';
 
@@ -80,12 +80,12 @@ class EncryptedCollectionItem {
       Uint8List? encryptionKey,
       Uint8List? etag,
       Uint8List content,
-    ] = client.coder.decodeRaw(cachedData) as List;
+    ] = client.converter.decodeRaw(cachedData) as List;
     return EncryptedCollectionItem()
-      ..uid = client.coder.base64Encode(uid)
+      ..uid = client.converter.base64Encode(uid)
       ..version = version
       .._encryptionKey = encryptionKey
-      .._etag = etag != null ? client.coder.base64Encode(etag) : null
+      .._etag = etag != null ? client.converter.base64Encode(etag) : null
       ..content = EncryptedRevision.cacheLoad(
         client,
         content,
@@ -95,13 +95,13 @@ class EncryptedCollectionItem {
   Map<String, dynamic> toJson() => _$EncryptedCollectionItemToJson(this);
 
   Uint8List cacheSave(Client client, {required bool saveContent}) =>
-      client.coder.encode([
+      client.converter.encode([
         _cacheFormatVersion,
-        client.coder.base64Decode(uid),
+        client.converter.base64Decode(uid),
         version,
         _encryptionKey,
         if (_etag case final String etag)
-          client.coder.base64Decode(etag)
+          client.converter.base64Decode(etag)
         else
           null,
         content.cacheSave(client, saveContent: saveContent),

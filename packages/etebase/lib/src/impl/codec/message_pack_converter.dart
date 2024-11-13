@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
+import 'package:msgpack_dart/msgpack_dart.dart';
 
 import '../../api/exceptions/http_error_content.dart';
+import '../../api/exceptions/invalid_message_pack_data.dart';
+import '../../api/models/etebase_item_metadata.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
+import '../models/account_data.dart';
+import '../models/account_data_stored.dart';
 import '../models/challenge_request.dart';
 import '../models/collection_item_fetch_info.dart';
 import '../models/collection_item_list_response.dart';
@@ -24,6 +30,14 @@ class MessagePackConverter {
   final _factories = <Type, TypeConverter<dynamic>>{};
 
   MessagePackConverter() {
+    _addRaw<void>();
+    _addRaw<Uint8List>();
+    _addRaw<String>();
+
+    _add(EtebaseItemMetadata.fromJson);
+    _add(AccountDataStored.fromJson);
+    _add(AccountData.fromJson);
+
     _add(HttpErrorContent.fromJson);
     _add(SignupRequest.fromJson);
     _add(LoginResponse.fromJson);
@@ -61,12 +75,17 @@ class MessagePackConverter {
 
   Uint8List base64Decode(String data) => base64.decode(data);
 
+  void _addRaw<T>() => _factories[T] = TypeConverter<T>.raw();
+
   void _add<T>(
     FromJson<T> fromJson, {
+    bool withPlain = true,
     bool withList = false,
     bool withMap = false,
   }) {
-    _factories[T] = TypeConverter<T>(fromJson);
+    if (withPlain) {
+      _factories[T] = TypeConverter<T>(fromJson);
+    }
     if (withList) {
       _factories[List<T>] = TypeConverter.list<T>(fromJson);
     }
@@ -85,8 +104,23 @@ class MessagePackConverter {
   T _fromJson<T>(dynamic data) {
     final converter = _factories[T] as TypeConverter<T>?;
     if (converter == null) {
-      throw UnimplementedError('No converter for $T registered');
+      throw UnsupportedError('No converter for $T registered');
     }
-    return converter(data);
+
+    try {
+      return converter(data);
+    } on FormatError catch (e, s) {
+      Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
+    } on CheckedFromJsonException catch (e, s) {
+      Error.throwWithStackTrace(
+        InvalidMessagePackData(e.message ?? e.toString(), e),
+        s,
+      );
+    } on FormatException catch (e, s) {
+      Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e, s) {
+      Error.throwWithStackTrace(InvalidMessagePackData(e.toString(), e), s);
+    }
   }
 }
