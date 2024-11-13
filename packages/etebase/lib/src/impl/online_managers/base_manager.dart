@@ -28,25 +28,30 @@ base class BaseManager extends BaseNetwork {
     List<String> path = const [],
     Map<String, String> headers = const {},
     EtebaseFetchOptionsBase? options,
+    Map<String, String>? query,
     dynamic body,
   }) =>
       invoke<T>(
         method: method,
         path: path,
         headers: headers,
-        query: queryFromOptions(options),
+        query: queryFromOptions(options, query),
         body: body,
         authToken: authTokenSource.authToken,
       );
 
   @protected
-  Map<String, String> queryFromOptions(EtebaseFetchOptionsBase? options) {
+  Map<String, String> queryFromOptions(
+    EtebaseFetchOptionsBase? options, [
+    Map<String, String>? query,
+  ]) {
     if (options == null) {
-      return const {};
+      return query ?? const {};
     }
 
     final fetchOptions = options.asFetchOptions();
     return {
+      ...?query,
       if (fetchOptions.limit case final int limit when limit > 0)
         'limit': limit.toString(),
       if (fetchOptions.iterator case final String iterator)

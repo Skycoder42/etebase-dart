@@ -165,7 +165,7 @@ class EncryptedCollection {
   ) async =>
       parentCm.colTypeFromUid(_collectionType);
 
-  Future<SignedInvitation> createInvitation(
+  Future<SignedInvitationWrite> createInvitation(
     Client client,
     AccountCryptoManager parentCm,
     BoxCryptoManager identityCm,
@@ -189,7 +189,7 @@ class EncryptedCollection {
         );
         return identityCm.encrypt(message: rawContent, pubKey: pubkey);
       });
-      return SignedInvitation(
+      return SignedInvitationWrite(
         uid: client.converter.base64Encode(uid),
         version: CryptoService.currentVersion,
         username: username,

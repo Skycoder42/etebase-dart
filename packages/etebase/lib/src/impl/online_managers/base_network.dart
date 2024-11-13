@@ -20,7 +20,9 @@ import '../models/auth_token.dart';
 enum HttpMethod {
   get('GET'),
   post('POST'),
-  put('PUT');
+  put('PUT'),
+  delete('DELETE'),
+  patch('PATCH');
 
   final String verb;
 
