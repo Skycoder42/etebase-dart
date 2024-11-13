@@ -14,9 +14,8 @@ final class EtebaseApiClient extends ChopperClient {
 
   factory EtebaseApiClient({
     Uri? baseUrl,
-    MessagePackConverter converter = const MessagePackConverter(),
   }) =>
-      EtebaseApiClient._(baseUrl, MsgPackConverter(converter));
+      EtebaseApiClient._(baseUrl, MsgPackConverter(MessagePackConverter()));
 
   EtebaseApiClient._(
     Uri? baseUrl,

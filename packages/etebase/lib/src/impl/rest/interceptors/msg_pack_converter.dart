@@ -16,6 +16,7 @@ import '../../../api/exceptions/server_problem.dart';
 import '../../../api/exceptions/temporary_server_problem.dart';
 import '../../../api/exceptions/unauthorized.dart';
 import '../../codec/message_pack_converter.dart';
+import '../../codec/type_converter.dart';
 import '../../encrypted_models/encrypted_collection.dart';
 import '../../encrypted_models/encrypted_collection_item.dart';
 import '../../models/challenge_request.dart';
@@ -28,7 +29,6 @@ import '../../models/login_request.dart';
 import '../../models/login_response.dart';
 import '../../models/signup_request.dart';
 import '../../models/web_socket_ticket_response.dart';
-import 'type_converter.dart';
 
 @internal
 class MsgPackConverter implements Converter, ErrorConverter {
@@ -42,6 +42,9 @@ class MsgPackConverter implements Converter, ErrorConverter {
   final _factories = <Type, TypeConverter<dynamic>>{};
 
   MsgPackConverter(this._converter) {
+    _addRaw<void>();
+    _addRaw<Uint8List>();
+    _addRaw<String>();
     _add(SignupRequest.fromJson);
     _add(LoginResponse.fromJson);
     _add(ChallengeRequest.fromJson);
@@ -146,6 +149,8 @@ class MsgPackConverter implements Converter, ErrorConverter {
       },
     );
   }
+
+  void _addRaw<T>() => _factories[T] = TypeConverter<T>.raw();
 
   void _add<T>(FromJson<T> fromJson) =>
       _factories[T] = TypeConverter<T>(fromJson);
