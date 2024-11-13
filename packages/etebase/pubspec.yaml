@@ -10,6 +10,7 @@ dependencies:
   chopper: ^8.0.3
   collection: ^1.18.0
   freezed_annotation: ^2.4.4
+  http: ^1.2.2
   json_annotation: ^4.9.0
   meta: ^1.15.0
   msgpack_dart: ^1.0.1

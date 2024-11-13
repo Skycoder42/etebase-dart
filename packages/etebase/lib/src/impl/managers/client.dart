@@ -26,7 +26,7 @@ class Client implements EtebaseClient {
       Client(
         EtebaseApiClient(baseUrl: serverUrl),
         CryptoServiceSync(sodium), // TODO allow async
-        const MessagePackConverter(),
+        MessagePackConverter(),
       );
 
   @override
