@@ -91,6 +91,8 @@ class MessagePackConverter {
 
   Uint8List base64Decode(String data) => base64.decode(data);
 
+  void addCustom<T>(FromJson<T> fromJson) => _add<T>(fromJson);
+
   void _addRaw<T>() => _factories[T] = TypeConverter<T>.raw();
 
   void _add<T>(

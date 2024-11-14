@@ -4,17 +4,17 @@ import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/managers/etebase_collection_member_manager.dart';
-import '../../api/managers/etebase_item_manager.dart';
 import '../../api/models/base/etebase_collection_list_response.dart';
 import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection.dart';
-import '../online_managers/base_manager.dart';
+import '../online_managers/collection_item_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
 import 'client.dart';
 import 'collection.dart';
+import 'item_manager.dart';
 
 @internal
 class CollectionManager implements EtebaseCollectionManager {
@@ -24,18 +24,14 @@ class CollectionManager implements EtebaseCollectionManager {
 
   CollectionManager(
     this._client,
-    AuthTokenSource authTokenSource,
     this._cryptoManager,
-  ) : _online = CollectionManagerOnline(
-          client: _client,
-          authTokenSource: authTokenSource,
-        );
+    this._online,
+  );
 
   @override
-  Future<Collection> create(
+  Future<Collection> create<TMeta extends EtebaseItemMetadata>(
     String collectionType,
-    // TODO allow custom metadata objects
-    EtebaseItemMetadata meta,
+    TMeta meta,
     Uint8List content,
   ) async {
     final (encryptedCollection, cm) = await EncryptedCollection.create(
@@ -135,10 +131,17 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  EtebaseItemManager getItemManager(EtebaseCollection col) {
-    // TODO: implement getItemManager
-    throw UnimplementedError();
-  }
+  Future<ItemManager> getItemManager(covariant Collection col) async =>
+      ItemManager(
+        _client,
+        await col.encrypted.getCryptoManager(_client, _cryptoManager),
+        CollectionItemManagerOnline(
+          client: _client,
+          authTokenSource: _online.authTokenSource,
+          colUid: col.uid,
+        ),
+        col.uid,
+      );
 
   @override
   EtebaseCollectionMemberManager getMemberManager(EtebaseCollection col) {

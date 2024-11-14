@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../api/models/etebase_collection_access_level.dart';
+import '../../api/models/etebase_signed_invitation.dart';
 import '../codec/msg_pack_converters.dart';
 
 part 'signed_invitation.freezed.dart';
@@ -26,6 +27,7 @@ sealed class SignedInvitation with _$SignedInvitation {
 
   @JsonSerializable(createToJson: true)
   @msgPackBytes
+  @Implements<EtebaseSignedInvitation>()
   const factory SignedInvitation.read({
     required String uid,
     required int version,

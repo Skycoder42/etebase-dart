@@ -5,7 +5,6 @@ import 'package:sodium/sodium.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/managers/etebase_account.dart';
-import '../../api/managers/etebase_collection_invitation_manager.dart';
 import '../../api/models/etebase_user.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
@@ -24,7 +23,10 @@ import '../models/login_response.dart';
 import '../models/signup_request.dart';
 import '../models/user.dart';
 import '../online_managers/base_manager.dart';
+import '../online_managers/collection_invitation_manager_online.dart';
+import '../online_managers/collection_manager_online.dart';
 import 'client.dart';
+import 'collection_invitation_manager.dart';
 import 'collection_manager.dart';
 
 @internal
@@ -35,8 +37,8 @@ class Account implements EtebaseAccount, AuthTokenSource {
   User _user;
   AuthToken _authToken;
 
-  final AccountCryptoManager _accountCryptoManager;
-  final BoxCryptoManager _identityCryptoManager;
+  final AccountCryptoManager accountCryptoManager;
+  final BoxCryptoManager identityCryptoManager;
 
   var _disposed = false;
 
@@ -48,8 +50,8 @@ class Account implements EtebaseAccount, AuthTokenSource {
     this._mainCryptoManager,
     this._user,
     String authToken,
-    this._accountCryptoManager,
-    this._identityCryptoManager,
+    this.accountCryptoManager,
+    this.identityCryptoManager,
   ) : _authToken = AuthToken(authToken);
 
   static Future<Account> signup(
@@ -202,15 +204,6 @@ class Account implements EtebaseAccount, AuthTokenSource {
   }
 
   @override
-  CollectionManager get collectionManager =>
-      CollectionManager(_client, this, _accountCryptoManager);
-
-  @override
-  // TODO: implement invitationManager
-  EtebaseCollectionInvitationManager get invitationManager =>
-      throw UnimplementedError();
-
-  @override
   Future<void> dispose() async {
     _authToken = AuthToken.empty;
 
@@ -220,9 +213,29 @@ class Account implements EtebaseAccount, AuthTokenSource {
 
     _disposed = true;
     await _mainCryptoManager.dispose();
-    await _accountCryptoManager.dispose();
-    await _identityCryptoManager.dispose();
+    await accountCryptoManager.dispose();
+    await identityCryptoManager.dispose();
   }
+
+  @override
+  late final collectionManager = CollectionManager(
+    _client,
+    accountCryptoManager,
+    CollectionManagerOnline(
+      client: _client,
+      authTokenSource: this,
+    ),
+  );
+
+  @override
+  late final invitationManager = CollectionInvitationManager(
+    _client,
+    this,
+    CollectionInvitationManagerOnline(
+      client: _client,
+      authTokenSource: this,
+    ),
+  );
 
   @override
   Future<void> fetchToken() async {
