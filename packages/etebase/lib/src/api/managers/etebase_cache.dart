@@ -8,7 +8,7 @@ import 'etebase_collection_manager.dart';
 import 'etebase_item_manager.dart';
 
 /// The dart binding of the EtebaseFileSystemCache rust class
-abstract class EtebaseFileSystemCache {
+abstract class EtebaseCache {
   /// Disposes of the instance and clear all cryptographic keys from memory.
   Future<void> dispose();
 
@@ -18,7 +18,7 @@ abstract class EtebaseFileSystemCache {
   ///
   /// @param path the path to a directory to store cache in
   /// @param username username of the user to cache data for
-  static Future<EtebaseFileSystemCache> create(
+  static Future<EtebaseCache> create(
     EtebaseClient client,
     String path,
     String username,
