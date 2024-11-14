@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_manager.dart';
-import '../../api/managers/etebase_collection_member_manager.dart';
 import '../../api/models/base/etebase_collection_list_response.dart';
 import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_fetch_options.dart';
@@ -12,8 +11,10 @@ import '../crypto/account_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../online_managers/collection_item_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
+import '../online_managers/collection_member_manager_online.dart';
 import 'client.dart';
 import 'collection.dart';
+import 'collection_member_manager.dart';
 import 'item_manager.dart';
 
 @internal
@@ -144,8 +145,12 @@ class CollectionManager implements EtebaseCollectionManager {
       );
 
   @override
-  EtebaseCollectionMemberManager getMemberManager(EtebaseCollection col) {
-    // TODO: implement getMemberManager
-    throw UnimplementedError();
-  }
+  CollectionMemberManager getMemberManager(covariant Collection col) =>
+      CollectionMemberManager(
+        CollectionMemberManagerOnline(
+          client: _client,
+          authTokenSource: _online.authTokenSource,
+          colUid: col.uid,
+        ),
+      );
 }
