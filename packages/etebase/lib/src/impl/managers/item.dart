@@ -13,13 +13,13 @@ class Item implements EtebaseItem {
   final Client _client;
   final CollectionItemCryptoManager _cm;
   final EncryptedCollectionItem encrypted;
-  final String collectionUid;
+  final String colUid;
 
   Item(
     this._client,
     this._cm,
     this.encrypted,
-    this.collectionUid,
+    this.colUid,
   );
 
   @override
@@ -41,11 +41,12 @@ class Item implements EtebaseItem {
   Future<bool> verify() => encrypted.verify(_client, _cm);
 
   @override
-  Future<void> setMeta(EtebaseItemMetadata meta) =>
+  Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta) =>
       encrypted.setMeta(_client, _cm, meta);
 
   @override
-  Future<EtebaseItemMetadata> getMeta() => encrypted.getMeta(_client, _cm);
+  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>() =>
+      encrypted.getMeta<TMeta>(_client, _cm);
 
   @override
   Future<void> setContent(Uint8List content) =>

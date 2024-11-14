@@ -50,11 +50,12 @@ class Collection implements EtebaseCollection {
   Future<bool> verify() => encrypted.verify(_client, _cm);
 
   @override
-  Future<void> setMeta(EtebaseItemMetadata meta) =>
+  Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta) =>
       encrypted.setMeta(_client, _cm, meta);
 
   @override
-  Future<EtebaseItemMetadata> getMeta() => encrypted.getMeta(_client, _cm);
+  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>() =>
+      encrypted.getMeta<TMeta>(_client, _cm);
 
   @override
   Future<void> setContent(Uint8List content) =>

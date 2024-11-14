@@ -5,12 +5,13 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
+import '../../api/exceptions/api_missuse.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../codec/msg_pack_converters.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_service.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
-import '../codec/msg_pack_converters.dart';
 import 'chunk.dart';
 import 'encrypted_revision.dart';
 
@@ -41,29 +42,38 @@ class EncryptedCollectionItem {
 
   String? get lastEtag => _etag;
 
-  bool get isMissingContent => _missingChunks.isNotEmpty;
+  bool get isMissingContent => missingChunks.isNotEmpty;
+
+  Iterable<Chunk> get pendingChunks => content.chunks;
+
+  Iterable<Chunk> get missingChunks =>
+      content.chunks.where((c) => c.data == null);
+
+  bool get _isLocallyChanged => _etag != content.uid;
 
   EncryptedCollectionItem();
 
-  static Future<EncryptedCollectionItem> create(
+  static Future<(EncryptedCollectionItem, CollectionItemCryptoManager)> create(
     Client client,
     MinimalCollectionCryptoManager parentCm,
     EtebaseItemMetadata meta,
     Uint8List content,
   ) async {
     final item = EncryptedCollectionItem()..uid = client.crypto.genUidBase64();
-    return item.withCm(
-      client,
-      parentCm,
-      (cm) async => item
-        ..content = await EncryptedRevision.create(
-          client: client,
-          cryptoManager: cm,
-          additionalData: item._getAdditionalMacData(),
-          meta: meta,
-          content: content,
-        ),
-    );
+    final cm = await item.getCryptoManager(client, parentCm);
+    try {
+      item.content = await EncryptedRevision.create(
+        client: client,
+        cryptoManager: cm,
+        additionalData: item._getAdditionalMacData(),
+        meta: meta,
+        content: content,
+      );
+      return (item, cm);
+    } catch (_) {
+      await cm.dispose();
+      rethrow;
+    }
   }
 
   factory EncryptedCollectionItem.fromJson(Map<String, dynamic> json) =>
@@ -119,6 +129,14 @@ class EncryptedCollectionItem {
 
   void markSaved() => _etag = content.uid;
 
+  void updateChunk(Chunk chunk) {
+    final index = content.chunks.indexWhere((c) => c.uid == chunk.uid);
+    if (index == -1) {
+      throw ApiMissuse('Tried to update a chunk on an unrelated item');
+    }
+    content.chunks[index] = chunk;
+  }
+
   Future<bool> verify(
     Client client,
     CollectionItemCryptoManager cm,
@@ -139,12 +157,12 @@ class EncryptedCollectionItem {
         ),
       );
 
-  Future<EtebaseItemMetadata> getMeta(
+  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
     Client client,
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
-    return content.getMeta(client, cm, _getAdditionalMacData());
+    return content.getMeta<TMeta>(client, cm, _getAdditionalMacData());
   }
 
   Future<void> setContent(
@@ -188,7 +206,7 @@ class EncryptedCollectionItem {
     MinimalCollectionCryptoManager parentCm,
     FutureOr<T> Function(CollectionItemCryptoManager cm) callback,
   ) async {
-    final cm = await _getCryptoManager(client, parentCm);
+    final cm = await getCryptoManager(client, parentCm);
     try {
       return await callback(cm);
     } finally {
@@ -196,19 +214,12 @@ class EncryptedCollectionItem {
     }
   }
 
-  Iterable<Chunk> get _pendingChunks => content.chunks;
-
-  Iterable<Chunk> get _missingChunks =>
-      content.chunks.where((c) => c.data == null);
-
-  bool _isLocallyChanged() => _etag != content.uid;
-
   Future<void> _cloneOrUpdateRevision(
     FutureOr<void> Function(
       EncryptedRevision<CollectionItemCryptoManager> rev,
     ) callback,
   ) async {
-    final rev = _isLocallyChanged() ? content : content.clone();
+    final rev = _isLocallyChanged ? content : content.clone();
     await callback(rev);
     content = rev;
   }
@@ -225,7 +236,7 @@ class EncryptedCollectionItem {
     return parentCm.deriveSubkey(_getAdditionalMacData());
   }
 
-  Future<CollectionItemCryptoManager> _getCryptoManager(
+  Future<CollectionItemCryptoManager> getCryptoManager(
     Client client,
     MinimalCollectionCryptoManager parentCm,
   ) async =>

@@ -1,6 +1,11 @@
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../impl/managers/client.dart';
+import '../models/etebase_item_metadata.dart';
+
+typedef MetaFromJson<TMeta extends EtebaseItemMetadata> = TMeta Function(
+  Map<String, dynamic> json,
+);
 
 /// The dart binding of the EtebaseClient rust class
 abstract interface class EtebaseClient {
@@ -18,4 +23,9 @@ abstract interface class EtebaseClient {
 
   /// Disposes of the instance and clear all cryptographic keys from memory.
   Future<void> dispose();
+
+  /// registers a new item metadata type for this client.
+  void registerCustomMetadata<TMeta extends EtebaseItemMetadata>(
+    MetaFromJson<TMeta> fromJson,
+  );
 }

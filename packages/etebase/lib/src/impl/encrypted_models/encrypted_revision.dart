@@ -8,9 +8,9 @@ import 'package:sodium/sodium_sumo.dart';
 import '../../api/exceptions/integrity_compromised.dart';
 import '../../api/exceptions/missing_content.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../codec/msg_pack_converters.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../managers/client.dart';
-import '../codec/msg_pack_converters.dart';
 import 'chunk.dart';
 
 part 'encrypted_revision.g.dart';
@@ -120,7 +120,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     uid = client.converter.base64Encode(encMeta.mac);
   }
 
-  Future<EtebaseItemMetadata> getMeta(
+  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
     Client client,
     TCryptoManager cryptoManager,
     Uint8List additionalData,
@@ -128,7 +128,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     final mac = client.converter.base64Decode(uid);
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
-    return client.converter.decode(
+    return client.converter.decode<TMeta>(
       client.crypto.bufferUnpad(
         await cryptoManager.decryptDetached(this.meta, mac, adHash),
       ),

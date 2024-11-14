@@ -69,12 +69,14 @@ class EncryptedCollection {
       );
 
       final cm = arena(await col.getCryptoManager(client, parentCm));
-      col.item = await EncryptedCollectionItem.create(
+      final (item, itemCm) = await EncryptedCollectionItem.create(
         client,
         cm,
         meta,
         content,
       );
+      arena(itemCm);
+      col.item = item;
       return (col, arena.detach(cm));
     } finally {
       await arena.dispose();
@@ -128,11 +130,11 @@ class EncryptedCollection {
   ) =>
       item.withCm(client, cm, (cm) => item.setMeta(client, cm, meta));
 
-  Future<EtebaseItemMetadata> getMeta(
+  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
     Client client,
     MinimalCollectionCryptoManager cm,
   ) =>
-      item.withCm(client, cm, (cm) => item.getMeta(client, cm));
+      item.withCm(client, cm, (cm) => item.getMeta<TMeta>(client, cm));
 
   Future<void> setContent(
     Client client,

@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
-import '../models/etebase_collection.dart';
+import '../../impl/managers/item.dart';
 import '../models/base/etebase_collection_list_response.dart';
+import '../models/etebase_collection.dart';
 import '../models/etebase_fetch_options.dart';
 import '../models/etebase_item_metadata.dart';
 import 'etebase_collection_member_manager.dart';
@@ -28,9 +29,9 @@ abstract class EtebaseCollectionManager {
   /// @param meta the [ItemMetadata] for the collection
   /// @param content the collection's content as a byte array. This is unrelated to the [Item]s in the collection.
   /// @param content_size the content size
-  Future<EtebaseCollection> create(
+  Future<EtebaseCollection> create<TMeta extends EtebaseItemMetadata>(
     String collectionType,
-    EtebaseItemMetadata meta,
+    TMeta meta,
     Uint8List content,
   );
 
@@ -38,7 +39,7 @@ abstract class EtebaseCollectionManager {
   ///
   /// @param this_ the object handle
   /// @param col the collection for which the item manager is required
-  EtebaseItemManager getItemManager(EtebaseCollection col);
+  Future<EtebaseItemManager> getItemManager(EtebaseCollection col);
 
   /// Fetch all collections of a specific type from the server and return a list response
   ///

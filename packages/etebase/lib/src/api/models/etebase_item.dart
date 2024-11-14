@@ -36,12 +36,12 @@ abstract class EtebaseItem {
   ///
   /// @param this_ the object handle
   /// @param meta the metadata object to be set for the item
-  Future<void> setMeta(EtebaseItemMetadata meta);
+  Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta);
 
   /// Return the metadata of the item
   ///
   /// @param this_ the object handle
-  Future<EtebaseItemMetadata> getMeta();
+  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>();
 
   /// Set the content of the item
   ///

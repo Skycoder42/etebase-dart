@@ -9,6 +9,9 @@ import 'etebase_item_manager.dart';
 
 /// The dart binding of the EtebaseFileSystemCache rust class
 abstract class EtebaseFileSystemCache {
+  /// Disposes of the instance and clear all cryptographic keys from memory.
+  Future<void> dispose();
+
   /// Initialize a file system cache object
   ///
   /// Should be destroyed with `etebase_fs_cache_destroy`

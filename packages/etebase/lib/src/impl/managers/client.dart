@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/managers/etebase_client.dart';
+import '../../api/models/etebase_item_metadata.dart';
 import '../codec/message_pack_converter.dart';
 import '../crypto/crypto_service.dart';
 import '../crypto/sync/crypto_service_sync.dart';
@@ -54,4 +55,10 @@ class Client implements EtebaseClient, NetworkClient {
 
   @override
   Future<bool> checkEtebaseServer() => authenticator.isEtebase();
+
+  @override
+  void registerCustomMetadata<TMeta extends EtebaseItemMetadata>(
+    MetaFromJson<TMeta> fromJson,
+  ) =>
+      converter.addCustom<TMeta>(fromJson);
 }

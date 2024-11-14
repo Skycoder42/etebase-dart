@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
+import '../models/base/etebase_iterator_list_response.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_collection_access_level.dart';
 import '../models/etebase_fetch_options.dart';
-import '../models/etebase_invitation_list_response.dart';
 import '../models/etebase_signed_invitation.dart';
 import '../models/etebase_user_profile.dart';
 
@@ -13,16 +13,16 @@ abstract class EtebaseCollectionInvitationManager {
   ///
   /// @param this_ the object handle
   /// @param fetch_options the `EtebaseFetchOptions` to fetch with
-  Future<EtebaseInvitationListResponse> listIncoming([
-    EtebaseFetchOptions? fetchOptions,
+  Future<EtebaseIteratorListResponse<EtebaseSignedInvitation>> listIncoming([
+    EtebaseIteratorFetchOptions? fetchOptions,
   ]);
 
   /// List the outgoing collection invitations for the account
   ///
   /// @param this_ the object handle
   /// @param fetch_options the `EtebaseFetchOptions` to fetch with
-  Future<EtebaseInvitationListResponse> listOutgoing([
-    EtebaseFetchOptions? fetchOptions,
+  Future<EtebaseIteratorListResponse<EtebaseSignedInvitation>> listOutgoing([
+    EtebaseIteratorFetchOptions? fetchOptions,
   ]);
 
   /// Accept an invitation

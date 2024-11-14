@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'chunk.freezed.dart';
 
 @internal
-@Freezed(fromJson: false, toJson: false)
+@Freezed(fromJson: false, toJson: false, copyWith: true)
 sealed class Chunk with _$Chunk {
   const factory Chunk(String uid, Uint8List? data) = _Chunk;
 

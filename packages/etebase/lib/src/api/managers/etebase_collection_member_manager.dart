@@ -4,6 +4,9 @@ import '../models/etebase_member_list_response.dart';
 
 /// The dart binding of the EtebaseCollectionMemberManager rust class
 abstract class EtebaseCollectionMemberManager {
+  /// Disposes of the instance and clear all cryptographic keys from memory.
+  Future<void> dispose();
+
   /// List the members of a collection
   ///
   /// @param this_ the object handle
