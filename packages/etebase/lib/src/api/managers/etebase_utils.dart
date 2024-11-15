@@ -1,20 +1,22 @@
 import 'dart:typed_data';
 
+import '../../impl/managers/client.dart';
+import '../../impl/managers/utils.dart';
 import 'etebase_client.dart';
 
 /// The dart binding of the EtebaseUtils rust class
-abstract class EtebaseUtils {
+sealed class EtebaseUtils {
   EtebaseUtils._();
 
   /// Return a buffer filled with cryptographically random bytes
   ///
   /// @param[out] buf the output byte buffer
   /// @param size the size of the returned buffer
-  static Future<Uint8List> randombytes(
+  static Uint8List randombytes(
     EtebaseClient client,
     int size,
   ) =>
-      throw UnimplementedError();
+      Utils.randombytes(client as Client, size);
 
   /// Return a pretty formatted fingerprint of the content
   ///
@@ -32,5 +34,5 @@ abstract class EtebaseUtils {
     EtebaseClient client,
     Uint8List content,
   ) =>
-      throw UnimplementedError();
+      Utils.prettyFingerprint(client as Client, content);
 }

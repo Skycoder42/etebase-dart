@@ -153,15 +153,4 @@ abstract base class CryptoManagerAsync<TCryptoManager extends CryptoManagerSync>
 
   @override
   Rollsum getChunker() => Rollsum();
-
-  @override
-  String prettyFingerprint(
-    Uint8List content, [
-    String delimiter = CryptoManager.defaultFingerprintDelimiter,
-  ]) =>
-      CryptoManagerSync.prettyFingerprintSync(
-        isolated.sodium,
-        content,
-        delimiter,
-      );
 }

@@ -1,5 +1,7 @@
-import 'dart:typed_data';
+import 'package:hive_ce/hive.dart';
+import 'package:sodium/sodium.dart';
 
+import '../../impl/cache/hive_cache.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_item.dart';
 import 'etebase_account.dart';
@@ -18,12 +20,11 @@ abstract class EtebaseCache {
   ///
   /// @param path the path to a directory to store cache in
   /// @param username username of the user to cache data for
-  static Future<EtebaseCache> create(
+  static EtebaseCache create(
     EtebaseClient client,
-    String path,
     String username,
   ) =>
-      throw UnimplementedError();
+      HiveCache(Hive, username);
 
   /// Clear all cache for the user
   ///
@@ -39,19 +40,19 @@ abstract class EtebaseCache {
   /// @param encryption_key used to encrypt the saved account string to enhance security
   /// @param encryption_key_size the size of the encryption_key
   Future<void> saveAccount(
-    EtebaseAccount etebase, [
-    Uint8List? encryptionKey,
+    EtebaseAccount account, [
+    SecureKey? encryptionKey,
   ]);
 
   /// Load the account object from cache
   ///
   /// @param this_ the object handle
-  /// @param client the already setup [Client] object
+  /// @param client the already setup [EtebaseClient] object
   /// @param encryption_key the same encryption key passed to [Self::save_account] while saving the account
   /// @param encryption_key_size the size of the encryption_key
-  Future<EtebaseAccount> loadAccount(
+  Future<EtebaseAccount?> loadAccount(
     EtebaseClient client, [
-    Uint8List? encryptionKey,
+    SecureKey? encryptionKey,
   ]);
 
   /// Save the collection list sync token
@@ -88,8 +89,9 @@ abstract class EtebaseCache {
   /// @param col the collection to be saved
   Future<void> collectionSet(
     EtebaseCollectionManager colMgr,
-    EtebaseCollection col,
-  );
+    EtebaseCollection col, {
+    bool saveContent = true,
+  });
 
   /// Remove a collection from cache
   ///
@@ -106,7 +108,7 @@ abstract class EtebaseCache {
   /// @param this_ the object handle
   /// @param col_mgr collection manager for the account
   /// @param col_uid the UID of the collection
-  Future<EtebaseCollection> collectionGet(
+  Future<EtebaseCollection?> collectionGet(
     EtebaseCollectionManager colMgr,
     String colUid,
   );
@@ -120,8 +122,9 @@ abstract class EtebaseCache {
   Future<void> itemSet(
     EtebaseItemManager itemMgr,
     String colUid,
-    EtebaseItem item,
-  );
+    EtebaseItem item, {
+    bool saveContent = true,
+  });
 
   /// Remove an item from cache
   ///
@@ -141,7 +144,7 @@ abstract class EtebaseCache {
   /// @param item_mgr item manager for the parent collection
   /// @param col_uid the UID of the parent collection
   /// @param item_uid the UID of the item
-  Future<EtebaseItem> itemGet(
+  Future<EtebaseItem?> itemGet(
     EtebaseItemManager itemMgr,
     String colUid,
     String itemUid,

@@ -106,6 +106,10 @@ abstract class EtebaseItemManager {
     EtebaseItemFetchOptions? options,
   });
 
+  Future<void> uploadContent(EtebaseItem item);
+
+  Future<void> downloadContent(EtebaseItem item);
+
   /// Load and return a cached item from a byte buffer
   ///
   /// @param this_ the object handle
@@ -122,10 +126,6 @@ abstract class EtebaseItemManager {
   /// @param item the item object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
   Uint8List cacheSave(EtebaseItem item, {bool saveContent = true});
-
-  Future<void> uploadContent(EtebaseItem item);
-
-  Future<void> downloadContent(EtebaseItem item);
 
   Stream<EtebaseCollectionItemListResponse<EtebaseItem>> subscribeChanges([
     EtebaseItemFetchOptions? options,

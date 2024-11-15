@@ -9,6 +9,14 @@ import '../models/etebase_user_profile.dart';
 
 /// The dart binding of the EtebaseCollectionInvitationManager rust class
 abstract class EtebaseCollectionInvitationManager {
+  /// Our identity's public key
+  ///
+  /// This is the key users see when we send invitations.
+  /// Can be pretty printed with `etebase_utils_pretty_fingerprint`.
+  ///
+  /// @param this_ the object handle
+  Uint8List get pubkey;
+
   /// List the incoming collection invitations for the account
   ///
   /// @param this_ the object handle
@@ -63,12 +71,4 @@ abstract class EtebaseCollectionInvitationManager {
   /// @param this_ the object handle
   /// @param invitation the invitation to cancel
   Future<void> disinvite(EtebaseSignedInvitation invitation);
-
-  /// Our identity's public key
-  ///
-  /// This is the key users see when we send invitations.
-  /// Can be pretty printed with `etebase_utils_pretty_fingerprint`.
-  ///
-  /// @param this_ the object handle
-  Uint8List get pubkey;
 }
