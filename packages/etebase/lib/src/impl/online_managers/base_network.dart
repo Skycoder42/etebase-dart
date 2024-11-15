@@ -31,12 +31,14 @@ enum HttpMethod {
 
 abstract interface class NetworkClient {
   http.Client get httpClient;
+  String get clientName;
   MessagePackConverter get converter;
   Uri get baseUri;
 }
 
 @internal
 base class BaseNetwork {
+  static const _userAgentHeader = 'User-Agent';
   static const _acceptHeader = 'Accept';
   static const _contentTypeHeader = 'Content-Type';
   static const _authorizationHeader = 'Authorization';
@@ -117,6 +119,7 @@ base class BaseNetwork {
     );
 
     final request = http.Request(method.verb, requestUri)
+      ..headers[_userAgentHeader] = client.clientName
       ..headers[_acceptHeader] = _msgPackContentType
       ..headers.addAll(headers);
     if (authToken != null) {
