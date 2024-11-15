@@ -19,6 +19,8 @@ class Client implements EtebaseClient, NetworkClient {
   @override
   final http.Client httpClient;
   @override
+  final String clientName;
+  @override
   final MessagePackConverter converter;
   @override
   final Uri baseUri;
@@ -26,6 +28,7 @@ class Client implements EtebaseClient, NetworkClient {
 
   Client(
     this.httpClient,
+    this.clientName,
     this.baseUri,
     this.converter,
     this.crypto, {
@@ -33,11 +36,13 @@ class Client implements EtebaseClient, NetworkClient {
   }) : _ownedClient = ownedClient;
 
   factory Client.create(
-    SodiumSumo sodium, [
+    SodiumSumo sodium,
+    String clientName, [
     Uri? serverUrl,
   ]) =>
       Client(
-        http.Client(), serverUrl ?? defaultUrl,
+        http.Client(),
+        clientName, serverUrl ?? defaultUrl,
         MessagePackConverter(),
         CryptoServiceSync(sodium), // TODO allow async
         ownedClient: true,

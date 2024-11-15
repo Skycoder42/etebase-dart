@@ -9,7 +9,8 @@ import 'etebase_client.dart';
 import 'etebase_collection_invitation_manager.dart';
 import 'etebase_collection_manager.dart';
 
-/// The dart binding of the EtebaseAccount rust class
+/// The main object for all user interactions and data manipulation,
+/// representing an authenticated user account.
 abstract interface class EtebaseAccount {
   /// Login a user and return a handle to an `EtebaseAccount` object
   ///
@@ -48,6 +49,16 @@ abstract interface class EtebaseAccount {
   ]) =>
       Account.restore(client as Client, accountDataStored, encryptionKey);
 
+  /// Return a `EtebaseCollectionManager` for creating, fetching and uploading collections
+  ///
+  /// @param this_ the object handle
+  EtebaseCollectionManager get collectionManager;
+
+  /// Return a `EtebaseCollectionInvitationManager` for managing collection invitations
+  ///
+  /// @param this_ the object handle
+  EtebaseCollectionInvitationManager get invitationManager;
+
   /// Disposes of the instance and clear all cryptographic keys from memory.
   Future<void> dispose();
 
@@ -71,16 +82,6 @@ abstract interface class EtebaseAccount {
   ///
   /// @param this_ the object handle
   Future<void> logout();
-
-  /// Return a `EtebaseCollectionManager` for creating, fetching and uploading collections
-  ///
-  /// @param this_ the object handle
-  EtebaseCollectionManager get collectionManager;
-
-  /// Return a `EtebaseCollectionInvitationManager` for managing collection invitations
-  ///
-  /// @param this_ the object handle
-  EtebaseCollectionInvitationManager get invitationManager;
 
   /// Save the account object to a string for restoring it later using `etebase_account_restore`
   ///
