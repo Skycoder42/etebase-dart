@@ -14,10 +14,12 @@ import 'key_derivator.dart';
 import 'main_crypto_manager.dart';
 import 'minimal_collection_crypto_manager.dart';
 import 'storage_crypto_manager.dart';
+import 'sync/crypto_manager_sync.dart';
 
 @internal
 abstract interface class CryptoService {
   static const currentVersion = 1;
+  static const defaultFingerprintDelimiter = '   ';
 
   KeyDerivator get keyDerivator;
 
@@ -68,6 +70,11 @@ abstract interface class CryptoService {
     SecureKey key, {
     int version = currentVersion,
   });
+
+  String prettyFingerprint(
+    Uint8List content, [
+    String delimiter = defaultFingerprintDelimiter,
+  ]);
 }
 
 @internal
@@ -133,6 +140,43 @@ mixin CryptoServiceCommon implements CryptoService {
     }
 
     return ret;
+  }
+
+  @override
+  String prettyFingerprint(
+    Uint8List content, [
+    String delimiter = CryptoService.defaultFingerprintDelimiter,
+  ]) {
+    final fingerprint = sodium.crypto.genericHash(
+      message: content,
+      outLen: CryptoManagerSync.hashSize,
+    );
+
+    /* We use 3 bytes each time to generate a 5 digit number - this means 10 pairs for bytes 0-29
+     * We then use bytes 29-31 for another number, and then the 3 most significant bits of each first byte for the last.
+     */
+    final ret = StringBuffer();
+    var lastNum = 0;
+    for (var i = 0; i < 10; i++) {
+      final suffix = (i % 4 == 3) ? '\n' : delimiter;
+      ret
+        ..write(_getEncodedChunk(fingerprint, i * 3))
+        ..write(suffix);
+      lastNum = (lastNum << 3) | ((fingerprint[i] & 0xE0) >>> 5);
+    }
+    ret
+      ..write(_getEncodedChunk(fingerprint, 29))
+      ..write(delimiter)
+      ..write((lastNum % 100000).toString().padLeft(5, '0'));
+    return ret.toString();
+  }
+
+  static String _getEncodedChunk(Uint8List content, int offset) {
+    final num = ((content[offset] << 16) +
+            (content[offset + 1] << 8) +
+            content[offset + 2]) %
+        100000;
+    return num.toString().padLeft(5, '0');
   }
 
   int _getPadding(int length) {

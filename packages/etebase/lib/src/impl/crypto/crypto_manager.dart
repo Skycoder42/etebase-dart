@@ -11,7 +11,6 @@ import 'rollsum.dart';
 @internal
 abstract interface class CryptoManager implements CryptoManagerBase {
   static const keySize = 32;
-  static const defaultFingerprintDelimiter = '   ';
 
   int get version;
 
@@ -73,9 +72,4 @@ abstract interface class CryptoManager implements CryptoManagerBase {
   });
 
   Rollsum getChunker();
-
-  String prettyFingerprint(
-    Uint8List content, [
-    String delimiter = defaultFingerprintDelimiter,
-  ]);
 }

@@ -10,6 +10,18 @@ import 'etebase_item_manager.dart';
 
 /// The dart binding of the EtebaseCollectionManager rust class
 abstract class EtebaseCollectionManager {
+  /// Return the item manager for the supplied collection
+  ///
+  /// @param this_ the object handle
+  /// @param col the collection for which the item manager is required
+  Future<EtebaseItemManager> getItemManager(EtebaseCollection col);
+
+  /// Return the collection member manager for the supplied collection
+  ///
+  /// @param this_ the object handle
+  /// @param col the collection for which the manager is required
+  EtebaseCollectionMemberManager getMemberManager(EtebaseCollection col);
+
   /// Fetch a single collection from the server using its UID
   ///
   /// @param this_ the object handle
@@ -34,12 +46,6 @@ abstract class EtebaseCollectionManager {
     TMeta meta,
     Uint8List content,
   );
-
-  /// Return the item manager for the supplied collection
-  ///
-  /// @param this_ the object handle
-  /// @param col the collection for which the item manager is required
-  Future<EtebaseItemManager> getItemManager(EtebaseCollection col);
 
   /// Fetch all collections of a specific type from the server and return a list response
   ///
@@ -98,11 +104,8 @@ abstract class EtebaseCollectionManager {
   /// @param this_ the object handle
   /// @param collection the collection object to be cached
   /// @param[out] ret_size to hold the size of the returned buffer
-  Uint8List cacheSave(EtebaseCollection collection);
-
-  /// Return the collection member manager for the supplied collection
-  ///
-  /// @param this_ the object handle
-  /// @param col the collection for which the manager is required
-  EtebaseCollectionMemberManager getMemberManager(EtebaseCollection col);
+  Uint8List cacheSave(
+    EtebaseCollection collection, {
+    bool saveContent = true,
+  });
 }

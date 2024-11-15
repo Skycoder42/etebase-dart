@@ -117,7 +117,7 @@ class CollectionManager implements EtebaseCollectionManager {
   @override
   Uint8List cacheSave(
     covariant Collection collection, {
-    bool saveContent = false,
+    bool saveContent = true,
   }) =>
       collection.encrypted.cacheSave(_client, saveContent: saveContent);
 

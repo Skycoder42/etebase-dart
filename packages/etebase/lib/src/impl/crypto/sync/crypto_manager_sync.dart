@@ -12,7 +12,7 @@ import '../rollsum.dart';
 @internal
 abstract base class CryptoManagerSync
     implements CryptoManager, CryptoManagerBaseSync {
-  static const _hashSize = 32;
+  static const hashSize = 32;
 
   final SodiumSumo sodium;
   @protected
@@ -193,7 +193,7 @@ abstract base class CryptoManagerSync
               return sodium.crypto.genericHash(
                 message: subDerivationKeyBytes,
                 key: key,
-                outLen: _hashSize,
+                outLen: hashSize,
               );
             } finally {
               key.dispose();
@@ -214,18 +214,11 @@ abstract base class CryptoManagerSync
       sodium.crypto.genericHash(
         message: message,
         key: withKey ? macKey : null,
-        outLen: _hashSize,
+        outLen: hashSize,
       );
 
   @override
   Rollsum getChunker() => Rollsum();
-
-  @override
-  String prettyFingerprint(
-    Uint8List content, [
-    String delimiter = CryptoManager.defaultFingerprintDelimiter,
-  ]) =>
-      prettyFingerprintSync(sodium, content, delimiter);
 
   SecureKey _keyGen(SecureKey key, int keyId) {
     final subKey = sodium.crypto.kdf.deriveFromKey(
@@ -236,42 +229,5 @@ abstract base class CryptoManagerSync
     );
     _disposables.add(subKey);
     return subKey;
-  }
-
-  static String prettyFingerprintSync(
-    SodiumSumo sodium,
-    Uint8List content, [
-    String? delimiter = '   ',
-  ]) {
-    final fingerprint = sodium.crypto.genericHash(
-      message: content,
-      outLen: _hashSize,
-    );
-
-    /* We use 3 bytes each time to generate a 5 digit number - this means 10 pairs for bytes 0-29
-     * We then use bytes 29-31 for another number, and then the 3 most significant bits of each first byte for the last.
-     */
-    final ret = StringBuffer();
-    var lastNum = 0;
-    for (var i = 0; i < 10; i++) {
-      final suffix = (i % 4 == 3) ? '\n' : delimiter;
-      ret
-        ..write(_getEncodedChunk(fingerprint, i * 3))
-        ..write(suffix);
-      lastNum = (lastNum << 3) | ((fingerprint[i] & 0xE0) >>> 5);
-    }
-    ret
-      ..write(_getEncodedChunk(fingerprint, 29))
-      ..write(delimiter)
-      ..write((lastNum % 100000).toString().padLeft(5, '0'));
-    return ret.toString();
-  }
-
-  static String _getEncodedChunk(Uint8List content, int offset) {
-    final num = ((content[offset] << 16) +
-            (content[offset + 1] << 8) +
-            content[offset + 2]) %
-        100000;
-    return num.toString().padLeft(5, '0');
   }
 }
