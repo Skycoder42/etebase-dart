@@ -24,8 +24,8 @@ class HiveCache implements EtebaseCache {
   final HiveInterface _hive;
   final String _encodedUsername;
 
-  late LazyBox<dynamic> _accountBox;
-  late LazyBox<Uint8List?> _collectionBox;
+  late final LazyBox<dynamic> _accountBox;
+  late final LazyBox<Uint8List?> _collectionBox;
 
   HiveCache(this._hive, String username)
       : _encodedUsername = utf8.fuse(base64Url).encode(username);
@@ -37,10 +37,8 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<void> dispose() async {
-    final collectionBoxes =
-        _collectionBox.keys.cast<String>().map(_itemBoxName);
     await Future.wait([
-      for (final boxName in collectionBoxes)
+      for (final boxName in _knownItemBoxNames)
         if (_hive.isBoxOpen(boxName)) _hive.box<Uint8List>(boxName).close(),
       _collectionBox.close(),
       _accountBox.close(),
@@ -48,20 +46,23 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<void> clearUser() async {
-    final collectionBoxes =
-        _collectionBox.keys.cast<String>().map(_itemBoxName);
+  Future<void> clearUser({bool reInitialize = false}) async {
     await Future.wait([
-      for (final boxName in collectionBoxes) _hive.deleteBoxFromDisk(boxName),
-      _collectionBox.deleteFromDisk(),
-      _accountBox.deleteFromDisk(),
+      for (final boxName in _knownItemBoxNames)
+        _hive.deleteBoxFromDisk(boxName),
+      if (reInitialize) ...[
+        _collectionBox.clear(),
+        _accountBox.clear(),
+      ] else ...[
+        _collectionBox.deleteFromDisk(),
+        _accountBox.deleteFromDisk(),
+      ],
     ]);
-
-    await initialize();
   }
 
   @override
-  bool get hasAccount => _accountBox.containsKey(_accountDataKey);
+  Future<bool> get hasAccount =>
+      Future.value(_accountBox.containsKey(_accountDataKey));
 
   @override
   Future<void> saveAccount(
@@ -78,7 +79,7 @@ class HiveCache implements EtebaseCache {
     SecureKey? encryptionKey,
   ]) async {
     final accountData =
-        await _accountBox.get(_accountDataKey).cast<Uint8List>();
+        await _accountBox.get(_accountDataKey).cast<Uint8List?>();
     if (accountData == null) {
       return null;
     }
@@ -86,7 +87,8 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  bool get hasStoken => _accountBox.containsKey(_accountStokenKey);
+  Future<bool> get hasStoken =>
+      Future.value(_accountBox.containsKey(_accountStokenKey));
 
   @override
   Future<void> saveStoken(String stoken) =>
@@ -96,10 +98,12 @@ class HiveCache implements EtebaseCache {
   Future<String?> loadStoken() => _accountBox.get(_accountStokenKey).cast();
 
   @override
-  Iterable<String> get persistedCollectionStokenUids => _accountBox.keys
-      .whereType<String>()
-      .where((key) => key.startsWith(_accountColStokenKeyPrefix))
-      .map((key) => key.substring(_accountColStokenKeyPrefix.length));
+  Stream<String> get persistedCollectionStokenUids => Stream.fromIterable(
+        _accountBox.keys
+            .whereType<String>()
+            .where((key) => key.startsWith(_accountColStokenKeyPrefix))
+            .map((key) => key.substring(_accountColStokenKeyPrefix.length)),
+      );
 
   @override
   Future<void> collectionSaveStoken(String colUid, String stoken) =>
@@ -108,6 +112,10 @@ class HiveCache implements EtebaseCache {
   @override
   Future<String?> collectionLoadStoken(String colUid) =>
       _accountBox.get(_collectionStokenKey(colUid)).cast();
+
+  @override
+  Stream<String> get persistedCollectionUids =>
+      Stream.fromIterable(_collectionBox.keys.cast());
 
   @override
   Future<void> collectionSet(
@@ -125,8 +133,11 @@ class HiveCache implements EtebaseCache {
     String colUid,
   ) async {
     final itemBox = _itemBoxName(colUid);
-    await _hive.deleteBoxFromDisk(itemBox);
-    await _collectionBox.delete(colUid);
+    if (_hive.isBoxOpen(itemBox) || await _hive.boxExists(itemBox)) {
+      await _collectionBox.put(colUid, null);
+    } else {
+      await _collectionBox.delete(colUid);
+    }
   }
 
   @override
@@ -140,6 +151,12 @@ class HiveCache implements EtebaseCache {
     }
     return colMgr.cacheLoad(colData);
   }
+
+  @override
+  Stream<String> persistedItemUids(String colUid) =>
+      // ignore: discarded_futures
+      Stream.fromFuture(_itemBox(colUid))
+          .expand((itemBox) => itemBox?.keys.cast() ?? const []);
 
   @override
   Future<void> itemSet(
@@ -184,22 +201,27 @@ class HiveCache implements EtebaseCache {
   String _collectionStokenKey(String colUid) =>
       '$_accountColStokenKeyPrefix$colUid';
 
+  Iterable<String> get _knownItemBoxNames =>
+      _collectionBox.keys.cast<String>().map(_itemBoxName);
+
   Future<LazyBox<Uint8List>?> _itemBox(
     String colUid, {
     bool create = false,
   }) async {
     final boxName = _itemBoxName(colUid);
-    if (!create && !await _hive.boxExists(boxName)) {
+    if (_hive.isBoxOpen(boxName)) {
+      return _hive.lazyBox(boxName);
+    } else if (!create && !await _hive.boxExists(boxName)) {
       return null;
+    } else {
+      if (!_collectionBox.containsKey(colUid)) {
+        await _collectionBox.put(colUid, null);
+      }
+      return _hive.openLazyBox<Uint8List>(boxName);
     }
-
-    if (!_collectionBox.containsKey(colUid)) {
-      await _collectionBox.put(colUid, null);
-    }
-    return _hive.openLazyBox<Uint8List>(boxName);
   }
 }
 
 extension on Future<dynamic> {
-  Future<T?> cast<T>() => then((v) => v as T?);
+  Future<T> cast<T>() => then((v) => v as T);
 }

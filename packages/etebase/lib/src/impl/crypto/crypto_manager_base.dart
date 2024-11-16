@@ -1,14 +1,10 @@
-import 'dart:async';
-
 import 'package:meta/meta.dart';
+
+import 'executors/crypto_executor.dart';
 
 @internal
 abstract interface class CryptoManagerBase {
-  FutureOr<void> dispose();
-}
+  CryptoExecutor get executor;
 
-@internal
-abstract interface class CryptoManagerBaseSync implements CryptoManagerBase {
-  @override
   void dispose();
 }

@@ -4,16 +4,20 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
+import '../../api/exceptions/crypto_failure.dart';
 import 'crypto_utils.dart';
+import 'executors/crypto_executor.dart';
 
 @internal
 class CryptoMac {
   final GenericHashConsumer consumer;
 
-  CryptoMac(SodiumSumo sodium, {SecureKey? key, int length = 32})
-      : consumer = sodium.crypto.genericHash.createConsumer(
-          outLen: length,
-          key: key,
+  CryptoMac(CryptoExecutor executor, {SecureKey? key, int length = 32})
+      : consumer = executor.execSync(
+          (sodium) => sodium.crypto.genericHash.createConsumer(
+            outLen: length,
+            key: key,
+          ),
         );
 
   void updateWithLenPrefix(Uint8List messageChunk) {
@@ -26,5 +30,6 @@ class CryptoMac {
     consumer.add(messageChunk);
   }
 
-  Future<Uint8List> finalize() => consumer.close();
+  Future<Uint8List> finalize() =>
+      CryptoFailure.wrap<Future<Uint8List>, Uint8List>(consumer.close);
 }

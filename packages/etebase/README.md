@@ -7,6 +7,9 @@ Dart client library for etebase, base on the javascript port.
 ## TODOs
 - dispose sync
 - hierarchical dispose -> client disposes everything
-- list response macros?
+- list response doc macros?
 - remove unused list response types
 - cleanup unused things
+- sodium constants for key sizes
+  - CryptoUtils as extension? instead of static const?
+- move utils elsewhere? maybe client?

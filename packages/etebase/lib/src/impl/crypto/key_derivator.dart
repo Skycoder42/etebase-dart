@@ -3,7 +3,8 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import 'crypto_manager.dart';
+import 'crypto_utils.dart';
+import 'executors/crypto_executor.dart';
 
 @internal
 enum KeyDerivationDifficulty {
@@ -14,21 +15,22 @@ enum KeyDerivationDifficulty {
 
 @internal
 class KeyDerivator {
-  final SodiumSumo _sodium;
+  final CryptoExecutor _executor;
 
-  KeyDerivator(this._sodium);
+  KeyDerivator(this._executor);
 
-  Uint8List randomSalt() =>
-      _sodium.randombytes.buf(_sodium.crypto.pwhash.saltBytes);
+  Uint8List randomSalt() => _executor.execSync(
+        (sodium) => sodium.randombytes.buf(sodium.crypto.pwhash.saltBytes),
+      );
 
   Future<SecureKey> call({
     required Uint8List salt,
     required String password,
     KeyDerivationDifficulty difficulty = KeyDerivationDifficulty.hard,
-  }) async =>
-      await _sodium.runIsolated(
+  }) =>
+      _executor.execAsync(
         (sodium, _, __) => sodium.crypto.pwhash(
-          outLen: CryptoManager.keySize,
+          outLen: CryptoUtils.symmetricKeySize,
           password: password.toCharArray(),
           salt: salt,
           opsLimit: switch (difficulty) {

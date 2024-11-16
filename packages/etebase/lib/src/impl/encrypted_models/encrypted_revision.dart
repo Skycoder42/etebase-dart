@@ -129,7 +129,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
     return client.converter.decode<TMeta>(
-      client.crypto.bufferUnpad(
+      client.crypto.bufferUnpadSmall(
         await cryptoManager.decryptDetached(this.meta, mac, adHash),
       ),
     );
@@ -212,7 +212,9 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
         .asyncMap(
           (chunk) async => Chunk(
             chunk.uid,
-            await cryptoManager.encrypt(client.crypto.bufferPad(chunk.data!)),
+            await cryptoManager.encrypt(
+              await client.crypto.bufferPad(chunk.data!),
+            ),
           ),
         )
         .toList();
@@ -234,7 +236,9 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
         );
       }
 
-      final buf = client.crypto.bufferUnpad(await cryptoManager.decrypt(data));
+      final buf = await client.crypto.bufferUnpad(
+        await cryptoManager.decrypt(data),
+      );
       final hash = await cryptoManager.calculateMac(buf);
 
       if (!const ListEquality<int>()
@@ -295,12 +299,12 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     TCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
-    final cryptoMac = await cryptoManager.getCryptoMac();
+    final cryptoMac = cryptoManager.getCryptoMac();
     cryptoMac
       ..update(Uint8List.fromList([if (deleted) 1 else 0]))
       ..updateWithLenPrefix(additionalData);
 
-    final chunksHash = await cryptoManager.getCryptoMac(withKey: false);
+    final chunksHash = cryptoManager.getCryptoMac(withKey: false);
     for (final Chunk(:uid) in this.chunks) {
       chunksHash.update(client.converter.base64Decode(uid));
     }

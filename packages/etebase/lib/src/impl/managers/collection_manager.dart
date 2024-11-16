@@ -72,7 +72,7 @@ class CollectionManager implements EtebaseCollectionManager {
   ]) async {
     final colTypes = [
       for (final collectionType in collectionTypes)
-        await _cryptoManager.colTypeToUid(collectionType),
+        _cryptoManager.colTypeToUid(collectionType),
     ];
     final result = await _online.list(colTypes, fetchOptions);
     return result.mapAsync(

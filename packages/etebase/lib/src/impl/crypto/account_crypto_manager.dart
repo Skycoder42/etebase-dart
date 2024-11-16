@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
@@ -6,16 +5,39 @@ import 'package:sodium/sodium_sumo.dart';
 
 import 'collection_crypto_manager.dart';
 import 'crypto_manager.dart';
-import 'crypto_service.dart';
 
 @internal
-abstract interface class AccountCryptoManager implements CryptoManager {
-  FutureOr<Uint8List> colTypeToUid(String colId); // TODO make sync
+class AccountCryptoManager extends CryptoManager {
+  static const _colTypePadSize = 32;
 
-  FutureOr<String> colTypeFromUid(Uint8List uid); // TODO make sync
+  AccountCryptoManager(super.executor, super.key, super.version);
+
+  @override
+  @visibleForOverriding
+  String get context => 'Acct';
+
+  Uint8List colTypeToUid(String colId) => deterministicEncrypt(
+        executor.execSync(
+          (sodium) => sodium.pad(
+            colId.toCharArray().unsignedView(),
+            _colTypePadSize,
+          ),
+        ),
+      );
+
+  String colTypeFromUid(Uint8List uid) {
+    final paddedColType = deterministicDecrypt(uid);
+    return executor.execSync(
+      (sodium) => sodium
+          .unpad(paddedColType, _colTypePadSize)
+          .signedView()
+          .toDartString(),
+    );
+  }
 
   CollectionCryptoManager createCollectionCryptoManager(
     SecureKey key, {
-    int version = CryptoService.currentVersion,
-  });
+    int? version,
+  }) =>
+      CollectionCryptoManager(executor, this, key, version ?? this.version);
 }

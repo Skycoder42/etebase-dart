@@ -1,12 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../codec/message_pack_converter.dart';
 import '../crypto/crypto_service.dart';
-import '../crypto/sync/crypto_service_sync.dart';
+import '../crypto/executors/crypto_executor.dart';
 import '../online_managers/authenticator.dart';
 import '../online_managers/base_network.dart';
 
@@ -36,15 +35,16 @@ class Client implements EtebaseClient, NetworkClient {
   }) : _ownedClient = ownedClient;
 
   factory Client.create(
-    SodiumSumo sodium,
+    CryptoExecutor cryptoExecutor,
     String clientName, [
     Uri? serverUrl,
   ]) =>
       Client(
         http.Client(),
-        clientName, serverUrl ?? defaultUrl,
+        clientName,
+        serverUrl ?? defaultUrl,
         MessagePackConverter(),
-        CryptoServiceSync(sodium), // TODO allow async
+        CryptoService(cryptoExecutor),
         ownedClient: true,
       );
 

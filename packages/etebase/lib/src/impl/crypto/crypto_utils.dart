@@ -11,6 +11,25 @@ import 'crypto_service.dart';
 abstract base class CryptoUtils {
   CryptoUtils._();
 
+  static const currentVersion = 1;
+
+  /// sodium.crypto_pwhash_argon2id_SALTBYTES
+  static const saltSize = 16;
+
+  /// sodium.crypto_box_curve25519xsalsa20poly1305_SECRETKEYBYTES;
+  static const privateKeySize = 32;
+
+  /// sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+  static const symmetricKeySize = 32;
+
+  /// sodium.crypto_aead_xchacha20poly1305_ietf_ABYTES;
+  static const symmetricTagSize = 16;
+
+  /// sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
+  static const symmetricNonceSize = 24;
+
+  static const hashSize = 32;
+
   static Uint8List concat(Iterable<Uint8List> chunks) {
     final buffer = BytesBuilder(copy: false);
     chunks.forEach(buffer.add);

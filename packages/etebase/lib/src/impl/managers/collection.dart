@@ -37,7 +37,7 @@ class Collection implements EtebaseCollection {
   String? get stoken => encrypted.stoken;
 
   @override
-  Future<String> get collectionType =>
+  String get collectionType =>
       encrypted.getCollectionType(_client, _cm.accountCryptoManager);
 
   @override

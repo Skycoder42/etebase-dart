@@ -9,7 +9,7 @@ import '../../api/exceptions/api_missuse.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../codec/msg_pack_converters.dart';
 import '../crypto/collection_item_crypto_manager.dart';
-import '../crypto/crypto_service.dart';
+import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
 import 'chunk.dart';
@@ -24,7 +24,7 @@ class EncryptedCollectionItem {
   static const _cacheFormatVersion = 1;
 
   late String uid;
-  int version = CryptoService.currentVersion;
+  int version = CryptoUtils.currentVersion;
   @JsonKey(
     name: 'encryptionKey',
     includeFromJson: true,
@@ -71,7 +71,7 @@ class EncryptedCollectionItem {
       );
       return (item, cm);
     } catch (_) {
-      await cm.dispose();
+      cm.dispose();
       rethrow;
     }
   }
@@ -210,7 +210,7 @@ class EncryptedCollectionItem {
     try {
       return await callback(cm);
     } finally {
-      await cm.dispose();
+      cm.dispose();
     }
   }
 
