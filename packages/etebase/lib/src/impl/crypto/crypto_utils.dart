@@ -13,21 +13,15 @@ abstract base class CryptoUtils {
 
   static const currentVersion = 1;
 
-  /// sodium.crypto_pwhash_argon2id_SALTBYTES
-  static const saltSize = 16;
-
-  /// sodium.crypto_box_curve25519xsalsa20poly1305_SECRETKEYBYTES;
-  static const privateKeySize = 32;
-
-  /// sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+  // Hard coded here as it is used in various places in the library and always
+  // providing a sodium instance for these places would be quite cumbersome.
+  // Instead, the value is hardcoded here and validated in the tests.
+  //
+  // is the same as: `sodium.crypto.aeadXChaCha20Poly1305IETF.keyBytes`
   static const symmetricKeySize = 32;
 
-  /// sodium.crypto_aead_xchacha20poly1305_ietf_ABYTES;
-  static const symmetricTagSize = 16;
-
-  /// sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
-  static const symmetricNonceSize = 24;
-
+  // The size of hashes and macs. Those do not have a strictly defined size and
+  // thus the size is defined specifically for the library.
   static const hashSize = 32;
 
   static Uint8List concat(Iterable<Uint8List> chunks) {

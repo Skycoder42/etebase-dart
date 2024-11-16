@@ -209,7 +209,7 @@ abstract class CryptoManager implements CryptoManagerBase {
           final nonce = Uint8List.sublistView(
             _calculateMac(sodium, macKey, message),
             0,
-            CryptoUtils.symmetricNonceSize,
+            sodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
           );
           final encrypted = sodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
             key: deterministicEncryptionKey,
@@ -230,7 +230,7 @@ abstract class CryptoManager implements CryptoManagerBase {
         (sodium) {
           final (nonce, cipherText) = CryptoUtils.split2(
             nonceCipherText,
-            CryptoUtils.symmetricNonceSize,
+            sodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
           );
           return sodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
             key: deterministicEncryptionKey,
@@ -260,7 +260,9 @@ abstract class CryptoManager implements CryptoManagerBase {
     Uint8List message,
     Uint8List? additionalData,
   ) {
-    final nonce = sodium.randombytes.buf(CryptoUtils.symmetricNonceSize);
+    final nonce = sodium.randombytes.buf(
+      sodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+    );
     final encrypted = sodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
       key: cipherKey,
       nonce: nonce,
@@ -278,7 +280,7 @@ abstract class CryptoManager implements CryptoManagerBase {
   ) {
     final (nonce, cipherText) = CryptoUtils.split2(
       nonceCipherText,
-      CryptoUtils.symmetricNonceSize,
+      sodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
     );
     return sodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
       key: cipherKey,
@@ -294,7 +296,9 @@ abstract class CryptoManager implements CryptoManagerBase {
     Uint8List message,
     Uint8List? additionalData,
   ) {
-    final nonce = sodium.randombytes.buf(CryptoUtils.symmetricNonceSize);
+    final nonce = sodium.randombytes.buf(
+      sodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+    );
     final encrypted = sodium.crypto.aeadXChaCha20Poly1305IETF.encryptDetached(
       key: cipherKey,
       nonce: nonce,
@@ -314,7 +318,7 @@ abstract class CryptoManager implements CryptoManagerBase {
   ) {
     final (nonce, cipherText) = CryptoUtils.split2(
       nonceCipherText,
-      CryptoUtils.symmetricNonceSize,
+      sodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
     );
     return sodium.crypto.aeadXChaCha20Poly1305IETF.decryptDetached(
       key: cipherKey,
