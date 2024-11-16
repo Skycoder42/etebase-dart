@@ -27,8 +27,8 @@ class ItemManager implements EtebaseItemManager {
   ItemManager(this._client, this._cryptoManager, this._online, this._colUid);
 
   @override
-  Future<void> dispose() async {
-    await _cryptoManager.dispose();
+  void dispose() {
+    _cryptoManager.dispose();
   }
 
   @override

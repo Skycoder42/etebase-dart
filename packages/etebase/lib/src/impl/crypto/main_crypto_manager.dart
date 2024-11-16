@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
@@ -9,12 +7,32 @@ import 'crypto_manager.dart';
 import 'login_crypto_manager.dart';
 
 @internal
-abstract interface class MainCryptoManager implements CryptoManager {
-  SecureKey get mainKey;
+class MainCryptoManager extends CryptoManager {
+  MainCryptoManager(super.executor, super.key, super.version);
 
-  FutureOr<LoginCryptoManager> createLoginCryptoManager();
+  @override
+  String get context => 'Main';
 
-  AccountCryptoManager createAccountCryptoManager(SecureKey privKey);
+  SecureKey get mainKey => super.key;
 
-  BoxCryptoManager createIdentityCryptoManager(SecureKey privKey);
+  LoginCryptoManager createLoginCryptoManager() => LoginCryptoManager(
+        executor,
+        executor.execSync(
+          (sodium) => sodium.crypto.sign.seedKeyPair(asymmetricKeySeed),
+        ),
+      );
+
+  AccountCryptoManager createAccountCryptoManager(SecureKey privKey) =>
+      AccountCryptoManager(executor, privKey, version);
+
+  BoxCryptoManager createIdentityCryptoManager(SecureKey privKey) =>
+      BoxCryptoManager(
+        executor,
+        executor.execSync(
+          (sodium) => KeyPair(
+            publicKey: sodium.crypto.scalarmult.base(n: privKey),
+            secretKey: privKey,
+          ),
+        ),
+      );
 }

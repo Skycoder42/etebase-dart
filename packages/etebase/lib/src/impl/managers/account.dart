@@ -9,8 +9,6 @@ import '../../api/models/etebase_user.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
 import '../crypto/crypto_arena.dart';
-import '../crypto/crypto_manager.dart';
-import '../crypto/crypto_service.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/main_crypto_manager.dart';
 import '../models/account_data.dart';
@@ -54,6 +52,27 @@ class Account implements EtebaseAccount, AuthTokenSource {
     this.identityCryptoManager,
   ) : _authToken = AuthToken(authToken);
 
+  factory Account._create(
+    CryptoArena arena,
+    Client client,
+    MainCryptoManager mainCryptoManager,
+    LoginResponse response,
+  ) {
+    final (accountKey, identityKey) = CryptoUtils.split2Secure(
+      client.crypto,
+      arena(mainCryptoManager.decryptKey(response.user.encryptedContent)),
+      CryptoUtils.symmetricKeySize,
+    );
+    return Account(
+      client,
+      arena.detach(mainCryptoManager),
+      response.user,
+      response.token,
+      mainCryptoManager.createAccountCryptoManager(accountKey),
+      mainCryptoManager.createIdentityCryptoManager(identityKey),
+    );
+  }
+
   static Future<Account> signup(
     Client client,
     EtebaseUser user,
@@ -70,14 +89,14 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final mainCryptoManager =
           arena(client.crypto.createMainCryptoManager(mainKey));
       final loginCryptoManager =
-          arena(await mainCryptoManager.createLoginCryptoManager());
+          arena(mainCryptoManager.createLoginCryptoManager());
       final identityCryptoManager =
           arena(client.crypto.createIdentityCryptoManager());
 
       final encryptedKeys = mainCryptoManager.encryptKey(
         arena(
           CryptoUtils.concatSecure(client.crypto, [
-            arena(client.crypto.secureRandom(CryptoManager.keySize)),
+            arena(client.crypto.secureRandom(CryptoUtils.symmetricKeySize)),
             identityCryptoManager.privKey,
           ]),
         ),
@@ -93,7 +112,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return _createAccount(
+      return Account._create(
         arena,
         client,
         mainCryptoManager,
@@ -138,7 +157,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return _createAccount(
+      return Account._create(
         arena,
         client,
         mainCryptoManager,
@@ -163,7 +182,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final cryptoManager = arena(
         client.crypto.createStorageCryptoManager(
           encryptionKey?.copy() ??
-              client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
+              client.crypto.secureCopy(Uint8List(CryptoUtils.symmetricKeySize)),
           version: decodedStoredData.version,
         ),
       );
@@ -189,7 +208,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return _createAccount(
+      return Account._create(
         arena,
         client,
         mainCryptoManager,
@@ -212,9 +231,9 @@ class Account implements EtebaseAccount, AuthTokenSource {
     }
 
     _disposed = true;
-    await _mainCryptoManager.dispose();
-    await accountCryptoManager.dispose();
-    await identityCryptoManager.dispose();
+    _mainCryptoManager.dispose();
+    accountCryptoManager.dispose();
+    identityCryptoManager.dispose();
   }
 
   @override
@@ -275,7 +294,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final newMainCryptoManager =
           arena(_client.crypto.createMainCryptoManager(newMainKey));
       final newLoginCryptoManager =
-          arena(await newMainCryptoManager.createLoginCryptoManager());
+          arena(newMainCryptoManager.createLoginCryptoManager());
 
       final newEncryptedContent = await newMainCryptoManager.encrypt(
         await _mainCryptoManager.decrypt(_user.encryptedContent),
@@ -312,7 +331,8 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final cryptoManager = arena(
         _client.crypto.createStorageCryptoManager(
           encryptionKey?.copy() ??
-              _client.crypto.secureCopy(Uint8List(CryptoManager.keySize)),
+              _client.crypto
+                  .secureCopy(Uint8List(CryptoUtils.symmetricKeySize)),
         ),
       );
 
@@ -320,7 +340,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         user: _user,
         authToken: _authToken.value,
         serverUrl: _client.baseUri,
-        version: CryptoService.currentVersion,
+        version: CryptoUtils.currentVersion,
         key: cryptoManager.encryptKey(_mainCryptoManager.mainKey),
       );
 
@@ -331,7 +351,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
 
       return _client.converter.encode(
         AccountDataStored(
-          version: CryptoService.currentVersion,
+          version: CryptoUtils.currentVersion,
           encryptedData: encryptedAccountData,
         ),
       );
@@ -354,8 +374,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
     String username,
     ChallengeResponse response,
   ) async {
-    final loginCryptoManager =
-        await mainCryptoManager.createLoginCryptoManager();
+    final loginCryptoManager = mainCryptoManager.createLoginCryptoManager();
     try {
       final encodedResponse = client.converter.encode(response);
       final signature = await loginCryptoManager.signDetached(encodedResponse);
@@ -364,28 +383,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         signature: signature,
       );
     } finally {
-      await loginCryptoManager.dispose();
+      loginCryptoManager.dispose();
     }
-  }
-
-  static Account _createAccount(
-    CryptoArena arena,
-    Client client,
-    MainCryptoManager mainCryptoManager,
-    LoginResponse response,
-  ) {
-    final (accountKey, identityKey) = CryptoUtils.split2Secure(
-      client.crypto,
-      arena(mainCryptoManager.decryptKey(response.user.encryptedContent)),
-      CryptoManager.keySize,
-    );
-    return Account(
-      client,
-      arena.detach(mainCryptoManager),
-      response.user,
-      response.token,
-      mainCryptoManager.createAccountCryptoManager(accountKey),
-      mainCryptoManager.createIdentityCryptoManager(identityKey),
-    );
   }
 }

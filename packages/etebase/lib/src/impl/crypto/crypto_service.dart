@@ -10,176 +10,147 @@ import 'account_crypto_manager.dart';
 import 'box_crypto_manager.dart';
 import 'collection_crypto_manager.dart';
 import 'collection_item_crypto_manager.dart';
+import 'crypto_utils.dart';
+import 'executors/crypto_executor.dart';
 import 'key_derivator.dart';
 import 'main_crypto_manager.dart';
 import 'minimal_collection_crypto_manager.dart';
 import 'storage_crypto_manager.dart';
-import 'sync/crypto_manager_sync.dart';
 
 @internal
-abstract interface class CryptoService {
-  static const currentVersion = 1;
+class CryptoService {
   static const defaultFingerprintDelimiter = '   ';
 
-  KeyDerivator get keyDerivator;
+  final CryptoExecutor _executor;
 
-  FutureOr<void> dispose();
+  CryptoService(this._executor);
 
-  Uint8List randomBytes(int length);
+  FutureOr<void> dispose() => _executor.dispose();
 
-  String genUidBase64();
+  KeyDerivator get keyDerivator => KeyDerivator(_executor);
 
-  SecureKey secureAlloc(int length);
+  Uint8List randomBytes(int length) =>
+      _executor.execSync((sodium) => sodium.randombytes.buf(length));
 
-  SecureKey secureRandom(int length);
+  String genUidBase64() => base64.encode(randomBytes(24));
 
-  SecureKey secureCopy(Uint8List bytes);
+  SecureKey secureAlloc(int length) =>
+      _executor.execSync((sodium) => sodium.secureAlloc(length));
 
-  Uint8List bufferPadSmall(Uint8List buffer);
+  SecureKey secureRandom(int length) =>
+      _executor.execSync((sodium) => sodium.secureRandom(length));
 
-  Uint8List bufferPad(Uint8List buffer);
+  SecureKey secureCopy(Uint8List bytes) =>
+      _executor.execSync((sodium) => sodium.secureCopy(bytes));
 
-  Uint8List bufferUnpad(Uint8List buffer);
+  Uint8List bufferPadSmall(Uint8List buffer) =>
+      _executor.execSync((sodium) => sodium.pad(buffer, buffer.length + 1));
 
-  List<int> shuffle<T>(List<T> list);
+  Uint8List bufferUnpadSmall(Uint8List buffer) => buffer.isEmpty
+      ? buffer
+      : _executor.execSync((sodium) => sodium.unpad(buffer, buffer.length));
 
-  MainCryptoManager createMainCryptoManager(
-    SecureKey key, {
-    int version = currentVersion,
-  });
+  FutureOr<Uint8List> bufferPad(Uint8List buffer) => _executor.exec(
+        (sodium, _, __) => sodium.pad(buffer, _getPadding(buffer.length)),
+      );
 
-  BoxCryptoManager createIdentityCryptoManager([SecureKey? seed]);
+  FutureOr<Uint8List> bufferUnpad(Uint8List buffer) => buffer.isEmpty
+      ? buffer
+      : _executor.exec((sodium, _, __) => sodium.unpad(buffer, buffer.length));
 
-  StorageCryptoManager createStorageCryptoManager(
-    SecureKey key, {
-    int version = currentVersion,
-  });
+  List<int> shuffle<T>(List<T> list) => _executor.execSync((sodium) {
+        final len = list.length;
+        final shuffledIndices = List.filled(len, 0);
 
-  CollectionItemCryptoManager createCollectionItemCryptoManager(
-    SecureKey key, {
-    int version = currentVersion,
-  });
+        // Fill up with the indices
+        for (var i = 0; i < len; i++) {
+          shuffledIndices[i] = i;
+        }
 
-  MinimalCollectionCryptoManager createMinimalCollectionCryptoManager(
-    SecureKey key, {
-    int version = currentVersion,
-  });
+        for (var i = 0; i < len; i++) {
+          final j = i + sodium.randombytes.uniform(len - i);
+          final tmp = list[i];
+          list[i] = list[j];
+          list[j] = tmp;
 
-  CollectionCryptoManager createCollectionCryptoManager(
-    AccountCryptoManager parentCryptoManager,
-    SecureKey key, {
-    int version = currentVersion,
-  });
+          // Also swap the index array
+          final tmp2 = shuffledIndices[i];
+          shuffledIndices[i] = shuffledIndices[j];
+          shuffledIndices[j] = tmp2;
+        }
+
+        final ret = List.filled(len, 0);
+        for (var i = 0; i < len; i++) {
+          ret[shuffledIndices[i]] = i;
+        }
+
+        return ret;
+      });
 
   String prettyFingerprint(
     Uint8List content, [
     String delimiter = defaultFingerprintDelimiter,
-  ]);
-}
+  ]) =>
+      _executor.execSync((sodium) {
+        final fingerprint = sodium.crypto.genericHash(
+          message: content,
+          outLen: CryptoUtils.hashSize,
+        );
 
-@internal
-mixin CryptoServiceCommon implements CryptoService {
-  @protected
-  SodiumSumo get sodium;
+        /* We use 3 bytes each time to generate a 5 digit number - this means 10 pairs for bytes 0-29
+        * We then use bytes 29-31 for another number, and then the 3 most significant bits of each first byte for the last.
+        */
+        final ret = StringBuffer();
+        var lastNum = 0;
+        for (var i = 0; i < 10; i++) {
+          final suffix = (i % 4 == 3) ? '\n' : delimiter;
+          ret
+            ..write(_getEncodedChunk(fingerprint, i * 3))
+            ..write(suffix);
+          lastNum = (lastNum << 3) | ((fingerprint[i] & 0xE0) >>> 5);
+        }
+        ret
+          ..write(_getEncodedChunk(fingerprint, 29))
+          ..write(delimiter)
+          ..write((lastNum % 100000).toString().padLeft(5, '0'));
+        return ret.toString();
+      });
 
-  @override
-  late final keyDerivator = KeyDerivator(sodium);
+  MainCryptoManager createMainCryptoManager(
+    SecureKey key, {
+    int version = CryptoUtils.currentVersion,
+  }) =>
+      MainCryptoManager(_executor, key, version);
 
-  @override
-  Uint8List randomBytes(int length) => sodium.randombytes.buf(length);
+  BoxCryptoManager createIdentityCryptoManager([SecureKey? seed]) =>
+      BoxCryptoManager.fromSeed(_executor, seed);
 
-  @override
-  String genUidBase64() => base64.encode(randomBytes(24));
+  StorageCryptoManager createStorageCryptoManager(
+    SecureKey key, {
+    int version = CryptoUtils.currentVersion,
+  }) =>
+      StorageCryptoManager(_executor, key, version);
 
-  @override
-  SecureKey secureAlloc(int length) => sodium.secureAlloc(length);
+  CollectionItemCryptoManager createCollectionItemCryptoManager(
+    SecureKey key, {
+    int version = CryptoUtils.currentVersion,
+  }) =>
+      CollectionItemCryptoManager(_executor, key, version);
 
-  @override
-  SecureKey secureRandom(int length) => sodium.secureRandom(length);
+  MinimalCollectionCryptoManager createMinimalCollectionCryptoManager(
+    SecureKey key, {
+    int version = CryptoUtils.currentVersion,
+  }) =>
+      MinimalCollectionCryptoManager(_executor, key, version);
 
-  @override
-  SecureKey secureCopy(Uint8List bytes) => sodium.secureCopy(bytes);
+  CollectionCryptoManager createCollectionCryptoManager(
+    AccountCryptoManager parentCryptoManager,
+    SecureKey key, {
+    int version = CryptoUtils.currentVersion,
+  }) =>
+      CollectionCryptoManager(_executor, parentCryptoManager, key, version);
 
-  @override
-  Uint8List bufferPadSmall(Uint8List buffer) =>
-      sodium.pad(buffer, buffer.length + 1);
-
-  @override
-  Uint8List bufferPad(Uint8List buffer) =>
-      sodium.pad(buffer, _getPadding(buffer.length));
-
-  @override
-  Uint8List bufferUnpad(Uint8List buffer) =>
-      buffer.isEmpty ? buffer : sodium.unpad(buffer, buffer.length);
-
-  @override
-  List<int> shuffle<T>(List<T> list) {
-    final len = list.length;
-    final shuffledIndices = List.filled(len, 0);
-
-    // Fill up with the indices
-    for (var i = 0; i < len; i++) {
-      shuffledIndices[i] = i;
-    }
-
-    for (var i = 0; i < len; i++) {
-      final j = i + sodium.randombytes.uniform(len - i);
-      final tmp = list[i];
-      list[i] = list[j];
-      list[j] = tmp;
-
-      // Also swap the index array
-      final tmp2 = shuffledIndices[i];
-      shuffledIndices[i] = shuffledIndices[j];
-      shuffledIndices[j] = tmp2;
-    }
-
-    final ret = List.filled(len, 0);
-    for (var i = 0; i < len; i++) {
-      ret[shuffledIndices[i]] = i;
-    }
-
-    return ret;
-  }
-
-  @override
-  String prettyFingerprint(
-    Uint8List content, [
-    String delimiter = CryptoService.defaultFingerprintDelimiter,
-  ]) {
-    final fingerprint = sodium.crypto.genericHash(
-      message: content,
-      outLen: CryptoManagerSync.hashSize,
-    );
-
-    /* We use 3 bytes each time to generate a 5 digit number - this means 10 pairs for bytes 0-29
-     * We then use bytes 29-31 for another number, and then the 3 most significant bits of each first byte for the last.
-     */
-    final ret = StringBuffer();
-    var lastNum = 0;
-    for (var i = 0; i < 10; i++) {
-      final suffix = (i % 4 == 3) ? '\n' : delimiter;
-      ret
-        ..write(_getEncodedChunk(fingerprint, i * 3))
-        ..write(suffix);
-      lastNum = (lastNum << 3) | ((fingerprint[i] & 0xE0) >>> 5);
-    }
-    ret
-      ..write(_getEncodedChunk(fingerprint, 29))
-      ..write(delimiter)
-      ..write((lastNum % 100000).toString().padLeft(5, '0'));
-    return ret.toString();
-  }
-
-  static String _getEncodedChunk(Uint8List content, int offset) {
-    final num = ((content[offset] << 16) +
-            (content[offset + 1] << 8) +
-            content[offset + 2]) %
-        100000;
-    return num.toString().padLeft(5, '0');
-  }
-
-  int _getPadding(int length) {
+  static int _getPadding(int length) {
     // Use the padme padding scheme for efficiently
     // https://www.petsymposium.org/2019/files/papers/issue4/popets-2019-0056.pdf
 
@@ -197,7 +168,15 @@ mixin CryptoServiceCommon implements CryptoService {
     return (length + bitMask) & ~bitMask;
   }
 
-  double _logBase(num x, num base) => math.log(x) / math.log(base);
-
-  double _log2(num x) => _logBase(x, 2);
+  static String _getEncodedChunk(Uint8List content, int offset) {
+    final num = ((content[offset] << 16) +
+            (content[offset + 1] << 8) +
+            content[offset + 2]) %
+        100000;
+    return num.toString().padLeft(5, '0');
+  }
 }
+
+double _logBase(num x, num base) => math.log(x) / math.log(base);
+
+double _log2(num x) => _logBase(x, 2);

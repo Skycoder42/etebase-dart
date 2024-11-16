@@ -72,8 +72,10 @@ abstract interface class EtebaseAccount {
   /// Serializes the account object to a string for restoring it later using
   /// [restore].
   ///
+  /// {@template encryption_key}
   /// You can optionally pass an [encryptionKey] to encrypt the account data
   /// with. It is recommended you always provide such a key to protect the users
   /// data.
+  /// {@endtemplate}
   Future<Uint8List> save([SecureKey? encryptionKey]);
 }

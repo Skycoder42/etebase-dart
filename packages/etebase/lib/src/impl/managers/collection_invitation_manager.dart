@@ -42,15 +42,15 @@ class CollectionInvitationManager
   @override
   Future<void> accept(covariant SignedInvitationRead invitation) async {
     final content = _client.converter.decode<SignedInvitationContent>(
-      _client.crypto.bufferUnpad(
+      _client.crypto.bufferUnpadSmall(
         await _account.identityCryptoManager.decrypt(
           nonceCipherText: invitation.signedEncryptionKey,
           pubKey: invitation.fromPubkey,
         ),
       ),
     );
-    final colTypeUid = await _account.accountCryptoManager
-        .colTypeToUid(content.collectionType);
+    final colTypeUid =
+        _account.accountCryptoManager.colTypeToUid(content.collectionType);
     final encryptedEncryptionKey = await _account.accountCryptoManager
         .encrypt(content.encryptionKey, colTypeUid);
     await _online.accept(

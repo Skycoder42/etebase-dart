@@ -12,8 +12,7 @@ import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
 import '../crypto/collection_crypto_manager.dart';
 import '../crypto/crypto_arena.dart';
-import '../crypto/crypto_manager.dart';
-import '../crypto/crypto_service.dart';
+import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
 import '../models/signed_invitation.dart';
@@ -61,10 +60,10 @@ class EncryptedCollection {
     final arena = CryptoArena();
     try {
       final col = EncryptedCollection()
-        .._collectionType = await parentCm.colTypeToUid(collectionTypeName);
+        .._collectionType = parentCm.colTypeToUid(collectionTypeName);
 
       col._collectionKey = parentCm.encryptKey(
-        arena(client.crypto.secureRandom(CryptoManager.keySize)),
+        arena(client.crypto.secureRandom(CryptoUtils.symmetricKeySize)),
         col._collectionType,
       );
 
@@ -160,10 +159,10 @@ class EncryptedCollection {
         (cm) => item.delete(client, cm, preserveContent: preserveContent),
       );
 
-  Future<String> getCollectionType(
+  String getCollectionType(
     Client client,
     AccountCryptoManager parentCm,
-  ) async =>
+  ) =>
       parentCm.colTypeFromUid(_collectionType);
 
   Future<SignedInvitationWrite> createInvitation(
@@ -177,7 +176,7 @@ class EncryptedCollection {
     final encryptionKey = _getCollectionKey(client, parentCm);
     try {
       final uid = client.crypto.randomBytes(_invitationUidSize);
-      final collectionType = await getCollectionType(client, parentCm);
+      final collectionType = getCollectionType(client, parentCm);
       final signedEncryptionKey =
           await encryptionKey.runUnlockedAsync((encryptionKeyBytes) async {
         final rawContent = client.crypto.bufferPadSmall(
@@ -192,7 +191,7 @@ class EncryptedCollection {
       });
       return SignedInvitationWrite(
         uid: client.converter.base64Encode(uid),
-        version: CryptoService.currentVersion,
+        version: CryptoUtils.currentVersion,
         username: username,
         collection: this.uid,
         accessLevel: accessLevel,
@@ -211,7 +210,7 @@ class EncryptedCollection {
       client.crypto.createCollectionCryptoManager(
         parentCm,
         _getCollectionKey(client, parentCm),
-        version: version ?? CryptoService.currentVersion,
+        version: version ?? CryptoUtils.currentVersion,
       );
 
   SecureKey _getCollectionKey(
@@ -221,6 +220,6 @@ class EncryptedCollection {
       parentCm.decryptKey(
         _collectionKey,
         _collectionType,
-        CryptoManager.keySize,
+        CryptoUtils.symmetricKeySize,
       );
 }

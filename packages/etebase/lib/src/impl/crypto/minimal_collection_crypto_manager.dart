@@ -3,5 +3,9 @@ import 'package:meta/meta.dart';
 import 'crypto_manager.dart';
 
 @internal
-abstract interface class MinimalCollectionCryptoManager
-    implements CryptoManager {}
+class MinimalCollectionCryptoManager extends CryptoManager {
+  MinimalCollectionCryptoManager(super.executor, super.key, super.version);
+
+  @override
+  String get context => 'Col';
+}
