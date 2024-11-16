@@ -36,12 +36,12 @@ sealed class CollectionItemListResponse<T>
 
   /// @nodoc
   @internal
-  Future<CollectionItemListResponse<TOther>> mapAsync<TOther>(
-    Future<TOther> Function(T) map,
-  ) async =>
+  CollectionItemListResponse<TOther> map<TOther>(
+    TOther Function(T) map,
+  ) =>
       CollectionItemListResponse(
         data: [
-          for (final item in data) await map(item),
+          for (final item in data) map(item),
         ],
         isDone: isDone,
         stoken: stoken,

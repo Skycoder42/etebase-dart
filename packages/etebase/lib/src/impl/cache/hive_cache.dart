@@ -19,6 +19,7 @@ class HiveCache implements EtebaseCache {
 
   static const _accountDataKey = 'account.data';
   static const _accountStokenKey = 'account.stoken';
+  static const _accountColStokenKeyPrefix = 'col.stoken.';
 
   final HiveInterface _hive;
   final String _encodedUsername;
@@ -60,6 +61,9 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
+  bool get hasAccount => _accountBox.containsKey(_accountDataKey);
+
+  @override
   Future<void> saveAccount(
     EtebaseAccount account, [
     SecureKey? encryptionKey,
@@ -82,11 +86,20 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
+  bool get hasStoken => _accountBox.containsKey(_accountStokenKey);
+
+  @override
   Future<void> saveStoken(String stoken) =>
       _accountBox.put(_accountStokenKey, stoken);
 
   @override
   Future<String?> loadStoken() => _accountBox.get(_accountStokenKey).cast();
+
+  @override
+  Iterable<String> get persistedCollectionStokenUids => _accountBox.keys
+      .whereType<String>()
+      .where((key) => key.startsWith(_accountColStokenKeyPrefix))
+      .map((key) => key.substring(_accountColStokenKeyPrefix.length));
 
   @override
   Future<void> collectionSaveStoken(String colUid, String stoken) =>
@@ -168,7 +181,8 @@ class HiveCache implements EtebaseCache {
 
   String _itemBoxName(String colUid) => _boxName('$_collectionBoxName.$colUid');
 
-  String _collectionStokenKey(String colUid) => 'col.stoken.$colUid';
+  String _collectionStokenKey(String colUid) =>
+      '$_accountColStokenKeyPrefix$colUid';
 
   Future<LazyBox<Uint8List>?> _itemBox(
     String colUid, {

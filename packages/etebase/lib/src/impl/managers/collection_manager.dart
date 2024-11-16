@@ -53,7 +53,7 @@ class CollectionManager implements EtebaseCollectionManager {
     final encryptedCollection = await _online.fetch(colUid, fetchOptions);
     return Collection(
       _client,
-      await encryptedCollection.getCryptoManager(_client, _cryptoManager),
+      encryptedCollection.getCryptoManager(_client, _cryptoManager),
       encryptedCollection,
     );
   }
@@ -78,7 +78,7 @@ class CollectionManager implements EtebaseCollectionManager {
     return result.mapAsync(
       (encrypted) async => Collection(
         _client,
-        await encrypted.getCryptoManager(_client, _cryptoManager),
+        encrypted.getCryptoManager(_client, _cryptoManager),
         encrypted,
       ),
     );
@@ -122,20 +122,19 @@ class CollectionManager implements EtebaseCollectionManager {
       collection.encrypted.cacheSave(_client, saveContent: saveContent);
 
   @override
-  Future<EtebaseCollection> cacheLoad(Uint8List cached) async {
+  EtebaseCollection cacheLoad(Uint8List cached) {
     final encryptedCollection = EncryptedCollection.cacheLoad(_client, cached);
     return Collection(
       _client,
-      await encryptedCollection.getCryptoManager(_client, _cryptoManager),
+      encryptedCollection.getCryptoManager(_client, _cryptoManager),
       encryptedCollection,
     );
   }
 
   @override
-  Future<ItemManager> getItemManager(covariant Collection col) async =>
-      ItemManager(
+  ItemManager getItemManager(covariant Collection col) => ItemManager(
         _client,
-        await col.encrypted.getCryptoManager(_client, _cryptoManager),
+        col.encrypted.getCryptoManager(_client, _cryptoManager),
         CollectionItemManagerOnline(
           client: _client,
           authTokenSource: _online.authTokenSource,

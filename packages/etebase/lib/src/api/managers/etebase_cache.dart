@@ -9,27 +9,37 @@ import 'etebase_client.dart';
 import 'etebase_collection_manager.dart';
 import 'etebase_item_manager.dart';
 
-/// The dart binding of the EtebaseFileSystemCache rust class
+/// A caching helper that allows you to easily save and restore items and
+/// collections on the end device.
+///
+/// The default implementation of the dart port uses
+/// [package:hive_ce](https://pub.dev/packages/hive_ce) to persist the data on
+/// the device. Hive was chosen as it simple (no other native dependencies),
+/// fast and compatible with the VM and the Web.
 abstract class EtebaseCache {
-  /// Disposes of the instance and clear all cryptographic keys from memory.
-  Future<void> dispose();
-
-  /// Initialize a file system cache object
+  /// Initialize hive based cache for the given [username].
   ///
-  /// Should be destroyed with `etebase_fs_cache_destroy`
+  /// **Important:** Before you can create an [EtebaseCache], you must
+  /// initialize hive! You can do so by calling [HiveInterface.init] :
   ///
-  /// @param path the path to a directory to store cache in
-  /// @param username username of the user to cache data for
+  /// ```dart
+  /// Hive.init('.../path/to/hive/dir');
+  /// ```
   static EtebaseCache create(
     EtebaseClient client,
     String username,
   ) =>
       HiveCache(Hive, username);
 
+  /// Disposes of the instance and clear all cryptographic keys from memory.
+  Future<void> dispose();
+
   /// Clear all cache for the user
   ///
   /// @param this_ the object handle
   Future<void> clearUser();
+
+  bool get hasAccount;
 
   /// Save the user account
   ///
@@ -55,6 +65,8 @@ abstract class EtebaseCache {
     SecureKey? encryptionKey,
   ]);
 
+  bool get hasStoken;
+
   /// Save the collection list sync token
   ///
   /// @param this_ the object handle
@@ -65,6 +77,8 @@ abstract class EtebaseCache {
   ///
   /// @param this_ the object handle
   Future<String?> loadStoken();
+
+  Iterable<String> get persistedCollectionStokenUids;
 
   /// Save a collection's sync token
   ///
@@ -81,6 +95,8 @@ abstract class EtebaseCache {
   /// @param this_ the object handle
   /// @param col_uid the UID of the collection
   Future<String?> collectionLoadStoken(String colUid);
+
+  Iterable<String> get persistedCollectionUids;
 
   /// Save a collection to cache
   ///
@@ -112,6 +128,8 @@ abstract class EtebaseCache {
     EtebaseCollectionManager colMgr,
     String colUid,
   );
+
+  Iterable<String> get persistedItemUids;
 
   /// Save an item to cache
   ///

@@ -6,69 +6,51 @@ import '../models/etebase_collection_access_level.dart';
 import '../models/etebase_fetch_options.dart';
 import '../models/etebase_signed_invitation.dart';
 import '../models/etebase_user_profile.dart';
+import 'etebase_utils.dart';
 
-/// The dart binding of the EtebaseCollectionInvitationManager rust class
+/// An manager for managing user invitations to [EtebaseCollection]s.
 abstract class EtebaseCollectionInvitationManager {
-  /// Our identity's public key
+  /// Our identity's public key.
   ///
   /// This is the key users see when we send invitations.
-  /// Can be pretty printed with `etebase_utils_pretty_fingerprint`.
-  ///
-  /// @param this_ the object handle
-  Uint8List get pubkey;
+  /// Can be pretty printed with [EtebaseUtils.prettyFingerprint].
+  Uint8List get pubKey;
 
-  /// List the incoming collection invitations for the account
+  /// List the incoming collection [EtebaseSignedInvitation]s for the account.
   ///
-  /// @param this_ the object handle
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
   Future<EtebaseIteratorListResponse<EtebaseSignedInvitation>> listIncoming([
     EtebaseIteratorFetchOptions? fetchOptions,
   ]);
 
-  /// List the outgoing collection invitations for the account
+  /// List the outgoing collection [EtebaseSignedInvitation]s for the account.
   ///
-  /// @param this_ the object handle
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
   Future<EtebaseIteratorListResponse<EtebaseSignedInvitation>> listOutgoing([
     EtebaseIteratorFetchOptions? fetchOptions,
   ]);
 
-  /// Accept an invitation
-  ///
-  /// @param this_ the object handle
-  /// @param invitation the invitation to accept
+  /// Accept an [invitation].
   Future<void> accept(EtebaseSignedInvitation invitation);
 
-  /// Reject an invitation
-  ///
-  /// @param this_ the object handle
-  /// @param invitation the invitation to reject
+  /// Reject an [invitation].
   Future<void> reject(EtebaseSignedInvitation invitation);
 
-  /// Fetch and return a user's profile
-  ///
-  /// @param this_ the object handle
-  /// @param username the username of the user to fetch
+  /// Fetch and return a [EtebaseUserProfile] for the given [username].
   Future<EtebaseUserProfile> fetchUserProfile(String username);
 
-  /// Invite a user to a collection
+  /// Invite a user identified by [username] to a collection.
   ///
-  /// @param this_ the object handle
-  /// @param collection the collection to invite to
-  /// @param username the username of the user to invite
-  /// @param pubkey the public key of the user to invite
-  /// @param pubkey_size the size of the public key
-  /// @param access_level the level of access to give to user
+  /// The [pubKey] must be the corresponding
+  /// [EtebaseCollectionInvitationManager.pubKey] of that user. The
+  /// [accessLevel] defines the level of access to give to user.
   Future<void> invite(
     EtebaseCollection collection,
     String username,
-    Uint8List pubkey,
+    Uint8List pubKey,
     EtebaseCollectionAccessLevel accessLevel,
   );
 
-  /// Cancel an invitation (disinvite)
-  ///
-  /// @param this_ the object handle
-  /// @param invitation the invitation to cancel
+  /// Cancel an [invitation] (disinvite the user).
   Future<void> disinvite(EtebaseSignedInvitation invitation);
 }

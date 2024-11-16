@@ -36,12 +36,12 @@ sealed class IteratorListResponse<T>
 
   /// @nodoc
   @internal
-  Future<IteratorListResponse<TOther>> mapAsync<TOther>(
-    Future<TOther> Function(T) map,
-  ) async =>
+  IteratorListResponse<TOther> map<TOther>(
+    TOther Function(T) map,
+  ) =>
       IteratorListResponse(
         data: [
-          for (final item in data) await map(item),
+          for (final item in data) map(item),
         ],
         isDone: isDone,
         iterator: iterator,

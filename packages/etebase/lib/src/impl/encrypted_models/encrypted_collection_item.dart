@@ -60,7 +60,7 @@ class EncryptedCollectionItem {
     Uint8List content,
   ) async {
     final item = EncryptedCollectionItem()..uid = client.crypto.genUidBase64();
-    final cm = await item.getCryptoManager(client, parentCm);
+    final cm = item.getCryptoManager(client, parentCm);
     try {
       item.content = await EncryptedRevision.create(
         client: client,
@@ -206,7 +206,7 @@ class EncryptedCollectionItem {
     MinimalCollectionCryptoManager parentCm,
     FutureOr<T> Function(CollectionItemCryptoManager cm) callback,
   ) async {
-    final cm = await getCryptoManager(client, parentCm);
+    final cm = getCryptoManager(client, parentCm);
     try {
       return await callback(cm);
     } finally {
@@ -226,31 +226,31 @@ class EncryptedCollectionItem {
 
   Uint8List _getAdditionalMacData() => uid.toCharArray().unsignedView();
 
-  Future<SecureKey> _getEncryptionKey(
+  SecureKey _getEncryptionKey(
     Client client,
     MinimalCollectionCryptoManager parentCm,
-  ) async {
+  ) {
     if (_encryptionKey case final Uint8List key) {
       return client.crypto.secureCopy(key);
     }
     return parentCm.deriveSubkey(_getAdditionalMacData());
   }
 
-  Future<CollectionItemCryptoManager> getCryptoManager(
+  CollectionItemCryptoManager getCryptoManager(
     Client client,
     MinimalCollectionCryptoManager parentCm,
-  ) async =>
+  ) =>
       client.crypto.createCollectionItemCryptoManager(
-        await _getEncryptionKey(client, parentCm),
+        _getEncryptionKey(client, parentCm),
         version: version,
       );
 
-  Future<MinimalCollectionCryptoManager> _getHierarchicalCryptoManager(
+  MinimalCollectionCryptoManager _getHierarchicalCryptoManager(
     Client client,
     MinimalCollectionCryptoManager parentCm,
-  ) async =>
+  ) =>
       client.crypto.createMinimalCollectionCryptoManager(
-        await _getEncryptionKey(client, parentCm),
+        _getEncryptionKey(client, parentCm),
         version: version,
       );
 }
