@@ -3,3 +3,10 @@
 [![Pub Version](https://img.shields.io/pub/v/etebase)](https://pub.dev/packages/etebase)
 
 Dart client library for etebase, base on the javascript port.
+
+## TODOs
+- dispose sync
+- hierarchical dispose -> client disposes everything
+- list response macros?
+- remove unused list response types
+- cleanup unused things

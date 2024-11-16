@@ -59,7 +59,7 @@ class ItemManager implements EtebaseItemManager {
     EtebaseItemFetchOptions? fetchOptions,
   ]) async {
     final result = await _online.list(fetchOptions);
-    return result.mapAsync(_createItem);
+    return result.map(_createItem);
   }
 
   @override
@@ -68,7 +68,7 @@ class ItemManager implements EtebaseItemManager {
     EtebaseRevisionFetchOptions? fetchOptions,
   ]) async {
     final revisions = await _online.itemRevisions(item.encrypted, fetchOptions);
-    return revisions.mapAsync(_createItem);
+    return revisions.map(_createItem);
   }
 
   @override
@@ -80,7 +80,7 @@ class ItemManager implements EtebaseItemManager {
       _prepareForUpload(items),
       fetchOptions,
     );
-    return response.mapAsync(_createItem);
+    return response.map(_createItem);
   }
 
   @override
@@ -89,7 +89,7 @@ class ItemManager implements EtebaseItemManager {
     EtebaseItemFetchOptions? fetchOptions,
   ]) async {
     final result = await _online.fetchMulti(items, fetchOptions);
-    return result.mapAsync(_createItem);
+    return result.map(_createItem);
   }
 
   @override
@@ -142,29 +142,29 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
+  Uint8List cacheSave(covariant Item item, {bool saveContent = true}) =>
+      item.encrypted.cacheSave(_client, saveContent: saveContent);
+
+  @override
+  Item cacheLoad(Uint8List cached) =>
+      _createItem(EncryptedCollectionItem.cacheLoad(_client, cached));
+
+  @override
   Stream<CollectionItemListResponse<Item>> subscribeChanges([
     EtebaseItemFetchOptions? options,
   ]) =>
       _online
           .subscribeChanges(options)
           // ignore: discarded_futures
-          .asyncMap((res) => res.mapAsync(_createItem));
+          .asyncMap((res) => res.map(_createItem));
 
-  @override
-  Uint8List cacheSave(covariant Item item, {bool saveContent = true}) =>
-      item.encrypted.cacheSave(_client, saveContent: saveContent);
-
-  @override
-  Future<Item> cacheLoad(Uint8List cached) =>
-      _createItem(EncryptedCollectionItem.cacheLoad(_client, cached));
-
-  Future<Item> _createItem(
+  Item _createItem(
     EncryptedCollectionItem encrypted, [
     CollectionItemCryptoManager? cm,
-  ]) async =>
+  ]) =>
       Item(
         _client,
-        cm ?? await encrypted.getCryptoManager(_client, _cryptoManager),
+        cm ?? encrypted.getCryptoManager(_client, _cryptoManager),
         encrypted,
         _colUid,
       );

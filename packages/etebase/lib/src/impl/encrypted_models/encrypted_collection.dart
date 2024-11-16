@@ -63,12 +63,12 @@ class EncryptedCollection {
       final col = EncryptedCollection()
         .._collectionType = await parentCm.colTypeToUid(collectionTypeName);
 
-      col._collectionKey = await parentCm.encryptKey(
+      col._collectionKey = parentCm.encryptKey(
         arena(client.crypto.secureRandom(CryptoManager.keySize)),
         col._collectionType,
       );
 
-      final cm = arena(await col.getCryptoManager(client, parentCm));
+      final cm = arena(col.getCryptoManager(client, parentCm));
       final (item, itemCm) = await EncryptedCollectionItem.create(
         client,
         cm,
@@ -174,7 +174,7 @@ class EncryptedCollection {
     Uint8List pubkey,
     EtebaseCollectionAccessLevel accessLevel,
   ) async {
-    final encryptionKey = await _getCollectionKey(client, parentCm);
+    final encryptionKey = _getCollectionKey(client, parentCm);
     try {
       final uid = client.crypto.randomBytes(_invitationUidSize);
       final collectionType = await getCollectionType(client, parentCm);
@@ -203,21 +203,21 @@ class EncryptedCollection {
     }
   }
 
-  Future<CollectionCryptoManager> getCryptoManager(
+  CollectionCryptoManager getCryptoManager(
     Client client,
     AccountCryptoManager parentCm, {
     int? version,
-  }) async =>
+  }) =>
       client.crypto.createCollectionCryptoManager(
         parentCm,
-        await _getCollectionKey(client, parentCm),
+        _getCollectionKey(client, parentCm),
         version: version ?? CryptoService.currentVersion,
       );
 
-  Future<SecureKey> _getCollectionKey(
+  SecureKey _getCollectionKey(
     Client client,
     AccountCryptoManager parentCm,
-  ) async =>
+  ) =>
       parentCm.decryptKey(
         _collectionKey,
         _collectionType,

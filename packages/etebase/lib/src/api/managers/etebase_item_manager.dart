@@ -6,127 +6,128 @@ import '../models/etebase_fetch_options.dart';
 import '../models/etebase_item.dart';
 import '../models/etebase_item_metadata.dart';
 
-/// The dart binding of the EtebaseItemManager rust class
+/// A manager for managing [EtebaseItem] operations like creation and fetching.
 abstract class EtebaseItemManager {
   /// Disposes of the instance and clear all cryptographic keys from memory.
   Future<void> dispose();
 
-  /// Fetch a single item from the server using its UID
+  /// Create a new [EtebaseItem].
   ///
-  /// @param this_ the object handle
-  /// @param item_uid the UID of the item to be fetched
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
-  Future<EtebaseItem> fetch(
-    String itemUid, [
-    EtebaseItemFetchOptions? fetchOptions,
-  ]);
-
-  /// Create a new item
+  /// The [meta] and [content] are defining the data of the item.
   ///
-  /// Should be destroyed with `etebase_item_destroy`
-  ///
-  /// @param this_ the object handle
-  /// @param meta the [ItemMetadata] for the item
-  /// @param content the item's content as a byte array
-  /// @param content_size the content size
+  /// {@macro meta_registration}
   Future<EtebaseItem> create<TMeta extends EtebaseItemMetadata>(
     TMeta meta,
     Uint8List content,
   );
 
-  /// Fetch all items of a collection and return a list response
+  /// Fetch a single [EtebaseItem] from the server using its [itemUid].
   ///
-  /// @param this_ the object handle
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
+  Future<EtebaseItem> fetch(
+    String itemUid, [
+    EtebaseItemFetchOptions? fetchOptions,
+  ]);
+
+  /// Fetch all [EtebaseItem] of a collection and return a
+  /// [EtebaseCollectionItemListResponse].
+  ///
+  /// {@macro fetch_options}
   Future<EtebaseCollectionItemListResponse<EtebaseItem>> list([
     EtebaseItemFetchOptions? fetchOptions,
   ]);
 
-  /// Fetch and return a list response of items with each item as the revision
+  /// Fetch and return a [EtebaseIteratorListResponse] of [EtebaseItem] with
+  /// each item as a revision of the given [item].
   ///
-  /// @param this_ the object handle
-  /// @param item the item for which to fetch the revision history
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
   Future<EtebaseIteratorListResponse<EtebaseItem>> itemRevisions(
     EtebaseItem item, [
     EtebaseRevisionFetchOptions? fetchOptions,
   ]);
 
-  /// Fetch the latest revision of the supplied items from the server and return a list response
+  /// Fetch the latest revision of the supplied [items] from the server and
+  /// return a [EtebaseCollectionItemListResponse] of [EtebaseItem]s.
   ///
-  /// @param this_ the object handle
-  /// @param items the list of items to be fetched
-  /// @param items_size the number of items
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
   Future<EtebaseCollectionItemListResponse<EtebaseItem>> fetchUpdates(
     List<EtebaseItem> items, [
     EtebaseItemFetchOptions? fetchOptions,
   ]);
 
-  /// Fetch multiple Items using their UID
+  /// Fetch multiple [EtebaseItem]s using their [itemUids] and return a
+  /// [EtebaseCollectionItemListResponse].
   ///
-  /// See etebase_item_manager_fetch for fetching a single item
+  /// See [fetch] for fetching a single [EtebaseItem].
   ///
-  /// @param this_ the object handle
-  /// @param items the list of item uids to be fetched
-  /// @param items_size the number of items
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
   Future<EtebaseCollectionItemListResponse<EtebaseItem>> fetchMulti(
-    List<String> items, [
+    List<String> itemUids, [
     EtebaseItemFetchOptions? fetchOptions,
   ]);
 
-  /// Upload the supplied items to the server
-  /// Upload the supplied items to the server with a list of items as dependencies
+  /// Upload the supplied [items] to the server.
   ///
-  /// This will fail if the dependencies have changed remotely
+  /// {@template deps}
+  /// The optional [deps] can be used to specify additional [EtebaseItem]s that
+  /// are dependencies of the uploaded [items]. The upload will fail if the
+  /// [deps] have changed remotely.
+  /// {@endtemplate}
   ///
-  /// @param this_ the object handle
-  /// @param items the list of items to be uploaded
-  /// @param items_size the number of items
-  /// @param fetch_options the `EtebaseFetchOptions` to upload with
+  /// {@macro fetch_options}
   Future<void> batch(
     List<EtebaseItem> items, {
     List<EtebaseItem>? deps,
     EtebaseItemFetchOptions? options,
   });
 
-  /// Upload items using a transaction
-  /// Upload items using a transaction with a list of items as dependencies
+  /// Upload the supplied [items] to the server using a transaction.
   ///
-  /// This call ensures that the items haven't changed since we last fetched them
+  /// {@macro deps}
   ///
-  /// @param this_ the object handle
-  /// @param items the list of items to be uploaded
-  /// @param items_size the number of items
-  /// @param fetch_options the `EtebaseFetchOptions` to upload with
+  /// {@macro fetch_options}
   Future<void> transaction(
     List<EtebaseItem> items, {
     List<EtebaseItem>? deps,
     EtebaseItemFetchOptions? options,
   });
 
+  /// Pre-upload the [item]s content - use it with large files.
+  ///
+  /// Pre-uploading item content is recommended when dealing with large files as
+  /// it is much more efficient. It uploads the content of the [item] in advance
+  /// so you don't need to upload it as part of transactions.
   Future<void> uploadContent(EtebaseItem item);
 
+  /// Download the content of an [item] if it is missing.
+  ///
+  /// When using some [EtebaseFetchOptionsBase], items may be incomplete. Use
+  /// this call to download the [item]s content so it can be accessed.
+  /// This is a much more efficient way of getting the content of large files.
+  ///
+  /// It can also be used to download the content of an [EtebaseItem] that was
+  /// cached via [cacheSave] without it's content.
   Future<void> downloadContent(EtebaseItem item);
 
-  /// Load and return a cached item from a byte buffer
+  /// Save the [item] object to a byte buffer for caching.
   ///
-  /// @param this_ the object handle
-  /// @param cached the byte buffer holding the cached item obtained using [cache_save]
-  /// @param cached_size size of the buffer
-  Future<EtebaseItem> cacheLoad(Uint8List cached);
-
-  /// Save the item object to a byte buffer for caching
-  /// Save the item object and its content to a byte buffer for caching
+  /// The item can later be loaded using [cacheLoad].
   ///
-  /// The item can later be loaded using `etebase_item_manager_cache_load`
-  ///
-  /// @param this_ the object handle
-  /// @param item the item object to be cached
-  /// @param[out] ret_size to hold the size of the returned buffer
+  /// {@macro save_content}
   Uint8List cacheSave(EtebaseItem item, {bool saveContent = true});
 
+  /// Load and return a cached [EtebaseItem] from the [cached] bytes originally
+  /// saved via [cacheSave].
+  EtebaseItem cacheLoad(Uint8List cached);
+
+  /// Subscribes to the remote server to get notified whenever items are
+  /// created or updated in to collection.
+  ///
+  /// The returned [Stream] will continuously return
+  /// [EtebaseCollectionItemListResponse]s containing the new [EtebaseItem]
+  /// revisions.
+  ///
+  /// {@macro fetch_options}
   Stream<EtebaseCollectionItemListResponse<EtebaseItem>> subscribeChanges([
     EtebaseItemFetchOptions? options,
   ]);

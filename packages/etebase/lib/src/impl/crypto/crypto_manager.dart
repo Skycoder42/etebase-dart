@@ -19,7 +19,7 @@ abstract interface class CryptoManager implements CryptoManagerBase {
     Uint8List? additionalData,
   ]);
 
-  FutureOr<Uint8List> encryptKey(
+  Uint8List encryptKey(
     SecureKey key, [
     Uint8List? additionalData,
   ]);
@@ -29,7 +29,7 @@ abstract interface class CryptoManager implements CryptoManagerBase {
     Uint8List? additionalData,
   ]);
 
-  FutureOr<SecureKey> decryptKey(
+  SecureKey decryptKey(
     Uint8List nonceCipherText, [
     Uint8List? additionalData,
     int? keySize,
@@ -62,7 +62,7 @@ abstract interface class CryptoManager implements CryptoManagerBase {
     Uint8List? additionalData,
   ]);
 
-  FutureOr<SecureKey> deriveSubkey(Uint8List salt);
+  SecureKey deriveSubkey(Uint8List salt);
 
   FutureOr<CryptoMac> getCryptoMac({bool withKey = true});
 

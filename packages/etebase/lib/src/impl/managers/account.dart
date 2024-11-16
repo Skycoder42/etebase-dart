@@ -74,7 +74,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final identityCryptoManager =
           arena(client.crypto.createIdentityCryptoManager());
 
-      final encryptedKeys = await mainCryptoManager.encryptKey(
+      final encryptedKeys = mainCryptoManager.encryptKey(
         arena(
           CryptoUtils.concatSecure(client.crypto, [
             arena(client.crypto.secureRandom(CryptoManager.keySize)),
@@ -93,7 +93,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return await _createAccount(
+      return _createAccount(
         arena,
         client,
         mainCryptoManager,
@@ -138,7 +138,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return await _createAccount(
+      return _createAccount(
         arena,
         client,
         mainCryptoManager,
@@ -184,12 +184,12 @@ class Account implements EtebaseAccount, AuthTokenSource {
 
       final mainCryptoManager = arena(
         client.crypto.createMainCryptoManager(
-          await cryptoManager.decryptKey(accountData.key),
+          cryptoManager.decryptKey(accountData.key),
           version: accountData.version,
         ),
       );
 
-      return await _createAccount(
+      return _createAccount(
         arena,
         client,
         mainCryptoManager,
@@ -321,7 +321,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         authToken: _authToken.value,
         serverUrl: _client.baseUri,
         version: CryptoService.currentVersion,
-        key: await cryptoManager.encryptKey(_mainCryptoManager.mainKey),
+        key: cryptoManager.encryptKey(_mainCryptoManager.mainKey),
       );
 
       final encryptedAccountData = await cryptoManager.encrypt(
@@ -368,15 +368,15 @@ class Account implements EtebaseAccount, AuthTokenSource {
     }
   }
 
-  static Future<Account> _createAccount(
+  static Account _createAccount(
     CryptoArena arena,
     Client client,
     MainCryptoManager mainCryptoManager,
     LoginResponse response,
-  ) async {
+  ) {
     final (accountKey, identityKey) = CryptoUtils.split2Secure(
       client.crypto,
-      arena(await mainCryptoManager.decryptKey(response.user.encryptedContent)),
+      arena(mainCryptoManager.decryptKey(response.user.encryptedContent)),
       CryptoManager.keySize,
     );
     return Account(

@@ -1,111 +1,102 @@
 import 'dart:typed_data';
 
-import '../../impl/managers/item.dart';
 import '../models/base/etebase_collection_list_response.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_fetch_options.dart';
+import '../models/etebase_item.dart';
 import '../models/etebase_item_metadata.dart';
+import 'etebase_client.dart';
 import 'etebase_collection_member_manager.dart';
 import 'etebase_item_manager.dart';
 
-/// The dart binding of the EtebaseCollectionManager rust class
+/// A manager for managing [EtebaseCollection] operations like creation and
+/// fetching.
 abstract class EtebaseCollectionManager {
-  /// Return the item manager for the supplied collection
+  /// Create a new [EtebaseCollection].
   ///
-  /// @param this_ the object handle
-  /// @param col the collection for which the item manager is required
-  Future<EtebaseItemManager> getItemManager(EtebaseCollection col);
-
-  /// Return the collection member manager for the supplied collection
+  /// The [collectionType] defines the type of [EtebaseItem]s stored in the
+  /// collection. The [meta] and [content] are backing the collections primary
+  /// [EtebaseItem]. This is unrelated to the [EtebaseItem]s in the collection.
   ///
-  /// @param this_ the object handle
-  /// @param col the collection for which the manager is required
-  EtebaseCollectionMemberManager getMemberManager(EtebaseCollection col);
-
-  /// Fetch a single collection from the server using its UID
-  ///
-  /// @param this_ the object handle
-  /// @param col_uid the UID of the collection to be fetched
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
-  Future<EtebaseCollection> fetch(
-    String colUid, [
-    EtebaseFetchOptions? fetchOptions,
-  ]);
-
-  /// Create a new collection
-  ///
-  /// Should be destroyed with `etebase_collection_destroy`
-  ///
-  /// @param this_ the object handle
-  /// @param collection_type the type of [Item]s stored in the collection
-  /// @param meta the [ItemMetadata] for the collection
-  /// @param content the collection's content as a byte array. This is unrelated to the [Item]s in the collection.
-  /// @param content_size the content size
+  /// {@template meta_registration}
+  /// By default, the [meta] data will be of the type [EtebaseItemMetadata].
+  /// You can use custom metadata objects that implement the
+  /// [EtebaseItemMetadata] with additional properties. However, this requires
+  /// you to register [TMeta] once via [EtebaseClient.registerCustomMetadata].
+  /// {@endtemplate}
   Future<EtebaseCollection> create<TMeta extends EtebaseItemMetadata>(
     String collectionType,
     TMeta meta,
     Uint8List content,
   );
 
-  /// Fetch all collections of a specific type from the server and return a list response
+  /// Fetch a single collection from the server using its [colUid].
+  Future<EtebaseCollection> fetch(
+    String colUid, [
+    EtebaseFetchOptions? fetchOptions,
+  ]);
+
+  /// Fetch all [EtebaseCollection]s of a specific [collectionType] from the
+  /// server and return a [EtebaseCollectionListResponse].
   ///
-  /// @param this_ the object handle
-  /// @param collection_type the type of items stored in the collection
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@template fetch_options}
+  /// The [fetchOptions] allow you to specify optional parameters to further
+  /// filter the returned result or continue with the next iteration of data.
+  /// {@endtemplate}
   Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
     String collectionType, [
     EtebaseFetchOptions? fetchOptions,
   ]);
 
-  /// Fetch all collections of the supplied types from the server and return a list response
+  /// Fetch all [EtebaseCollection]s of the supplied [collectionTypes] from the
+  /// server and return a [EtebaseCollectionListResponse].
   ///
-  /// @param this_ the object handle
-  /// @param collection_types array of strings denoting the collection types
-  /// @param collection_types_size size of the collection_types array
-  /// @param fetch_options the `EtebaseFetchOptions` to fetch with
+  /// {@macro fetch_options}
   Future<EtebaseCollectionListResponse<EtebaseCollection>> listMulti(
     List<String> collectionTypes, [
     EtebaseFetchOptions? fetchOptions,
   ]);
 
-  /// Upload a collection
+  /// Upload a [collection].
   ///
-  /// @param this_ the object handle
-  /// @param collection the collection object to be uploaded
-  /// @param fetch_options the `EtebaseFetchOptions` to upload with
+  /// {@macro fetch_options}
   Future<void> upload(
     EtebaseCollection collection, [
     EtebaseFetchOptions? fetchOptions,
   ]);
 
-  /// Upload a collection using a transaction
+  /// Upload a [collection] using a transaction.
   ///
-  /// This call ensures that the collection hasn't changed since we last fetched it
+  /// This call ensures that the collection hasn't changed since we last fetched
+  /// it.
   ///
-  /// @param this_ the object handle
-  /// @param collection the collection object to be uploaded
-  /// @param fetch_options the `EtebaseFetchOptions` to upload with
+  /// {@macro fetch_options}
   Future<void> transaction(
     EtebaseCollection collection, [
     EtebaseFetchOptions? fetchOptions,
   ]);
 
-  /// Load and return a cached collection object from a byte buffer
+  /// Save the [collection] object to a byte buffer for caching.
   ///
-  /// @param this_ the object handle
-  /// @param cached the byte buffer holding the cached collection obtained using [cache_save]
-  /// @param cached_size size of the buffer
-  Future<EtebaseCollection> cacheLoad(Uint8List cached);
-
-  /// Save the collection object to a byte buffer for caching
+  /// The collection can later be loaded using [cacheLoad].
   ///
-  /// The collection can later be loaded using `etebase_collection_manager_cache_load`
-  ///
-  /// @param this_ the object handle
-  /// @param collection the collection object to be cached
-  /// @param[out] ret_size to hold the size of the returned buffer
+  /// {@template save_content}
+  /// If [saveContent] is `true` (the default), the object is saved together
+  /// with it's content. If set to `false`, only the metadata is stored and the
+  /// content has to be restored using [EtebaseItemManager.downloadContent].
+  /// {@endtemplate}
   Uint8List cacheSave(
     EtebaseCollection collection, {
     bool saveContent = true,
   });
+
+  /// Load and return a cached [EtebaseCollection] object from the [cached]
+  /// bytes originally saved via [cacheSave].
+  EtebaseCollection cacheLoad(Uint8List cached);
+
+  /// Return the item manager for the supplied [collection].
+  EtebaseItemManager getItemManager(EtebaseCollection collection);
+
+  /// Return the collection member manager for the supplied [collection].
+  EtebaseCollectionMemberManager getMemberManager(EtebaseCollection collection);
 }
