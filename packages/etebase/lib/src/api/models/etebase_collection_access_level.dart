@@ -14,7 +14,7 @@ enum EtebaseCollectionAccessLevel {
   /// Read and write access.
   readWrite(2);
 
-  /// The numeric value of the access level
+  /// The numeric value of the access level.
   final int value;
 
   const EtebaseCollectionAccessLevel(this.value);

@@ -2,35 +2,23 @@ import 'dart:typed_data';
 
 import 'etebase_collection_access_level.dart';
 
-/// The dart binding of the EtebaseSignedInvitation rust class
+/// A signed invitation to join a collection.
 abstract class EtebaseSignedInvitation {
-  /// The uid of the invitation
-  ///
-  /// @param this_ the object handle
+  /// The uid of the invitation.
   String get uid;
 
-  /// The username this invitation is for
-  ///
-  /// @param this_ the object handle
+  /// The username this invitation is for.
   String get username;
 
-  /// The uid of the collection this invitation is for
-  ///
-  /// @param this_ the object handle
+  /// The uid of the collection this invitation is for.
   String get collection;
 
-  /// The access level offered in this invitation
-  ///
-  /// @param this_ the object handle
+  /// The access level offered in this invitation.
   EtebaseCollectionAccessLevel get accessLevel;
 
-  /// The username this invitation is from
-  ///
-  /// @param this_ the object handle
+  /// The username this invitation is from.
   String? get fromUsername;
 
-  /// The public key of the inviting user
-  ///
-  /// @param this_ the object handle
-  Uint8List get fromPubkey;
+  /// The public key of the inviting user.
+  Uint8List get fromPubKey;
 }

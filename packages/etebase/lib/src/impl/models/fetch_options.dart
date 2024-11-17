@@ -22,9 +22,6 @@ sealed class FetchOptions with _$FetchOptions {
 @internal
 extension EtebaseFetchOptionsX on EtebaseFetchOptionsBase {
   FetchOptions asFetchOptions() => switch (this) {
-        final EtebaseListFetchOptions o => FetchOptions(
-            limit: o.limit,
-          ),
         final EtebaseFetchOptions o => FetchOptions(
             limit: o.limit,
             stoken: o.stoken,

@@ -45,7 +45,7 @@ class CollectionInvitationManager
       _client.crypto.bufferUnpadSmall(
         await _account.identityCryptoManager.decrypt(
           nonceCipherText: invitation.signedEncryptionKey,
-          pubKey: invitation.fromPubkey,
+          pubKey: invitation.fromPubKey,
         ),
       ),
     );

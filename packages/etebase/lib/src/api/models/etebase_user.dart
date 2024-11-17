@@ -3,15 +3,15 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'etebase_user.freezed.dart';
 part 'etebase_user.g.dart';
 
-/// A etebase user object for signing up
+/// A user object.
 @freezed
 sealed class EtebaseUser with _$EtebaseUser {
-  /// Default constructor
+  /// Default constructor.
   const factory EtebaseUser({
-    /// The username
+    /// The username.
     required String username,
 
-    /// The email address
+    /// The email address.
     required String email,
   }) = _EtebaseUser;
 

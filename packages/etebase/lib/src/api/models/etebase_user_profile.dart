@@ -8,16 +8,16 @@ import 'etebase_signed_invitation.dart';
 part 'etebase_user_profile.freezed.dart';
 part 'etebase_user_profile.g.dart';
 
-/// The dart binding of the EtebaseUserProfile rust class
+/// A user's public profile.
 @freezed
 class EtebaseUserProfile with _$EtebaseUserProfile {
-  /// Constructor
+  /// Default Constructor.
   @msgPackBytes
   const factory EtebaseUserProfile({
-    /// The user's identity public key
+    /// The user's identity public key.
     ///
     /// This is used for identifying the user and safely sending them data (such
-    /// as [EtebaseSignedInvitation]).
+    /// as [EtebaseSignedInvitation]s).
     required Uint8List pubkey,
   }) = _EtebaseUserProfile;
 
