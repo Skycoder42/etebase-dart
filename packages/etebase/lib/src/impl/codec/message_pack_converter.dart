@@ -9,6 +9,7 @@ import '../../api/exceptions/http_error_content.dart';
 import '../../api/exceptions/invalid_message_pack_data.dart';
 import '../../api/models/etebase_collection_member.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../../api/models/etebase_user_profile.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
@@ -16,11 +17,8 @@ import '../models/account_data.dart';
 import '../models/account_data_stored.dart';
 import '../models/challenge_request.dart';
 import '../models/collection_item_fetch_info.dart';
-import '../models/collection_item_list_response.dart';
-import '../models/collection_list_response.dart';
 import '../models/invitation_accept_request.dart';
 import '../models/item_batch_request.dart';
-import '../models/iterator_list_response.dart';
 import '../models/login_challenge.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
@@ -44,7 +42,7 @@ class MessagePackConverter {
     _add(EtebaseUserProfile.fromJson);
     _addWithContainer(
       EtebaseCollectionMember.fromJson,
-      IteratorListResponse<EtebaseCollectionMember>.fromJson,
+      EtebaseListResponse.iteratorFromJson<EtebaseCollectionMember>,
     );
     _add(AccountDataStored.fromJson);
     _add(AccountData.fromJson);
@@ -57,18 +55,18 @@ class MessagePackConverter {
     _add(LoginRequest.fromJson);
     _addWithContainer(
       EncryptedCollection.fromJson,
-      CollectionListResponse<EncryptedCollection>.fromJson,
+      EtebaseListResponse.collectionFromJson<EncryptedCollection>,
     );
     _addWithContainer(
       EncryptedCollectionItem.fromJson,
-      CollectionItemListResponse<EncryptedCollectionItem>.fromJson,
+      EtebaseListResponse.itemFromJson<EncryptedCollectionItem>,
     );
     _add(CollectionItemFetchInfo.fromJson);
     _add(ItemBatchRequest.fromJson);
     _add(WebSocketTicketResponse.fromJson);
     _addWithContainer(
       SignedInvitationRead.fromJson,
-      IteratorListResponse<SignedInvitationRead>.fromJson,
+      EtebaseListResponse.iteratorFromJson<SignedInvitationRead>,
     );
     _add(InvitationAcceptRequest.fromJson);
     _add(SignedInvitationWrite.fromJson);

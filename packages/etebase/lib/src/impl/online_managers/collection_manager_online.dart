@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/models/etebase_fetch_options.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../models/collection_list_request.dart';
-import '../models/collection_list_response.dart';
 import 'base_manager.dart';
 import 'base_network.dart';
 import 'collection_item_manager_online.dart';
@@ -33,11 +33,11 @@ final class CollectionManagerOnline extends BaseManager {
         options: options,
       );
 
-  Future<CollectionListResponse<EncryptedCollection>> list(
+  Future<EtebaseCollectionListResponse<EncryptedCollection>> list(
     List<Uint8List> collectionTypes,
     EtebaseFetchOptions? options,
   ) =>
-      invokeApi<CollectionListResponse<EncryptedCollection>>(
+      invokeApi<EtebaseCollectionListResponse<EncryptedCollection>>(
         method: HttpMethod.post,
         path: const ['list_multi'],
         body: CollectionListRequest(collectionTypes),

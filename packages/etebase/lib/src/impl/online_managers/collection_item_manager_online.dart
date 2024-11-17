@@ -6,12 +6,11 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/models/etebase_fetch_options.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../encrypted_models/chunk.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
 import '../models/collection_item_fetch_info.dart';
-import '../models/collection_item_list_response.dart';
 import '../models/item_batch_request.dart';
-import '../models/iterator_list_response.dart';
 import '../models/web_socket_ticket_response.dart';
 import 'base_manager.dart';
 import 'base_network.dart';
@@ -33,19 +32,19 @@ final class CollectionItemManagerOnline extends BaseManager {
         options: options,
       );
 
-  Future<CollectionItemListResponse<EncryptedCollectionItem>> list(
+  Future<EtebaseItemListResponse<EncryptedCollectionItem>> list(
     EtebaseItemFetchOptions? options,
   ) =>
-      invokeApi<CollectionItemListResponse<EncryptedCollectionItem>>(
+      invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
         options: options,
       );
 
-  Future<IteratorListResponse<EncryptedCollectionItem>> itemRevisions(
+  Future<EtebaseIteratorListResponse<EncryptedCollectionItem>> itemRevisions(
     EncryptedCollectionItem item,
     EtebaseRevisionFetchOptions? options,
   ) async {
     final response =
-        await invokeApi<IteratorListResponse<EncryptedCollectionItem>>(
+        await invokeApi<EtebaseIteratorListResponse<EncryptedCollectionItem>>(
       path: [item.uid, 'revision'],
       options: options,
     );
@@ -61,22 +60,22 @@ final class CollectionItemManagerOnline extends BaseManager {
         body: item,
       );
 
-  Future<CollectionItemListResponse<EncryptedCollectionItem>> fetchUpdates(
+  Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchUpdates(
     List<EncryptedCollectionItem> items,
     EtebaseItemFetchOptions? options,
   ) =>
-      invokeApi<CollectionItemListResponse<EncryptedCollectionItem>>(
+      invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
         method: HttpMethod.post,
         path: const ['fetch_updates'],
         body: items.toFetchInfo(wantEtag: options?.stoken == null),
         options: options,
       );
 
-  Future<CollectionItemListResponse<EncryptedCollectionItem>> fetchMulti(
+  Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchMulti(
     List<String> items,
     EtebaseItemFetchOptions? options,
   ) =>
-      invokeApi<CollectionItemListResponse<EncryptedCollectionItem>>(
+      invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
         method: HttpMethod.post,
         path: const ['fetch_updates'],
         body: items.map(CollectionItemFetchInfo.new).toList(),
@@ -140,7 +139,7 @@ final class CollectionItemManagerOnline extends BaseManager {
         options: options,
       );
 
-  Stream<CollectionItemListResponse<EncryptedCollectionItem>> subscribeChanges(
+  Stream<EtebaseItemListResponse<EncryptedCollectionItem>> subscribeChanges(
     EtebaseItemFetchOptions? options,
   ) async* {
     final ticket = await invokeApi<WebSocketTicketResponse>(

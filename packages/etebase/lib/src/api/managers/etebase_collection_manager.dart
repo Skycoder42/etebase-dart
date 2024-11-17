@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import '../models/base/etebase_collection_list_response.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_fetch_options.dart';
 import '../models/etebase_item.dart';
 import '../models/etebase_item_metadata.dart';
+import '../models/etebase_list_response.dart';
 import 'etebase_client.dart';
 import 'etebase_collection_member_manager.dart';
 import 'etebase_item_manager.dart';

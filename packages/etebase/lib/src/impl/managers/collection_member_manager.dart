@@ -4,7 +4,7 @@ import '../../api/managers/etebase_collection_member_manager.dart';
 import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_collection_member.dart';
 import '../../api/models/etebase_fetch_options.dart';
-import '../models/iterator_list_response.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../online_managers/collection_member_manager_online.dart';
 
 @internal
@@ -14,7 +14,7 @@ class CollectionMemberManager implements EtebaseCollectionMemberManager {
   CollectionMemberManager(this._online);
 
   @override
-  Future<IteratorListResponse<EtebaseCollectionMember>> list([
+  Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list([
     EtebaseIteratorFetchOptions? fetchOptions,
   ]) =>
       _online.list(fetchOptions);

@@ -7,12 +7,11 @@ import '../../api/exceptions/conflict.dart';
 import '../../api/managers/etebase_item_manager.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../encrypted_models/chunk.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
-import '../models/collection_item_list_response.dart';
-import '../models/iterator_list_response.dart';
 import '../online_managers/collection_item_manager_online.dart';
 import 'client.dart';
 import 'item.dart';
@@ -55,7 +54,7 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<CollectionItemListResponse<Item>> list([
+  Future<EtebaseItemListResponse<Item>> list([
     EtebaseItemFetchOptions? fetchOptions,
   ]) async {
     final result = await _online.list(fetchOptions);
@@ -63,7 +62,7 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<IteratorListResponse<Item>> itemRevisions(
+  Future<EtebaseIteratorListResponse<Item>> itemRevisions(
     covariant Item item, [
     EtebaseRevisionFetchOptions? fetchOptions,
   ]) async {
@@ -72,7 +71,7 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<CollectionItemListResponse<Item>> fetchUpdates(
+  Future<EtebaseItemListResponse<Item>> fetchUpdates(
     covariant List<Item> items, [
     EtebaseItemFetchOptions? fetchOptions,
   ]) async {
@@ -84,7 +83,7 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<CollectionItemListResponse<Item>> fetchMulti(
+  Future<EtebaseItemListResponse<Item>> fetchMulti(
     List<String> items, [
     EtebaseItemFetchOptions? fetchOptions,
   ]) async {
@@ -150,7 +149,7 @@ class ItemManager implements EtebaseItemManager {
       _createItem(EncryptedCollectionItem.cacheLoad(_client, cached));
 
   @override
-  Stream<CollectionItemListResponse<Item>> subscribeChanges([
+  Stream<EtebaseItemListResponse<Item>> subscribeChanges([
     EtebaseItemFetchOptions? options,
   ]) =>
       _online

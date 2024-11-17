@@ -1,9 +1,9 @@
 import 'package:meta/meta.dart';
 
 import '../../api/models/etebase_fetch_options.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../../api/models/etebase_user_profile.dart';
 import '../models/invitation_accept_request.dart';
-import '../models/iterator_list_response.dart';
 import '../models/signed_invitation.dart';
 import 'base_manager.dart';
 import 'base_network.dart';
@@ -15,17 +15,17 @@ final class CollectionInvitationManagerOnline extends BaseManager {
     required super.authTokenSource,
   }) : super(path: const ['invitation']);
 
-  Future<IteratorListResponse<SignedInvitationRead>> listIncoming(
+  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming(
     EtebaseIteratorFetchOptions? options,
   ) =>
-      invokeApi<IteratorListResponse<SignedInvitationRead>>(
+      invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
         path: const ['incoming'],
       );
 
-  Future<IteratorListResponse<SignedInvitationRead>> listOutgoing(
+  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing(
     EtebaseIteratorFetchOptions? options,
   ) =>
-      invokeApi<IteratorListResponse<SignedInvitationRead>>(
+      invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
         path: const ['outgoing'],
       );
 
