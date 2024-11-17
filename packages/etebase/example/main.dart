@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:typed_data';
 
 import 'package:etebase/src/api/managers/etebase_account.dart';
 import 'package:etebase/src/api/managers/etebase_client.dart';
@@ -16,7 +17,11 @@ void main(List<String> args) async {
   final userName = base64Url.encode(sodium.randombytes.buf(18));
   print(userName);
 
-  final client = EtebaseClient.create(sodium, Uri.http('127.0.0.1:3735'));
+  final client = EtebaseClient.create(
+    sodium,
+    'test_client',
+    Uri.http('127.0.0.1:3735'),
+  );
   {
     final account = await EtebaseAccount.signup(
       client,
@@ -43,7 +48,7 @@ void main(List<String> args) async {
   }
 
   final encryptionKey = sodium.secureRandom(32);
-  String storedData;
+  Uint8List storedData;
   {
     final account = await EtebaseAccount.login(client, userName, userName * 2);
     print('second login successful');

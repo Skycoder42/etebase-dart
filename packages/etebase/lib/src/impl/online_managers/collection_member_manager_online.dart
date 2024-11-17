@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_collection_member.dart';
 import '../../api/models/etebase_fetch_options.dart';
-import '../models/iterator_list_response.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../models/modify_access_level_request.dart';
 import 'base_manager.dart';
 import 'base_network.dart';
@@ -16,10 +16,10 @@ final class CollectionMemberManagerOnline extends BaseManager {
     required String colUid,
   }) : super(path: ['collection', colUid, 'member']);
 
-  Future<IteratorListResponse<EtebaseCollectionMember>> list(
+  Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list(
     EtebaseIteratorFetchOptions? options,
   ) =>
-      invokeApi<IteratorListResponse<EtebaseCollectionMember>>(
+      invokeApi<EtebaseIteratorListResponse<EtebaseCollectionMember>>(
         options: options,
       );
 

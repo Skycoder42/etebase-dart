@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
-import '../models/base/etebase_iterator_list_response.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_collection_access_level.dart';
 import '../models/etebase_fetch_options.dart';
+import '../models/etebase_list_response.dart';
 import '../models/etebase_signed_invitation.dart';
 import '../models/etebase_user_profile.dart';
 import 'etebase_utils.dart';

@@ -5,9 +5,9 @@ import 'package:meta/meta.dart';
 import '../../api/managers/etebase_collection_invitation_manager.dart';
 import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_fetch_options.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../../api/models/etebase_user_profile.dart';
 import '../models/invitation_accept_request.dart';
-import '../models/iterator_list_response.dart';
 import '../models/signed_invitation.dart';
 import '../models/signed_invitation_content.dart';
 import '../online_managers/collection_invitation_manager_online.dart';
@@ -28,13 +28,13 @@ class CollectionInvitationManager
   Uint8List get pubKey => _account.identityCryptoManager.pubKey;
 
   @override
-  Future<IteratorListResponse<SignedInvitationRead>> listIncoming([
+  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming([
     EtebaseIteratorFetchOptions? fetchOptions,
   ]) =>
       _online.listIncoming(fetchOptions);
 
   @override
-  Future<IteratorListResponse<SignedInvitationRead>> listOutgoing([
+  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing([
     EtebaseIteratorFetchOptions? fetchOptions,
   ]) =>
       _online.listOutgoing(fetchOptions);

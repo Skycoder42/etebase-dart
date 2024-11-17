@@ -3,10 +3,10 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_manager.dart';
-import '../../api/models/base/etebase_collection_list_response.dart';
 import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/etebase_list_response.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../online_managers/collection_item_manager_online.dart';
@@ -75,8 +75,8 @@ class CollectionManager implements EtebaseCollectionManager {
         _cryptoManager.colTypeToUid(collectionType),
     ];
     final result = await _online.list(colTypes, fetchOptions);
-    return result.mapAsync(
-      (encrypted) async => Collection(
+    return result.map(
+      (encrypted) => Collection(
         _client,
         encrypted.getCryptoManager(_client, _cryptoManager),
         encrypted,
