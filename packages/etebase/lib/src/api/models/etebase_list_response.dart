@@ -10,7 +10,7 @@ part 'etebase_list_response.g.dart';
 const _doneKey = JsonKey(name: 'done');
 
 /// The response of fetching a list
-@Freezed(copyWith: true, fromJson: false, toJson: false)
+@Freezed(fromJson: false, toJson: false)
 sealed class EtebaseListResponse<T extends Object>
     with _$EtebaseListResponse<T> {
   /// The response of fetching an item list

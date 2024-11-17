@@ -6,55 +6,50 @@ import 'etebase_prefetch_option.dart';
 
 part 'etebase_fetch_options.freezed.dart';
 
-/// The dart binding of the EtebaseFetchOptions rust class
+/// Configuration options for data fetching.
 @freezed
 sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
   const factory EtebaseFetchOptionsBase({
-    /// Limit the amount of items returned
+    /// Limit the amount of items returned.
     int? limit,
 
-    /// The sync token to fetch with
+    /// The sync token to fetch with.
     String? stoken,
 
-    /// How much data to prefetch
+    /// How much data to prefetch.
     EtebasePrefetchOption? prefetch,
   }) = EtebaseFetchOptions;
 
-  const factory EtebaseFetchOptionsBase.list({
-    /// Limit the amount of items returned
-    int? limit,
-  }) = EtebaseListFetchOptions;
-
   const factory EtebaseFetchOptionsBase.item({
-    /// Limit the amount of items returned
+    /// Limit the amount of items returned.
     int? limit,
 
-    /// The sync token to fetch with
+    /// The sync token to fetch with.
     String? stoken,
 
-    /// How much data to prefetch
+    /// How much data to prefetch.
     EtebasePrefetchOption? prefetch,
 
-    /// Toggle fetching the collection's item
+    /// Toggle fetching the collection's items.
     bool? withCollection,
   }) = EtebaseItemFetchOptions;
 
   const factory EtebaseFetchOptionsBase.iterator({
-    /// Limit the amount of items returned
+    /// Limit the amount of items returned.
     int? limit,
 
-    /// The current iterator to start from (when iterating lists)
+    /// The current iterator to start from (when iterating lists).
     String? iterator,
   }) = EtebaseIteratorFetchOptions;
 
   const factory EtebaseFetchOptionsBase.revision({
-    /// Limit the amount of items returned
+    /// Limit the amount of items returned.
     int? limit,
 
-    /// The current iterator to start from (when iterating lists)
+    /// The current iterator to start from (when iterating lists).
     String? iterator,
 
-    /// How much data to prefetch
+    /// How much data to prefetch.
     EtebasePrefetchOption? prefetch,
   }) = EtebaseRevisionFetchOptions;
 

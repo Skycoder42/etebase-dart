@@ -48,11 +48,7 @@ final class CollectionItemManagerOnline extends BaseManager {
       path: [item.uid, 'revision'],
       options: options,
     );
-    return response.copyWith(
-      data: response.data
-          .map((rev) => item.cloneWithRevision(rev.content))
-          .toList(),
-    );
+    return response.map((rev) => item.cloneWithRevision(rev.content));
   }
 
   Future<void> create(EncryptedCollectionItem item) => invokeApi<void>(

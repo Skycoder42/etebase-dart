@@ -5,15 +5,15 @@ import 'etebase_collection_access_level.dart';
 part 'etebase_collection_member.freezed.dart';
 part 'etebase_collection_member.g.dart';
 
-/// The dart binding of the EtebaseCollectionMember rust class
+/// A member of a collection.
 @freezed
 class EtebaseCollectionMember with _$EtebaseCollectionMember {
-  /// Default constructor
+  /// Default constructor.
   const factory EtebaseCollectionMember({
-    /// The username of a member
+    /// The username of the member.
     required String username,
 
-    /// The access_level of the member
+    /// The access level of the member.
     required EtebaseCollectionAccessLevel accessLevel,
   }) = _EtebaseCollectionMember;
 

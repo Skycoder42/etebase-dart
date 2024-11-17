@@ -2,6 +2,8 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../impl/codec/date_time_millis_converter.dart';
+
 part 'etebase_item_metadata.freezed.dart';
 part 'etebase_item_metadata.g.dart';
 
@@ -9,30 +11,31 @@ part 'etebase_item_metadata.g.dart';
 typedef EtebaseItemMetadataCopyWith
     = _$EtebaseItemMetadataImplCopyWith<EtebaseItemMetadata>;
 
-/// The dart binding of the EtebaseItemMetadata rust class
+/// Metadata of the item.
 abstract interface class EtebaseItemMetadata {
-  /// The item color in `#RRGGBB` or `#RRGGBBAA` format
-  String? get color;
-
-  /// The item description
-  String? get description;
-
-  /// Modification time of the item
-  DateTime? get mtime;
-
-  /// The item name
-  String? get name;
-
-  /// The item type
+  /// The item type.
   String? get itemType;
 
-  /// Create a copy of EtebaseItemMetadata
-  /// with the given fields replaced by the non-null parameter values.
+  /// The item name.
+  String? get name;
+
+  /// Modification time of the item.
+  DateTime? get mtime;
+
+  /// The item description.
+  String? get description;
+
+  /// The item color in `#RRGGBB` or `#RRGGBBAA` format.
+  String? get color;
+
+  /// Create a copy of [EtebaseItemMetadata] with the given fields replaced by
+  /// the non-null parameter values.
   EtebaseItemMetadataCopyWith get copyWith;
 
   /// Serializes this EtebaseItemMetadata to a JSON map.
   Map<String, dynamic> toJson();
 
+  /// Default constructor.
   const factory EtebaseItemMetadata({
     String? color,
     String? description,
@@ -41,6 +44,7 @@ abstract interface class EtebaseItemMetadata {
     String? itemType,
   }) = _EtebaseItemMetadataImpl;
 
+  /// Deserializes the [EtebaseItemMetadata] from a [json] object.
   factory EtebaseItemMetadata.fromJson(Map<String, dynamic> json) =>
       _$EtebaseItemMetadataImplFromJson(json);
 }
@@ -53,7 +57,7 @@ sealed class _EtebaseItemMetadataImpl
   const factory _EtebaseItemMetadataImpl({
     String? color,
     String? description,
-    DateTime? mtime,
+    @dateTimeMillis DateTime? mtime,
     String? name,
     String? itemType,
   }) = __EtebaseItemMetadataImpl;

@@ -36,7 +36,7 @@ sealed class SignedInvitation with _$SignedInvitation {
     required EtebaseCollectionAccessLevel accessLevel,
     required Uint8List signedEncryptionKey,
     String? fromUsername,
-    required Uint8List fromPubkey,
+    @JsonKey(name: 'fromPubkey') required Uint8List fromPubKey,
   }) = SignedInvitationRead;
 
   const SignedInvitation._();
