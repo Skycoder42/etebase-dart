@@ -1,8 +1,9 @@
 import 'package:sodium/sodium_sumo.dart';
 
-import '../../impl/crypto/executors/crypto_executor.dart';
+import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/client.dart';
 import '../models/etebase_item_metadata.dart';
+import 'crypto_executor.dart';
 
 /// A callback that takes a [json] map and returns an instance of a type that
 /// implements [EtebaseItemMetadata].
@@ -17,6 +18,9 @@ typedef MetaFromJson<TMeta extends EtebaseItemMetadata> = TMeta Function(
 abstract interface class EtebaseClient {
   /// The URL of the main hosted server.
   static Uri get defaultServerUrl => Client.defaultUrl;
+
+  /// The current version of the internal data model.
+  static const currentVersion = CryptoUtils.currentVersion;
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
@@ -83,7 +87,7 @@ abstract interface class EtebaseClient {
   /// Checks whether the client is pointing to a valid Etebase server.
   Future<bool> checkEtebaseServer();
 
-  /// Disposes of the instance and clear all cryptographic keys from memory.
+  /// Disposes of the instance and clears all cryptographic keys from memory.
   Future<void> dispose();
 
   /// Registers a new item metadata type [TMeta] for this client.

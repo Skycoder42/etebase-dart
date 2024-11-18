@@ -50,7 +50,7 @@ abstract interface class EtebaseAccount {
   /// invitations.
   EtebaseCollectionInvitationManager get invitationManager;
 
-  /// Disposes of the instance and clear all cryptographic keys from memory.
+  /// Disposes of the instance and clears all cryptographic keys from memory.
   Future<void> dispose();
 
   /// Fetch a new auth token for the account and update the [EtebaseAccount]

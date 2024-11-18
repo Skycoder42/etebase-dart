@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
+import '../../api/managers/crypto_executor.dart';
 import 'crypto_mac.dart';
 import 'crypto_manager_base.dart';
 import 'crypto_utils.dart';
-import 'executors/crypto_executor.dart';
 import 'rollsum.dart';
 
 @internal

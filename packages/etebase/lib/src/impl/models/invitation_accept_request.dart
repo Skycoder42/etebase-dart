@@ -9,7 +9,7 @@ part 'invitation_accept_request.g.dart';
 
 @internal
 @freezed
-class InvitationAcceptRequest with _$InvitationAcceptRequest {
+sealed class InvitationAcceptRequest with _$InvitationAcceptRequest {
   @msgPackBytes
   const factory InvitationAcceptRequest({
     required Uint8List collectionType,

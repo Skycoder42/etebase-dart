@@ -3,15 +3,18 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 /*
- * The rolling sum implementation is based on Rollsum from bup which is in turn based on rollsum from librsync:
+ * The rolling sum implementation is based on Rollsum from bup which is in turn
+ * based on rollsum from librsync:
  * https://github.com/bup/bup/blob/master/lib/bup/bupsplit.c
  * https://github.com/librsync/librsync/blob/master/src/rollsum.h
  *
- * We tried a few alternatives (see experiments/chunker/ for details) though this was by far the best one.
+ * We tried a few alternatives (see experiments/chunker/ for details) though
+ * this was by far the best one.
  *
- * The problem with using such a chunker is that it leaks information about the sizes of different chunks which
- * in turn leaks information about the original file (because the chunking is deterministic).
- * Therefore one needs to make sure to pad the chunks in a way that doesn't leak this information.
+ * The problem with using such a chunker is that it leaks information about the
+ * sizes of different chunks which in turn leaks information about the original
+ * file (because the chunking is deterministic). Therefore one needs to make
+ * sure to pad the chunks in a way that doesn't leak this information.
  */
 @internal
 class Rollsum {

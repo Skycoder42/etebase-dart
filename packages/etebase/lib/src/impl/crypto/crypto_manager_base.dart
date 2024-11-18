@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-import 'executors/crypto_executor.dart';
+import '../../api/managers/crypto_executor.dart';
 
 @internal
 abstract interface class CryptoManagerBase {

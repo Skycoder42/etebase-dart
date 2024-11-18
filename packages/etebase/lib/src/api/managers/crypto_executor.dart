@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:sodium/sodium_sumo.dart';
 
-import '../../../api/exceptions/crypto_failure.dart';
-import 'async_crypto_executor.dart';
-import 'sync_crypto_executor.dart';
+import '../../impl/crypto/executors/async_crypto_executor.dart';
+import '../../impl/crypto/executors/sync_crypto_executor.dart';
+import '../exceptions/crypto_failure.dart';
 
 /// A callback for a synchronous cryptographic operations.
 typedef SyncCallback<T> = T Function(SodiumSumo sodium);

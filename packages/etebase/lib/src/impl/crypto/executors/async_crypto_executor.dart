@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../../api/exceptions/crypto_failure.dart';
-import 'crypto_executor.dart';
+import '../../../api/managers/crypto_executor.dart';
 
 part 'async_crypto_executor.freezed.dart';
 
