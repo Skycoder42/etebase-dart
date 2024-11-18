@@ -7,7 +7,7 @@ import '../models/etebase_list_response.dart';
 
 /// A manager for managing [EtebaseItem] operations like creation and fetching.
 abstract class EtebaseItemManager {
-  /// Disposes of the instance and clear all cryptographic keys from memory.
+  /// Disposes of the instance and clears all cryptographic keys from memory.
   void dispose();
 
   /// Create a new [EtebaseItem].

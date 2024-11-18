@@ -196,7 +196,8 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
         }
       }).toList();
 
-      // If we have more than one chunk we need to encode the mapping header in the last chunk
+      // If we have more than one chunk we need to encode the mapping header in
+      // the last chunk
       if (indices.length > 1) {
         // We encode it in an array so we can extend it later on if needed
         final buf = client.converter.encode([indices]);
@@ -232,7 +233,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       final Chunk(:uid, :data) = chunk;
       if (data == null) {
         throw MissingContent(
-          'Missing content for item. Please download it using `downloadContent`',
+          'Missing content for item. Please download it using downloadContent',
         );
       }
 
@@ -250,7 +251,8 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       return buf;
     }).toList();
 
-    // If we have more than one chunk we have the mapping header in the last chunk
+    // If we have more than one chunk we have the mapping header in the last
+    // chunk
     if (this.chunks.length > 1) {
       final lastChunk = client.converter.decodeRaw(decryptedChunks.removeLast())
           as List<List<int>>;
@@ -299,8 +301,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     TCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
-    final cryptoMac = cryptoManager.getCryptoMac();
-    cryptoMac
+    final cryptoMac = cryptoManager.getCryptoMac()
       ..update(Uint8List.fromList([if (deleted) 1 else 0]))
       ..updateWithLenPrefix(additionalData);
 

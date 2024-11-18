@@ -22,6 +22,7 @@ class ListCastDecoder extends Converter<Uint8List, List<int>> {
   List<int> convert(Uint8List input) => input;
 }
 
+@internal
 class ListCastCodec extends Codec<List<int>, Uint8List> {
   const ListCastCodec();
 

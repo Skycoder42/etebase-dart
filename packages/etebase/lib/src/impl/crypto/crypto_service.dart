@@ -6,12 +6,12 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
+import '../../api/managers/crypto_executor.dart';
 import 'account_crypto_manager.dart';
 import 'box_crypto_manager.dart';
 import 'collection_crypto_manager.dart';
 import 'collection_item_crypto_manager.dart';
 import 'crypto_utils.dart';
-import 'executors/crypto_executor.dart';
 import 'key_derivator.dart';
 import 'main_crypto_manager.dart';
 import 'minimal_collection_crypto_manager.dart';
@@ -97,9 +97,9 @@ class CryptoService {
           outLen: CryptoUtils.hashSize,
         );
 
-        /* We use 3 bytes each time to generate a 5 digit number - this means 10 pairs for bytes 0-29
-        * We then use bytes 29-31 for another number, and then the 3 most significant bits of each first byte for the last.
-        */
+        // We use 3 bytes each time to generate a 5 digit number - this means
+        // 10 pairs for bytes 0-29. We then use bytes 29-31 for another number,
+        // and then the 3 most significant bits of each first byte for the last.
         final ret = StringBuffer();
         var lastNum = 0;
         for (var i = 0; i < 10; i++) {

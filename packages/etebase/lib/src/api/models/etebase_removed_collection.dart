@@ -11,7 +11,7 @@ part 'etebase_removed_collection.g.dart';
 /// when we just lose access to a collection and it hasn't been deleted, we get
 /// this object.
 @freezed
-class EtebaseRemovedCollection with _$EtebaseRemovedCollection {
+sealed class EtebaseRemovedCollection with _$EtebaseRemovedCollection {
   /// Default constructor
   const factory EtebaseRemovedCollection(
     /// The uid of the removed collection.

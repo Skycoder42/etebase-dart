@@ -1,11 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 
+import '../../api/managers/crypto_executor.dart';
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../codec/message_pack_converter.dart';
 import '../crypto/crypto_service.dart';
-import '../crypto/executors/crypto_executor.dart';
 import '../online_managers/authenticator.dart';
 import '../online_managers/base_network.dart';
 

@@ -10,7 +10,7 @@ part 'etebase_user_profile.g.dart';
 
 /// A user's public profile.
 @freezed
-class EtebaseUserProfile with _$EtebaseUserProfile {
+sealed class EtebaseUserProfile with _$EtebaseUserProfile {
   /// Default Constructor.
   @msgPackBytes
   const factory EtebaseUserProfile({

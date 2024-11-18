@@ -5,8 +5,8 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/exceptions/crypto_failure.dart';
+import '../../api/managers/crypto_executor.dart';
 import 'crypto_utils.dart';
-import 'executors/crypto_executor.dart';
 
 @internal
 class CryptoMac {

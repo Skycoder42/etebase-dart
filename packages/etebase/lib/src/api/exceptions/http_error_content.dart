@@ -5,14 +5,23 @@ import 'http_field_error.dart';
 part 'http_error_content.freezed.dart';
 part 'http_error_content.g.dart';
 
+/// An error message as received from the server.
 @Freezed(toStringOverride: false)
 sealed class HttpErrorContent with _$HttpErrorContent {
+  /// Default constructor.
   const factory HttpErrorContent({
+    /// The error code of the error.
     String? code,
+
+    /// Potential human readable error details.
     String? detail,
+
+    /// A list of specific field errors in case of validation errors.
     @Default([]) List<HttpFieldError> errors,
   }) = _HttpErrorContent;
 
+  /// @nodoc
+  @internal
   factory HttpErrorContent.fromJson(Map<String, dynamic> json) =>
       _$HttpErrorContentFromJson(json);
 

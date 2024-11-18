@@ -29,6 +29,7 @@ enum HttpMethod {
   const HttpMethod(this.verb);
 }
 
+@internal
 abstract interface class NetworkClient {
   http.Client get httpClient;
   String get clientName;

@@ -7,7 +7,7 @@ part 'etebase_collection_member.g.dart';
 
 /// A member of a collection.
 @freezed
-class EtebaseCollectionMember with _$EtebaseCollectionMember {
+sealed class EtebaseCollectionMember with _$EtebaseCollectionMember {
   /// Default constructor.
   const factory EtebaseCollectionMember({
     /// The username of the member.
