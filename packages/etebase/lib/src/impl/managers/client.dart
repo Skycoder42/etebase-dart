@@ -9,6 +9,10 @@ import '../crypto/crypto_service.dart';
 import '../online_managers/authenticator.dart';
 import '../online_managers/base_network.dart';
 
+import '../online_managers/platform/user_agent_stub.dart'
+    if (dart.library.io) '../online_managers/platform/user_agent_vm.dart'
+    if (dart.library.js_interop) '../online_managers/platform/user_agent_web.dart';
+
 @internal
 class Client implements EtebaseClient, NetworkClient {
   static final defaultUrl = Uri.https('api.etebase.com');
@@ -18,7 +22,7 @@ class Client implements EtebaseClient, NetworkClient {
   @override
   final http.Client httpClient;
   @override
-  final String clientName;
+  final String userAgent;
   @override
   final MessagePackConverter converter;
   @override
@@ -27,26 +31,23 @@ class Client implements EtebaseClient, NetworkClient {
 
   Client(
     this.httpClient,
-    this.clientName,
+    this.userAgent,
     this.baseUri,
     this.converter,
     this.crypto, {
     bool ownedClient = false,
   }) : _ownedClient = ownedClient;
 
-  factory Client.create(
+  Client.create(
     CryptoExecutor cryptoExecutor,
     String clientName, [
     Uri? serverUrl,
-  ]) =>
-      Client(
-        http.Client(),
-        clientName,
-        serverUrl ?? defaultUrl,
-        MessagePackConverter(),
-        CryptoService(cryptoExecutor),
-        ownedClient: true,
-      );
+  ])  : httpClient = http.Client(),
+        userAgent = UserAgent.build(clientName),
+        converter = MessagePackConverter(),
+        baseUri = serverUrl ?? defaultUrl,
+        crypto = CryptoService(cryptoExecutor),
+        _ownedClient = true;
 
   Authenticator get authenticator => Authenticator(client: this);
 

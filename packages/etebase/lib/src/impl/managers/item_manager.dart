@@ -26,9 +26,7 @@ class ItemManager implements EtebaseItemManager {
   ItemManager(this._client, this._cryptoManager, this._online, this._colUid);
 
   @override
-  void dispose() {
-    _cryptoManager.dispose();
-  }
+  void dispose() => _cryptoManager.dispose();
 
   @override
   Future<Item> create<TMeta extends EtebaseItemMetadata>(

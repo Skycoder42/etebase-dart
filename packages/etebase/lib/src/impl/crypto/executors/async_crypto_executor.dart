@@ -47,6 +47,8 @@ sealed class _CryptoJobResult with _$CryptoJobResult {
 
 @internal
 class AsyncCryptoExecutor implements CryptoExecutor {
+  static final _finalizer = Finalizer(_finalize);
+
   final SodiumSumo _sodium;
 
   late final SendPort _sendPort;
@@ -73,6 +75,8 @@ class AsyncCryptoExecutor implements CryptoExecutor {
         sendPort: _receivePort.sendPort,
       ),
     );
+
+    _finalizer.attach(this, (_isolate, _receivePort), detach: this);
   }
 
   @override
@@ -84,7 +88,10 @@ class AsyncCryptoExecutor implements CryptoExecutor {
     try {
       _disposed = true;
       await _exec<void>(_CryptoJob.exit(_jobIdCtr++)).timeout(timeout);
+    } on TimeoutException {
+      // ignore
     } finally {
+      _finalizer.detach(this);
       _receivePort.close();
       _isolate.kill();
     }
@@ -149,6 +156,12 @@ class AsyncCryptoExecutor implements CryptoExecutor {
         },
       )
       .first;
+
+  static void _finalize((Isolate, ReceivePort) token) {
+    final (isolate, port) = token;
+    port.close();
+    isolate.kill();
+  }
 }
 
 Future<void> _isolateMain(_IsolateMessage message) async {

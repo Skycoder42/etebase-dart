@@ -31,6 +31,7 @@ abstract class CryptoManager implements CryptoManagerBase {
   @protected
   late final deterministicEncryptionKey = _keyGen(key, 5);
   final _disposables = <SecureKey>[];
+  var _disposed = false;
 
   CryptoManager(
     this.executor,
@@ -43,12 +44,17 @@ abstract class CryptoManager implements CryptoManagerBase {
 
   @override
   void dispose() {
-    key.dispose();
+    if (!_disposed) {
+      _disposed = true;
+      key.dispose();
+    }
+
     // using the list ensures that keys are not initialized in the dispose
     // method. Each call to [_keyGen] adds the generated key to the list.
     for (final key in _disposables) {
       key.dispose();
     }
+    _disposables.clear();
   }
 
   FutureOr<Uint8List> encrypt(

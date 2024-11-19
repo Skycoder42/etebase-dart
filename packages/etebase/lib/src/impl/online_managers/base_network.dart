@@ -32,17 +32,17 @@ enum HttpMethod {
 @internal
 abstract interface class NetworkClient {
   http.Client get httpClient;
-  String get clientName;
+  String get userAgent;
   MessagePackConverter get converter;
   Uri get baseUri;
 }
 
 @internal
 base class BaseNetwork {
-  static const _userAgentHeader = 'User-Agent';
-  static const _acceptHeader = 'Accept';
-  static const _contentTypeHeader = 'Content-Type';
-  static const _authorizationHeader = 'Authorization';
+  static const _userAgentHeader = 'user-agent';
+  static const _acceptHeader = 'accept';
+  static const _contentTypeHeader = 'content-type';
+  static const _authorizationHeader = 'authorization';
 
   static const _msgPackContentType = 'application/msgpack';
   static const _binaryContentType = 'application/octet-stream';
@@ -113,18 +113,20 @@ base class BaseNetwork {
         ...path,
         '', // ensures the path has a trailing /
       ],
-      queryParameters: {
-        ..._apiUri.queryParametersAll,
-        ...query,
-      },
+      queryParameters: query.isNotEmpty
+          ? {
+              ..._apiUri.queryParametersAll,
+              ...query,
+            }
+          : null,
     );
 
     final request = http.Request(method.verb, requestUri)
-      ..headers[_userAgentHeader] = client.clientName
+      ..headers[_userAgentHeader] = client.userAgent
       ..headers[_acceptHeader] = _msgPackContentType
       ..headers.addAll(headers);
     if (authToken != null) {
-      headers[_authorizationHeader] = authToken.header;
+      request.headers[_authorizationHeader] = authToken.header;
     }
 
     switch (body) {
@@ -147,15 +149,20 @@ base class BaseNetwork {
   String? _getContentType(http.Response response) =>
       response.headers[_contentTypeHeader];
 
-  T _convertResponse<T>(http.Response response) =>
-      switch (_getContentType(response)) {
-        _msgPackContentType => converter.decode<T>(response.bodyBytes),
-        _binaryContentType => response.bodyBytes as T,
-        _plainTextContentType => response.body as T,
-        final contentType => throw InvalidMessagePackData(
-            'Content type $contentType is not supported',
-          )
-      };
+  T _convertResponse<T>(http.Response response) {
+    if (_isVoid<T>()) {
+      return null as T;
+    }
+
+    return switch (_getContentType(response)) {
+      _msgPackContentType => converter.decode<T>(response.bodyBytes),
+      _binaryContentType => response.bodyBytes as T,
+      _plainTextContentType => response.body as T,
+      final contentType => throw InvalidMessagePackData(
+          'Content type $contentType is not supported',
+        )
+    };
+  }
 
   Never _convertError(http.Response response) {
     final (message, error) = _extractErrorData(response);
@@ -196,4 +203,8 @@ base class BaseNetwork {
 
     return (fallbackMessage, null);
   }
+
+  static bool _isVoid<T>() => _compareType<T, void>();
+
+  static bool _compareType<T1, T2>() => T1 == T2;
 }

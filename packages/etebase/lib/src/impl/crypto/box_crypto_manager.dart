@@ -14,6 +14,7 @@ class BoxCryptoManager implements CryptoManagerBase {
   @protected
   final CryptoExecutor executor;
   final KeyPair _keyPair;
+  var _disposed = false;
 
   BoxCryptoManager(this.executor, this._keyPair);
 
@@ -33,16 +34,21 @@ class BoxCryptoManager implements CryptoManagerBase {
     return cm;
   }
 
-  Uint8List get pubKey => _keyPair.publicKey;
+  Uint8List get pubkey => _keyPair.publicKey;
 
-  SecureKey get privKey => _keyPair.secretKey;
+  SecureKey get privkey => _keyPair.secretKey;
 
   @override
-  void dispose() => _keyPair.dispose();
+  void dispose() {
+    if (!_disposed) {
+      _disposed = true;
+      _keyPair.dispose();
+    }
+  }
 
   FutureOr<Uint8List> encrypt({
     required Uint8List message,
-    required Uint8List pubKey,
+    required Uint8List pubkey,
   }) =>
       executor.exec(
         secureKeys: [_keyPair.secretKey],
@@ -51,7 +57,7 @@ class BoxCryptoManager implements CryptoManagerBase {
           final result = sodium.crypto.box.easy(
             message: message,
             nonce: nonce,
-            publicKey: pubKey,
+            publicKey: pubkey,
             secretKey: secureKeys.single,
           );
           return CryptoUtils.concat([nonce, result]);
@@ -60,7 +66,7 @@ class BoxCryptoManager implements CryptoManagerBase {
 
   FutureOr<Uint8List> decrypt({
     required Uint8List nonceCipherText,
-    required Uint8List pubKey,
+    required Uint8List pubkey,
   }) =>
       executor.exec(
         secureKeys: [_keyPair.secretKey],
@@ -72,7 +78,7 @@ class BoxCryptoManager implements CryptoManagerBase {
           return sodium.crypto.box.openEasy(
             cipherText: cipherText,
             nonce: nonce,
-            publicKey: pubKey,
+            publicKey: pubkey,
             secretKey: secureKeys.single,
           );
         },

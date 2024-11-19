@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
@@ -7,7 +5,7 @@ import 'crypto_manager_base.dart';
 
 @internal
 class CryptoArena {
-  final _disposables = <Object, FutureOr<void> Function()>{};
+  final _disposables = <Object, void Function()>{};
 
   T call<T>(T object) {
     switch (object) {
@@ -32,10 +30,10 @@ class CryptoArena {
     return object;
   }
 
-  Future<void> dispose() {
-    final disposeCalls =
-        _disposables.values.map((dispose) async => await dispose());
+  void dispose() {
+    for (final disposable in _disposables.values) {
+      disposable();
+    }
     _disposables.clear();
-    return Future.wait(disposeCalls);
   }
 }

@@ -14,7 +14,7 @@ abstract class EtebaseCollectionInvitationManager {
   ///
   /// This is the key users see when we send invitations.
   /// Can be pretty printed with [EtebaseUtils.prettyFingerprint].
-  Uint8List get pubKey;
+  Uint8List get pubkey;
 
   /// List the incoming collection [EtebaseSignedInvitation]s for the account.
   ///
@@ -41,13 +41,13 @@ abstract class EtebaseCollectionInvitationManager {
 
   /// Invite a user identified by [username] to a collection.
   ///
-  /// The [pubKey] must be the corresponding
-  /// [EtebaseCollectionInvitationManager.pubKey] of that user. The
+  /// The [pubkey] must be the corresponding
+  /// [EtebaseCollectionInvitationManager.pubkey] of that user. The
   /// [accessLevel] defines the level of access to give to user.
   Future<void> invite(
     EtebaseCollection collection,
     String username,
-    Uint8List pubKey,
+    Uint8List pubkey,
     EtebaseCollectionAccessLevel accessLevel,
   );
 

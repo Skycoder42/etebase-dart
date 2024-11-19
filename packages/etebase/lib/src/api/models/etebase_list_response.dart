@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'etebase_fetch_options.dart';
 import 'etebase_removed_collection.dart';
 
 part 'etebase_list_response.freezed.dart';
@@ -9,52 +10,63 @@ part 'etebase_list_response.g.dart';
 
 const _doneKey = JsonKey(name: 'done');
 
-/// The response of fetching a list
+/// The response of fetching a list.
+///
+/// The [data] field will contain the elements returned by this response. If
+/// [isDone] is true, no more elements are available on the server. Otherwise
+/// you have to continuously fetch more elements until you are done.
+///
+/// Depending on the subtype of the response you have to either use the stoken
+/// or the iterator.
+/// - For [EtebaseItemListResponse]s and [EtebaseCollectionListResponse]s, you
+/// must use the stoken and pass it via a [EtebaseFetchOptions.stoken].
+/// - For [EtebaseIteratorListResponse]s, you should instead use the
+/// [EtebaseIteratorFetchOptions.iterator].
 @Freezed(fromJson: false, toJson: false)
 sealed class EtebaseListResponse<T extends Object>
     with _$EtebaseListResponse<T> {
-  /// The response of fetching an item list
+  /// The response of fetching an item list.
   @JsonSerializable(genericArgumentFactories: true)
-  @With<_ItemMixin<T>>()
+  @With.fromString('_ItemMixin<T>')
   const factory EtebaseListResponse.item({
-    /// List of collections included in the response
+    /// List of collections included in the response.
     required List<T> data,
 
-    /// Indicates whether there are no more collections to fetch
+    /// Indicates whether there are no more collections to fetch.
     @_doneKey required bool isDone,
 
-    /// Sync token for the list response
+    /// Sync token for the list response.
     String? stoken,
   }) = EtebaseItemListResponse<T>;
 
-  /// The response of fetching a collection list
+  /// The response of fetching a collection list.
   @JsonSerializable(genericArgumentFactories: true)
-  @With<_CollectionMixin<T>>()
+  @With.fromString('_CollectionMixin<T>')
   const factory EtebaseListResponse.collection({
-    /// List of collections included in the response
+    /// List of collections included in the response.
     required List<T> data,
 
-    /// Indicates whether there are no more collections to fetch
+    /// Indicates whether there are no more collections to fetch.
     @_doneKey required bool isDone,
 
-    /// Sync token for the list response
+    /// Sync token for the list response.
     String? stoken,
 
-    /// The list of collections to which the user lost access
+    /// The list of collections to which the user lost access.
     List<EtebaseRemovedCollection>? removedMemberships,
   }) = EtebaseCollectionListResponse<T>;
 
-  /// The response of fetching a generic iterable data list
+  /// The response of fetching a generic iterable data list.
   @JsonSerializable(genericArgumentFactories: true)
-  @With<_IteratorMixin<T>>()
+  @With.fromString('_IteratorMixin<T>')
   const factory EtebaseListResponse.iterator({
-    /// List of collections included in the response
+    /// List of collections included in the response.
     required List<T> data,
 
-    /// Indicates whether there are no more collections to fetch
+    /// Indicates whether there are no more collections to fetch.
     @_doneKey required bool isDone,
 
-    /// Iterator for the list response
+    /// Iterator for the list response.
     required String iterator,
   }) = EtebaseIteratorListResponse<T>;
 

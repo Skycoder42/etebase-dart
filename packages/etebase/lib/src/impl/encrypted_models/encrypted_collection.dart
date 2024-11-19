@@ -78,7 +78,7 @@ class EncryptedCollection {
       col.item = item;
       return (col, arena.detach(cm));
     } finally {
-      await arena.dispose();
+      arena.dispose();
     }
   }
 
@@ -187,7 +187,7 @@ class EncryptedCollection {
             ),
           ),
         );
-        return identityCm.encrypt(message: rawContent, pubKey: pubkey);
+        return identityCm.encrypt(message: rawContent, pubkey: pubkey);
       });
       return SignedInvitationWrite(
         uid: client.converter.base64Encode(uid),

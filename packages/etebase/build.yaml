@@ -1,5 +1,9 @@
 targets:
   $default:
+    sources:
+      - $package$
+      - lib/**
+      - pubspec.yaml
     builders:
       freezed:
         options:
@@ -11,4 +15,7 @@ targets:
           any_map: true
           checked: true
           explicit_to_json: true
+      pubspec_generator:
+        options:
+          output: lib/gen/pubspec.g.dart
 

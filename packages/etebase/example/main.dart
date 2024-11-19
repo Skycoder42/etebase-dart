@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:etebase/src/api/managers/etebase_account.dart';
 import 'package:etebase/src/api/managers/etebase_client.dart';
+import 'package:etebase/src/api/models/etebase_item_metadata.dart';
 import 'package:etebase/src/api/models/etebase_user.dart';
 import 'package:sodium/sodium_sumo.dart';
 
@@ -32,7 +33,7 @@ void main(List<String> args) async {
       userName,
     );
     print('signup successful');
-    await account.dispose();
+    account.dispose();
   }
 
   {
@@ -44,7 +45,7 @@ void main(List<String> args) async {
     print('fetchToken successful');
     await account.logout();
     print('logout successful');
-    await account.dispose();
+    account.dispose();
   }
 
   final encryptionKey = sodium.secureRandom(32);
@@ -53,8 +54,8 @@ void main(List<String> args) async {
     final account = await EtebaseAccount.login(client, userName, userName * 2);
     print('second login successful');
     storedData = await account.save(encryptionKey);
-    print('save successful: $storedData');
-    await account.dispose();
+    print('save successful: ${base64.encode(storedData)}');
+    account.dispose();
   }
 
   final account = await EtebaseAccount.restore(
@@ -65,7 +66,22 @@ void main(List<String> args) async {
   print('restore successful');
   await account.fetchToken();
   print('fetchToken successful');
-  await account.dispose();
+
+  final col1 = await account.collectionManager
+      .create('test1', const EtebaseItemMetadata(), Uint8List(0));
+  await col1.setMeta(const EtebaseItemMetadata(name: 'Test-1'));
+  await col1.setContent(utf8.encode('Hello, World!'));
+  await account.collectionManager.upload(col1);
+
+  final list = await account.collectionManager.list('test1');
+  print(
+    await Stream.fromIterable(list.data).asyncExpand((item) async* {
+      yield await item.getMeta();
+      yield utf8.decode(await item.getContent());
+    }).toList(),
+  );
+
+  account.dispose();
   encryptionKey.dispose();
 
   await client.dispose();

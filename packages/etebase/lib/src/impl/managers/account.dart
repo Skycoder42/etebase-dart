@@ -38,8 +38,6 @@ class Account implements EtebaseAccount, AuthTokenSource {
   final AccountCryptoManager accountCryptoManager;
   final BoxCryptoManager identityCryptoManager;
 
-  var _disposed = false;
-
   @override
   AuthToken get authToken => _authToken;
 
@@ -97,7 +95,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         arena(
           CryptoUtils.concatSecure(client.crypto, [
             arena(client.crypto.secureRandom(CryptoUtils.symmetricKeySize)),
-            identityCryptoManager.privKey,
+            identityCryptoManager.privkey,
           ]),
         ),
       );
@@ -106,8 +104,8 @@ class Account implements EtebaseAccount, AuthTokenSource {
         SignupRequest(
           user: user,
           salt: salt,
-          loginPubkey: loginCryptoManager.pubKey,
-          pubkey: identityCryptoManager.pubKey,
+          loginPubkey: loginCryptoManager.pubkey,
+          pubkey: identityCryptoManager.pubkey,
           encryptedContent: encryptedKeys,
         ),
       );
@@ -119,7 +117,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         response,
       );
     } finally {
-      await arena.dispose();
+      arena.dispose();
     }
   }
 
@@ -164,7 +162,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         loginResponse,
       );
     } finally {
-      await arena.dispose();
+      arena.dispose();
     }
   }
 
@@ -218,19 +216,13 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
     } finally {
-      await arena.dispose();
+      arena.dispose();
     }
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     _authToken = AuthToken.empty;
-
-    if (_disposed) {
-      return;
-    }
-
-    _disposed = true;
     _mainCryptoManager.dispose();
     accountCryptoManager.dispose();
     identityCryptoManager.dispose();
@@ -277,7 +269,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
   @override
   Future<void> logout() async {
     await _client.authenticator.logout(_authToken);
-    await dispose();
+    dispose();
   }
 
   @override
@@ -303,7 +295,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         username: _user.username,
         challenge: challenge.challenge,
         host: _client.baseUri.host,
-        loginPubkey: newLoginCryptoManager.pubKey,
+        loginPubkey: newLoginCryptoManager.pubkey,
         encryptedContent: newEncryptedContent,
       );
 
@@ -316,7 +308,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       _mainCryptoManager = arena.detach(newMainCryptoManager);
       _user = _user.copyWith(encryptedContent: newEncryptedContent);
     } finally {
-      await arena.dispose();
+      arena.dispose();
     }
   }
 
@@ -356,7 +348,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
     } finally {
-      await arena.dispose();
+      arena.dispose();
     }
   }
 

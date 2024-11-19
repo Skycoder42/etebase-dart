@@ -26,7 +26,7 @@ abstract class EtebaseItem {
   bool get isMissingContent;
 
   /// Disposes of the item and clears all cryptographic keys from memory.
-  Future<void> dispose();
+  void dispose();
 
   /// Manually verify the integrity of the item.
   ///
