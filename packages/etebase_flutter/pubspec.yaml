@@ -7,43 +7,19 @@ environment:
   sdk: ^3.5.0
   flutter: ">=3.24.0"
 
-platforms:
-  android:
-  ios:
-  linux:
-  macos:
-  windows:
-
 dependencies:
   etebase: ^1.0.3
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.8
+  hive_ce_flutter: ^2.1.0
+  meta: ^1.15.0
+  package_info_plus: ^8.1.1
+  sodium_libs: ^3.3.0+2
 
 dev_dependencies:
   custom_lint: ^0.6.8
   dart_pre_commit: ^5.4.0
   dart_test_tools: ^6.0.0
-
-flutter:
-  plugin:
-    platforms:
-      android:
-        package: de.skycoder42.etebase_flutter
-        pluginClass: EtebaseFlutterPlugin
-        dartPluginClass: EtebaseFlutterAndroid
-      ios:
-        pluginClass: EtebaseFlutterPlugin
-        dartPluginClass: EtebaseFlutterIos
-      linux:
-        pluginClass: EtebaseFlutterPlugin
-        dartPluginClass: EtebaseFlutterLinux
-      macos:
-        pluginClass: EtebaseFlutterPlugin
-        dartPluginClass: EtebaseFlutterMacos
-      windows:
-        pluginClass: EtebaseFlutterPluginCApi
-        dartPluginClass: EtebaseFlutterWindows
 
 cider:
   link_template:

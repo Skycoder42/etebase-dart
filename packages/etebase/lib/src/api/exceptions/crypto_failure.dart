@@ -21,9 +21,9 @@ class CryptoFailure extends EtebaseException {
   static FT wrap<FT extends FutureOr<T>, T>(FT Function() callback) {
     try {
       final result = callback();
-      if (result is Future<T>) {
+      if (result case final Future<T> castResult) {
         // ignore: discarded_futures
-        return result.onError<SodiumException>(_rethrow) as FT;
+        return castResult.onError<SodiumException>(_rethrow) as FT;
       } else {
         return result;
       }

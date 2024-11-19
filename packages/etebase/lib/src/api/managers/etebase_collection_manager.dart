@@ -31,6 +31,11 @@ abstract class EtebaseCollectionManager {
   );
 
   /// Fetch a single collection from the server using its [colUid].
+  ///
+  /// {@template fetch_options}
+  /// The [fetchOptions] allow you to specify optional parameters to further
+  /// filter the returned result or continue with the next iteration of data.
+  /// {@endtemplate}
   Future<EtebaseCollection> fetch(
     String colUid, [
     EtebaseFetchOptions? fetchOptions,
@@ -39,10 +44,7 @@ abstract class EtebaseCollectionManager {
   /// Fetch all [EtebaseCollection]s of a specific [collectionType] from the
   /// server and return a [EtebaseCollectionListResponse].
   ///
-  /// {@template fetch_options}
-  /// The [fetchOptions] allow you to specify optional parameters to further
-  /// filter the returned result or continue with the next iteration of data.
-  /// {@endtemplate}
+  /// {@macro fetch_options}
   Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
     String collectionType, [
     EtebaseFetchOptions? fetchOptions,

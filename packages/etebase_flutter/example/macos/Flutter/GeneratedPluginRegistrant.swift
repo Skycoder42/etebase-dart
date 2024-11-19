@@ -5,8 +5,14 @@
 import FlutterMacOS
 import Foundation
 
-import etebase_flutter
+import device_info_plus
+import package_info_plus
+import path_provider_foundation
+import sodium_libs
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  EtebaseFlutterPlugin.register(with: registry.registrar(forPlugin: "EtebaseFlutterPlugin"))
+  DeviceInfoPlusMacosPlugin.register(with: registry.registrar(forPlugin: "DeviceInfoPlusMacosPlugin"))
+  FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
+  PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
+  SodiumLibsPlugin.register(with: registry.registrar(forPlugin: "SodiumLibsPlugin"))
 }

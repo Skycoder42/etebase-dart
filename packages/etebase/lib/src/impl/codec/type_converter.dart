@@ -15,8 +15,6 @@ typedef ContainerFromJson<TContainer, TData> = TContainer Function(
 sealed class TypeConverter<T> {
   const factory TypeConverter(FromJson<T> fromJson) = _DefaultTypeConverter<T>;
 
-  const factory TypeConverter.raw() = _RawTypeConverter<T>;
-
   static TypeConverter<List<T>> list<T>(FromJson<T> fromJson) =>
       _ListTypeConverter<T>(fromJson);
 
@@ -39,13 +37,6 @@ class _DefaultTypeConverter<T> implements TypeConverter<T> {
 
   @override
   T call(dynamic data) => _fromJson((data as Map).cast());
-}
-
-class _RawTypeConverter<T> implements TypeConverter<T> {
-  const _RawTypeConverter();
-
-  @override
-  T call(dynamic data) => data as T;
 }
 
 class _ListTypeConverter<T> implements TypeConverter<List<T>> {
@@ -81,6 +72,6 @@ class _GenericTypeConverter<TContainer, TData>
   @override
   TContainer call(dynamic data) => _containerFromJson(
         (data as Map).cast(),
-        (data) => _fromJson(data! as Map<String, dynamic>),
+        (data) => _fromJson((data! as Map).cast()),
       );
 }

@@ -4,7 +4,7 @@ set -e
 
 function startServer {
   echo "::group::Start etesync server"
-  podman run -d --rm \
+  docker run -d --rm \
     --pull always \
     -e SUPER_USER=admin \
     -e AUTO_SIGNUP=true \

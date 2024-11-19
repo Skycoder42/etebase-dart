@@ -22,16 +22,16 @@ class MainCryptoManager extends CryptoManager {
         ),
       );
 
-  AccountCryptoManager createAccountCryptoManager(SecureKey privKey) =>
-      AccountCryptoManager(executor, privKey, version);
+  AccountCryptoManager createAccountCryptoManager(SecureKey privkey) =>
+      AccountCryptoManager(executor, privkey, version);
 
-  BoxCryptoManager createIdentityCryptoManager(SecureKey privKey) =>
+  BoxCryptoManager createIdentityCryptoManager(SecureKey privkey) =>
       BoxCryptoManager(
         executor,
         executor.execSync(
           (sodium) => KeyPair(
-            publicKey: sodium.crypto.scalarmult.base(n: privKey),
-            secretKey: privKey,
+            publicKey: sodium.crypto.scalarmult.base(n: privkey),
+            secretKey: privkey,
           ),
         ),
       );

@@ -34,10 +34,6 @@ class MessagePackConverter {
   final _factories = <Type, TypeConverter<dynamic>>{};
 
   MessagePackConverter() {
-    _addRaw<void>();
-    _addRaw<Uint8List>();
-    _addRaw<String>();
-
     _add(EtebaseItemMetadata.fromJson);
     _add(EtebaseUserProfile.fromJson);
     _addWithContainer(
@@ -91,8 +87,6 @@ class MessagePackConverter {
 
   void addCustom<T>(FromJson<T> fromJson) => _add<T>(fromJson);
 
-  void _addRaw<T>() => _factories[T] = TypeConverter<T>.raw();
-
   void _add<T>(
     FromJson<T> fromJson, {
     bool withPlain = true,
@@ -134,7 +128,7 @@ class MessagePackConverter {
     } on CheckedFromJsonException catch (e, s) {
       Error.throwWithStackTrace(
         InvalidMessagePackData(e.message ?? e.toString(), e),
-        s,
+        e.innerStack ?? s,
       );
     } on FormatException catch (e, s) {
       Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);

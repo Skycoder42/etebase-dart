@@ -6,9 +6,9 @@
 
 #include "generated_plugin_registrant.h"
 
-#include <etebase_flutter/etebase_flutter_plugin_c_api.h>
+#include <sodium_libs/sodium_libs_plugin_c_api.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
-  EtebaseFlutterPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("EtebaseFlutterPluginCApi"));
+  SodiumLibsPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("SodiumLibsPluginCApi"));
 }

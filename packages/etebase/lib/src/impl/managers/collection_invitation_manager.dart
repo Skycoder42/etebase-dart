@@ -25,7 +25,7 @@ class CollectionInvitationManager
   CollectionInvitationManager(this._client, this._account, this._online);
 
   @override
-  Uint8List get pubKey => _account.identityCryptoManager.pubKey;
+  Uint8List get pubkey => _account.identityCryptoManager.pubkey;
 
   @override
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming([
@@ -45,7 +45,7 @@ class CollectionInvitationManager
       _client.crypto.bufferUnpadSmall(
         await _account.identityCryptoManager.decrypt(
           nonceCipherText: invitation.signedEncryptionKey,
-          pubKey: invitation.fromPubKey,
+          pubkey: invitation.fromPubKey,
         ),
       ),
     );
@@ -74,7 +74,7 @@ class CollectionInvitationManager
   Future<void> invite(
     covariant Collection collection,
     String username,
-    Uint8List pubKey,
+    Uint8List pubkey,
     EtebaseCollectionAccessLevel accessLevel,
   ) async {
     final invitation = await collection.encrypted.createInvitation(
@@ -82,7 +82,7 @@ class CollectionInvitationManager
       _account.accountCryptoManager,
       _account.identityCryptoManager,
       username,
-      pubKey,
+      pubkey,
       accessLevel,
     );
     await _online.invite(invitation);

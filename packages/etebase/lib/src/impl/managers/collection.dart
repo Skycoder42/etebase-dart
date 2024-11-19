@@ -44,7 +44,7 @@ class Collection implements EtebaseCollection {
   EtebaseCollectionAccessLevel get accessLevel => encrypted.accessLevel;
 
   @override
-  Future<void> dispose() async => _cm.dispose();
+  void dispose() => _cm.dispose();
 
   @override
   Future<bool> verify() => encrypted.verify(_client, _cm);

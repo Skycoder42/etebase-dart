@@ -16,6 +16,7 @@ dependencies:
   msgpack_dart: ^1.0.1
   sodium: ^3.4.1
   synchronized: ^3.3.0+3
+  web: ^1.1.0
   web_socket_channel: ^3.0.1
 
 dev_dependencies:
@@ -26,6 +27,7 @@ dev_dependencies:
   freezed: ^2.5.7
   json_serializable: ^6.8.0
   mocktail: ^1.0.4
+  pubspec_generator: ^4.0.0
   test: ^1.25.8
 
 dart_pre_commit:

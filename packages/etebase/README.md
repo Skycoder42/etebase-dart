@@ -5,8 +5,6 @@
 Dart client library for etebase, base on the javascript port.
 
 ## TODOs
-- hierarchical dispose -> client disposes everything
-- list response doc macros?
 - cleanup unused things
 - move utils elsewhere? maybe client?
-- rename pubKey to pubkey
+- get/set content via stream
