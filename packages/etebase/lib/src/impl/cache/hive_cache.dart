@@ -11,6 +11,7 @@ import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/managers/etebase_item_manager.dart';
 import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_item.dart';
+import '../codec/msg_pack_codec.dart';
 
 @internal
 class HiveCache implements EtebaseCache {
@@ -28,7 +29,7 @@ class HiveCache implements EtebaseCache {
   late final LazyBox<Uint8List?> _collectionBox;
 
   HiveCache(this._hive, String username)
-      : _encodedUsername = utf8.fuse(base64Url).encode(username);
+      : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
 
   Future<void> initialize() async {
     _accountBox = await _hive.openLazyBox(_boxName(_accountBoxName));

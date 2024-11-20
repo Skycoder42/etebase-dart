@@ -59,7 +59,8 @@ class EncryptedCollectionItem {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) async {
-    final item = EncryptedCollectionItem()..uid = client.crypto.genUidBase64();
+    final item = EncryptedCollectionItem()
+      ..uid = client.converter.base64Encode(client.crypto.randomBytes(24));
     final cm = item.getCryptoManager(client, parentCm);
     try {
       item.content = await EncryptedRevision.create(

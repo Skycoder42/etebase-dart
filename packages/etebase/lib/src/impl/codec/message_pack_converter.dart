@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -69,21 +68,21 @@ class MessagePackConverter {
     _add(ModifyAccessLevelRequest.fromJson);
   }
 
-  Uint8List encode(dynamic data) => msgPack.encode(data);
+  Uint8List encode(dynamic data) => msgPack.encode(_toJson(data));
 
-  String encode64(dynamic data) => msgPack64.encode(data);
+  String encode64(dynamic data) => msgPack64UrlNoPad.encode(_toJson(data));
 
-  String base64Encode(Uint8List data) => base64.encode(data);
+  String base64Encode(Uint8List data) => base64UrlNoPad.encode(data);
 
   dynamic decodeRaw(Uint8List data) => msgPack.decode(data);
 
   T decode<T>(Uint8List data) => _fromJson<T>(decodeRaw(data));
 
-  dynamic decode64Raw(String data) => msgPack64.decode(data);
+  dynamic decode64Raw(String data) => msgPack64UrlNoPad.decode(data);
 
   T decode64<T>(String data) => _fromJson<T>(decode64Raw(data));
 
-  Uint8List base64Decode(String data) => base64.decode(data);
+  Uint8List base64Decode(String data) => base64UrlNoPad.decode(data);
 
   void addCustom<T>(FromJson<T> fromJson) => _add<T>(fromJson);
 
@@ -114,6 +113,14 @@ class MessagePackConverter {
       fromJson,
     );
   }
+
+  dynamic _toJson(dynamic data) => switch (data) {
+        List() => data.map(_toJson).toList(),
+        Map<String, dynamic>() => data.map((k, v) => MapEntry(k, _toJson(v))),
+        null || bool() || num() || String() => data,
+        // ignore: avoid_dynamic_calls
+        _ => data.toJson(),
+      };
 
   T _fromJson<T>(dynamic data) {
     final converter = _factories[T] as TypeConverter<T>?;

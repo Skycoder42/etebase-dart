@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-import '../../api/exceptions/api_missuse.dart';
+import '../../api/exceptions/unauthorized.dart';
 
 @internal
 class AuthToken {
@@ -11,6 +11,6 @@ class AuthToken {
   const AuthToken(this.value);
 
   String get header => value.isEmpty
-      ? throw ApiMissuse('The account is logged out!')
+      ? throw Unauthorized('The account is logged out!')
       : 'Token $value';
 }
