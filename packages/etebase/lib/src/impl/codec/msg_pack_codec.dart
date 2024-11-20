@@ -54,12 +54,8 @@ class Base64UrlSafeNoPadDecoder extends Converter<String, Uint8List> {
   const Base64UrlSafeNoPadDecoder();
 
   @override
-  Uint8List convert(String input) {
-    final extraBytes = input.length % 4;
-    return base64Url.decode(
-      extraBytes == 0 ? input : (input + ('=' * (4 - extraBytes))),
-    );
-  }
+  Uint8List convert(String input) =>
+      base64Url.decode(base64Url.normalize(input));
 }
 
 @internal
