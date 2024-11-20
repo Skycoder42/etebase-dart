@@ -4,6 +4,7 @@
     "concat",
     "derivator",
     "disinvite",
+    "endtemplate",
     "etebase",
     "finalizer",
     "missuse",
@@ -11,7 +12,7 @@
     "pubkey",
     "rollsum",
     "signup",
-    "stoken",
+    "stoken"
   ],
   "dart.runPubGetOnPubspecChanges": "never",
   "cmake.configureOnOpen": false
