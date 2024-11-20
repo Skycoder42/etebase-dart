@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
@@ -31,8 +30,6 @@ class CryptoService {
 
   Uint8List randomBytes(int length) =>
       _executor.execSync((sodium) => sodium.randombytes.buf(length));
-
-  String genUidBase64() => base64.encode(randomBytes(24));
 
   SecureKey secureAlloc(int length) =>
       _executor.execSync((sodium) => sodium.secureAlloc(length));

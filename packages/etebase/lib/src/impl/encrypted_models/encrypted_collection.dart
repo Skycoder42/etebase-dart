@@ -89,7 +89,7 @@ class EncryptedCollection {
     final [
       _,
       Uint8List collectionKey,
-      EtebaseCollectionAccessLevel accessLevel,
+      int accessLevelValue,
       String? stoken,
       Uint8List item,
       Uint8List collectionType,
@@ -98,7 +98,8 @@ class EncryptedCollection {
       .._collectionKey = collectionKey
       .._collectionType = collectionType
       ..item = EncryptedCollectionItem.cacheLoad(client, item)
-      ..accessLevel = accessLevel
+      ..accessLevel = EtebaseCollectionAccessLevel.values
+          .singleWhere((e) => e.value == accessLevelValue)
       ..stoken = stoken;
   }
 
@@ -108,7 +109,7 @@ class EncryptedCollection {
       client.converter.encode([
         _cacheFormatVersion,
         _collectionKey,
-        accessLevel,
+        accessLevel.value,
         stoken,
         item.cacheSave(client, saveContent: saveContent),
         _collectionType,

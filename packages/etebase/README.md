@@ -5,6 +5,7 @@
 Dart client library for etebase, base on the javascript port.
 
 ## TODOs
+- export key size for account save/restore
 - cleanup unused things
 - move utils elsewhere? maybe client?
 - get/set content via stream
