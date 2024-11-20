@@ -10,10 +10,8 @@ abstract base class UserAgent {
         clientName,
         values: [
           'Dart/${Platform.version}',
-          if (Platform.isIOS || Platform.isMacOS)
-            '${Platform.operatingSystem} ${Platform.operatingSystemVersion}'
-          else
-            Platform.operatingSystemVersion,
+          Platform.operatingSystem,
+          Platform.operatingSystemVersion,
         ],
       );
 }
