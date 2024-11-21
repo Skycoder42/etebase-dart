@@ -6,6 +6,7 @@ import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/conflict.dart';
 import '../../api/managers/etebase_item_manager.dart';
 import '../../api/models/etebase_fetch_options.dart';
+import '../../api/models/etebase_item.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../../api/models/etebase_list_response.dart';
 import '../crypto/collection_item_crypto_manager.dart';
@@ -70,11 +71,11 @@ class ItemManager implements EtebaseItemManager {
 
   @override
   Future<EtebaseItemListResponse<Item>> fetchUpdates(
-    covariant List<Item> items, [
+    List<EtebaseItem> items, [
     EtebaseItemFetchOptions? fetchOptions,
   ]) async {
     final response = await _online.fetchUpdates(
-      _prepareForUpload(items),
+      _prepareForUpload(items.cast()),
       fetchOptions,
     );
     return response.map(_createItem);
@@ -91,32 +92,32 @@ class ItemManager implements EtebaseItemManager {
 
   @override
   Future<void> batch(
-    covariant List<Item> items, {
-    covariant List<Item>? deps,
+    List<EtebaseItem> items, {
+    List<EtebaseItem>? deps,
     EtebaseItemFetchOptions? options,
   }) async {
     await _online.batch(
-      _prepareForUpload(items),
-      deps != null ? _prepareForUpload(deps) : null,
+      _prepareForUpload(items.cast()),
+      deps != null ? _prepareForUpload(deps.cast()) : null,
       options,
     );
-    for (final item in items) {
+    for (final item in items.cast<Item>()) {
       item.encrypted.markSaved();
     }
   }
 
   @override
   Future<void> transaction(
-    covariant List<Item> items, {
-    covariant List<Item>? deps,
+    List<EtebaseItem> items, {
+    List<EtebaseItem>? deps,
     EtebaseItemFetchOptions? options,
   }) async {
     await _online.transaction(
-      _prepareForUpload(items),
-      deps != null ? _prepareForUpload(deps) : null,
+      _prepareForUpload(items.cast()),
+      deps != null ? _prepareForUpload(deps.cast()) : null,
       options,
     );
-    for (final item in items) {
+    for (final item in items.cast<Item>()) {
       item.encrypted.markSaved();
     }
   }

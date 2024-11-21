@@ -9,7 +9,6 @@ import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
-import 'util/matchers.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.item_test';
@@ -28,17 +27,13 @@ void main() {
   late String itemId3;
 
   setUpAll(() async {
-    Etebase.ensureInitialized(loadLibEtebase);
-
-    final client = await EtebaseClient.create('item-test', serverUri);
+    final client = await createClient();
     addTearDown(client.dispose);
 
-    final account = await createAccount(client, 'item-test-user');
+    final account = await createAccount(client, 'collection-test-user');
     addTearDown(account.dispose);
 
-    final collectionManager = await account.getCollectionManager();
-    addTearDown(collectionManager.dispose);
-
+    final collectionManager = account.collectionManager;
     final collection = await collectionManager.create(
       testCollectionType,
       const EtebaseItemMetadata(),
@@ -47,7 +42,7 @@ void main() {
     addTearDown(collection.dispose);
 
     await collectionManager.upload(collection);
-    itemManager = await collectionManager.getItemManager(collection);
+    itemManager = collectionManager.getItemManager(collection);
     addTearDown(itemManager.dispose);
   });
 
@@ -62,31 +57,15 @@ void main() {
       addTearDown(item.dispose);
 
       expect(await item.verify(), isTrue);
-      expect(await item.isDeleted(), isFalse);
+      expect(item.isDeleted, isFalse);
 
-      expect(await item.getEtag(), isNotEmpty);
-      expect(await item.getUid(), isNotEmpty);
+      expect(item.etag, isNotEmpty);
+      expect(item.uid, isNotEmpty);
       expect(await item.getContent(), testItemContent1);
-      expect(
-        await item.getContent(testItemContent1.length - 10),
-        testItemContent1,
-      );
-      expect(
-        await item.getContent(testItemContent1.length),
-        testItemContent1,
-      );
-      expect(
-        await item.getContent(testItemContent1.length + 10),
-        testItemContent1,
-      );
 
       final loadedMeta = await item.getMeta();
       expect(loadedMeta.name, testItemName);
       expect(loadedMeta.description, isNull);
-
-      final cloned = await item.clone();
-      addTearDown(cloned.dispose);
-      expect(await cloned.getUid(), await item.getUid());
     });
 
     test('can be updated and deleted', () async {
@@ -120,55 +99,50 @@ void main() {
         testItemContent1,
       );
       addTearDown(item1.dispose);
-      itemId1 = await item1.getUid();
+      itemId1 = item1.uid;
 
       final item2 = await itemManager.create(
         const EtebaseItemMetadata(itemType: testItemTypeA),
         testItemContent2,
       );
       addTearDown(item2.dispose);
-      itemId2 = await item2.getUid();
+      itemId2 = item2.uid;
 
       final item3 = await itemManager.create(
         const EtebaseItemMetadata(itemType: testItemTypeB),
         Uint8List(0),
       );
       addTearDown(item3.dispose);
-      itemId3 = await item3.getUid();
+      itemId3 = item3.uid;
 
       await itemManager.batch([item1, item2, item3]);
     });
 
     test('can list items', () async {
       final listResponse = await itemManager.list();
-      addTearDown(listResponse.dispose);
 
-      expect(await listResponse.isDone(), isTrue);
-      expect(await listResponse.getStoken(), allOf(isNotNull, isNotEmpty));
+      expect(listResponse.isDone, isTrue);
+      expect(listResponse.stoken, allOf(isNotNull, isNotEmpty));
 
-      final items = await listResponse.getData();
+      final items = listResponse.data;
       expect(items, hasLength(3));
 
-      expect(await items[0].getUid(), itemId1);
-      expect(await items[1].getUid(), itemId2);
-      expect(await items[2].getUid(), itemId3);
+      expect(items[0].uid, itemId1);
+      expect(items[1].uid, itemId2);
+      expect(items[2].uid, itemId3);
 
       final meta1 = await items[0].getMeta();
       expect(meta1.itemType, testItemTypeA);
       expect(meta1.name, testItemName);
 
       final changedResponse = await itemManager.list(
-        EtebaseFetchOptions(
-          stoken: await listResponse.getStoken(),
-        ),
+        EtebaseItemFetchOptions(stoken: listResponse.stoken),
       );
-      addTearDown(changedResponse.dispose);
-      expect(await changedResponse.getData(), isEmpty);
+      expect(changedResponse.data, isEmpty);
 
       final selectedItems = items.take(2).toList();
       final selectedResponse = await itemManager.fetchUpdates(selectedItems);
-      addTearDown(selectedResponse.dispose);
-      expect(await selectedResponse.getData(), isEmpty);
+      expect(selectedResponse.data, isEmpty);
     });
 
     test('can modify single item', () async {
@@ -184,18 +158,17 @@ void main() {
 
       expect(
         () => itemManager.transaction([item2]),
-        throwsEtebaseException(EtebaseErrorCode.conflict),
+        throwsA(isA<Conflict>()),
       );
     });
 
     test('can modify multiple items', () async {
       final listResponse = await itemManager.fetchMulti([itemId1, itemId2]);
-      addTearDown(listResponse.dispose);
 
-      expect(await listResponse.isDone(), isTrue);
-      expect(await listResponse.getStoken(), allOf(isNotNull, isNotEmpty));
+      expect(listResponse.isDone, isTrue);
+      expect(listResponse.stoken, allOf(isNotNull, isNotEmpty));
 
-      final items = await listResponse.getData();
+      final items = listResponse.data;
       expect(items, hasLength(2));
 
       for (final item in items) {
@@ -213,29 +186,29 @@ void main() {
       final item3 = await itemManager.fetch(itemId3);
       addTearDown(item3.dispose);
 
-      final item2Old = await item2.clone();
+      final item2Old = await itemManager.fetch(itemId2);
       addTearDown(item2Old.dispose);
-      final item3Old = await item3.clone();
+      final item3Old = await itemManager.fetch(itemId3);
       addTearDown(item3Old.dispose);
 
       await item2.setContent(testItemContent1);
       final meta3 = await item3.getMeta();
       await item3.setMeta(meta3.copyWith(mtime: DateTime.now()));
 
-      await itemManager.batchDeps([item2], [item1]);
-      await itemManager.transactionDeps([item3], [item1]);
+      await itemManager.batch([item2], deps: [item1]);
+      await itemManager.transaction([item3], deps: [item1]);
 
       final meta1 = await item1.getMeta();
       await item1.setMeta(meta1.copyWith(mtime: DateTime.now()));
       await item1.setContent(Uint8List.fromList(utf8.encode('TEST!')));
 
       expect(
-        () => itemManager.batchDeps([item1], [item2Old]),
-        throwsEtebaseException(EtebaseErrorCode.conflict),
+        () => itemManager.batch([item1], deps: [item2Old]),
+        throwsA(isA<Conflict>()),
       );
       expect(
-        () => itemManager.transactionDeps([item1], [item3Old]),
-        throwsEtebaseException(EtebaseErrorCode.conflict),
+        () => itemManager.transaction([item1], deps: [item3Old]),
+        throwsA(isA<Conflict>()),
       );
     });
 
@@ -252,40 +225,47 @@ void main() {
         ),
       );
       await item.delete();
-      expect(await item.isDeleted(), isTrue);
+      expect(item.isDeleted, isTrue);
 
       await itemManager.batch([item]);
 
       final deletedItem = await itemManager.fetch(itemId3);
       addTearDown(deletedItem.dispose);
-      expect(await deletedItem.isDeleted(), isTrue);
+      expect(deletedItem.isDeleted, isTrue);
     });
 
     test('can save and restore item from and to cache', () async {
       final item = await itemManager.fetch(itemId2);
       addTearDown(item.dispose);
 
-      final saved = await itemManager.cacheSave(item);
-      final restored = await itemManager.cacheLoad(saved);
+      final saved = itemManager.cacheSave(item);
+      final restored = itemManager.cacheLoad(saved);
       addTearDown(restored.dispose);
 
-      expect(await restored.getUid(), itemId2);
+      expect(restored.uid, itemId2);
+      expect(restored.isMissingContent, isFalse);
       expect(await restored.getContent(), testItemContent1);
       final meta = await restored.getMeta();
       expect(meta.itemType, testItemTypeA);
 
-      final savedWithContent = await itemManager.cacheSaveWithContent(
+      final savedWithoutContent = itemManager.cacheSave(
         item,
+        saveContent: false,
       );
-      final restoredWithContent = await itemManager.cacheLoad(
-        savedWithContent,
+      final restoredWithoutContent = itemManager.cacheLoad(
+        savedWithoutContent,
       );
-      addTearDown(restoredWithContent.dispose);
+      addTearDown(restoredWithoutContent.dispose);
 
-      expect(await restoredWithContent.getUid(), itemId2);
-      expect(await restoredWithContent.getContent(), testItemContent1);
-      final metaWithContent = await restoredWithContent.getMeta();
+      expect(restoredWithoutContent.uid, itemId2);
+      expect(restoredWithoutContent.isMissingContent, isTrue);
+      final metaWithContent = await restoredWithoutContent.getMeta();
       expect(metaWithContent.itemType, testItemTypeA);
+      expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
+
+      await itemManager.downloadContent(restoredWithoutContent);
+      expect(restoredWithoutContent.isMissingContent, isFalse);
+      expect(await restoredWithoutContent.getContent(), testItemContent1);
     });
   });
 
@@ -295,17 +275,16 @@ void main() {
       addTearDown(item.dispose);
 
       final response = await itemManager.itemRevisions(item);
-      addTearDown(response.dispose);
 
-      expect(await response.isDone(), isTrue);
-      expect(await response.getIterator(), isNotEmpty);
+      expect(response.isDone, isTrue);
+      expect(response.iterator, isNotEmpty);
 
-      final revisions = await response.getData();
+      final revisions = response.data;
       expect(revisions, hasLength(3));
 
       final item1 = revisions[0];
-      expect(await item1.getUid(), itemId1);
-      expect(await item1.getEtag(), isNotEmpty);
+      expect(item1.uid, itemId1);
+      expect(item1.etag, isNotEmpty);
       final meta = await revisions[0].getMeta();
       expect(meta.itemType, testItemTypeA);
       expect(meta.name, testItemName);

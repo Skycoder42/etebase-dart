@@ -67,7 +67,7 @@ sealed class EtebaseListResponse<T extends Object>
     @_doneKey required bool isDone,
 
     /// Iterator for the list response.
-    required String iterator,
+    required String? iterator,
   }) = EtebaseIteratorListResponse<T>;
 
   const EtebaseListResponse._();

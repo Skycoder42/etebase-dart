@@ -17,6 +17,7 @@ import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
 import '../models/signed_invitation.dart';
 import '../models/signed_invitation_content.dart';
+import 'cached/cached_collection.dart';
 import 'encrypted_collection_item.dart';
 
 part 'encrypted_collection.g.dart';
@@ -25,7 +26,6 @@ part 'encrypted_collection.g.dart';
 @JsonSerializable()
 @msgPackBytes
 class EncryptedCollection {
-  static const _cacheFormatVersion = 1;
   static const _invitationUidSize = 32;
 
   @JsonKey(name: 'collectionKey', includeFromJson: true, includeToJson: true)
@@ -86,34 +86,27 @@ class EncryptedCollection {
       _$EncryptedCollectionFromJson(json);
 
   factory EncryptedCollection.cacheLoad(Client client, Uint8List cachedData) {
-    final [
-      _,
-      Uint8List collectionKey,
-      int accessLevelValue,
-      String? stoken,
-      Uint8List item,
-      Uint8List collectionType,
-    ] = client.converter.decodeRaw(cachedData) as List;
+    final cached = client.converter.decode<CachedCollection>(cachedData);
     return EncryptedCollection()
-      .._collectionKey = collectionKey
-      .._collectionType = collectionType
-      ..item = EncryptedCollectionItem.cacheLoad(client, item)
-      ..accessLevel = EtebaseCollectionAccessLevel.values
-          .singleWhere((e) => e.value == accessLevelValue)
-      ..stoken = stoken;
+      .._collectionKey = cached.collectionKey
+      .._collectionType = cached.collectionType
+      ..item = EncryptedCollectionItem.cacheLoad(client, cached.item)
+      ..accessLevel = cached.accessLevel
+      ..stoken = cached.stoken;
   }
 
   Map<String, dynamic> toJson() => _$EncryptedCollectionToJson(this);
 
   Uint8List cacheSave(Client client, {required bool saveContent}) =>
-      client.converter.encode([
-        _cacheFormatVersion,
-        _collectionKey,
-        accessLevel.value,
-        stoken,
-        item.cacheSave(client, saveContent: saveContent),
-        _collectionType,
-      ]);
+      client.converter.encode(
+        CachedCollection(
+          collectionKey: _collectionKey,
+          accessLevel: accessLevel,
+          stoken: stoken,
+          item: item.cacheSave(client, saveContent: saveContent),
+          collectionType: _collectionType,
+        ),
+      );
 
   void markSaved() => item.markSaved();
 

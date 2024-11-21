@@ -6,22 +6,20 @@ import 'dart:typed_data';
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
-import 'util/matchers.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.fs_cache_test';
 
   late final EtebaseClient client;
   late final EtebaseAccount account;
-  late final EtebaseFileSystemCache cache;
+  late final EtebaseCache cache;
 
   setUpAll(() async {
-    Etebase.ensureInitialized(loadLibEtebase);
-
-    client = await EtebaseClient.create('fs-cache-test', serverUri);
+    client = await createClient();
     addTearDown(client.dispose);
 
     final username = generateUsername('fs-cache-test-user');
@@ -37,9 +35,12 @@ void main() {
 
     final cacheDir = await Directory.systemTemp.createTemp();
     addTearDown(() => cacheDir.delete(recursive: true));
-    cache = await EtebaseFileSystemCache.create(
+
+    Hive.init(cacheDir.path);
+    addTearDown(Hive.close);
+
+    cache = await EtebaseCache.create(
       client,
-      cacheDir.path,
       username,
     );
     addTearDown(cache.dispose);
@@ -48,19 +49,18 @@ void main() {
   test('can cache and restore account', () async {
     await cache.saveAccount(account);
     final restoredAccount = await cache.loadAccount(client);
-    addTearDown(restoredAccount.dispose);
-    await restoredAccount.fetchToken();
+    expect(restoredAccount, isNotNull);
+    await restoredAccount!.fetchToken();
 
-    final encryptionKey = await EtebaseUtils.randombytes(client, 32);
+    final encryptionKey = EtebaseUtils.randomKey(client, 32);
     await cache.saveAccount(account, encryptionKey);
     final restoredAccountEnc = await cache.loadAccount(client, encryptionKey);
-    addTearDown(restoredAccountEnc.dispose);
-    await restoredAccountEnc.fetchToken();
+    expect(restoredAccountEnc, isNotNull);
+    await restoredAccountEnc!.fetchToken();
   });
 
   test('can cache and restore collection list stoken', () async {
-    final collectionManager = await account.getCollectionManager();
-    addTearDown(collectionManager.dispose);
+    final collectionManager = account.collectionManager;
 
     final collection = await collectionManager.create(
       testCollectionType,
@@ -73,24 +73,21 @@ void main() {
     expect(await cache.loadStoken(), isNull);
 
     final response = await collectionManager.list(testCollectionType);
-    addTearDown(response.dispose);
-    await cache.saveStoken((await response.getStoken())!);
+    await cache.saveStoken(response.stoken!);
     final restoredToken = await cache.loadStoken();
 
-    expect(restoredToken, await response.getStoken());
+    expect(restoredToken, response.stoken);
 
-    final response2 = await collectionManager.list(
+    await collectionManager.list(
       testCollectionType,
       EtebaseFetchOptions(stoken: restoredToken),
     );
-    addTearDown(response2.dispose);
   });
 
   test('can cache and restore collection and stoken', () async {
     final testCollectionData = Uint8List.fromList(List.filled(10, 10));
 
-    final collectionManager = await account.getCollectionManager();
-    addTearDown(collectionManager.dispose);
+    final collectionManager = account.collectionManager;
 
     const meta = EtebaseItemMetadata();
     var collection = await collectionManager.create(
@@ -100,9 +97,9 @@ void main() {
     );
     addTearDown(collection.dispose);
     await collectionManager.upload(collection);
-    final collectionId = await collection.getUid();
+    final collectionId = collection.uid;
 
-    final itemManager = await collectionManager.getItemManager(collection);
+    final itemManager = collectionManager.getItemManager(collection);
     addTearDown(itemManager.dispose);
     final item = await itemManager.create(meta, Uint8List(0));
     addTearDown(item.dispose);
@@ -113,36 +110,35 @@ void main() {
 
     await expectLater(
       () => cache.collectionGet(collectionManager, collectionId),
-      throwsEtebaseException(EtebaseErrorCode.urlParse),
+      throwsA(isA<UnsupportedError>()),
     );
     await cache.collectionSet(collectionManager, collection);
     final restoredCollection = await cache.collectionGet(
       collectionManager,
       collectionId,
     );
-    expect(await restoredCollection.getUid(), collectionId);
+    expect(restoredCollection!.uid, collectionId);
     expect(await restoredCollection.getContent(), testCollectionData);
 
     expect(await cache.collectionLoadStoken(collectionId), isNull);
     await cache.collectionSaveStoken(
       collectionId,
-      (await collection.getStoken())!,
+      collection.stoken!,
     );
     final restoredToken = await cache.collectionLoadStoken(collectionId);
 
-    expect(restoredToken, await collection.getStoken());
+    expect(restoredToken, collection.stoken);
 
     await cache.collectionUnset(collectionManager, collectionId);
     await expectLater(
       () => cache.collectionGet(collectionManager, collectionId),
-      throwsEtebaseException(EtebaseErrorCode.urlParse),
+      throwsA(isA<UnsupportedError>()),
     );
     expect(await cache.collectionLoadStoken(collectionId), isNull);
   });
 
   test('can cache and restore items', () async {
-    final collectionManager = await account.getCollectionManager();
-    addTearDown(collectionManager.dispose);
+    final collectionManager = account.collectionManager;
 
     final collection = await collectionManager.create(
       testCollectionType,
@@ -151,10 +147,10 @@ void main() {
     );
     addTearDown(collection.dispose);
     await collectionManager.upload(collection);
-    final collectionId = await collection.getUid();
+    final collectionId = collection.uid;
     await cache.collectionSet(collectionManager, collection);
 
-    final itemManager = await collectionManager.getItemManager(collection);
+    final itemManager = collectionManager.getItemManager(collection);
     addTearDown(itemManager.dispose);
 
     const itemMeta = EtebaseItemMetadata(color: 'AABBCC');
@@ -165,25 +161,25 @@ void main() {
     );
     addTearDown(item.dispose);
     await itemManager.batch([item]);
-    final itemId = await item.getUid();
+    final itemId = item.uid;
 
     await expectLater(
       () => cache.itemGet(itemManager, collectionId, itemId),
-      throwsEtebaseException(EtebaseErrorCode.urlParse),
+      throwsA(isA<UnsupportedError>()),
     );
 
     await cache.itemSet(itemManager, collectionId, item);
 
     final restoredItem = await cache.itemGet(itemManager, collectionId, itemId);
-    expect(await restoredItem.getUid(), itemId);
+    expect(restoredItem!.uid, itemId);
     expect(await restoredItem.getMeta(), itemMeta);
     expect(await restoredItem.getContent(), itemContent);
-    expect(await restoredItem.getEtag(), await item.getEtag());
+    expect(restoredItem.etag, item.etag);
 
     await cache.itemUnset(itemManager, collectionId, itemId);
     await expectLater(
       () => cache.itemGet(itemManager, collectionId, itemId),
-      throwsEtebaseException(EtebaseErrorCode.urlParse),
+      throwsA(isA<UnsupportedError>()),
     );
   });
 
@@ -191,7 +187,7 @@ void main() {
     await cache.clearUser();
     await expectLater(
       () => cache.loadAccount(client),
-      throwsEtebaseException(EtebaseErrorCode.urlParse),
+      throwsA(isA<UnsupportedError>()),
     );
   });
 }

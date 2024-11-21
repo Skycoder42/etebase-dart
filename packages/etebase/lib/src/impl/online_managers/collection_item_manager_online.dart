@@ -9,6 +9,7 @@ import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_list_response.dart';
 import '../encrypted_models/chunk.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
+import '../encrypted_models/encrypted_revision.dart';
 import '../models/collection_item_fetch_info.dart';
 import '../models/item_batch_request.dart';
 import '../models/web_socket_ticket_response.dart';
@@ -44,11 +45,11 @@ final class CollectionItemManagerOnline extends BaseManager {
     EtebaseRevisionFetchOptions? options,
   ) async {
     final response =
-        await invokeApi<EtebaseIteratorListResponse<EncryptedCollectionItem>>(
+        await invokeApi<EtebaseIteratorListResponse<EncryptedRevision>>(
       path: [item.uid, 'revision'],
       options: options,
     );
-    return response.map((rev) => item.cloneWithRevision(rev.content));
+    return response.map((rev) => item.cloneWithRevision(rev));
   }
 
   Future<void> create(EncryptedCollectionItem item) => invokeApi<void>(

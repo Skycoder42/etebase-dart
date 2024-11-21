@@ -294,7 +294,7 @@ void main() {
       expect(restoredWithoutContent.isMissingContent, isTrue);
       final metaWithoutContent = await restoredWithoutContent.getMeta();
       expect(metaWithoutContent.name, 'create-collection-test-2');
-      expect(restoredWithoutContent.getContent, throwsA(isA<ApiMissuse>()));
+      expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
     });
   });
 }
