@@ -15,26 +15,24 @@ jobs:
     with:
       workingDirectory: packages/etebase
       buildRunner: true
-      buildRunnerArgs: >-
-        --delete-conflicting-outputs
-        --define etebase:etebase_client_builder=restoreMode=true
-        --define etebase:etebase_isolate_builder=restoreMode=true
+      panaScoreThreshold: 10
       unitTestPaths: -P unit
       coverageExclude: >-
-        "lib/src/gen/**"
         "**/*.freezed.dart"
+        "**/*.g.dart"
       integrationTestPaths: -P integration
       integrationTestCacheConfig: >-
         {
-          "key": "etebase-libetebase-v0.5.6",
-          "path": "packages/etebase/tool/integration/libetebase"
+          "key": "etebase-cache-with-sodium-1.0.20",
+          "path": "packages/etebase/tool/integration/cache"
         }
       integrationTestSetup: >-
         {
-          "linux": "bash tool/integration/setup_linux.sh v0.5.6",
-          "macos": "bash tool/integration/setup_macos.sh v0.5.6",
-          "windows": "powershell -File tool\\integration\\setup_win.ps1 v0.5.6"
+          "linux": "bash tool/integration/setup_linux.sh",
+          "macos": "bash tool/integration/setup_macos.sh",
+          "windows": "bash tool/integration/setup_win.sh 1.0.20"
         }
+
   cd:
     name: CD
     uses: Skycoder42/dart_test_tools/.github/workflows/release.yml@main

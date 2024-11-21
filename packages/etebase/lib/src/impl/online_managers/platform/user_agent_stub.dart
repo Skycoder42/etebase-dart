@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart';
 
-// ignore: no_self_package_imports
-import '../../../../gen/pubspec.g.dart';
+import '../../../gen/pubspec.g.dart';
 
 @internal
 abstract base class UserAgent {
