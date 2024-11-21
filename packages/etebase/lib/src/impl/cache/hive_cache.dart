@@ -4,6 +4,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
+import '../../api/exceptions/not_found.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_cache.dart';
 import '../../api/managers/etebase_client.dart';
@@ -75,14 +76,14 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<EtebaseAccount?> loadAccount(
+  Future<EtebaseAccount> loadAccount(
     EtebaseClient client, [
     SecureKey? encryptionKey,
   ]) async {
     final accountData =
         await _accountBox.get(_accountDataKey).cast<Uint8List?>();
     if (accountData == null) {
-      return null;
+      throw NotFound('No account has been cached');
     }
     return EtebaseAccount.restore(client, accountData, encryptionKey);
   }
@@ -96,7 +97,13 @@ class HiveCache implements EtebaseCache {
       _accountBox.put(_accountStokenKey, stoken);
 
   @override
-  Future<String?> loadStoken() => _accountBox.get(_accountStokenKey).cast();
+  Future<String> loadStoken() async {
+    final stoken = await _accountBox.get(_accountStokenKey).cast<String?>();
+    if (stoken == null) {
+      throw NotFound('No stoken has been cached');
+    }
+    return stoken;
+  }
 
   @override
   Stream<String> get persistedCollectionStokenUids => Stream.fromIterable(
@@ -111,8 +118,14 @@ class HiveCache implements EtebaseCache {
       _accountBox.put(_collectionStokenKey(colUid), stoken);
 
   @override
-  Future<String?> collectionLoadStoken(String colUid) =>
-      _accountBox.get(_collectionStokenKey(colUid)).cast();
+  Future<String> collectionLoadStoken(String colUid) async {
+    final stoken =
+        await _accountBox.get(_collectionStokenKey(colUid)).cast<String?>();
+    if (stoken == null) {
+      throw NotFound('No stoken has been cached for $colUid');
+    }
+    return stoken;
+  }
 
   @override
   Stream<String> get persistedCollectionUids =>
@@ -133,6 +146,7 @@ class HiveCache implements EtebaseCache {
     EtebaseCollectionManager colMgr,
     String colUid,
   ) async {
+    await _accountBox.delete(_collectionStokenKey(colUid));
     final itemBox = _itemBoxName(colUid);
     if (_hive.isBoxOpen(itemBox) || await _hive.boxExists(itemBox)) {
       await _collectionBox.put(colUid, null);
@@ -142,13 +156,13 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<EtebaseCollection?> collectionGet(
+  Future<EtebaseCollection> collectionGet(
     EtebaseCollectionManager colMgr,
     String colUid,
   ) async {
     final colData = await _collectionBox.get(colUid);
     if (colData == null) {
-      return null;
+      throw NotFound('No collection has been cached for $colUid');
     }
     return colMgr.cacheLoad(colData);
   }
@@ -182,7 +196,7 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<EtebaseItem?> itemGet(
+  Future<EtebaseItem> itemGet(
     EtebaseItemManager itemMgr,
     String colUid,
     String itemUid,
@@ -190,7 +204,9 @@ class HiveCache implements EtebaseCache {
     final itemBox = await _itemBox(colUid);
     final itemData = await itemBox?.get(itemUid);
     if (itemData == null) {
-      return null;
+      throw NotFound(
+        'No item has been cached for $itemUid in collection $colUid',
+      );
     }
     return itemMgr.cacheLoad(itemData);
   }
@@ -202,8 +218,9 @@ class HiveCache implements EtebaseCache {
   String _collectionStokenKey(String colUid) =>
       '$_accountColStokenKeyPrefix$colUid';
 
-  Iterable<String> get _knownItemBoxNames =>
-      _collectionBox.keys.cast<String>().map(_itemBoxName);
+  Iterable<String> get _knownItemBoxNames => _collectionBox.isOpen
+      ? _collectionBox.keys.cast<String>().map(_itemBoxName)
+      : const [];
 
   Future<LazyBox<Uint8List>?> _itemBox(
     String colUid, {

@@ -60,7 +60,7 @@ abstract class EtebaseCache {
   /// Load the [EtebaseAccount] object from cache.
   ///
   /// The [encryptionKey] must be the same as used for [saveAccount].
-  Future<EtebaseAccount?> loadAccount(
+  Future<EtebaseAccount> loadAccount(
     EtebaseClient client, [
     SecureKey? encryptionKey,
   ]);
@@ -72,7 +72,7 @@ abstract class EtebaseCache {
   Future<void> saveStoken(String stoken);
 
   /// Load the collection list sync stoken from cache.
-  Future<String?> loadStoken();
+  Future<String> loadStoken();
 
   /// Lists all collection uids for collections that have their stoken stored
   /// in the cache.
@@ -80,13 +80,15 @@ abstract class EtebaseCache {
 
   /// Save a collections sync [stoken] for the collection identified by
   /// [colUid].
+  ///
+  /// **Note:** To delete the token, use [collectionUnset].
   Future<void> collectionSaveStoken(
     String colUid,
     String stoken,
   );
 
   /// Load the sync stoken for the collection identified by [colUid].
-  Future<String?> collectionLoadStoken(String colUid);
+  Future<String> collectionLoadStoken(String colUid);
 
   /// Lists all collection uids for collections been stored in the cache.
   Stream<String> get persistedCollectionUids;
@@ -101,13 +103,16 @@ abstract class EtebaseCache {
   });
 
   /// Remove a collection identified by [colUid] from cache.
+  ///
+  /// This will also remove the collection stoken if previously set via
+  /// [collectionSaveStoken].
   Future<void> collectionUnset(
     EtebaseCollectionManager colMgr,
     String colUid,
   );
 
   /// Load a [EtebaseCollection] identified by [colUid] from cache.
-  Future<EtebaseCollection?> collectionGet(
+  Future<EtebaseCollection> collectionGet(
     EtebaseCollectionManager colMgr,
     String colUid,
   );
@@ -136,7 +141,7 @@ abstract class EtebaseCache {
 
   /// Load an [EtebaseItem] identified by [itemUid] of the collection identified
   /// by [colUid] from cache.
-  Future<EtebaseItem?> itemGet(
+  Future<EtebaseItem> itemGet(
     EtebaseItemManager itemMgr,
     String colUid,
     String itemUid,
