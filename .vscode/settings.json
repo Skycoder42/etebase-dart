@@ -8,11 +8,13 @@
     "etebase",
     "finalizer",
     "missuse",
+    "msgpack",
     "privkey",
     "pubkey",
     "rollsum",
     "signup",
-    "stoken"
+    "stoken",
+    "uids"
   ],
   "dart.runPubGetOnPubspecChanges": "never",
   "cmake.configureOnOpen": false
