@@ -239,13 +239,4 @@ class EncryptedCollectionItem {
         _getEncryptionKey(client, parentCm),
         version: version,
       );
-
-  MinimalCollectionCryptoManager _getHierarchicalCryptoManager(
-    Client client,
-    MinimalCollectionCryptoManager parentCm,
-  ) =>
-      client.crypto.createMinimalCollectionCryptoManager(
-        _getEncryptionKey(client, parentCm),
-        version: version,
-      );
 }
