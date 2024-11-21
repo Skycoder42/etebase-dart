@@ -73,30 +73,28 @@ base class BaseNetwork {
     dynamic body,
     AuthToken? authToken,
   }) async {
-    final request = _createRequest(
-      method: method,
-      path: path,
-      query: query,
-      headers: headers,
-      body: body,
-      authToken: authToken,
-    );
-
-    http.Response response;
     try {
+      final request = _createRequest(
+        method: method,
+        path: path,
+        query: query,
+        headers: headers,
+        body: body,
+        authToken: authToken,
+      );
+
+      http.Response response;
       final streamResponse = await client.httpClient.send(request);
       response = await http.Response.fromStream(streamResponse);
-    } on Exception catch (e, s) {
+
+      if (response.statusCode case >= 200 && < 300) {
+        return _convertResponse<T>(response);
+      } else {
+        _convertError(response);
+      }
+    } on http.ClientException catch (e, s) {
       Error.throwWithStackTrace(ConnectionProblem(e), s);
     }
-
-    if (response.statusCode case >= 200 && < 300) {
-      return _convertResponse<T>(response);
-    } else {
-      _convertError(response);
-    }
-
-    // TODO try/catch for network error
   }
 
   http.Request _createRequest({
