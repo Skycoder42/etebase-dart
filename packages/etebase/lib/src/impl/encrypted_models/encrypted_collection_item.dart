@@ -12,6 +12,7 @@ import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
+import 'cached/cached_collection_item.dart';
 import 'chunk.dart';
 import 'encrypted_revision.dart';
 
@@ -21,8 +22,6 @@ part 'encrypted_collection_item.g.dart';
 @JsonSerializable()
 @msgPackBytes
 class EncryptedCollectionItem {
-  static const _cacheFormatVersion = 1;
-
   late String uid;
   int version = CryptoUtils.currentVersion;
   @JsonKey(
@@ -84,39 +83,36 @@ class EncryptedCollectionItem {
     Client client,
     Uint8List cachedData,
   ) {
-    final [
-      _,
-      Uint8List uid,
-      int version,
-      Uint8List? encryptionKey,
-      Uint8List? etag,
-      Uint8List content,
-    ] = client.converter.decodeRaw(cachedData) as List;
+    final cached = client.converter.decode<CachedCollectionItem>(cachedData);
     return EncryptedCollectionItem()
-      ..uid = client.converter.base64Encode(uid)
-      ..version = version
-      .._encryptionKey = encryptionKey
-      .._etag = etag != null ? client.converter.base64Encode(etag) : null
+      ..uid = client.converter.base64Encode(cached.uid)
+      ..version = cached.version
+      .._encryptionKey = cached.encryptionKey
+      .._etag = switch (cached.etag) {
+        final Uint8List etag => client.converter.base64Encode(etag),
+        _ => null,
+      }
       ..content = EncryptedRevision.cacheLoad(
         client,
-        content,
+        cached.revision,
       );
   }
 
   Map<String, dynamic> toJson() => _$EncryptedCollectionItemToJson(this);
 
   Uint8List cacheSave(Client client, {required bool saveContent}) =>
-      client.converter.encode([
-        _cacheFormatVersion,
-        client.converter.base64Decode(uid),
-        version,
-        _encryptionKey,
-        if (_etag case final String etag)
-          client.converter.base64Decode(etag)
-        else
-          null,
-        content.cacheSave(client, saveContent: saveContent),
-      ]);
+      client.converter.encode(
+        CachedCollectionItem(
+          uid: client.converter.base64Decode(uid),
+          version: version,
+          encryptionKey: _encryptionKey,
+          etag: switch (_etag) {
+            final String etag => client.converter.base64Decode(etag),
+            _ => null,
+          },
+          revision: content.cacheSave(client, saveContent: saveContent),
+        ),
+      );
 
   EncryptedCollectionItem cloneWithRevision(
     EncryptedRevision revision,
@@ -216,9 +212,7 @@ class EncryptedCollectionItem {
   }
 
   Future<void> _cloneOrUpdateRevision(
-    FutureOr<void> Function(
-      EncryptedRevision<CollectionItemCryptoManager> rev,
-    ) callback,
+    FutureOr<void> Function(EncryptedRevision rev) callback,
   ) async {
     final rev = _isLocallyChanged ? content : content.clone();
     await callback(rev);

@@ -11,6 +11,8 @@ import '../../api/models/etebase_item_metadata.dart';
 import '../codec/msg_pack_converters.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../managers/client.dart';
+import 'cached/cached_chunk.dart';
+import 'cached/cached_revision.dart';
 import 'chunk.dart';
 
 part 'encrypted_revision.g.dart';
@@ -52,21 +54,16 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
     Client client,
     Uint8List cachedData,
   ) {
-    final [
-      Uint8List uid,
-      Uint8List meta,
-      bool deleted,
-      List<List<Uint8List?>> chunks
-    ] = client.converter.decodeRaw(cachedData) as List;
+    final cached = client.converter.decode<CachedRevision>(cachedData);
     return EncryptedRevision<TCryptoManager>()
-      ..uid = client.converter.base64Encode(uid)
-      ..meta = meta
-      ..deleted = deleted
-      ..chunks = chunks
+      ..uid = client.converter.base64Encode(cached.uid)
+      ..meta = cached.meta
+      ..deleted = cached.deleted
+      ..chunks = cached.chunks
           .map(
             (chunk) => Chunk(
-              client.converter.base64Encode(chunk[0]!),
-              chunk.length > 1 ? chunk[1] : null,
+              client.converter.base64Encode(chunk.uid),
+              chunk.data,
             ),
           )
           .toList();
@@ -75,19 +72,21 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
   Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
 
   Uint8List cacheSave(Client client, {required bool saveContent}) =>
-      client.converter.encode([
-        client.converter.base64Decode(uid),
-        meta,
-        deleted,
-        chunks
-            .map(
-              (chunk) => [
-                client.converter.base64Decode(chunk.uid),
-                if (saveContent) chunk.data,
-              ],
-            )
-            .toList(),
-      ]);
+      client.converter.encode(
+        CachedRevision(
+          uid: client.converter.base64Decode(uid),
+          meta: meta,
+          deleted: deleted,
+          chunks: chunks
+              .map(
+                (chunk) => CachedChunk(
+                  client.converter.base64Decode(chunk.uid),
+                  saveContent ? chunk.data : null,
+                ),
+              )
+              .toList(),
+        ),
+      );
 
   Future<bool> verify(
     Client client,
@@ -200,7 +199,7 @@ class EncryptedRevision<TCryptoManager extends CollectionItemCryptoManager> {
       // the last chunk
       if (indices.length > 1) {
         // We encode it in an array so we can extend it later on if needed
-        final buf = client.converter.encode([indices]);
+        final buf = client.converter.encodeRaw([indices]);
         final hash = client.converter.base64Encode(
           await cryptoManager.calculateMac(buf),
         );

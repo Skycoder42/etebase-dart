@@ -8,7 +8,6 @@ import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
-import 'util/matchers.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.sharing_test';
@@ -24,9 +23,7 @@ void main() {
   late final EtebaseCollectionInvitationManager invitationManager2;
 
   setUpAll(() async {
-    Etebase.ensureInitialized(loadLibEtebase);
-
-    client = await EtebaseClient.create('sharing-test', serverUri);
+    client = await createClient();
     addTearDown(client.dispose);
 
     final account1 = await EtebaseAccount.signup(
@@ -39,10 +36,8 @@ void main() {
     );
     addTearDown(account1.dispose);
 
-    collectionManager1 = await account1.getCollectionManager();
-    addTearDown(collectionManager1.dispose);
-    invitationManager1 = await account1.getInvitationManager();
-    addTearDown(invitationManager1.dispose);
+    collectionManager1 = account1.collectionManager;
+    invitationManager1 = account1.invitationManager;
 
     final account2 = await EtebaseAccount.signup(
       client,
@@ -54,30 +49,26 @@ void main() {
     );
     addTearDown(account2.dispose);
 
-    collectionManager2 = await account2.getCollectionManager();
-    addTearDown(collectionManager2.dispose);
-    invitationManager2 = await account2.getInvitationManager();
-    addTearDown(invitationManager2.dispose);
+    collectionManager2 = account2.collectionManager;
+    invitationManager2 = account2.invitationManager;
   });
 
   test('can obtain personal fingerprint and profiles', () async {
-    final pubKey1 = await invitationManager1.getPubkey();
-    final pubKey2 = await invitationManager2.getPubkey();
+    final pubKey1 = invitationManager1.pubkey;
+    final pubKey2 = invitationManager2.pubkey;
 
     expect(pubKey1, isNot(pubKey2));
 
-    final prettyPubKey1 = await EtebaseUtils.prettyFingerprint(client, pubKey1);
-    final prettyPubKey2 = await EtebaseUtils.prettyFingerprint(client, pubKey2);
+    final prettyPubKey1 = EtebaseUtils.prettyFingerprint(client, pubKey1);
+    final prettyPubKey2 = EtebaseUtils.prettyFingerprint(client, pubKey2);
 
     expect(prettyPubKey1, isNot(prettyPubKey2));
 
     final profile1 = await invitationManager2.fetchUserProfile(userName1);
-    addTearDown(profile1.dispose);
     final profile2 = await invitationManager1.fetchUserProfile(userName2);
-    addTearDown(profile2.dispose);
 
-    expect(await profile1.getPubkey(), pubKey1);
-    expect(await profile2.getPubkey(), pubKey2);
+    expect(profile1.pubkey, pubKey1);
+    expect(profile2.pubkey, pubKey2);
   });
 
   test('can invite others to a collection', () async {
@@ -92,83 +83,69 @@ void main() {
 
     // create invitation
     final profile2 = await invitationManager2.fetchUserProfile(userName2);
-    addTearDown(profile2.dispose);
     await invitationManager1.invite(
       collection,
       userName2,
-      await profile2.getPubkey(),
+      profile2.pubkey,
       EtebaseCollectionAccessLevel.readWrite,
     );
 
     // validate outgoing invitation
     final outResponse = await invitationManager1.listOutgoing();
-    addTearDown(outResponse.dispose);
-    expect(await outResponse.isDone(), isTrue);
-    expect(await outResponse.getIterator(), isNotEmpty);
+    expect(outResponse.isDone, isTrue);
+    expect(outResponse.iterator, isNotEmpty);
 
-    final outInvitations = await outResponse.getData();
+    final outInvitations = outResponse.data;
     expect(outInvitations, hasLength(1));
     final outInvitation = outInvitations[0];
     expect(
-      await outInvitation.getAccessLevel(),
+      outInvitation.accessLevel,
       EtebaseCollectionAccessLevel.readWrite,
     );
-    expect(await outInvitation.getCollection(), await collection.getUid());
+    expect(outInvitation.collection, collection.uid);
     expect(
-      await outInvitation.getFromPubkey(),
-      await invitationManager1.getPubkey(),
+      outInvitation.fromPubKey,
+      invitationManager1.pubkey,
     );
-    // TODO is currently broken, don't know why
-    // expect(await outInvitation.getFromUsername(), userName1);
-    expect(await outInvitation.getUid(), isNotEmpty);
-    expect(await outInvitation.getUsername(), userName2);
-    final outInvitationClone = await outInvitation.clone();
-    addTearDown(outInvitationClone.dispose);
-    expect(await outInvitationClone.getUid(), await outInvitation.getUid());
+    expect(outInvitation.fromUsername, userName1);
+    expect(outInvitation.uid, isNotEmpty);
+    expect(outInvitation.username, userName2);
 
     // validate incoming invitation
     final inResponse = await invitationManager2.listIncoming();
-    addTearDown(inResponse.dispose);
-    expect(await inResponse.isDone(), isTrue);
-    expect(await inResponse.getIterator(), isNotEmpty);
+    expect(inResponse.isDone, isTrue);
+    expect(inResponse.iterator, isNotEmpty);
 
-    final inInvitations = await inResponse.getData();
+    final inInvitations = inResponse.data;
     expect(inInvitations, hasLength(1));
     final inInvitation = inInvitations[0];
     expect(
-      await inInvitation.getAccessLevel(),
+      inInvitation.accessLevel,
       EtebaseCollectionAccessLevel.readWrite,
     );
-    expect(await inInvitation.getCollection(), await collection.getUid());
+    expect(inInvitation.collection, collection.uid);
     expect(
-      await inInvitation.getFromPubkey(),
-      await invitationManager1.getPubkey(),
+      inInvitation.fromPubKey,
+      invitationManager1.pubkey,
     );
-    // TODO is currently broken, don't know why
-    // expect(await inInvitation.getFromUsername(), userName1);
-    expect(await inInvitation.getUid(), await outInvitation.getUid());
-    expect(await inInvitation.getUsername(), userName2);
-    final inInvitationClone = await inInvitation.clone();
-    addTearDown(inInvitationClone.dispose);
-    expect(await inInvitationClone.getUid(), await inInvitation.getUid());
+    expect(inInvitation.fromUsername, userName1);
+    expect(inInvitation.uid, outInvitation.uid);
+    expect(inInvitation.username, userName2);
 
     // accept invitation
     await invitationManager2.accept(inInvitation);
 
-    final sharedCollection =
-        await collectionManager2.fetch(await collection.getUid());
+    final sharedCollection = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection.dispose);
     expect(
-      await sharedCollection.getAccessLevel(),
+      sharedCollection.accessLevel,
       EtebaseCollectionAccessLevel.readWrite,
     );
 
     final outResponse2 = await invitationManager1.listOutgoing();
-    addTearDown(outResponse2.dispose);
-    expect(await outResponse2.getData(), isEmpty);
+    expect(outResponse2.data, isEmpty);
     final inResponse2 = await invitationManager2.listIncoming();
-    addTearDown(inResponse2.dispose);
-    expect(await inResponse2.getData(), isEmpty);
+    expect(inResponse2.data, isEmpty);
   });
 
   test('invitations can be canceled and rejected', () async {
@@ -182,69 +159,59 @@ void main() {
     await collectionManager1.upload(collection);
 
     final profile2 = await invitationManager2.fetchUserProfile(userName2);
-    addTearDown(profile2.dispose);
 
     // create invitation
     await invitationManager1.invite(
       collection,
       userName2,
-      await profile2.getPubkey(),
+      profile2.pubkey,
       EtebaseCollectionAccessLevel.readWrite,
     );
 
     final outResponse1 = await invitationManager1.listOutgoing();
-    addTearDown(outResponse1.dispose);
-    expect(await outResponse1.getData(), hasLength(1));
+    expect(outResponse1.data, hasLength(1));
     final inResponse1 = await invitationManager2.listIncoming();
-    addTearDown(inResponse1.dispose);
-    expect(await inResponse1.getData(), hasLength(1));
+    expect(inResponse1.data, hasLength(1));
 
     // cancel invitation
-    await invitationManager1.disinvite((await outResponse1.getData()).single);
+    await invitationManager1.disinvite(outResponse1.data.single);
 
     final outResponse2 = await invitationManager1.listOutgoing();
-    addTearDown(outResponse2.dispose);
-    expect(await outResponse2.getData(), isEmpty);
+    expect(outResponse2.data, isEmpty);
     final inResponse2 = await invitationManager2.listIncoming();
-    addTearDown(inResponse2.dispose);
-    expect(await inResponse2.getData(), isEmpty);
+    expect(inResponse2.data, isEmpty);
 
     // create another invitation
     await invitationManager1.invite(
       collection,
       userName2,
-      await profile2.getPubkey(),
+      profile2.pubkey,
       EtebaseCollectionAccessLevel.readWrite,
     );
 
     final outResponse3 = await invitationManager1.listOutgoing();
-    addTearDown(outResponse3.dispose);
-    expect(await outResponse3.getData(), hasLength(1));
+    expect(outResponse3.data, hasLength(1));
     final inResponse3 = await invitationManager2.listIncoming();
-    addTearDown(inResponse3.dispose);
-    expect(await inResponse3.getData(), hasLength(1));
+    expect(inResponse3.data, hasLength(1));
 
     await expectLater(
-      () async => collectionManager2.fetch(await collection.getUid()),
-      throwsEtebaseException(),
+      () async => collectionManager2.fetch(collection.uid),
+      throwsA(isA<NotFound>()),
     );
 
     // reject the invitation
-    await invitationManager2.reject((await inResponse3.getData()).single);
+    await invitationManager2.reject(inResponse3.data.single);
 
     final outResponse4 = await invitationManager1.listOutgoing();
-    addTearDown(outResponse4.dispose);
-    expect(await outResponse4.getData(), isEmpty);
+    expect(outResponse4.data, isEmpty);
     final inResponse4 = await invitationManager2.listIncoming();
-    addTearDown(inResponse4.dispose);
-    expect(await inResponse4.getData(), isEmpty);
+    expect(inResponse4.data, isEmpty);
 
     // validate has no access
-    // TODO does ACCEPT! FIX BUG!
-    // await expectLater(
-    //   () async => collectionManager2.fetch(await collection.getUid()),
-    //   throwsEtebaseException(),
-    // );
+    await expectLater(
+      () async => collectionManager2.fetch(collection.uid),
+      throwsA(isA<NotFound>()),
+    );
   });
 
   test('can leave shared collection', () async {
@@ -257,35 +224,30 @@ void main() {
     addTearDown(collection.dispose);
     await collectionManager1.upload(collection);
     final profile2 = await invitationManager2.fetchUserProfile(userName2);
-    addTearDown(profile2.dispose);
     await invitationManager1.invite(
       collection,
       userName2,
-      await profile2.getPubkey(),
+      profile2.pubkey,
       EtebaseCollectionAccessLevel.readOnly,
     );
     final inResponse = await invitationManager2.listIncoming();
-    addTearDown(inResponse.dispose);
-    await invitationManager2.accept((await inResponse.getData()).single);
+    await invitationManager2.accept(inResponse.data.single);
 
     // leave collection
-    final sharedCollection =
-        await collectionManager2.fetch(await collection.getUid());
+    final sharedCollection = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection.dispose);
     expect(
-      await sharedCollection.getAccessLevel(),
+      sharedCollection.accessLevel,
       EtebaseCollectionAccessLevel.readOnly,
     );
 
-    final memberManager =
-        await collectionManager2.getMemberManager(sharedCollection);
-    addTearDown(memberManager.dispose);
+    final memberManager = collectionManager2.getMemberManager(sharedCollection);
     await memberManager.leave();
 
     // validate has no access
     await expectLater(
-      () async => collectionManager2.fetch(await collection.getUid()),
-      throwsEtebaseException(),
+      () async => collectionManager2.fetch(collection.uid),
+      throwsA(isA<NotFound>()),
     );
   });
 
@@ -299,47 +261,40 @@ void main() {
     addTearDown(collection.dispose);
     await collectionManager1.upload(collection);
     final profile2 = await invitationManager2.fetchUserProfile(userName2);
-    addTearDown(profile2.dispose);
     await invitationManager1.invite(
       collection,
       userName2,
-      await profile2.getPubkey(),
+      profile2.pubkey,
       EtebaseCollectionAccessLevel.readOnly,
     );
     final inResponse = await invitationManager2.listIncoming();
-    addTearDown(inResponse.dispose);
-    await invitationManager2.accept((await inResponse.getData()).single);
+    await invitationManager2.accept(inResponse.data.single);
 
-    final sharedCollection1 =
-        await collectionManager2.fetch(await collection.getUid());
+    final sharedCollection1 = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection1.dispose);
     expect(
-      await sharedCollection1.getAccessLevel(),
+      sharedCollection1.accessLevel,
       EtebaseCollectionAccessLevel.readOnly,
     );
 
-    final memberManager = await collectionManager1.getMemberManager(collection);
-    addTearDown(memberManager.dispose);
+    final memberManager = collectionManager1.getMemberManager(collection);
 
     // list members
     final membersResponse = await memberManager.list();
-    addTearDown(membersResponse.dispose);
-    expect(await membersResponse.isDone(), isTrue);
-    expect(await membersResponse.getIterator(), isNotEmpty);
-    final members = await membersResponse.getData();
+    expect(membersResponse.isDone, isTrue);
+    expect(membersResponse.iterator, isNotEmpty);
+    final members = membersResponse.data;
 
     expect(members, hasLength(2));
     final member1 = members[0];
-    expect(await member1.getUsername(), userName1);
-    expect(await member1.getAccessLevel(), EtebaseCollectionAccessLevel.admin);
+    expect(member1.username, userName1);
+    expect(member1.accessLevel, EtebaseCollectionAccessLevel.admin);
     final member2 = members[1];
-    expect(await member2.getUsername(), userName2);
+    expect(member2.username, userName2);
     expect(
-      await member2.getAccessLevel(),
+      member2.accessLevel,
       EtebaseCollectionAccessLevel.readOnly,
     );
-    final clonedMember = await member1.clone();
-    addTearDown(clonedMember.dispose);
 
     // edit member access
     await memberManager.modifyAccessLevel(
@@ -347,34 +302,31 @@ void main() {
       EtebaseCollectionAccessLevel.readWrite,
     );
 
-    final sharedCollection2 =
-        await collectionManager2.fetch(await collection.getUid());
+    final sharedCollection2 = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection2.dispose);
     expect(
-      await sharedCollection2.getAccessLevel(),
+      sharedCollection2.accessLevel,
       EtebaseCollectionAccessLevel.readWrite,
     );
 
     // remove member
     await memberManager.remove(userName2);
     final removedMembersResponse = await memberManager.list();
-    addTearDown(removedMembersResponse.dispose);
-    expect(await removedMembersResponse.getData(), hasLength(1));
+    expect(removedMembersResponse.data, hasLength(1));
 
-    // TODO currently broken
-    // final collectionsResponse =
-    //     await collectionManager2.list(testCollectionType);
-    // addTearDown(collectionsResponse.dispose);
-    // final removedCollections =
-    //     await collectionsResponse.getRemovedMemberships();
-    // expect(removedCollections, hasLength(1));
+    final collectionsResponse = await collectionManager2.list(
+      testCollectionType,
+      EtebaseFetchOptions(stoken: sharedCollection2.stoken),
+    );
+    final removedCollections = collectionsResponse.removedMemberships;
+    expect(removedCollections, allOf(isNotNull, hasLength(1)));
 
-    // final removedCollection = removedCollections[0];
-    // expect(await removedCollection.getUid(), await collection.getUid());
+    final removedCollection = removedCollections![0];
+    expect(removedCollection.uid, collection.uid);
 
     await expectLater(
-      () async => collectionManager2.fetch(await collection.getUid()),
-      throwsEtebaseException(),
+      () async => collectionManager2.fetch(collection.uid),
+      throwsA(isA<NotFound>()),
     );
   });
 }

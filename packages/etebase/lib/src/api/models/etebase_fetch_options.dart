@@ -7,7 +7,7 @@ import 'etebase_prefetch_option.dart';
 part 'etebase_fetch_options.freezed.dart';
 
 /// Configuration options for data fetching.
-@freezed
+@Freezed(copyWith: true)
 sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
   const factory EtebaseFetchOptionsBase({
     /// Limit the amount of items returned.

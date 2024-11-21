@@ -6,6 +6,10 @@ typedef FromJson<T> = T Function(Map<String, dynamic> json);
 
 /// @nodoc
 @internal
+typedef FromJsonList<T> = T Function(List<dynamic> json);
+
+/// @nodoc
+@internal
 typedef ContainerFromJson<TContainer, TData> = TContainer Function(
   Map<String, dynamic> json,
   TData Function(Object?) fromJson,
@@ -15,11 +19,8 @@ typedef ContainerFromJson<TContainer, TData> = TContainer Function(
 sealed class TypeConverter<T> {
   const factory TypeConverter(FromJson<T> fromJson) = _DefaultTypeConverter<T>;
 
-  static TypeConverter<List<T>> list<T>(FromJson<T> fromJson) =>
-      _ListTypeConverter<T>(fromJson);
-
-  static TypeConverter<Map<String, T>> map<T>(FromJson<T> fromJson) =>
-      _MapTypeConverter<T>(fromJson);
+  const factory TypeConverter.list(FromJsonList<T> fromJson) =
+      _ListTypeConverter<T>;
 
   static TypeConverter<TContainer> generic<TContainer, TData>(
     ContainerFromJson<TContainer, TData> containerFromJson,
@@ -39,27 +40,13 @@ class _DefaultTypeConverter<T> implements TypeConverter<T> {
   T call(dynamic data) => _fromJson((data as Map).cast());
 }
 
-class _ListTypeConverter<T> implements TypeConverter<List<T>> {
-  final FromJson<T> _fromJson;
+class _ListTypeConverter<T> implements TypeConverter<T> {
+  final FromJsonList<T> _fromJson;
 
   const _ListTypeConverter(this._fromJson);
 
   @override
-  List<T> call(dynamic data) => [
-        for (final value in data as List) _fromJson((value as Map).cast()),
-      ];
-}
-
-class _MapTypeConverter<T> implements TypeConverter<Map<String, T>> {
-  final FromJson<T> _fromJson;
-
-  const _MapTypeConverter(this._fromJson);
-
-  @override
-  Map<String, T> call(dynamic data) => {
-        for (final MapEntry(:key, :value) in (data as Map).entries)
-          key as String: _fromJson((value as Map).cast()),
-      };
+  T call(dynamic data) => _fromJson(data as List);
 }
 
 class _GenericTypeConverter<TContainer, TData>

@@ -10,8 +10,13 @@ import '../../api/models/etebase_collection_member.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../../api/models/etebase_list_response.dart';
 import '../../api/models/etebase_user_profile.dart';
+import '../encrypted_models/cached/cached_chunk.dart';
+import '../encrypted_models/cached/cached_collection.dart';
+import '../encrypted_models/cached/cached_collection_item.dart';
+import '../encrypted_models/cached/cached_revision.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
+import '../encrypted_models/encrypted_revision.dart';
 import '../models/account_data.dart';
 import '../models/account_data_stored.dart';
 import '../models/challenge_request.dart';
@@ -23,6 +28,7 @@ import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/modify_access_level_request.dart';
 import '../models/signed_invitation.dart';
+import '../models/signed_invitation_content.dart';
 import '../models/signup_request.dart';
 import '../models/web_socket_ticket_response.dart';
 import 'msg_pack_codec.dart';
@@ -41,6 +47,7 @@ class MessagePackConverter {
     );
     _add(AccountDataStored.fromJson);
     _add(AccountData.fromJson);
+    _add(SignedInvitationContent.fromJson);
 
     _add(HttpErrorContent.fromJson);
     _add(SignupRequest.fromJson);
@@ -56,6 +63,10 @@ class MessagePackConverter {
       EncryptedCollectionItem.fromJson,
       EtebaseListResponse.itemFromJson<EncryptedCollectionItem>,
     );
+    _addWithContainer(
+      EncryptedRevision.fromJson,
+      EtebaseListResponse.iteratorFromJson<EncryptedRevision>,
+    );
     _add(CollectionItemFetchInfo.fromJson);
     _add(ItemBatchRequest.fromJson);
     _add(WebSocketTicketResponse.fromJson);
@@ -66,11 +77,20 @@ class MessagePackConverter {
     _add(InvitationAcceptRequest.fromJson);
     _add(SignedInvitationWrite.fromJson);
     _add(ModifyAccessLevelRequest.fromJson);
+
+    _addList(CachedChunk.fromJson);
+    _addList(CachedRevision.fromJson);
+    _addList(CachedCollectionItem.fromJson);
+    _addList(CachedCollection.fromJson);
   }
 
   Uint8List encode(dynamic data) => msgPack.encode(_toJson(data));
 
+  Uint8List encodeRaw(dynamic data) => msgPack.encode(data);
+
   String encode64(dynamic data) => msgPack64UrlNoPad.encode(_toJson(data));
+
+  String encode64Raw(dynamic data) => msgPack64UrlNoPad.encode(data);
 
   String base64Encode(Uint8List data) => base64UrlNoPad.encode(data);
 
@@ -86,22 +106,11 @@ class MessagePackConverter {
 
   void addCustom<T>(FromJson<T> fromJson) => _add<T>(fromJson);
 
-  void _add<T>(
-    FromJson<T> fromJson, {
-    bool withPlain = true,
-    bool withList = false,
-    bool withMap = false,
-  }) {
-    if (withPlain) {
+  void _add<T>(FromJson<T> fromJson) =>
       _factories[T] = TypeConverter<T>(fromJson);
-    }
-    if (withList) {
-      _factories[List<T>] = TypeConverter.list<T>(fromJson);
-    }
-    if (withMap) {
-      _factories[Map<String, T>] = TypeConverter.map<T>(fromJson);
-    }
-  }
+
+  void _addList<T>(FromJsonList<T> fromJson) =>
+      _factories[T] = TypeConverter<T>.list(fromJson);
 
   void _addWithContainer<TContainer, TData>(
     FromJson<TData> fromJson,
@@ -114,10 +123,10 @@ class MessagePackConverter {
     );
   }
 
+  // ignore: avoid_dynamic_calls
   dynamic _toJson(dynamic data) => switch (data) {
         List() => data.map(_toJson).toList(),
         Map<String, dynamic>() => data.map((k, v) => MapEntry(k, _toJson(v))),
-        null || bool() || num() || String() => data,
         // ignore: avoid_dynamic_calls
         _ => data.toJson(),
       };
