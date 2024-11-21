@@ -30,8 +30,8 @@ class EncryptedCollectionItem {
     includeToJson: true,
     includeIfNull: false,
   )
-  Uint8List? _encryptionKey; //  TODO make secure key
-  late EncryptedRevision<CollectionItemCryptoManager> content;
+  Uint8List? _encryptionKey;
+  late EncryptedRevision content;
   @JsonKey(name: 'etag', includeFromJson: false, includeToJson: true)
   String? _etag;
 
@@ -226,9 +226,10 @@ class EncryptedCollectionItem {
     MinimalCollectionCryptoManager parentCm,
   ) {
     if (_encryptionKey case final Uint8List key) {
-      return client.crypto.secureCopy(key);
+      return parentCm.decryptKey(key);
+    } else {
+      return parentCm.deriveSubkey(_getAdditionalMacData());
     }
-    return parentCm.deriveSubkey(_getAdditionalMacData());
   }
 
   CollectionItemCryptoManager getCryptoManager(
