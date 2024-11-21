@@ -49,14 +49,12 @@ void main() {
   test('can cache and restore account', () async {
     await cache.saveAccount(account);
     final restoredAccount = await cache.loadAccount(client);
-    expect(restoredAccount, isNotNull);
-    await restoredAccount!.fetchToken();
+    await restoredAccount.fetchToken();
 
     final encryptionKey = EtebaseUtils.randomKey(client, 32);
     await cache.saveAccount(account, encryptionKey);
     final restoredAccountEnc = await cache.loadAccount(client, encryptionKey);
-    expect(restoredAccountEnc, isNotNull);
-    await restoredAccountEnc!.fetchToken();
+    await restoredAccountEnc.fetchToken();
   });
 
   test('can cache and restore collection list stoken', () async {
@@ -70,7 +68,10 @@ void main() {
     addTearDown(collection.dispose);
     await collectionManager.upload(collection);
 
-    expect(await cache.loadStoken(), isNull);
+    await expectLater(
+      () => cache.loadStoken(),
+      throwsA(isA<NotFound>()),
+    );
 
     final response = await collectionManager.list(testCollectionType);
     await cache.saveStoken(response.stoken!);
@@ -110,17 +111,20 @@ void main() {
 
     await expectLater(
       () => cache.collectionGet(collectionManager, collectionId),
-      throwsA(isA<UnsupportedError>()),
+      throwsA(isA<NotFound>()),
     );
     await cache.collectionSet(collectionManager, collection);
     final restoredCollection = await cache.collectionGet(
       collectionManager,
       collectionId,
     );
-    expect(restoredCollection!.uid, collectionId);
+    expect(restoredCollection.uid, collectionId);
     expect(await restoredCollection.getContent(), testCollectionData);
 
-    expect(await cache.collectionLoadStoken(collectionId), isNull);
+    await expectLater(
+      () => cache.collectionLoadStoken(collectionId),
+      throwsA(isA<NotFound>()),
+    );
     await cache.collectionSaveStoken(
       collectionId,
       collection.stoken!,
@@ -132,9 +136,12 @@ void main() {
     await cache.collectionUnset(collectionManager, collectionId);
     await expectLater(
       () => cache.collectionGet(collectionManager, collectionId),
-      throwsA(isA<UnsupportedError>()),
+      throwsA(isA<NotFound>()),
     );
-    expect(await cache.collectionLoadStoken(collectionId), isNull);
+    await expectLater(
+      () => cache.collectionLoadStoken(collectionId),
+      throwsA(isA<NotFound>()),
+    );
   });
 
   test('can cache and restore items', () async {
@@ -165,13 +172,13 @@ void main() {
 
     await expectLater(
       () => cache.itemGet(itemManager, collectionId, itemId),
-      throwsA(isA<UnsupportedError>()),
+      throwsA(isA<NotFound>()),
     );
 
     await cache.itemSet(itemManager, collectionId, item);
 
     final restoredItem = await cache.itemGet(itemManager, collectionId, itemId);
-    expect(restoredItem!.uid, itemId);
+    expect(restoredItem.uid, itemId);
     expect(await restoredItem.getMeta(), itemMeta);
     expect(await restoredItem.getContent(), itemContent);
     expect(restoredItem.etag, item.etag);
@@ -179,15 +186,21 @@ void main() {
     await cache.itemUnset(itemManager, collectionId, itemId);
     await expectLater(
       () => cache.itemGet(itemManager, collectionId, itemId),
-      throwsA(isA<UnsupportedError>()),
+      throwsA(isA<NotFound>()),
     );
   });
 
   test('can clear cache data', () async {
+    await cache.clearUser(reInitialize: true);
+    await expectLater(
+      () => cache.loadAccount(client),
+      throwsA(isA<NotFound>()),
+    );
+
     await cache.clearUser();
     await expectLater(
       () => cache.loadAccount(client),
-      throwsA(isA<UnsupportedError>()),
+      throwsA(isA<HiveError>()),
     );
   });
 }
