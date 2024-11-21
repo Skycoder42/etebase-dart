@@ -2,5 +2,4 @@ include: package:dart_test_tools/package.yaml
 
 analyzer:
   exclude:
-    - "**.g.dart"
-    - "**.chopper.dart"
+    - lib/gen
