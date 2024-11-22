@@ -1,3 +1,5 @@
+import 'dart:io';
+
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
@@ -8,7 +10,7 @@ void main() {
   late final EtebaseClient sut;
 
   setUp(() async {
-    sut = await createClient();
+    sut = await createClient(useDefaultServer: Platform.isWindows);
   });
 
   tearDown(() async {
