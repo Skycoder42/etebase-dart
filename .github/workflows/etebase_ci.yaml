@@ -30,7 +30,7 @@ jobs:
         {
           "linux": "bash tool/integration/setup_linux.sh",
           "macos": "bash tool/integration/setup_macos.sh",
-          "windows": "bash tool/integration/setup_win.sh 1.0.20"
+          "windows": "bash tool/integration/setup_win.sh 1.0.20",
           "web": "bash tool/integration/setup_web.sh 0.7.15"
         }
 

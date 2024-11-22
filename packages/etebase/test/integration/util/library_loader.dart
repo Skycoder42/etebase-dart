@@ -17,10 +17,11 @@ final serverUri = Uri.http('localhost:3735', '/');
 
 String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
 
-Future<EtebaseClient> createClient() async => EtebaseClient.create(
+Future<EtebaseClient> createClient({bool useDefaultServer = false}) async =>
+    EtebaseClient.create(
       await SodiumSumoInit.init(getLibsodium),
       'package:etebase/test/integration',
-      serverUri,
+      useDefaultServer ? null : serverUri,
     );
 
 Future<EtebaseAccount> createAccount(
