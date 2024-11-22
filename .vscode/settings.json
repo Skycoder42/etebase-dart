@@ -14,7 +14,8 @@
     "rollsum",
     "signup",
     "stoken",
-    "uids"
+    "uids",
+    "uuid"
   ],
   "dart.runPubGetOnPubspecChanges": "never",
   "cmake.configureOnOpen": false
