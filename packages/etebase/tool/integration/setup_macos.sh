@@ -31,10 +31,15 @@ fi
 # enable python 3.7
 echo "::group::Setup python 3.7"
 brew install pyenv
-pyenv install 3.7.17
-PYENV_ROOT="$(pyenv root)"
-export PATH="$PYENV_ROOT/shims:$PATH"
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+pyenv install 3.7
+pyenv global 3.7
+
 which python3
+python3 --version
 echo ::endgroup::
 
 echo "::group::Build etebase server"

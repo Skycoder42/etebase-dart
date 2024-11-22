@@ -13,7 +13,6 @@ part 'async_crypto_executor.freezed.dart';
 sealed class _IsolateMessage with _$IsolateMessage {
   const factory _IsolateMessage({
     required SodiumSumoFactory sodiumFactory,
-    required ReceivePort receivePort,
     required SendPort sendPort,
   }) = __IsolateMessage;
 }
@@ -55,28 +54,27 @@ class AsyncCryptoExecutor implements CryptoExecutor {
   late final ReceivePort _receivePort;
   late final Stream<_CryptoJobResult> _receivePortStream;
   late final Isolate _isolate;
-  var _jobIdCtr = 0;
+  var _jobIdCtr = 1; // start at 1 as 0 is reserved for the initializer message
   var _disposed = false;
 
   AsyncCryptoExecutor(this._sodium);
 
   Future<void> initialize() async {
     _receivePort = ReceivePort('AsyncCryptoExecutor.main');
-    final isolateRp = ReceivePort('AsyncCryptoExecutor.isolate');
-    _sendPort = isolateRp.sendPort;
     _receivePortStream =
         _receivePort.cast<_CryptoJobResult>().asBroadcastStream();
+    final sendPortFuture = _waitForResult<SendPort>(0);
     _isolate = await Isolate.spawn(
       debugName: 'AsyncCryptoExecutor.isolate',
       _isolateMain,
       _IsolateMessage(
         sodiumFactory: _sodium.isolateFactory,
-        receivePort: isolateRp,
         sendPort: _receivePort.sendPort,
       ),
     );
 
     _finalizer.attach(this, (_isolate, _receivePort), detach: this);
+    _sendPort = await sendPortFuture;
   }
 
   @override
@@ -87,7 +85,7 @@ class AsyncCryptoExecutor implements CryptoExecutor {
 
     try {
       _disposed = true;
-      await _exec<void>(_CryptoJob.exit(_jobIdCtr++)).timeout(timeout);
+      await _exec<void>(_CryptoJob.exit(_nextJobId)).timeout(timeout);
     } on TimeoutException {
       // ignore
     } finally {
@@ -110,7 +108,7 @@ class AsyncCryptoExecutor implements CryptoExecutor {
       CryptoFailure.wrap<Future<T>, T>(
         () => _exec<T>(
           _CryptoJob.run(
-            id: _jobIdCtr++,
+            id: _nextJobId,
             callback: callback,
             secureKeys:
                 secureKeys.map(_sodium.createTransferrableSecureKey).toList(),
@@ -130,6 +128,8 @@ class AsyncCryptoExecutor implements CryptoExecutor {
         secureKeys: secureKeys,
         keyPairs: keyPairs,
       );
+
+  int get _nextJobId => _jobIdCtr++;
 
   Future<TResult> _exec<TResult>(_CryptoJob job) {
     _sendPort.send(job);
@@ -165,10 +165,13 @@ class AsyncCryptoExecutor implements CryptoExecutor {
 }
 
 Future<void> _isolateMain(_IsolateMessage message) async {
+  final receivePort = ReceivePort('AsyncCryptoExecutor.isolate');
   try {
+    message.sendPort.send(_CryptoJobResult.success(0, receivePort.sendPort));
+
     final sodium = await message.sodiumFactory();
 
-    await for (final job in message.receivePort.cast<_CryptoJob>()) {
+    await for (final job in receivePort.cast<_CryptoJob>()) {
       try {
         switch (job) {
           case _CryptoJobRun():
@@ -184,7 +187,7 @@ Future<void> _isolateMain(_IsolateMessage message) async {
       }
     }
   } finally {
-    message.receivePort.close();
+    receivePort.close();
   }
 }
 
