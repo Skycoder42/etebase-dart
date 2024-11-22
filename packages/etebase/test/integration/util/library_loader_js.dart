@@ -6,7 +6,7 @@ import 'package:web/web.dart';
 
 import 'sodium.js.fake.dart'
 // ignore: conditional_uri_does_not_exist
-    if (dart.library.js) '../../tool/integration/cache/sodium/sodium.js.dart'
+    if (dart.library.js) '../../../tool/integration/cache/sodium/sodium.js.dart'
     as sodium_sumo_js;
 
 extension type SodiumBrowserInit._(JSObject _) implements JSObject {
