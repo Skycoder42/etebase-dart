@@ -23,7 +23,7 @@ jobs:
       integrationTestPaths: -P integration
       integrationTestCacheConfig: >-
         {
-          "key": "etebase-cache-with-sodium-1.0.20",
+          "key": "etebase-cache_1.0.20_0.7.15",
           "path": "packages/etebase/tool/integration/cache"
         }
       integrationTestSetup: >-
@@ -31,6 +31,7 @@ jobs:
           "linux": "bash tool/integration/setup_linux.sh",
           "macos": "bash tool/integration/setup_macos.sh",
           "windows": "bash tool/integration/setup_win.sh 1.0.20"
+          "web": "bash tool/integration/setup_web.sh 0.7.15"
         }
 
   cd:
