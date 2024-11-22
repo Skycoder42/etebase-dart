@@ -30,8 +30,10 @@ fi
 
 # enable python 3.7
 echo "::group::Setup python 3.7"
-PYTHON_DIRS=("$RUNNER_TOOL_CACHE"/Python/3.7.*/x64/bin)
-export PATH=${PYTHON_DIRS[0]}:$PATH
+brew install pyenv
+pyenv install 3.7.17
+PYENV_ROOT="$(pyenv root)"
+export PATH="$PYENV_ROOT/shims:$PATH"
 which python3
 echo ::endgroup::
 
