@@ -10,7 +10,7 @@ void main() {
   late final EtebaseClient sut;
 
   setUp(() async {
-    sut = await createClient(useDefaultServer: Platform.isWindows);
+    sut = await createClient(useDefaultServer: !kIsWeb && Platform.isWindows);
   });
 
   tearDown(() async {

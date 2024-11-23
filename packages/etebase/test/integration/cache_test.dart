@@ -33,11 +33,16 @@ void main() {
     );
     addTearDown(account.dispose);
 
-    final cacheDir = await Directory.systemTemp.createTemp();
-    addTearDown(() => cacheDir.delete(recursive: true));
+    if (kIsWeb) {
+      Hive.init(null);
+      addTearDown(Hive.close);
+    } else {
+      final cacheDir = await Directory.systemTemp.createTemp();
+      addTearDown(() => cacheDir.delete(recursive: true));
 
-    Hive.init(cacheDir.path);
-    addTearDown(Hive.close);
+      Hive.init(cacheDir.path);
+      addTearDown(Hive.close);
+    }
 
     cache = await EtebaseCache.create(
       client,
