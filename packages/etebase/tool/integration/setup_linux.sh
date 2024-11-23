@@ -2,8 +2,12 @@
 set -eo pipefail
 
 echo "::group::Installing libsodium"
-sudo apt-get -y update
-sudo apt-get -y install libsodium-dev
+if pkgconf --exists libsodium; then
+  echo "libsodium is already installed"
+else
+  sudo apt-get -y update
+  sudo apt-get -y install libsodium-dev
+fi
 echo ::endgroup::
 
 echo "::group::Start etesync server"
