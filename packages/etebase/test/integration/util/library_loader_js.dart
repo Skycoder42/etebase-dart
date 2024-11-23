@@ -9,6 +9,8 @@ import 'sodium.js.fake.dart'
     if (dart.library.js) '../../../tool/integration/cache/sodium/sodium.js.dart'
     as sodium_sumo_js;
 
+const kIsWeb = true;
+
 extension type SodiumBrowserInit._(JSObject _) implements JSObject {
   external JSFunction get onload;
 

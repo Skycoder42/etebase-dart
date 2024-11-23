@@ -22,7 +22,7 @@ final serverUri = Uri.http('localhost:3735', '/');
 String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
 
 Future<EtebaseClient> createClient({bool useDefaultServer = false}) async {
-  final useAsync = _rng.nextBool();
+  final useAsync = !kIsWeb && _rng.nextBool();
   printOnFailure('Running client in ${useAsync ? 'async' : 'sync'} mode');
 
   return useAsync
