@@ -28,16 +28,24 @@ if [ "$CACHE_HIT" = "true" ]; then
   exit 0
 fi
 
-# enable python 3.12
-echo "::group::Setup python 3.12"
-brew install pyenv || true
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# # install python 3.12
+# echo "::group::Setup python 3.12"
+# brew install pyenv || true
+# export PYENV_ROOT="$HOME/.pyenv"
+# export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
 
-pyenv install 3.12
-pyenv global 3.12
+# pyenv install 3.12
+# pyenv global 3.12
 
+# which python3
+# python3 --version
+# echo ::endgroup::
+# enable python 3.7
+
+echo "::group::Enable python 3.12"
+PYTHON_DIRS=("$RUNNER_TOOL_CACHE"/Python/3.12.*/x64/bin)
+export PATH=${PYTHON_DIRS[0]}:$PATH
 which python3
 python3 --version
 echo ::endgroup::
