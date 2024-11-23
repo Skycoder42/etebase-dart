@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 
+const kIsWeb = false;
+
 DynamicLibrary getLibsodium() {
   if (Platform.isLinux) {
     final pkgConfPath =
