@@ -30,7 +30,7 @@ fi
 
 # enable python 3.12
 echo "::group::Setup python 3.12"
-brew install pyenv
+brew install pyenv || true
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
