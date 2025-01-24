@@ -1,7 +1,9 @@
-name: etebase_dart_melos
+name: etebase_dart
+publish_to: none
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^3.6.0
 
-dependencies:
-  melos:
+workspace:
+  - packages/etebase
+  - packages/etebase_flutter
