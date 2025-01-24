@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
-import 'package:msgpack_dart/msgpack_dart.dart';
+import 'package:msgpack_codec/msgpack_codec.dart';
 
 import '../../api/exceptions/http_error_content.dart';
 import '../../api/exceptions/invalid_message_pack_data.dart';
@@ -139,7 +139,7 @@ class MessagePackConverter {
 
     try {
       return converter(data);
-    } on FormatError catch (e, s) {
+    } on MsgpackFormatException catch (e, s) {
       Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
     } on CheckedFromJsonException catch (e, s) {
       Error.throwWithStackTrace(
