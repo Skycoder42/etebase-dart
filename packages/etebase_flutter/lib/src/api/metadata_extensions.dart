@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:etebase/etebase.dart';
+import 'package:flutter/material.dart';
 
 /// Extension on [EtebaseItemMetadata] to get and set [Color] values directly.
 extension MetadataExtensions<T extends EtebaseItemMetadata> on T {
@@ -39,20 +40,24 @@ extension MetadataExtensions<T extends EtebaseItemMetadata> on T {
   /// stringified value of [color].
   ///
   /// The [withAlpha] parameter can be used to control whether the color is
-  /// saved with or without it's [Color.alpha] value. If unspecified, the alpha
+  /// saved with or without it's [Color.a] value. If unspecified, the alpha
   /// channel is only saved if it is not `FF`.
   T copyWithColor(Color color, {bool? withAlpha}) {
     final colorBuffer = StringBuffer()
       ..write('#')
-      ..write(_toHex(color.red))
-      ..write(_toHex(color.green))
-      ..write(_toHex(color.blue));
-    if (withAlpha ?? (color.alpha != 0xFF)) {
-      colorBuffer.write(_toHex(color.alpha));
+      ..write(_toHex(color.r))
+      ..write(_toHex(color.g))
+      ..write(_toHex(color.b));
+    if (withAlpha ?? (color.a != 1.0)) {
+      colorBuffer.write(_toHex(color.a));
     }
     return copyWith(color: colorBuffer.toString()) as T;
   }
 
-  static String _toHex(int value) =>
-      value.toRadixString(16).padLeft(2, '0').toUpperCase();
+  static String _toHex(double value) => (value * 0xFF)
+      .clamp(0, 0xFF)
+      .toInt()
+      .toRadixString(16)
+      .padLeft(2, '0')
+      .toUpperCase();
 }
