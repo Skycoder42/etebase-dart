@@ -2,40 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import 'package:msgpack_dart/msgpack_dart.dart' as msg_pack;
+import 'package:msgpack_codec/msgpack_codec.dart';
 
 import 'list_cast_codec.dart';
-
-@internal
-class MessagePackEncoder extends Converter<dynamic, Uint8List> {
-  const MessagePackEncoder();
-
-  @override
-  Uint8List convert(dynamic input) => msg_pack.serialize(input);
-}
-
-@internal
-class MessagePackDecoder extends Converter<Uint8List, dynamic> {
-  const MessagePackDecoder();
-
-  @override
-  dynamic convert(Uint8List input) => msg_pack.deserialize(input);
-}
-
-@internal
-class MessagePackCodec extends Codec<dynamic, Uint8List> {
-  const MessagePackCodec();
-
-  @override
-  MessagePackEncoder get encoder => const MessagePackEncoder();
-
-  @override
-  MessagePackDecoder get decoder => const MessagePackDecoder();
-}
-
-/// @nodoc
-@internal
-const msgPack = MessagePackCodec();
 
 @internal
 class Base64UrlSafeNoPadEncoder extends Converter<Uint8List, String> {
