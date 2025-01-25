@@ -15,5 +15,23 @@
       // This field is required for this configuration to be used by the test runner.
       "templateFor": "test/integration",
     },
+    {
+      "name": "Run Web",
+      "request": "launch",
+      "type": "dart",
+      "codeLens": {
+        "for": [
+          "run-test",
+          "run-test-file"
+        ]
+      },
+      "toolArgs": [
+        "-p",
+        "chrome"
+      ],
+      "env": {
+        "CHROME_EXECUTABLE": "chromium"
+      }
+    }
   ]
 }

@@ -28,8 +28,10 @@ abstract class EtebaseCache {
   static Future<EtebaseCache> create(
     EtebaseClient client,
     String username,
-  ) async {
-    final cache = HiveCache(Hive, username);
+    String path, {
+    bool autoCompact = true,
+  }) async {
+    final cache = SembastCache(Hive, username);
     await cache.initialize();
     return cache;
   }
@@ -38,11 +40,7 @@ abstract class EtebaseCache {
   Future<void> dispose();
 
   /// Clear all cache for the user.
-  ///
-  /// If [reInitialize] is `false` (the default), this will implicitly [dispose]
-  /// of the cache, thus making it unusable. If you intend to reuse the cache
-  /// for the user to add data again, set it to `true` instead.
-  Future<void> clearUser({bool reInitialize = false});
+  Future<void> clearUser();
 
   /// Checks if the users account is stored within the cache.
   Future<bool> get hasAccount;

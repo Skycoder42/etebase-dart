@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:sembast/sembast.dart';
 import 'package:sodium/sodium.dart';
 
 import '../../api/exceptions/not_found.dart';
@@ -15,7 +15,7 @@ import '../../api/models/etebase_item.dart';
 import '../codec/msg_pack_codec.dart';
 
 @internal
-class HiveCache implements EtebaseCache {
+abstract base class SembastCache implements EtebaseCache {
   static const _accountBoxName = 'account';
   static const _collectionBoxName = 'collection';
 
@@ -23,48 +23,39 @@ class HiveCache implements EtebaseCache {
   static const _accountStokenKey = 'account.stoken';
   static const _accountColStokenKeyPrefix = 'col.stoken.';
 
-  final HiveInterface _hive;
   final String _encodedUsername;
+  final String _path;
 
-  late final LazyBox<dynamic> _accountBox;
-  late final LazyBox<Uint8List?> _collectionBox;
+  late final Database _database;
+  late final StoreRef<String, dynamic> _accountStore;
+  late final StoreRef<String, Uint8List?> _collectionStore;
 
-  HiveCache(this._hive, String username)
+  SembastCache(String username, this._path)
       : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
 
+  @visibleForOverriding
+  Future<Database> openDatabase(String encodedUserName, String path);
+
   Future<void> initialize() async {
-    _accountBox = await _hive.openLazyBox(_boxName(_accountBoxName));
-    _collectionBox = await _hive.openLazyBox(_boxName(_collectionBoxName));
+    _database = await openDatabase(_encodedUsername, _path);
+    await _database.compact();
+    _accountStore = StoreRef(_accountBoxName);
+    _collectionStore = StoreRef(_collectionBoxName);
   }
 
   @override
   Future<void> dispose() async {
-    await Future.wait([
-      for (final boxName in _knownItemBoxNames)
-        if (_hive.isBoxOpen(boxName)) _hive.box<Uint8List>(boxName).close(),
-      _collectionBox.close(),
-      _accountBox.close(),
-    ]);
+    await _database.close();
   }
 
   @override
-  Future<void> clearUser({bool reInitialize = false}) async {
-    await Future.wait([
-      for (final boxName in _knownItemBoxNames)
-        _hive.deleteBoxFromDisk(boxName),
-      if (reInitialize) ...[
-        _collectionBox.clear(),
-        _accountBox.clear(),
-      ] else ...[
-        _collectionBox.deleteFromDisk(),
-        _accountBox.deleteFromDisk(),
-      ],
-    ]);
+  Future<void> clearUser() async {
+    await _database.dropAll();
   }
 
   @override
   Future<bool> get hasAccount =>
-      Future.value(_accountBox.containsKey(_accountDataKey));
+      _accountStore.record(_accountDataKey).exists(_database);
 
   @override
   Future<void> saveAccount(
@@ -72,7 +63,7 @@ class HiveCache implements EtebaseCache {
     SecureKey? encryptionKey,
   ]) async {
     final accountData = await account.save(encryptionKey);
-    await _accountBox.put(_accountDataKey, accountData);
+    await _accountStore.record(_accountDataKey).put(_database, accountData);
   }
 
   @override
@@ -80,8 +71,10 @@ class HiveCache implements EtebaseCache {
     EtebaseClient client, [
     SecureKey? encryptionKey,
   ]) async {
-    final accountData =
-        await _accountBox.get(_accountDataKey).cast<Uint8List?>();
+    final accountData = await _accountStore
+        .record(_accountDataKey)
+        .get(_database)
+        .cast<Uint8List?>();
     if (accountData == null) {
       throw NotFound('No account has been cached');
     }
@@ -90,15 +83,18 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<bool> get hasStoken =>
-      Future.value(_accountBox.containsKey(_accountStokenKey));
+      _accountStore.record(_accountStokenKey).exists(_database);
 
   @override
   Future<void> saveStoken(String stoken) =>
-      _accountBox.put(_accountStokenKey, stoken);
+      _accountStore.record(_accountStokenKey).put(_database, stoken);
 
   @override
   Future<String> loadStoken() async {
-    final stoken = await _accountBox.get(_accountStokenKey).cast<String?>();
+    final stoken = await _accountStore
+        .record(_accountStokenKey)
+        .get(_database)
+        .cast<String?>();
     if (stoken == null) {
       throw NotFound('No stoken has been cached');
     }
@@ -106,21 +102,35 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Stream<String> get persistedCollectionStokenUids => Stream.fromIterable(
-        _accountBox.keys
-            .whereType<String>()
-            .where((key) => key.startsWith(_accountColStokenKeyPrefix))
-            .map((key) => key.substring(_accountColStokenKeyPrefix.length)),
-      );
+  Stream<String> get persistedCollectionStokenUids => Stream.fromFuture(
+        // ignore: discarded_futures
+        _accountStore.findKeys(
+          _database,
+          finder: Finder(
+            filter: Filter.custom(
+              (record) => switch (record) {
+                RecordSnapshot(key: final String key)
+                    when key.startsWith(_accountColStokenKeyPrefix) =>
+                  true,
+                _ => false,
+              },
+            ),
+          ),
+        ),
+      )
+          .expand((keys) => keys)
+          .map((key) => key.substring(_accountColStokenKeyPrefix.length));
 
   @override
   Future<void> collectionSaveStoken(String colUid, String stoken) =>
-      _accountBox.put(_collectionStokenKey(colUid), stoken);
+      _accountStore.record(_collectionStokenKey(colUid)).put(_database, stoken);
 
   @override
   Future<String> collectionLoadStoken(String colUid) async {
-    final stoken =
-        await _accountBox.get(_collectionStokenKey(colUid)).cast<String?>();
+    final stoken = await _accountStore
+        .record(_collectionStokenKey(colUid))
+        .get(_database)
+        .cast<String?>();
     if (stoken == null) {
       throw NotFound('No stoken has been cached for $colUid');
     }
@@ -129,7 +139,9 @@ class HiveCache implements EtebaseCache {
 
   @override
   Stream<String> get persistedCollectionUids =>
-      Stream.fromIterable(_collectionBox.keys.cast());
+      // ignore: discarded_futures
+      Stream.fromFuture(_collectionStore.findKeys(_database))
+          .expand((keys) => keys);
 
   @override
   Future<void> collectionSet(
@@ -138,7 +150,7 @@ class HiveCache implements EtebaseCache {
     bool saveContent = true,
   }) async {
     final colData = colMgr.cacheSave(col, saveContent: saveContent);
-    await _collectionBox.put(col.uid, colData);
+    await _collectionStore.record(col.uid).put(_database, colData);
   }
 
   @override
@@ -146,13 +158,9 @@ class HiveCache implements EtebaseCache {
     EtebaseCollectionManager colMgr,
     String colUid,
   ) async {
-    await _accountBox.delete(_collectionStokenKey(colUid));
-    final itemBox = _itemBoxName(colUid);
-    if (_hive.isBoxOpen(itemBox) || await _hive.boxExists(itemBox)) {
-      await _collectionBox.put(colUid, null);
-    } else {
-      await _collectionBox.delete(colUid);
-    }
+    await _accountStore.record(_collectionStokenKey(colUid)).delete(_database);
+    final itemStore = _itemStore(colUid);
+    await itemStore.delete(_database);
   }
 
   @override
@@ -160,7 +168,7 @@ class HiveCache implements EtebaseCache {
     EtebaseCollectionManager colMgr,
     String colUid,
   ) async {
-    final colData = await _collectionBox.get(colUid);
+    final colData = await _collectionStore.record(colUid).get(_database);
     if (colData == null) {
       throw NotFound('No collection has been cached for $colUid');
     }
@@ -170,8 +178,8 @@ class HiveCache implements EtebaseCache {
   @override
   Stream<String> persistedItemUids(String colUid) =>
       // ignore: discarded_futures
-      Stream.fromFuture(_itemBox(colUid))
-          .expand((itemBox) => itemBox?.keys.cast() ?? const []);
+      Stream.fromFuture(_itemStore(colUid).findKeys(_database))
+          .expand((keys) => keys);
 
   @override
   Future<void> itemSet(
@@ -180,9 +188,9 @@ class HiveCache implements EtebaseCache {
     EtebaseItem item, {
     bool saveContent = true,
   }) async {
-    final itemBox = await _itemBox(colUid, create: true);
+    final itemStore = _itemStore(colUid);
     final itemData = itemMgr.cacheSave(item, saveContent: saveContent);
-    await itemBox!.put(item.uid, itemData);
+    await itemStore.record(item.uid).put(_database, itemData);
   }
 
   @override
@@ -191,8 +199,8 @@ class HiveCache implements EtebaseCache {
     String colUid,
     String itemUid,
   ) async {
-    final itemBox = await _itemBox(colUid);
-    await itemBox?.delete(itemUid);
+    final itemStore = _itemStore(colUid);
+    await itemStore.record(itemUid).delete(_database);
   }
 
   @override
@@ -201,8 +209,8 @@ class HiveCache implements EtebaseCache {
     String colUid,
     String itemUid,
   ) async {
-    final itemBox = await _itemBox(colUid);
-    final itemData = await itemBox?.get(itemUid);
+    final itemStore = _itemStore(colUid);
+    final itemData = await itemStore.record(itemUid).get(_database);
     if (itemData == null) {
       throw NotFound(
         'No item has been cached for $itemUid in collection $colUid',
@@ -211,33 +219,11 @@ class HiveCache implements EtebaseCache {
     return itemMgr.cacheLoad(itemData);
   }
 
-  String _boxName(String name) => '$_encodedUsername.$name';
-
-  String _itemBoxName(String colUid) => _boxName('$_collectionBoxName.$colUid');
+  StoreRef<String, Uint8List> _itemStore(String colUid) =>
+      StoreRef('$_collectionBoxName.$colUid');
 
   String _collectionStokenKey(String colUid) =>
       '$_accountColStokenKeyPrefix$colUid';
-
-  Iterable<String> get _knownItemBoxNames => _collectionBox.isOpen
-      ? _collectionBox.keys.cast<String>().map(_itemBoxName)
-      : const [];
-
-  Future<LazyBox<Uint8List>?> _itemBox(
-    String colUid, {
-    bool create = false,
-  }) async {
-    final boxName = _itemBoxName(colUid);
-    if (_hive.isBoxOpen(boxName)) {
-      return _hive.lazyBox(boxName);
-    } else if (!create && !await _hive.boxExists(boxName)) {
-      return null;
-    } else {
-      if (!_collectionBox.containsKey(colUid)) {
-        await _collectionBox.put(colUid, null);
-      }
-      return _hive.openLazyBox<Uint8List>(boxName);
-    }
-  }
 }
 
 extension on Future<dynamic> {
