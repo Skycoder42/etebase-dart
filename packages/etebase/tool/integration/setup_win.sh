@@ -19,7 +19,12 @@ if [ "$CACHE_HIT" = "true" ]; then
 fi
 
 echo "::group::Install minisign"
-scoop install minisign
+# scoop install minisign
+
+# Workaround for https://github.com/ScoopInstaller/Main/pull/6461
+curl -sSLo "$RUNNER_TEMP/minisign.zip" 'https://github.com/jedisct1/minisign/releases/download/0.12/minisign-0.12-win64.zip'
+unzip "$RUNNER_TEMP/minisign.zip" -d "$RUNNER_TOOL_CACHE"
+echo "$RUNNER_TOOL_CACHE/minisign-win64/x86_64" >> "$GITHUB_PATH"
 echo ::endgroup::
 
 echo "::group::Install libsodium"
