@@ -1,7 +1,6 @@
-import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium.dart';
 
-import '../../impl/cache/hive_cache.dart';
+import '../../impl/cache/sembast_cache.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_item.dart';
 import 'etebase_account.dart';
@@ -13,30 +12,36 @@ import 'etebase_item_manager.dart';
 /// collections on the end device.
 ///
 /// The default implementation of the dart port uses
-/// [package:hive_ce](https://pub.dev/packages/hive_ce) to persist the data on
-/// the device. Hive was chosen as it simple (no other native dependencies),
+/// [package:sembast](https://pub.dev/packages/sembast) to persist the data on
+/// the device. Sembast was chosen as it simple (no other native dependencies),
 /// fast and compatible with the VM and the Web.
 abstract class EtebaseCache {
-  /// Initialize hive based cache for the given [username].
+  /// Initialize sembast based cache for the given [client] and [username].
   ///
-  /// **Important:** Before you can create an [EtebaseCache], you must
-  /// initialize hive! You can do so by calling the[HiveInterface.init] method:
+  /// The [pathHint] is a hint to the cache where to store the data. It has
+  /// no effect on the web platform, but on the VM it will be used to determine
+  /// the path to the cache directory. By default, the cache will be stored in
+  /// etebase_cache in the current directory.
   ///
-  /// ```dart
-  /// Hive.init('.../path/to/hive/dir');
-  /// ```
+  /// If [autoCompact] is true (the default), the cache will be compacted every
+  /// time it is opened. This is useful to keep the cache size small, but comes
+  /// at a performance cost on creation.
   static Future<EtebaseCache> create(
     EtebaseClient client,
-    String username,
-    String path, {
+    String username, {
+    String? pathHint,
     bool autoCompact = true,
   }) async {
-    final cache = SembastCache(Hive, username);
+    final cache = SembastCache(
+      username,
+      pathHint: pathHint,
+      autoCompact: autoCompact,
+    );
     await cache.initialize();
     return cache;
   }
 
-  /// Disposes of the instance and closes all hive boxes.
+  /// Disposes of the instance and closes all open databases.
   Future<void> dispose();
 
   /// Clear all cache for the user.

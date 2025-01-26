@@ -6,7 +6,6 @@ import 'dart:typed_data';
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
-import 'package:hive_ce/hive.dart';
 import 'package:test/test.dart';
 
 import 'util/library_loader.dart';
@@ -33,20 +32,18 @@ void main() {
     );
     addTearDown(account.dispose);
 
-    if (kIsWeb) {
-      Hive.init(null);
-      addTearDown(Hive.close);
-    } else {
+    String? pathHint;
+    if (!kIsWeb) {
       final cacheDir = await Directory.systemTemp.createTemp();
       addTearDown(() => cacheDir.delete(recursive: true));
-
-      Hive.init(cacheDir.path);
-      addTearDown(Hive.close);
+      pathHint = cacheDir.path;
     }
 
     cache = await EtebaseCache.create(
       client,
       username,
+      pathHint: pathHint,
+      autoCompact: false,
     );
     addTearDown(cache.dispose);
   });
@@ -196,16 +193,10 @@ void main() {
   });
 
   test('can clear cache data', () async {
-    await cache.clearUser(reInitialize: true);
-    await expectLater(
-      () => cache.loadAccount(client),
-      throwsA(isA<NotFound>()),
-    );
-
     await cache.clearUser();
     await expectLater(
       () => cache.loadAccount(client),
-      throwsA(isA<HiveError>()),
+      throwsA(isA<NotFound>()),
     );
   });
 }

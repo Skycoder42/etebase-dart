@@ -1,6 +1,8 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
+import 'package:sembast/blob.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sodium/sodium.dart';
 
@@ -14,8 +16,15 @@ import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_item.dart';
 import '../codec/msg_pack_codec.dart';
 
+export 'platform/sembast_cache_stub.dart'
+    if (dart.library.io) 'platform/sembast_cache_io.dart'
+    if (dart.library.js_interop) 'platform/sembast_cache_web.dart'
+    show SembastCache;
+
 @internal
-abstract base class SembastCache implements EtebaseCache {
+abstract base class SembastCacheBase implements EtebaseCache {
+  static const _databaseVersion = 1;
+
   static const _accountBoxName = 'account';
   static const _collectionBoxName = 'collection';
 
@@ -23,22 +32,37 @@ abstract base class SembastCache implements EtebaseCache {
   static const _accountStokenKey = 'account.stoken';
   static const _accountColStokenKeyPrefix = 'col.stoken.';
 
-  final String _encodedUsername;
-  final String _path;
+  final String username;
+  final String? pathHint;
+  final bool autoCompact;
 
   late final Database _database;
   late final StoreRef<String, dynamic> _accountStore;
-  late final StoreRef<String, Uint8List?> _collectionStore;
+  late final StoreRef<String, Blob?> _collectionStore;
 
-  SembastCache(String username, this._path)
-      : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
+  SembastCacheBase(
+    this.username, {
+    this.pathHint,
+    this.autoCompact = true,
+  });
 
   @visibleForOverriding
-  Future<Database> openDatabase(String encodedUserName, String path);
+  DatabaseFactory get databaseFactory;
 
   Future<void> initialize() async {
-    _database = await openDatabase(_encodedUsername, _path);
-    await _database.compact();
+    final encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
+    _database = await databaseFactory.openDatabase(
+      path.join(
+        pathHint ?? 'etebase_cache',
+        '$encodedUsername.sdb',
+      ),
+      version: _databaseVersion,
+    );
+
+    if (autoCompact) {
+      await _database.compact();
+    }
+
     _accountStore = StoreRef(_accountBoxName);
     _collectionStore = StoreRef(_collectionBoxName);
   }
@@ -63,7 +87,9 @@ abstract base class SembastCache implements EtebaseCache {
     SecureKey? encryptionKey,
   ]) async {
     final accountData = await account.save(encryptionKey);
-    await _accountStore.record(_accountDataKey).put(_database, accountData);
+    await _accountStore
+        .record(_accountDataKey)
+        .put(_database, Blob(accountData));
   }
 
   @override
@@ -74,11 +100,11 @@ abstract base class SembastCache implements EtebaseCache {
     final accountData = await _accountStore
         .record(_accountDataKey)
         .get(_database)
-        .cast<Uint8List?>();
+        .cast<Blob?>();
     if (accountData == null) {
       throw NotFound('No account has been cached');
     }
-    return EtebaseAccount.restore(client, accountData, encryptionKey);
+    return EtebaseAccount.restore(client, accountData.bytes, encryptionKey);
   }
 
   @override
@@ -150,7 +176,7 @@ abstract base class SembastCache implements EtebaseCache {
     bool saveContent = true,
   }) async {
     final colData = colMgr.cacheSave(col, saveContent: saveContent);
-    await _collectionStore.record(col.uid).put(_database, colData);
+    await _collectionStore.record(col.uid).put(_database, Blob(colData));
   }
 
   @override
@@ -160,7 +186,11 @@ abstract base class SembastCache implements EtebaseCache {
   ) async {
     await _accountStore.record(_collectionStokenKey(colUid)).delete(_database);
     final itemStore = _itemStore(colUid);
-    await itemStore.delete(_database);
+    if (await itemStore.findFirst(_database) == null) {
+      await _collectionStore.record(colUid).delete(_database);
+    } else {
+      await _collectionStore.record(colUid).put(_database, null);
+    }
   }
 
   @override
@@ -172,7 +202,7 @@ abstract base class SembastCache implements EtebaseCache {
     if (colData == null) {
       throw NotFound('No collection has been cached for $colUid');
     }
-    return colMgr.cacheLoad(colData);
+    return colMgr.cacheLoad(colData.bytes);
   }
 
   @override
@@ -190,7 +220,7 @@ abstract base class SembastCache implements EtebaseCache {
   }) async {
     final itemStore = _itemStore(colUid);
     final itemData = itemMgr.cacheSave(item, saveContent: saveContent);
-    await itemStore.record(item.uid).put(_database, itemData);
+    await itemStore.record(item.uid).put(_database, Blob(itemData));
   }
 
   @override
@@ -216,10 +246,10 @@ abstract base class SembastCache implements EtebaseCache {
         'No item has been cached for $itemUid in collection $colUid',
       );
     }
-    return itemMgr.cacheLoad(itemData);
+    return itemMgr.cacheLoad(itemData.bytes);
   }
 
-  StoreRef<String, Uint8List> _itemStore(String colUid) =>
+  StoreRef<String, Blob> _itemStore(String colUid) =>
       StoreRef('$_collectionBoxName.$colUid');
 
   String _collectionStokenKey(String colUid) =>
