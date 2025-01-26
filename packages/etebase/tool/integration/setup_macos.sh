@@ -2,6 +2,7 @@
 #$1 libetebase version
 set -eo pipefail
 
+PYENV_ROOT=$PWD/tool/integration/cache/python
 SERVER_DIR=$PWD/tool/integration/cache/server
 STATIC_DIR="$RUNNER_TEMP/etebase-static"
 MEDIA_DIR="$RUNNER_TEMP/etebase-media"
@@ -31,7 +32,7 @@ fi
 # enable python 3.12
 echo "::group::Setup python 3.12"
 brew install pyenv || true
-export PYENV_ROOT="$HOME/.pyenv"
+export PYENV_ROOT
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
