@@ -24,7 +24,6 @@ echo "::group::Install minisign"
 # Workaround for https://github.com/ScoopInstaller/Main/pull/6461
 curl -sSLo "$RUNNER_TEMP/minisign.zip" 'https://github.com/jedisct1/minisign/releases/download/0.12/minisign-0.12-win64.zip'
 unzip "$RUNNER_TEMP/minisign.zip" -d "$RUNNER_TOOL_CACHE"
-export PATH="$RUNNER_TOOL_CACHE\minisign-win64\x86_64:$PATH"
 echo ::endgroup::
 
 echo "::group::Install libsodium"
@@ -35,7 +34,7 @@ curl \
   -fo "$RUNNER_TEMP/libsodium.zip.minisig " \
   "https://download.libsodium.org/libsodium/releases/libsodium-$version-stable-msvc.zip.minisig"
 
-minisign \
+"$RUNNER_TOOL_CACHE/minisign-win64/x86_64/minisign" \
   -VP RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 \
   -m "$RUNNER_TEMP/libsodium.zip"
 7z x -y "-o$RUNNER_TEMP" "$RUNNER_TEMP/libsodium.zip"
