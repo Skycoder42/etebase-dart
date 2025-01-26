@@ -51,13 +51,13 @@ class HiveCache implements EtebaseCache {
   Future<void> clearUser({bool reInitialize = false}) async {
     await Future.wait([
       for (final boxName in _knownItemBoxNames)
-        _hive.deleteBoxFromDisk(boxName),
+        _safeDeleteBoxByName<Uint8List>(boxName),
       if (reInitialize) ...[
         _collectionBox.clear(),
         _accountBox.clear(),
       ] else ...[
-        _collectionBox.deleteFromDisk(),
-        _accountBox.deleteFromDisk(),
+        _safeDeleteBox(_collectionBox),
+        _safeDeleteBox(_accountBox),
       ],
     ]);
   }
@@ -237,6 +237,26 @@ class HiveCache implements EtebaseCache {
       }
       return _hive.openLazyBox<Uint8List>(boxName);
     }
+  }
+
+  // Helper methods to safely delete a box.
+  // On web, deleting a box that is open will never complete.
+  // On io, when calling box.deleteFromDisk on a closed box, it will throw.
+  // So, as a workaround we close open boxes before deleting them and then
+  // always delete them via the deleteBoxFromDisk method.
+
+  Future<void> _safeDeleteBoxByName<T>(String boxName) async {
+    if (_hive.isBoxOpen(boxName)) {
+      await _hive.lazyBox<T>(boxName).close();
+    }
+    await _hive.deleteBoxFromDisk(boxName);
+  }
+
+  Future<void> _safeDeleteBox(BoxBase<dynamic> box) async {
+    if (box.isOpen) {
+      await box.close();
+    }
+    await _hive.deleteBoxFromDisk(box.name);
   }
 }
 
