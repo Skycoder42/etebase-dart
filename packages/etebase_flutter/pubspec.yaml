@@ -20,7 +20,7 @@ dependencies:
 dev_dependencies:
   custom_lint: ^0.7.0
   dart_pre_commit: ^5.4.2
-  dart_test_tools: ^6.0.2
+  dart_test_tools: ^6.0.2+1
 
 cider:
   link_template:

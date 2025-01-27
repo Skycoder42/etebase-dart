@@ -24,7 +24,7 @@ dev_dependencies:
   build_runner: ^2.4.14
   custom_lint: ^0.7.0
   dart_pre_commit: ^5.4.2
-  dart_test_tools: ^6.0.2
+  dart_test_tools: ^6.0.2+1
   freezed: ^2.5.7
   json_serializable: ^6.9.0
   mocktail: ^1.0.4
