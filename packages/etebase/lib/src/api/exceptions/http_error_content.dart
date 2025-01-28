@@ -41,23 +41,19 @@ sealed class HttpErrorContent with _$HttpErrorContent {
       buffer.write(detail);
     }
 
+    if (buffer.isEmpty) {
+      buffer.write('Unknown error');
+    }
+
     if (withErrors && errors.isNotEmpty) {
-      var withNewline = buffer.isNotEmpty;
       for (final error in errors) {
-        if (withNewline) {
-          buffer.writeln();
-        }
         buffer
+          ..writeln()
           ..write(' | ')
           ..write(error);
-        withNewline = true;
       }
     }
 
-    if (buffer.isEmpty) {
-      return 'Unknown error';
-    } else {
-      return buffer.toString();
-    }
+    return buffer.toString();
   }
 }
