@@ -54,7 +54,7 @@ app.*.map.json
 # Generated files
 *.freezed.dart
 *.g.dart
-*.chopper.dart
+*.mocks.dart
 
 # Binaries
 packages/etebase/tool/integration/libetebase

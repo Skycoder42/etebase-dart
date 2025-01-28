@@ -155,20 +155,28 @@ void main() {
           });
         });
 
-        test('preserves StackTrace', () async {
-          final testTrace = StackTrace.current;
-          try {
-            CryptoFailure.wrap<int, int>(
-              () => Error.throwWithStackTrace(
-                SodiumException('testMessage'),
-                testTrace,
-              ),
-            );
-            fail('No exception was thrown');
-          } on CryptoFailure catch (_, s) {
-            expect(s, same(testTrace));
-          }
-        });
+        test(
+          'preserves StackTrace',
+          onPlatform: {
+            'js': const Skip(
+              'On web the trace looks the same, but is not identical',
+            ),
+          },
+          () async {
+            final testTrace = StackTrace.current;
+            try {
+              CryptoFailure.wrap<int, int>(
+                () => Error.throwWithStackTrace(
+                  SodiumException('testMessage'),
+                  testTrace,
+                ),
+              );
+              fail('No exception was thrown');
+            } on CryptoFailure catch (_, s) {
+              expect(s, same(testTrace));
+            }
+          },
+        );
       });
     });
   });

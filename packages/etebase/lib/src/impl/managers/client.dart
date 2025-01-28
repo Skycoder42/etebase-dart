@@ -1,9 +1,15 @@
+import 'dart:typed_data';
+
+import 'package:hive_ce/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+import 'package:sodium/sodium.dart';
 
 import '../../api/managers/crypto_executor.dart';
+import '../../api/managers/etebase_cache.dart';
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_item_metadata.dart';
+import '../cache/hive_cache.dart';
 import '../codec/message_pack_converter.dart';
 import '../crypto/crypto_service.dart';
 import '../online_managers/authenticator.dart';
@@ -12,6 +18,7 @@ import '../online_managers/base_network.dart';
 import '../online_managers/platform/user_agent_stub.dart'
     if (dart.library.io) '../online_managers/platform/user_agent_vm.dart'
     if (dart.library.js_interop) '../online_managers/platform/user_agent_web.dart';
+import 'account.dart';
 
 @internal
 class Client implements EtebaseClient, NetworkClient {
@@ -67,4 +74,18 @@ class Client implements EtebaseClient, NetworkClient {
     MetaFromJson<TMeta> fromJson,
   ) =>
       converter.addCustom<TMeta>(fromJson);
+
+  // factory methods for other types
+
+  Future<EtebaseCache> createCache(String username) async {
+    final cache = HiveCache(this, Hive, username);
+    await cache.initialize();
+    return cache;
+  }
+
+  Future<Account> restoreAccount(
+    Uint8List accountDataStored, [
+    SecureKey? encryptionKey,
+  ]) =>
+      Account.restore(this, accountDataStored, encryptionKey);
 }

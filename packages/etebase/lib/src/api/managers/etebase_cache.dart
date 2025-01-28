@@ -1,7 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium.dart';
 
-import '../../impl/cache/hive_cache.dart';
+import '../../impl/managers/client.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_item.dart';
 import 'etebase_account.dart';
@@ -28,11 +28,8 @@ abstract class EtebaseCache {
   static Future<EtebaseCache> create(
     EtebaseClient client,
     String username,
-  ) async {
-    final cache = HiveCache(Hive, username);
-    await cache.initialize();
-    return cache;
-  }
+  ) =>
+      (client as Client).createCache(username);
 
   /// Disposes of the instance and closes all hive boxes.
   Future<void> dispose();
@@ -60,10 +57,7 @@ abstract class EtebaseCache {
   /// Load the [EtebaseAccount] object from cache.
   ///
   /// The [encryptionKey] must be the same as used for [saveAccount].
-  Future<EtebaseAccount> loadAccount(
-    EtebaseClient client, [
-    SecureKey? encryptionKey,
-  ]);
+  Future<EtebaseAccount> loadAccount([SecureKey? encryptionKey]);
 
   /// Checks if the users account stoken is stored within the cache.
   Future<bool> get hasStoken;
@@ -82,10 +76,7 @@ abstract class EtebaseCache {
   /// [colUid].
   ///
   /// **Note:** To delete the token, use [collectionUnset].
-  Future<void> collectionSaveStoken(
-    String colUid,
-    String stoken,
-  );
+  Future<void> collectionSaveStoken(String colUid, String stoken);
 
   /// Load the sync stoken for the collection identified by [colUid].
   Future<String> collectionLoadStoken(String colUid);
@@ -106,10 +97,7 @@ abstract class EtebaseCache {
   ///
   /// This will also remove the collection stoken if previously set via
   /// [collectionSaveStoken].
-  Future<void> collectionUnset(
-    EtebaseCollectionManager colMgr,
-    String colUid,
-  );
+  Future<void> collectionUnset(String colUid);
 
   /// Load a [EtebaseCollection] identified by [colUid] from cache.
   Future<EtebaseCollection> collectionGet(
@@ -134,7 +122,6 @@ abstract class EtebaseCache {
   /// Remove an item identified by [itemUid] of the collection identified by
   /// [colUid] from cache.
   Future<void> itemUnset(
-    EtebaseItemManager itemMgr,
     String colUid,
     String itemUid,
   );

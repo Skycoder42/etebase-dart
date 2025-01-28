@@ -4,6 +4,7 @@ targets:
       - $package$
       - lib/**
       - pubspec.yaml
+      - test/unit/**
     builders:
       freezed:
         options:

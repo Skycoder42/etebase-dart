@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 import 'dart:typed_data';
 
 import 'etebase_collection_access_level.dart';

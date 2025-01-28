@@ -7,33 +7,34 @@ import 'package:sodium/sodium.dart';
 import '../../api/exceptions/not_found.dart';
 import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_cache.dart';
-import '../../api/managers/etebase_client.dart';
 import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/managers/etebase_item_manager.dart';
 import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_item.dart';
 import '../codec/msg_pack_codec.dart';
+import '../managers/client.dart';
 
 @internal
 class HiveCache implements EtebaseCache {
-  static const _accountBoxName = 'account';
+  static const _metaBoxName = 'meta';
   static const _collectionBoxName = 'collection';
 
   static const _accountDataKey = 'account.data';
   static const _accountStokenKey = 'account.stoken';
   static const _accountColStokenKeyPrefix = 'col.stoken.';
 
+  final Client _client;
   final HiveInterface _hive;
   final String _encodedUsername;
 
-  late final LazyBox<dynamic> _accountBox;
-  late final LazyBox<Uint8List?> _collectionBox;
+  late final LazyBox<dynamic> _metaBox;
+  late final LazyBox<Uint8List> _collectionBox;
 
-  HiveCache(this._hive, String username)
+  HiveCache(this._client, this._hive, String username)
       : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
 
   Future<void> initialize() async {
-    _accountBox = await _hive.openLazyBox(_boxName(_accountBoxName));
+    _metaBox = await _hive.openLazyBox(_boxName(_metaBoxName));
     _collectionBox = await _hive.openLazyBox(_boxName(_collectionBoxName));
   }
 
@@ -41,9 +42,9 @@ class HiveCache implements EtebaseCache {
   Future<void> dispose() async {
     await Future.wait([
       for (final boxName in _knownItemBoxNames)
-        if (_hive.isBoxOpen(boxName)) _hive.box<Uint8List>(boxName).close(),
+        if (_hive.isBoxOpen(boxName)) _hive.lazyBox<Uint8List>(boxName).close(),
       _collectionBox.close(),
-      _accountBox.close(),
+      _metaBox.close(),
     ]);
   }
 
@@ -54,17 +55,17 @@ class HiveCache implements EtebaseCache {
         _safeDeleteBoxByName<Uint8List>(boxName),
       if (reInitialize) ...[
         _collectionBox.clear(),
-        _accountBox.clear(),
+        _metaBox.clear(),
       ] else ...[
         _safeDeleteBox(_collectionBox),
-        _safeDeleteBox(_accountBox),
+        _safeDeleteBox(_metaBox),
       ],
     ]);
   }
 
   @override
   Future<bool> get hasAccount =>
-      Future.value(_accountBox.containsKey(_accountDataKey));
+      Future.value(_metaBox.containsKey(_accountDataKey));
 
   @override
   Future<void> saveAccount(
@@ -72,33 +73,31 @@ class HiveCache implements EtebaseCache {
     SecureKey? encryptionKey,
   ]) async {
     final accountData = await account.save(encryptionKey);
-    await _accountBox.put(_accountDataKey, accountData);
+    await _metaBox.put(_accountDataKey, accountData);
   }
 
   @override
-  Future<EtebaseAccount> loadAccount(
-    EtebaseClient client, [
+  Future<EtebaseAccount> loadAccount([
     SecureKey? encryptionKey,
   ]) async {
-    final accountData =
-        await _accountBox.get(_accountDataKey).cast<Uint8List?>();
+    final accountData = await _metaBox.get(_accountDataKey).cast<Uint8List?>();
     if (accountData == null) {
       throw NotFound('No account has been cached');
     }
-    return EtebaseAccount.restore(client, accountData, encryptionKey);
+    return _client.restoreAccount(accountData, encryptionKey);
   }
 
   @override
   Future<bool> get hasStoken =>
-      Future.value(_accountBox.containsKey(_accountStokenKey));
+      Future.value(_metaBox.containsKey(_accountStokenKey));
 
   @override
   Future<void> saveStoken(String stoken) =>
-      _accountBox.put(_accountStokenKey, stoken);
+      _metaBox.put(_accountStokenKey, stoken);
 
   @override
   Future<String> loadStoken() async {
-    final stoken = await _accountBox.get(_accountStokenKey).cast<String?>();
+    final stoken = await _metaBox.get(_accountStokenKey).cast<String?>();
     if (stoken == null) {
       throw NotFound('No stoken has been cached');
     }
@@ -107,20 +106,20 @@ class HiveCache implements EtebaseCache {
 
   @override
   Stream<String> get persistedCollectionStokenUids => Stream.fromIterable(
-        _accountBox.keys
-            .whereType<String>()
+        _metaBox.keys
+            .cast<String>()
             .where((key) => key.startsWith(_accountColStokenKeyPrefix))
             .map((key) => key.substring(_accountColStokenKeyPrefix.length)),
       );
 
   @override
   Future<void> collectionSaveStoken(String colUid, String stoken) =>
-      _accountBox.put(_collectionStokenKey(colUid), stoken);
+      _metaBox.put(_collectionStokenKey(colUid), stoken);
 
   @override
   Future<String> collectionLoadStoken(String colUid) async {
     final stoken =
-        await _accountBox.get(_collectionStokenKey(colUid)).cast<String?>();
+        await _metaBox.get(_collectionStokenKey(colUid)).cast<String?>();
     if (stoken == null) {
       throw NotFound('No stoken has been cached for $colUid');
     }
@@ -142,17 +141,12 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<void> collectionUnset(
-    EtebaseCollectionManager colMgr,
-    String colUid,
-  ) async {
-    await _accountBox.delete(_collectionStokenKey(colUid));
-    final itemBox = _itemBoxName(colUid);
-    if (_hive.isBoxOpen(itemBox) || await _hive.boxExists(itemBox)) {
-      await _collectionBox.put(colUid, null);
-    } else {
-      await _collectionBox.delete(colUid);
-    }
+  Future<void> collectionUnset(String colUid) async {
+    await Future.wait([
+      _metaBox.delete(_collectionStokenKey(colUid)),
+      _collectionBox.delete(colUid),
+      _safeDeleteBoxByName<Uint8List>(_itemBoxName(colUid)),
+    ]);
   }
 
   @override
@@ -186,11 +180,7 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<void> itemUnset(
-    EtebaseItemManager itemMgr,
-    String colUid,
-    String itemUid,
-  ) async {
+  Future<void> itemUnset(String colUid, String itemUid) async {
     final itemBox = await _itemBox(colUid);
     await itemBox?.delete(itemUid);
   }
@@ -228,13 +218,10 @@ class HiveCache implements EtebaseCache {
   }) async {
     final boxName = _itemBoxName(colUid);
     if (_hive.isBoxOpen(boxName)) {
-      return _hive.lazyBox(boxName);
+      return _hive.lazyBox<Uint8List>(boxName);
     } else if (!create && !await _hive.boxExists(boxName)) {
       return null;
     } else {
-      if (!_collectionBox.containsKey(colUid)) {
-        await _collectionBox.put(colUid, null);
-      }
       return _hive.openLazyBox<Uint8List>(boxName);
     }
   }

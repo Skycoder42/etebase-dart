@@ -53,12 +53,12 @@ void main() {
 
   test('can cache and restore account', () async {
     await cache.saveAccount(account);
-    final restoredAccount = await cache.loadAccount(client);
+    final restoredAccount = await cache.loadAccount();
     await restoredAccount.fetchToken();
 
     final encryptionKey = EtebaseUtils.randomKey(client, 32);
     await cache.saveAccount(account, encryptionKey);
-    final restoredAccountEnc = await cache.loadAccount(client, encryptionKey);
+    final restoredAccountEnc = await cache.loadAccount(encryptionKey);
     await restoredAccountEnc.fetchToken();
   });
 
@@ -138,7 +138,7 @@ void main() {
 
     expect(restoredToken, collection.stoken);
 
-    await cache.collectionUnset(collectionManager, collectionId);
+    await cache.collectionUnset(collectionId);
     await expectLater(
       () => cache.collectionGet(collectionManager, collectionId),
       throwsA(isA<NotFound>()),
@@ -188,7 +188,7 @@ void main() {
     expect(await restoredItem.getContent(), itemContent);
     expect(restoredItem.etag, item.etag);
 
-    await cache.itemUnset(itemManager, collectionId, itemId);
+    await cache.itemUnset(collectionId, itemId);
     await expectLater(
       () => cache.itemGet(itemManager, collectionId, itemId),
       throwsA(isA<NotFound>()),
@@ -198,13 +198,13 @@ void main() {
   test('can clear cache data', () async {
     await cache.clearUser(reInitialize: true);
     await expectLater(
-      () => cache.loadAccount(client),
+      () => cache.loadAccount(),
       throwsA(isA<NotFound>()),
     );
 
     await cache.clearUser();
     await expectLater(
-      () => cache.loadAccount(client),
+      () => cache.loadAccount(),
       throwsA(isA<HiveError>()),
     );
   });

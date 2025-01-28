@@ -40,7 +40,7 @@ abstract interface class EtebaseAccount {
     Uint8List accountDataStored, [
     SecureKey? encryptionKey,
   ]) =>
-      Account.restore(client as Client, accountDataStored, encryptionKey);
+      (client as Client).restoreAccount(accountDataStored, encryptionKey);
 
   /// Return a [EtebaseCollectionManager] for creating, fetching and uploading
   /// collections.
