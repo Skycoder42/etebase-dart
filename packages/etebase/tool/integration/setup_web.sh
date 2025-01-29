@@ -5,6 +5,7 @@ version=${1:-0.7.15}
 DEST_DIR=$PWD/tool/integration/cache/sodium
 VERSION_FILE="$DEST_DIR/version.txt"
 DART_FILE="$DEST_DIR/sodium.js.dart"
+TMP_DIR=${RUNNER_TEMP:-/tmp}
 
 if [ "$CACHE_HIT" = "true" ]; then
   current_version=$(cat "$VERSION_FILE")
@@ -15,13 +16,13 @@ if [ "$CACHE_HIT" = "true" ]; then
 else
   echo "::group::Download libsodium.js"
   curl \
-    -Lfo "$RUNNER_TEMP/libsodium.js.tar.gz" \
+    -Lfo "$TMP_DIR/libsodium.js.tar.gz" \
     "https://github.com/jedisct1/libsodium.js/archive/refs/tags/$version.tar.gz"
-  tar -xvf "$RUNNER_TEMP/libsodium.js.tar.gz" -C "$RUNNER_TEMP"
+  tar -xvf "$TMP_DIR/libsodium.js.tar.gz" -C "$TMP_DIR"
 
   mkdir -p "$DEST_DIR"
   echo 'const src = r"""' > "$DART_FILE"
-  cat "$RUNNER_TEMP/libsodium.js-$version/dist/browsers-sumo/sodium.js" >> "$DART_FILE"
+  cat "$TMP_DIR/libsodium.js-$version/dist/browsers-sumo/sodium.js" >> "$DART_FILE"
   echo '""";' >> "$DART_FILE"
   echo "$version" > "$VERSION_FILE"
   echo ::endgroup::

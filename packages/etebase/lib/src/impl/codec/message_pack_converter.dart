@@ -94,13 +94,13 @@ class MessagePackConverter {
 
   String base64Encode(Uint8List data) => base64UrlNoPad.encode(data);
 
-  dynamic decodeRaw(Uint8List data) => msgPack.decode(data);
-
   T decode<T>(Uint8List data) => _fromJson<T>(decodeRaw(data));
 
-  dynamic decode64Raw(String data) => msgPack64UrlNoPad.decode(data);
+  dynamic decodeRaw(Uint8List data) => msgPack.decode(data);
 
   T decode64<T>(String data) => _fromJson<T>(decode64Raw(data));
+
+  dynamic decode64Raw(String data) => msgPack64UrlNoPad.decode(data);
 
   Uint8List base64Decode(String data) => base64UrlNoPad.decode(data);
 

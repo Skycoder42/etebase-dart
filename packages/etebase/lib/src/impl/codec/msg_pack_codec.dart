@@ -4,8 +4,6 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 
-import 'list_cast_codec.dart';
-
 @internal
 class Base64UrlSafeNoPadEncoder extends Converter<Uint8List, String> {
   const Base64UrlSafeNoPadEncoder();
@@ -44,5 +42,4 @@ const base64UrlNoPad = Base64UrlSafeNoPadCodec();
 
 /// @nodoc
 @internal
-final msgPack64UrlNoPad =
-    msgPack.fuse(const ListCastCodec().inverted).fuse(base64UrlNoPad);
+final msgPack64UrlNoPad = msgPack.fuse(base64UrlNoPad);

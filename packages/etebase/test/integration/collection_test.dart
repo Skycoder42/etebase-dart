@@ -33,7 +33,7 @@ void main() {
     const testItemType = 'test.collection';
     const testName = 'test-name';
     const testDescription = 'multiline\ntest\ndescription';
-    final testMTime = DateTime(2022, 10, 11, 12, 13, 15, 678);
+    final testMTime = DateTime.utc(2022, 10, 11, 12, 13, 15, 678);
     const testColor = '#AABBCC';
 
     final testCollection = await collectionManager.create(

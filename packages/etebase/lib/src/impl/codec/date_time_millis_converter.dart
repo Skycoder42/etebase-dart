@@ -10,7 +10,8 @@ class DateTimeMillisConverter implements JsonConverter<DateTime, int> {
   const DateTimeMillisConverter();
 
   @override
-  DateTime fromJson(int json) => DateTime.fromMillisecondsSinceEpoch(json);
+  DateTime fromJson(int json) =>
+      DateTime.fromMillisecondsSinceEpoch(json, isUtc: true);
 
   @override
   int toJson(DateTime object) => object.millisecondsSinceEpoch;
