@@ -6,7 +6,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_signed_invitation.dart';
-import '../codec/msg_pack_converters.dart';
+import '../codec/byte_array_converter.dart';
 
 part 'signed_invitation.freezed.dart';
 part 'signed_invitation.g.dart';

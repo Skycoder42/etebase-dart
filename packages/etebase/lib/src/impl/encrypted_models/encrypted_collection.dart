@@ -7,7 +7,7 @@ import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/models/etebase_collection_access_level.dart';
 import '../../api/models/etebase_item_metadata.dart';
-import '../codec/msg_pack_converters.dart';
+import '../codec/byte_array_converter.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
 import '../crypto/collection_crypto_manager.dart';

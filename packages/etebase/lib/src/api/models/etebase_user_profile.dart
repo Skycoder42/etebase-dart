@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../impl/codec/msg_pack_converters.dart';
+import '../../impl/codec/byte_array_converter.dart';
 import 'etebase_signed_invitation.dart';
 
 part 'etebase_user_profile.freezed.dart';

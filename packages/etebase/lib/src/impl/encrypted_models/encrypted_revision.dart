@@ -8,7 +8,7 @@ import 'package:sodium/sodium_sumo.dart';
 import '../../api/exceptions/integrity_compromised.dart';
 import '../../api/exceptions/missing_content.dart';
 import '../../api/models/etebase_item_metadata.dart';
-import '../codec/msg_pack_converters.dart';
+import '../codec/byte_array_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../managers/client.dart';
 import 'cached/cached_chunk.dart';

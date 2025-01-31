@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sodium/sodium_sumo.dart';
@@ -8,6 +9,19 @@ import '../../../api/exceptions/crypto_failure.dart';
 import '../../../api/managers/crypto_executor.dart';
 
 part 'async_crypto_executor.freezed.dart';
+
+/// A wrapper exception type for error that occur on the background isolate of
+/// the [AsyncCryptoExecutor].
+class AsyncCryptoExecutorIsolateFailure implements Exception {
+  /// The toString() result of the original exception.
+  final String originalMessage;
+
+  /// Default constructor.
+  AsyncCryptoExecutorIsolateFailure(this.originalMessage);
+
+  @override
+  String toString() => originalMessage;
+}
 
 @Freezed(toStringOverride: false, equal: false)
 sealed class _IsolateMessage with _$IsolateMessage {
@@ -52,6 +66,7 @@ class AsyncCryptoExecutor implements CryptoExecutor {
 
   late final SendPort _sendPort;
   late final ReceivePort _receivePort;
+  late final ReceivePort _errorPort;
   late final Stream<_CryptoJobResult> _receivePortStream;
   late final Isolate _isolate;
   var _jobIdCtr = 1; // start at 1 as 0 is reserved for the initializer message
@@ -63,6 +78,16 @@ class AsyncCryptoExecutor implements CryptoExecutor {
     _receivePort = ReceivePort('AsyncCryptoExecutor.main');
     _receivePortStream =
         _receivePort.cast<_CryptoJobResult>().asBroadcastStream();
+
+    _errorPort = ReceivePort('AsyncCryptoExecutor.error')
+      ..cast<List<dynamic>>().map((l) => l.cast<String>()).listen(
+            (error) => Zone.current.handleUncaughtError(
+              AsyncCryptoExecutorIsolateFailure(error[0]),
+              StackTrace.fromString(error[1]),
+            ),
+            onError: Zone.current.handleUncaughtError,
+          );
+
     final sendPortFuture = _waitForResult<SendPort>(0);
     _isolate = await Isolate.spawn(
       debugName: 'AsyncCryptoExecutor.isolate',
@@ -71,9 +96,10 @@ class AsyncCryptoExecutor implements CryptoExecutor {
         sodiumFactory: _sodium.isolateFactory,
         sendPort: _receivePort.sendPort,
       ),
+      onError: _errorPort.sendPort,
     );
 
-    _finalizer.attach(this, (_isolate, _receivePort), detach: this);
+    _finalizer.attach(this, (_isolate, _receivePort, _errorPort), detach: this);
     _sendPort = await sendPortFuture;
   }
 
@@ -90,8 +116,9 @@ class AsyncCryptoExecutor implements CryptoExecutor {
       // ignore
     } finally {
       _finalizer.detach(this);
-      _receivePort.close();
       _isolate.kill();
+      _receivePort.close();
+      _errorPort.close();
     }
   }
 
@@ -142,6 +169,9 @@ class AsyncCryptoExecutor implements CryptoExecutor {
       KeyPair => _waitForResult<TransferrableKeyPair>(job.id)
           .then(_sodium.materializeTransferrableKeyPair)
           .then((k) => k as TResult),
+      // ignore: type_literal_in_constant_pattern
+      Uint8List => _waitForResult<TransferableTypedData>(job.id)
+          .then((d) => d.materialize().asUint8List() as TResult),
       _ => _waitForResult<TResult>(job.id),
     };
   }
@@ -157,10 +187,11 @@ class AsyncCryptoExecutor implements CryptoExecutor {
       )
       .first;
 
-  static void _finalize((Isolate, ReceivePort) token) {
-    final (isolate, port) = token;
-    port.close();
+  static void _finalize((Isolate, ReceivePort, ReceivePort) token) {
+    final (isolate, dataPort, errPort) = token;
     isolate.kill();
+    dataPort.close();
+    errPort.close();
   }
 }
 
@@ -213,6 +244,8 @@ _CryptoJobResult _processRunJob(
       case KeyPair():
         transferrableResult = sodium.createTransferrableKeyPair(result);
         result.dispose();
+      case Uint8List():
+        transferrableResult = TransferableTypedData.fromList([result]);
       default:
         transferrableResult = result;
     }

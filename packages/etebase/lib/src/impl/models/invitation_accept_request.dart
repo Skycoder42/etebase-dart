@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../codec/msg_pack_converters.dart';
+import '../codec/byte_array_converter.dart';
 
 part 'invitation_accept_request.freezed.dart';
 part 'invitation_accept_request.g.dart';

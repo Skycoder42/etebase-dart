@@ -7,7 +7,7 @@ import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/models/etebase_item_metadata.dart';
-import '../codec/msg_pack_converters.dart';
+import '../codec/byte_array_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';

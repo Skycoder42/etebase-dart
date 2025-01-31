@@ -11,7 +11,7 @@ import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/managers/etebase_item_manager.dart';
 import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_item.dart';
-import '../codec/msg_pack_codec.dart';
+import '../codec/base64_url_no_pad_codec.dart';
 import '../managers/client.dart';
 
 @internal

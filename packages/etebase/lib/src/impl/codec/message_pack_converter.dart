@@ -31,7 +31,7 @@ import '../models/signed_invitation.dart';
 import '../models/signed_invitation_content.dart';
 import '../models/signup_request.dart';
 import '../models/web_socket_ticket_response.dart';
-import 'msg_pack_codec.dart';
+import 'base64_url_no_pad_codec.dart';
 import 'type_converter.dart';
 
 @internal
@@ -84,25 +84,31 @@ class MessagePackConverter {
     _addList(CachedCollection.fromJson);
   }
 
-  Uint8List encode(dynamic data) => msgPack.encode(_toJson(data));
+  Uint8List encode(dynamic data) =>
+      _wrapped(() => msgPack.encode(_toJson(data)));
 
-  Uint8List encodeRaw(dynamic data) => msgPack.encode(data);
+  Uint8List encodeRaw(dynamic data) => _wrapped(() => msgPack.encode(data));
 
-  String encode64(dynamic data) => msgPack64UrlNoPad.encode(_toJson(data));
+  String encode64(dynamic data) =>
+      _wrapped(() => msgPack64UrlNoPad.encode(_toJson(data)));
 
-  String encode64Raw(dynamic data) => msgPack64UrlNoPad.encode(data);
+  String encode64Raw(dynamic data) =>
+      _wrapped(() => msgPack64UrlNoPad.encode(data));
 
-  String base64Encode(Uint8List data) => base64UrlNoPad.encode(data);
+  String base64Encode(Uint8List data) =>
+      _wrapped(() => base64UrlNoPad.encode(data));
 
-  T decode<T>(Uint8List data) => _fromJson<T>(decodeRaw(data));
+  T decode<T>(Uint8List data) => _wrapped(() => _fromJson<T>(decodeRaw(data)));
 
-  dynamic decodeRaw(Uint8List data) => msgPack.decode(data);
+  dynamic decodeRaw(Uint8List data) => _wrapped(() => msgPack.decode(data));
 
-  T decode64<T>(String data) => _fromJson<T>(decode64Raw(data));
+  T decode64<T>(String data) => _wrapped(() => _fromJson<T>(decode64Raw(data)));
 
-  dynamic decode64Raw(String data) => msgPack64UrlNoPad.decode(data);
+  dynamic decode64Raw(String data) =>
+      _wrapped(() => msgPack64UrlNoPad.decode(data));
 
-  Uint8List base64Decode(String data) => base64UrlNoPad.decode(data);
+  Uint8List base64Decode(String data) =>
+      _wrapped(() => base64UrlNoPad.decode(data));
 
   void addCustom<T>(FromJson<T> fromJson) => _add<T>(fromJson);
 
@@ -137,8 +143,17 @@ class MessagePackConverter {
       throw UnsupportedError('No converter for $T registered');
     }
 
+    return converter(data);
+  }
+
+  T _wrapped<T>(T Function() callback) {
     try {
-      return converter(data);
+      return callback();
+    } on InvalidMessagePackData {
+      rethrow;
+      // ignore: avoid_catching_errors
+    } on UnsupportedError {
+      rethrow;
     } on MsgpackFormatException catch (e, s) {
       Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
     } on CheckedFromJsonException catch (e, s) {

@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:etebase/src/api/exceptions/invalid_message_pack_data.dart';
 import 'package:etebase/src/api/models/etebase_user_profile.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 import 'package:test/test.dart';
@@ -14,6 +16,13 @@ class CustomType {
 
   factory CustomType.fromJson(Map<String, dynamic> json) =>
       CustomType(json['value'] as int);
+
+  // ignore: avoid_unused_constructor_parameters
+  factory CustomType.withFormatException(Map<String, dynamic> json) =>
+      throw const FormatException();
+
+  // ignore: avoid_unused_constructor_parameters
+  factory CustomType.withOtherError(Map<String, dynamic> json) => throw Error();
 
   Map<String, dynamic> toJson() => {'value': value};
 
@@ -70,15 +79,33 @@ void main() {
         test('throws for unknown types', () {
           expect(
             () => sut.encode(42),
-            throwsA(isNoSuchMethodError),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isNoSuchMethodError,
+              ),
+            ),
           );
           expect(
             () => sut.encode([42]),
-            throwsA(isNoSuchMethodError),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isNoSuchMethodError,
+              ),
+            ),
           );
           expect(
             () => sut.encode({42: userProfile}),
-            throwsA(isNoSuchMethodError),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isNoSuchMethodError,
+              ),
+            ),
           );
         });
       });
@@ -87,7 +114,13 @@ void main() {
         expect(sut.encodeRaw(42), Uint8List.fromList([42]));
         expect(
           () => sut.encodeRaw(userProfile),
-          throwsA(isA<MsgpackFormatException>()),
+          throwsA(
+            isA<InvalidMessagePackData>().having(
+              (m) => m.innerError,
+              'innerError',
+              isA<MsgpackFormatException>(),
+            ),
+          ),
         );
       });
 
@@ -113,10 +146,68 @@ void main() {
           );
         });
 
-        test('throws for unknown types', () {
+        test('throws UnsupportedError for unknown types', () {
           expect(
             () => sut.decode<int>(Uint8List.fromList([42])),
             throwsA(isUnsupportedError),
+          );
+        });
+
+        test('throws InvalidMessagePackData if message pack data is invalid',
+            () {
+          expect(
+            () => sut.decode<EtebaseUserProfile>(Uint8List.fromList([0xc1])),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isA<MsgpackFormatException>(),
+              ),
+            ),
+          );
+        });
+
+        test('throws InvalidMessagePackData if data does not match the model',
+            () {
+          expect(
+            () => sut.decode<EtebaseUserProfile>(
+              Uint8List.fromList(userProfileMsgPack.sublist(0, 8) + [42]),
+            ),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isA<CheckedFromJsonException>(),
+              ),
+            ),
+          );
+        });
+
+        test('throws InvalidMessagePackData if it throws format exception', () {
+          sut.addCustom(CustomType.withFormatException);
+          expect(
+            () => sut.decode<CustomType>(Uint8List.fromList([0x80])),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isA<FormatException>(),
+              ),
+            ),
+          );
+        });
+
+        test('throws InvalidMessagePackData if it throws other error', () {
+          sut.addCustom(CustomType.withOtherError);
+          expect(
+            () => sut.decode<CustomType>(Uint8List.fromList([0x80])),
+            throwsA(
+              isA<InvalidMessagePackData>().having(
+                (m) => m.innerError,
+                'innerError',
+                isA<Error>(),
+              ),
+            ),
           );
         });
       });
