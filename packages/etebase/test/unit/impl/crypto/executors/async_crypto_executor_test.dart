@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:etebase/src/api/exceptions/async_crypto_executor_isolate_failure.dart';
 import 'package:etebase/src/api/exceptions/crypto_failure.dart';
 import 'package:etebase/src/api/managers/crypto_executor.dart';
 import 'package:etebase/src/impl/crypto/executors/async_crypto_executor.dart';

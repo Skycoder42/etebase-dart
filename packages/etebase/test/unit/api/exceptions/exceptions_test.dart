@@ -1,5 +1,6 @@
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
+import 'package:etebase/src/api/exceptions/async_crypto_executor_isolate_failure.dart';
 import 'package:etebase/src/api/exceptions/conflict.dart';
 import 'package:etebase/src/api/exceptions/connection_problem.dart';
 import 'package:etebase/src/api/exceptions/crypto_failure.dart';
@@ -31,6 +32,7 @@ void main() {
       'Simple exceptions print type and message',
       [
         (ApiMissuse('test'), '$ApiMissuse: test'),
+        (AsyncCryptoExecutorIsolateFailure('test'), 'test'),
         (Conflict('test'), '$Conflict(409): test'),
         (
           ConnectionProblem(Exception('test')),

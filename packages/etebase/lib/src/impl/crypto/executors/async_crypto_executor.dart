@@ -5,23 +5,11 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sodium/sodium_sumo.dart';
 
+import '../../../api/exceptions/async_crypto_executor_isolate_failure.dart';
 import '../../../api/exceptions/crypto_failure.dart';
 import '../../../api/managers/crypto_executor.dart';
 
 part 'async_crypto_executor.freezed.dart';
-
-/// A wrapper exception type for error that occur on the background isolate of
-/// the [AsyncCryptoExecutor].
-class AsyncCryptoExecutorIsolateFailure implements Exception {
-  /// The toString() result of the original exception.
-  final String originalMessage;
-
-  /// Default constructor.
-  AsyncCryptoExecutorIsolateFailure(this.originalMessage);
-
-  @override
-  String toString() => originalMessage;
-}
 
 @Freezed(toStringOverride: false, equal: false)
 sealed class _IsolateMessage with _$IsolateMessage {

@@ -1,4 +1,5 @@
 export 'src/api/exceptions/api_missuse.dart';
+export 'src/api/exceptions/async_crypto_executor_isolate_failure.dart';
 export 'src/api/exceptions/conflict.dart';
 export 'src/api/exceptions/connection_problem.dart';
 export 'src/api/exceptions/crypto_failure.dart';
