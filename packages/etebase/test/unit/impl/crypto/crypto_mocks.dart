@@ -15,11 +15,14 @@ import 'package:test/test.dart';
   MockSpec<CryptoSumo>(as: #MockCryptoBase),
   MockSpec<Kdf>(),
   MockSpec<Aead>(),
+  MockSpec<GenericHash>(),
   MockSpec<CryptoExecutor>(as: #MockCryptoExecutorBase),
 ])
 import 'crypto_mocks.mocks.dart';
 
 export 'crypto_mocks.mocks.dart';
+
+class FakeGenericHashConsumer extends Fake implements GenericHashConsumer {}
 
 class FakeSecureKey extends Fake implements SecureKey {
   final int id;
@@ -71,6 +74,9 @@ class MockCrypto extends MockCryptoBase {
   @override
   final MockAead aeadXChaCha20Poly1305IETF = MockAead();
 
+  @override
+  final MockGenericHash genericHash = MockGenericHash();
+
   void resetAll() {
     reset(kdf);
     reset(aeadXChaCha20Poly1305IETF);
@@ -91,6 +97,10 @@ class MockSodium extends MockSodiumBase {
     reset(this);
 
     provideDummy<SecureKey>(FakeSecureKey(-1));
+    provideDummy(
+      DetachedCipherResult(cipherText: Uint8List(0), mac: Uint8List(0)),
+    );
+    provideDummy<GenericHashConsumer>(FakeGenericHashConsumer());
   }
 }
 

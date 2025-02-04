@@ -12,8 +12,11 @@ import 'crypto_utils.dart';
 class CryptoMac {
   final GenericHashConsumer consumer;
 
-  CryptoMac(CryptoExecutor executor, {SecureKey? key, int length = 32})
-      : consumer = executor.execSync(
+  CryptoMac(
+    CryptoExecutor executor, {
+    SecureKey? key,
+    int length = CryptoUtils.hashSize,
+  }) : consumer = executor.execSync(
           (sodium) => sodium.crypto.genericHash.createConsumer(
             outLen: length,
             key: key,

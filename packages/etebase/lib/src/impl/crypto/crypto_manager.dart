@@ -30,6 +30,7 @@ abstract class CryptoManager implements CryptoManagerBase {
   late final subDerivationKey = _keyGen(key, 4);
   @protected
   late final deterministicEncryptionKey = _keyGen(key, 5);
+
   final _disposables = <SecureKey>[];
   var _disposed = false;
 
