@@ -11,9 +11,13 @@ class CryptoArena {
     switch (object) {
       case final SecureKey key:
         _disposables[object] = key.dispose;
+      case final KeyPair keyPair:
+        _disposables[object] = keyPair.dispose;
       case (final SecureKey k1, final SecureKey k2):
-        _disposables[object] = k1.dispose;
-        _disposables[object] = k2.dispose;
+        _disposables[object] = () {
+          k1.dispose();
+          k2.dispose();
+        };
       case final CryptoManagerBase cm:
         _disposables[object] = cm.dispose;
       default:
