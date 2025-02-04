@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_use_of_protected_member
-
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
@@ -34,24 +32,11 @@ void main() {
     late TestableCryptoManager sut;
 
     setUp(() {
-      mockSodium.resetAll();
-      reset(mockCryptoExecutor);
+      mockSodium.resetAndSetup();
+      mockCryptoExecutor.resetAndSetup();
 
       when(mockSodium.crypto.kdf.contextBytes)
           .thenReturn(testContextPadded.length);
-      when(
-        mockSodium.crypto.kdf.deriveFromKey(
-          masterKey: anyNamed('masterKey'),
-          context: anyNamed('context'),
-          subkeyId: anyNamed('subkeyId'),
-          subkeyLen: anyNamed('subkeyLen'),
-        ),
-      ).thenAnswer((i) {
-        final {#subkeyId: BigInt subkeyId} = i.namedArguments;
-        return FakeSecureKey(subkeyId.toInt());
-      });
-
-      mockCryptoExecutor.setupMocks();
 
       sut =
           TestableCryptoManager(mockCryptoExecutor, testMasterKey, testVersion);

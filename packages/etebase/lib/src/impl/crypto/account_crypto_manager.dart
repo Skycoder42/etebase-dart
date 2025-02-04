@@ -14,6 +14,7 @@ class AccountCryptoManager extends CryptoManager {
 
   @override
   @visibleForOverriding
+  @visibleForTesting
   String get context => 'Acct';
 
   Uint8List colTypeToUid(String colId) => deterministicEncrypt(

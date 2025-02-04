@@ -14,7 +14,8 @@ import 'library_loader_stub.dart'
 
 export 'library_loader_stub.dart'
     if (dart.library.io) 'library_loader_vm.dart'
-    if (dart.library.js_interop) 'library_loader_js.dart' show kIsWeb;
+    if (dart.library.js_interop) 'library_loader_js.dart'
+    show getLibsodium, kIsWeb;
 
 final _rng = Random.secure();
 final _uuid = Uuid(

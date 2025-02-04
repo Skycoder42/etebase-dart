@@ -16,19 +16,26 @@ abstract class CryptoManager implements CryptoManagerBase {
 
   @protected
   @override
+  @visibleForTesting
   final CryptoExecutor executor;
   @protected
+  @visibleForTesting
   final SecureKey key;
 
   @protected
+  @visibleForTesting
   late final cipherKey = _keyGen(key, 1);
   @protected
+  @visibleForTesting
   late final macKey = _keyGen(key, 2);
   @protected
+  @visibleForTesting
   late final asymmetricKeySeed = _keyGen(key, 3);
   @protected
+  @visibleForTesting
   late final subDerivationKey = _keyGen(key, 4);
   @protected
+  @visibleForTesting
   late final deterministicEncryptionKey = _keyGen(key, 5);
 
   final _disposables = <SecureKey>[];
@@ -207,6 +214,7 @@ abstract class CryptoManager implements CryptoManagerBase {
       );
 
   @protected
+  @visibleForTesting
   Uint8List deterministicEncrypt(
     Uint8List message, [
     Uint8List? additionalData,
@@ -229,6 +237,7 @@ abstract class CryptoManager implements CryptoManagerBase {
       );
 
   @protected
+  @visibleForTesting
   Uint8List deterministicDecrypt(
     Uint8List nonceCipherText, [
     Uint8List? additionalData,

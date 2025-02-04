@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 import 'package:meta/meta.dart';
 
 import 'account_crypto_manager.dart';

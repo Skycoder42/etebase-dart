@@ -12,7 +12,9 @@ import 'crypto_utils.dart';
 class BoxCryptoManager implements CryptoManagerBase {
   @override
   @protected
+  @visibleForTesting
   final CryptoExecutor executor;
+
   final KeyPair _keyPair;
   var _disposed = false;
 

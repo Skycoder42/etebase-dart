@@ -15,11 +15,12 @@ enum KeyDerivationDifficulty {
 
 @internal
 class KeyDerivator {
-  final CryptoExecutor _executor;
+  @visibleForTesting
+  final CryptoExecutor executor;
 
-  KeyDerivator(this._executor);
+  KeyDerivator(this.executor);
 
-  Uint8List randomSalt() => _executor.execSync(
+  Uint8List randomSalt() => executor.execSync(
         (sodium) => sodium.randombytes.buf(sodium.crypto.pwhash.saltBytes),
       );
 
@@ -28,7 +29,7 @@ class KeyDerivator {
     required String password,
     KeyDerivationDifficulty difficulty = KeyDerivationDifficulty.hard,
   }) =>
-      _executor.execAsync(
+      executor.execAsync(
         (sodium, _, __) => sodium.crypto.pwhash(
           outLen: CryptoUtils.symmetricKeySize,
           password: password.toCharArray(),

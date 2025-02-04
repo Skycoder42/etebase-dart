@@ -57,12 +57,7 @@ class CryptoService {
 
   List<int> shuffle<T>(List<T> list) => _executor.execSync((sodium) {
         final len = list.length;
-        final shuffledIndices = List.filled(len, 0);
-
-        // Fill up with the indices
-        for (var i = 0; i < len; i++) {
-          shuffledIndices[i] = i;
-        }
+        final shuffledIndices = List.generate(len, (i) => i);
 
         for (var i = 0; i < len; i++) {
           final j = i + sodium.randombytes.uniform(len - i);
@@ -160,9 +155,9 @@ class CryptoService {
 
     final e = _log2(length).floor();
     final s = _log2(e).floor() + 1;
-    final lastBits = e - s;
-    final bitMask = (math.pow(2, lastBits) - 1).toInt();
-    return (length + bitMask) & ~bitMask;
+    final z = e - s;
+    final m = (1 << z) - 1;
+    return (length + m) & ~m;
   }
 
   static String _getEncodedChunk(Uint8List content, int offset) {

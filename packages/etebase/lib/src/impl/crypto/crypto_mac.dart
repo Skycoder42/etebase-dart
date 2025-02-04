@@ -10,13 +10,13 @@ import 'crypto_utils.dart';
 
 @internal
 class CryptoMac {
-  final GenericHashConsumer consumer;
+  final GenericHashConsumer _consumer;
 
   CryptoMac(
     CryptoExecutor executor, {
     SecureKey? key,
     int length = CryptoUtils.hashSize,
-  }) : consumer = executor.execSync(
+  }) : _consumer = executor.execSync(
           (sodium) => sodium.crypto.genericHash.createConsumer(
             outLen: length,
             key: key,
@@ -24,15 +24,15 @@ class CryptoMac {
         );
 
   void updateWithLenPrefix(Uint8List messageChunk) {
-    consumer
+    _consumer
       ..add(CryptoUtils.uint32ToUint8List(messageChunk.length))
       ..add(messageChunk);
   }
 
   void update(Uint8List messageChunk) {
-    consumer.add(messageChunk);
+    _consumer.add(messageChunk);
   }
 
   Future<Uint8List> finalize() =>
-      CryptoFailure.wrap<Future<Uint8List>, Uint8List>(consumer.close);
+      CryptoFailure.wrap<Future<Uint8List>, Uint8List>(_consumer.close);
 }

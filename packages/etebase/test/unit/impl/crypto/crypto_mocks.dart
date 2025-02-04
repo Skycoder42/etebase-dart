@@ -16,6 +16,7 @@ import 'package:test/test.dart';
   MockSpec<Kdf>(),
   MockSpec<Aead>(),
   MockSpec<GenericHash>(),
+  MockSpec<Box>(),
   MockSpec<CryptoExecutor>(as: #MockCryptoExecutorBase),
 ])
 import 'crypto_mocks.mocks.dart';
@@ -28,6 +29,7 @@ class FakeSecureKey extends Fake implements SecureKey {
   final int id;
 
   bool disposed = false;
+  Uint8List? writeBuffer;
 
   FakeSecureKey(this.id);
 
@@ -35,33 +37,42 @@ class FakeSecureKey extends Fake implements SecureKey {
   void dispose() => disposed = true;
 
   @override
-  T runUnlockedSync<T>(SecureCallbackFn<T> callback, {bool writable = false}) =>
-      callback(
+  int get length => 5;
+
+  @override
+  T runUnlockedSync<T>(SecureCallbackFn<T> callback, {bool writable = false}) {
+    if (writable) {
+      return callback(writeBuffer!);
+    } else {
+      return callback(
         Uint8List.fromList([
           // prefix
           0xDE, 0xAD, 0xBE, 0xEF,
           // id
           id,
-          // writable
-          if (writable) 1 else 0,
         ]),
       );
+    }
+  }
 
   @override
   FutureOr<T> runUnlockedAsync<T>(
     SecureCallbackFn<FutureOr<T>> callback, {
     bool writable = false,
-  }) =>
-      callback(
+  }) {
+    if (writable) {
+      return callback(writeBuffer!);
+    } else {
+      return callback(
         Uint8List.fromList([
           // prefix
           0xDE, 0xAD, 0xBE, 0xAD,
           // id
           id,
-          // writable
-          if (writable) 1 else 0,
         ]),
       );
+    }
+  }
 
   @override
   String toString() => 'FakeSecureKey($id)';
@@ -77,9 +88,14 @@ class MockCrypto extends MockCryptoBase {
   @override
   final MockGenericHash genericHash = MockGenericHash();
 
+  @override
+  final MockBox box = MockBox();
+
   void resetAll() {
     reset(kdf);
     reset(aeadXChaCha20Poly1305IETF);
+    reset(genericHash);
+    reset(box);
     reset(this);
   }
 }
@@ -91,16 +107,31 @@ class MockSodium extends MockSodiumBase {
   @override
   final MockCrypto crypto = MockCrypto();
 
-  void resetAll() {
+  void resetAndSetup() {
     reset(randombytes);
     crypto.resetAll();
     reset(this);
 
     provideDummy<SecureKey>(FakeSecureKey(-1));
+    provideDummy<KeyPair>(
+      KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey(-1)),
+    );
     provideDummy(
       DetachedCipherResult(cipherText: Uint8List(0), mac: Uint8List(0)),
     );
     provideDummy<GenericHashConsumer>(FakeGenericHashConsumer());
+
+    when(
+      crypto.kdf.deriveFromKey(
+        masterKey: anyNamed('masterKey'),
+        context: anyNamed('context'),
+        subkeyId: anyNamed('subkeyId'),
+        subkeyLen: anyNamed('subkeyLen'),
+      ),
+    ).thenAnswer((i) {
+      final {#subkeyId: BigInt subkeyId} = i.namedArguments;
+      return FakeSecureKey(subkeyId.toInt());
+    });
   }
 }
 
@@ -109,7 +140,9 @@ class MockCryptoExecutor extends MockCryptoExecutorBase {
 
   MockCryptoExecutor(this._mockSodium);
 
-  void setupMocks() {
+  void resetAndSetup() {
+    reset(this);
+
     when(execSync<dynamic>(any)).thenAnswer((i) {
       final [SyncCallback<dynamic> cb] = i.positionalArguments;
       return cb(_mockSodium);
@@ -157,7 +190,6 @@ TypeMatcher<FakeSecureKey> isKey(dynamic id, {dynamic disposed}) {
 
 Matcher isUnlockedKey(
   dynamic id, {
-  bool writable = false,
   bool async = false,
 }) =>
     allOf(
@@ -167,8 +199,6 @@ Matcher isUnlockedKey(
         0xDE, 0xAD, 0xBE, if (async) 0xAD else 0xEF,
         // id
         id,
-        // writable
-        if (writable) 1 else 0,
       ]),
     );
 
