@@ -169,6 +169,6 @@ class CryptoService {
   }
 }
 
-double _logBase(num x, num base) => math.log(x) / math.log(base);
+double _logOf2 = math.log(2);
 
-double _log2(num x) => _logBase(x, 2);
+double _log2(num x) => math.log(x) / _logOf2;

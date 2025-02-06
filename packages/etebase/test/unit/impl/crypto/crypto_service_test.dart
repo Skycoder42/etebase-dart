@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
+import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/crypto_service.dart';
 import 'package:etebase/src/impl/crypto/crypto_utils.dart';
 import 'package:mockito/mockito.dart';
@@ -9,6 +10,8 @@ import 'package:sodium/sodium_sumo.dart';
 import 'package:test/test.dart';
 
 import 'crypto_mocks.dart';
+
+class FakeAccountCryptoManager extends Fake implements AccountCryptoManager {}
 
 void main() {
   group('$CryptoService', () {
@@ -154,7 +157,7 @@ void main() {
         (16385, 17408),
         (17408, 17408),
         (17409, 18432),
-        (1073741820, 1073741824),
+        (16777210, 16777216),
         // and so on
       ],
       (fixture) async {
@@ -202,7 +205,7 @@ void main() {
     });
 
     group('shuffle', () {
-      final testRandom = Random(Random.secure().nextInt(1 << 32));
+      final testRandom = Random(Random.secure().nextInt(1 << 30));
 
       setUp(() {
         when(mockSodium.randombytes.uniform(any)).thenAnswer(
@@ -257,6 +260,155 @@ void main() {
             outLen: CryptoUtils.hashSize,
           ),
         ]);
+      });
+
+      test('creates pretty fingerprint with custom delimiter', () {
+        final testFingerprint = Uint8List.fromList([4, 5, 2, 4, 1]);
+        final testHash = Uint8List.fromList(List.generate(32, (i) => i));
+
+        when(
+          mockSodium.crypto.genericHash.call(
+            message: anyNamed('message'),
+            outLen: anyNamed('outLen'),
+          ),
+        ).thenReturn(testHash);
+
+        final result = sut.prettyFingerprint(testFingerprint, '-');
+
+        expect(result, '''
+00258-97637-95016-92395
+89774-87153-84532-81911
+79290-76669-08255-00000''');
+      });
+    });
+
+    group('createMainCryptoManager', () {
+      final testKey = FakeSecureKey(13);
+
+      test('creates crypto manager with default version', () {
+        final result = sut.createMainCryptoManager(testKey);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.mainKey, testKey);
+        expect(result.version, CryptoUtils.currentVersion);
+      });
+
+      test('creates crypto manager with custom version', () {
+        final result = sut.createMainCryptoManager(testKey, version: 34);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.mainKey, testKey);
+        expect(result.version, 34);
+      });
+    });
+
+    test('createIdentityCryptoManager creates crypto manager with seed', () {
+      final testSeed = FakeSecureKey(212);
+      final testKeyPair = KeyPair(
+        publicKey: Uint8List.fromList([4]),
+        secretKey: FakeSecureKey(21),
+      );
+
+      when(mockSodium.crypto.box.seedKeyPair(any)).thenReturn(testKeyPair);
+
+      final result = sut.createIdentityCryptoManager(testSeed);
+      expect(result.executor, same(mockCryptoExecutor));
+      expect(result.pubkey, testKeyPair.publicKey);
+      expect(result.privkey, testKeyPair.secretKey);
+
+      verify(mockSodium.crypto.box.seedKeyPair(testSeed));
+    });
+
+    group('createStorageCryptoManager', () {
+      final testKey = FakeSecureKey(31);
+
+      test('creates crypto manager with default version', () {
+        final result = sut.createStorageCryptoManager(testKey);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.key, testKey);
+        expect(result.version, CryptoUtils.currentVersion);
+      });
+
+      test('creates crypto manager with custom version', () {
+        final result = sut.createStorageCryptoManager(testKey, version: 34);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.key, testKey);
+        expect(result.version, 34);
+      });
+    });
+
+    group('createCollectionItemCryptoManager', () {
+      final testKey = FakeSecureKey(31);
+
+      test('creates crypto manager with default version', () {
+        final result = sut.createCollectionItemCryptoManager(testKey);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.key, testKey);
+        expect(result.version, CryptoUtils.currentVersion);
+      });
+
+      test('creates crypto manager with custom version', () {
+        final result =
+            sut.createCollectionItemCryptoManager(testKey, version: 34);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.key, testKey);
+        expect(result.version, 34);
+      });
+    });
+
+    group('createMinimalCollectionCryptoManager', () {
+      final testKey = FakeSecureKey(31);
+
+      test('creates crypto manager with default version', () {
+        final result = sut.createMinimalCollectionCryptoManager(testKey);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.key, testKey);
+        expect(result.version, CryptoUtils.currentVersion);
+      });
+
+      test('creates crypto manager with custom version', () {
+        final result =
+            sut.createMinimalCollectionCryptoManager(testKey, version: 34);
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.key, testKey);
+        expect(result.version, 34);
+      });
+    });
+
+    group('createCollectionCryptoManager', () {
+      final testKey = FakeSecureKey(31);
+
+      final fakeAccountCryptoManager = FakeAccountCryptoManager();
+
+      test('creates crypto manager with default version', () {
+        final result = sut.createCollectionCryptoManager(
+          fakeAccountCryptoManager,
+          testKey,
+        );
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.accountCryptoManager, same(fakeAccountCryptoManager));
+        expect(result.key, testKey);
+        expect(result.version, CryptoUtils.currentVersion);
+      });
+
+      test('creates crypto manager with custom version', () {
+        final result = sut.createCollectionCryptoManager(
+          fakeAccountCryptoManager,
+          testKey,
+          version: 34,
+        );
+
+        expect(result.executor, same(mockCryptoExecutor));
+        expect(result.accountCryptoManager, same(fakeAccountCryptoManager));
+        expect(result.key, testKey);
+        expect(result.version, 34);
       });
     });
   });

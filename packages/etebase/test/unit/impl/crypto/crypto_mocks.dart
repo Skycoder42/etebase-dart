@@ -17,6 +17,9 @@ import 'package:test/test.dart';
   MockSpec<Aead>(),
   MockSpec<GenericHash>(),
   MockSpec<Box>(),
+  MockSpec<Pwhash>(),
+  MockSpec<SignSumo>(),
+  MockSpec<Scalarmult>(),
   MockSpec<CryptoExecutor>(as: #MockCryptoExecutorBase),
 ])
 import 'crypto_mocks.mocks.dart';
@@ -91,11 +94,23 @@ class MockCrypto extends MockCryptoBase {
   @override
   final MockBox box = MockBox();
 
+  @override
+  final MockPwhash pwhash = MockPwhash();
+
+  @override
+  final MockSignSumo sign = MockSignSumo();
+
+  @override
+  final MockScalarmult scalarmult = MockScalarmult();
+
   void resetAll() {
     reset(kdf);
     reset(aeadXChaCha20Poly1305IETF);
     reset(genericHash);
     reset(box);
+    reset(pwhash);
+    reset(sign);
+    reset(scalarmult);
     reset(this);
   }
 }
@@ -149,21 +164,6 @@ class MockCryptoExecutor extends MockCryptoExecutorBase {
     });
 
     when(
-      execAsync<dynamic>(
-        any,
-        secureKeys: anyNamed('secureKeys'),
-        keyPairs: anyNamed('keyPairs'),
-      ),
-    ).thenAnswer((i) {
-      final [AsyncCallback<dynamic> cb] = i.positionalArguments;
-      final {
-        #secureKeys: List<SecureKey> secureKeys,
-        #keyPairs: List<KeyPair> keyPairs,
-      } = i.namedArguments;
-      return Future.value(cb(_mockSodium, secureKeys, keyPairs));
-    });
-
-    when(
       exec<dynamic>(
         any,
         secureKeys: anyNamed('secureKeys'),
@@ -176,6 +176,23 @@ class MockCryptoExecutor extends MockCryptoExecutorBase {
         #keyPairs: List<KeyPair> keyPairs,
       } = i.namedArguments;
       return cb(_mockSodium, secureKeys, keyPairs);
+    });
+  }
+
+  void mockExecAsync<T>() {
+    when(
+      execAsync<T>(
+        any,
+        secureKeys: anyNamed('secureKeys'),
+        keyPairs: anyNamed('keyPairs'),
+      ),
+    ).thenAnswer((i) {
+      final [AsyncCallback<T> cb] = i.positionalArguments;
+      final {
+        #secureKeys: List<SecureKey> secureKeys,
+        #keyPairs: List<KeyPair> keyPairs,
+      } = i.namedArguments;
+      return Future.value(cb(_mockSodium, secureKeys, keyPairs));
     });
   }
 }

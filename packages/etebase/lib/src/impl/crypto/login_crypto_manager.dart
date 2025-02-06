@@ -11,24 +11,28 @@ import 'crypto_manager_base.dart';
 class LoginCryptoManager implements CryptoManagerBase {
   @protected
   @override
+  @visibleForTesting
   final CryptoExecutor executor;
-  final KeyPair _keyPair;
+
+  @visibleForTesting
+  final KeyPair keyPair;
+
   var _disposed = false;
 
-  LoginCryptoManager(this.executor, this._keyPair);
+  LoginCryptoManager(this.executor, this.keyPair);
 
-  Uint8List get pubkey => _keyPair.publicKey;
+  Uint8List get pubkey => keyPair.publicKey;
 
   @override
   void dispose() {
     if (!_disposed) {
       _disposed = true;
-      _keyPair.dispose();
+      keyPair.dispose();
     }
   }
 
   FutureOr<Uint8List> signDetached(Uint8List message) => executor.exec(
-        secureKeys: [_keyPair.secretKey],
+        secureKeys: [keyPair.secretKey],
         (sodium, secureKeys, _) => sodium.crypto.sign.detached(
           message: message,
           secretKey: secureKeys.single,

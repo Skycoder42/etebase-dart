@@ -26,6 +26,7 @@ class EncryptedRevision {
   bool deleted = false;
   List<Chunk> chunks = [];
 
+  @internal
   EncryptedRevision();
 
   static Future<EncryptedRevision> create({
@@ -36,12 +37,13 @@ class EncryptedRevision {
     required Uint8List content,
   }) async {
     final revision = EncryptedRevision();
-    await revision.setMeta(client, cryptoManager, additionalData, meta);
+    // await revision.setMeta(client, cryptoManager, additionalData, meta);
     await revision.setContent(
       client,
       cryptoManager,
       additionalData: additionalData,
       content: content,
+      metaData: meta,
     );
     return revision;
   }
@@ -138,8 +140,10 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
     required Uint8List content,
+    EtebaseItemMetadata? metaData,
   }) async {
-    final meta = await getMeta(client, cryptoManager, additionalData);
+    final meta =
+        metaData ?? await getMeta(client, cryptoManager, additionalData);
 
     var chunks = <Chunk>[];
     const minChunk = 1 << 14;
