@@ -25,9 +25,22 @@ import 'package:test/test.dart';
 ])
 import 'encrypted_revision_test.mocks.dart';
 
+typedef TestNext = void Function(Uint8List data, int depth);
+
 void main() {
   group('$EncryptedRevision', () {
     const smartMockPrefix = 0x42;
+    const smConverterEncode = 0x11;
+    const smConverterEncodeRaw = 0x12;
+    const smCryptoPad = 0x21;
+    const smCryptoPadSmall = 0x22;
+    const smCmCrypt = 0x31;
+    const smCmDetachedCrypt = 0x32;
+    const smCmDetachedMac = 0x33;
+    const smCmMac = 0x34;
+    const smMac = 0x41;
+    const smMacUpdate = 0x42;
+    const smMacUpdateLen = 0x43;
 
     final mockClient = MockClient();
     final mockCryptoService = MockCryptoService();
@@ -38,7 +51,7 @@ void main() {
 
     Uint8List wrap(int id, List<dynamic> data) => msgPack.encode([
           // header
-          0x42, id,
+          smartMockPrefix, id,
           // data
           ...data,
         ]);
@@ -55,35 +68,25 @@ void main() {
     void setupSmartMocks() {
       when(mockClient.converter).thenReturn(mockMessagePackConverter);
 
-      var encodedCacheCtr = 0;
-      final encodeCache = <int, dynamic>{};
       when(mockMessagePackConverter.encode(any)).thenAnswer((i) {
         final [dynamic data] = i.positionalArguments;
-        final idx = encodedCacheCtr++;
-        encodeCache[idx] = data;
-        return wrap(0x01, [data.runtimeType.toString(), idx]);
+        // ignore: avoid_dynamic_calls
+        return wrap(smConverterEncode, [data.toJson()]);
       });
-      when(mockMessagePackConverter.decode<dynamic>(any)).thenAnswer((i) {
+      when(mockMessagePackConverter.decode<EtebaseItemMetadata>(any))
+          .thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
-        final [String typeName, int idx] = unwrap(data, 0x01);
-        expect(encodeCache, contains(idx));
-        final value = encodeCache[idx];
-        expect(value.runtimeType.toString(), typeName);
-        return value;
+        final [Map<String, dynamic> json] = unwrap(data, smConverterEncode);
+        return EtebaseItemMetadata.fromJson(json);
       });
       when(mockMessagePackConverter.encodeRaw(any)).thenAnswer((i) {
         final [dynamic data] = i.positionalArguments;
-        final idx = encodedCacheCtr++;
-        encodeCache[idx] = data;
-        return wrap(0x02, [data.runtimeType.toString(), idx]);
+        return wrap(smConverterEncodeRaw, [data]);
       });
       when(mockMessagePackConverter.decodeRaw(any)).thenAnswer((i) {
-        final [Uint8List data] = i.positionalArguments;
-        final [String typeName, int idx] = unwrap(data, 0x02);
-        expect(encodeCache, contains(idx));
-        final value = encodeCache[idx];
-        expect(value.runtimeType.toString(), typeName);
-        return value;
+        final [Uint8List raw] = i.positionalArguments;
+        final [dynamic data] = unwrap(raw, smConverterEncodeRaw);
+        return data;
       });
       when(mockMessagePackConverter.base64Encode(any)).thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
@@ -98,22 +101,22 @@ void main() {
 
       when(mockCryptoService.bufferPadSmall(any)).thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
-        return wrap(0x11, [data]);
+        return wrap(smCryptoPadSmall, [data]);
       });
       when(mockCryptoService.bufferUnpadSmall(any)).thenAnswer((i) {
         final [Uint8List raw] = i.positionalArguments;
-        final [Uint8List data] = unwrap(raw, 0x11);
+        final [Uint8List data] = unwrap(raw, smCryptoPadSmall);
         return data;
       });
       // ignore: discarded_futures
       when(mockCryptoService.bufferPad(any)).thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
-        return wrap(0x12, [data]);
+        return wrap(smCryptoPad, [data]);
       });
       // ignore: discarded_futures
       when(mockCryptoService.bufferUnpad(any)).thenAnswer((i) {
         final [Uint8List raw] = i.positionalArguments;
-        final [Uint8List data] = unwrap(raw, 0x12);
+        final [Uint8List data] = unwrap(raw, smCryptoPad);
         return data;
       });
       when(mockCryptoService.shuffle<dynamic>(any)).thenAnswer((i) {
@@ -135,16 +138,17 @@ void main() {
       // ignore: discarded_futures
       when(mockCryptoManager.encryptDetached(any, any)).thenAnswer((i) {
         final [Uint8List msg, Uint8List? ad] = i.positionalArguments;
-        final cipher = wrap(0x21, [msg, ad]);
-        final mac = wrap(0x22, [msg, ad]);
+        final cipher = wrap(smCmDetachedCrypt, [msg, ad]);
+        final mac = wrap(smCmDetachedMac, [msg, ad]);
         return (mac: mac, nonceCipherText: cipher);
       });
       // ignore: discarded_futures
       when(mockCryptoManager.decryptDetached(any, any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List mac, Uint8List? ad] =
             i.positionalArguments;
-        final [Uint8List msgC, Uint8List? adC] = unwrap(cipher, 0x21);
-        final [Uint8List msgM, Uint8List? adM] = unwrap(mac, 0x22);
+        final [Uint8List msgC, Uint8List? adC] =
+            unwrap(cipher, smCmDetachedCrypt);
+        final [Uint8List msgM, Uint8List? adM] = unwrap(mac, smCmDetachedMac);
         expect(adC, ad);
         expect(adM, ad);
         expect(msgM, msgC);
@@ -154,8 +158,9 @@ void main() {
       when(mockCryptoManager.verify(any, any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List mac, Uint8List? ad] =
             i.positionalArguments;
-        final [Uint8List msgC, Uint8List? adC] = unwrap(cipher, 0x21);
-        final [Uint8List msgM, Uint8List? adM] = unwrap(mac, 0x22);
+        final [Uint8List msgC, Uint8List? adC] =
+            unwrap(cipher, smCmDetachedCrypt);
+        final [Uint8List msgM, Uint8List? adM] = unwrap(mac, smCmDetachedMac);
         expect(adC, ad);
         expect(adM, ad);
         expect(msgM, msgC);
@@ -166,18 +171,18 @@ void main() {
           .thenAnswer((i) {
         final [Uint8List message] = i.positionalArguments;
         final {#withKey: bool withKey} = i.namedArguments;
-        return wrap(0x23, [message, withKey]);
+        return wrap(smCmMac, [message, withKey]);
       });
       // ignore: discarded_futures
       when(mockCryptoManager.encrypt(any, any)).thenAnswer((i) {
         final [Uint8List msg, Uint8List? ad] = i.positionalArguments;
-        final cipher = wrap(0x24, [msg, ad]);
+        final cipher = wrap(smCmCrypt, [msg, ad]);
         return cipher;
       });
       // ignore: discarded_futures
       when(mockCryptoManager.decrypt(any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List? ad] = i.positionalArguments;
-        final [Uint8List msgC, Uint8List? adC] = unwrap(cipher, 0x24);
+        final [Uint8List msgC, Uint8List? adC] = unwrap(cipher, smCmCrypt);
         expect(adC, ad);
         return msgC;
       });
@@ -185,18 +190,18 @@ void main() {
       when(mockCryptoManager.getCryptoMac(withKey: anyNamed('withKey')))
           .thenAnswer((i) {
         final {#withKey: bool withKey} = i.namedArguments;
-        final buffer = BytesBuilder()..add(wrap(0x31, [withKey]));
+        final values = <dynamic>[withKey];
         final cm = MockCryptoMac();
         when(cm.update(any)).thenAnswer((i) {
           final [Uint8List data] = i.positionalArguments;
-          buffer.add(wrap(0x32, data));
+          values.add(wrap(smMacUpdate, data));
         });
         when(cm.updateWithLenPrefix(any)).thenAnswer((i) {
           final [Uint8List data] = i.positionalArguments;
-          buffer.add(wrap(0x33, data));
+          values.add(wrap(smMacUpdateLen, data));
         });
         // ignore: discarded_futures
-        when(cm.finalize()).thenAnswer((i) async => buffer.takeBytes());
+        when(cm.finalize()).thenAnswer((i) async => wrap(smMac, values));
         return cm;
       });
     }
@@ -225,6 +230,91 @@ void main() {
         additionalData: testAd,
         meta: testMeta,
         content: testContent,
+      );
+
+      void isWrappedImpl(
+        Uint8List data,
+        String name,
+        int id,
+        List<dynamic> expectations,
+        int depth,
+      ) {
+        int? index;
+        try {
+          final unwrapped = unwrap(data, id);
+          expect(unwrapped, hasLength(expectations.length));
+          for (var i = 0; i < unwrapped.length; i++) {
+            index = i;
+            final value = unwrapped[i];
+            final expectation = expectations[i];
+            if (expectation is TestNext) {
+              expect(value, isA<Uint8List>());
+              expectation(value as Uint8List, depth + 1);
+            } else {
+              expect(value, expectation);
+            }
+          }
+        } catch (e) {
+          fail('${'  ' * depth}> $name[$index]\n$e');
+        }
+      }
+
+      TestNext isWrapped(String name, int id, List<dynamic> expectations) =>
+          (data, depth) => isWrappedImpl(data, name, id, expectations, depth);
+
+      void expectWrapped(Uint8List data, TestNext matcher) => matcher(data, 0);
+
+      expectWrapped(
+        result.meta,
+        isWrapped('encrypted', smCmDetachedCrypt, [
+          isWrapped('padded', smCryptoPadSmall, [
+            42,
+          ]),
+          anything,
+        ]),
+      );
+
+      expect(
+        result.meta,
+        // encrypted ... ...
+        wrap(smCmDetachedCrypt, [
+          // padded ...
+          wrap(smCryptoPadSmall, [
+            // encoded ...
+            wrap(smConverterEncode, [
+              // meta
+              testMeta.toJson(),
+            ]),
+          ]),
+          // cryptoMac ...
+          wrap(smMac, [
+            // with key
+            true,
+            // update ...
+            wrap(smMacUpdate, [
+              // not deleted
+              Uint8List.fromList([0]),
+            ]),
+            // update ...
+            wrap(smMacUpdateLen, [
+              // additional data
+              testAd,
+            ]),
+            // update ...
+            wrap(smMacUpdate, [
+              // cryptoMac ...
+              wrap(smMac, [
+                // without key
+                false,
+                // update ...
+                wrap(smMacUpdate, [
+                  // single chunk uid
+                  base64.decode(result.chunks.single.uid),
+                ]),
+              ]),
+            ]),
+          ]),
+        ]),
       );
 
       expect(
