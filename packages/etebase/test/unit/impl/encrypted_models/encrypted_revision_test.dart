@@ -60,10 +60,10 @@ void main() {
 
     List<dynamic> unwrap(Uint8List raw, int id) {
       final decoded = msgPack.decode(raw);
-      expect(decoded, isA<List<dynamic>>());
+      expect(decoded, isA<List<dynamic>>(), reason: 'decoded is List');
       final [int mPrefix, int mId, ...rest] = decoded as List;
-      expect(mPrefix, smartMockPrefix);
-      expect(mId, id);
+      expect(mPrefix, smartMockPrefix, reason: 'has prefix');
+      expect(mId, id, reason: 'has id');
       return rest;
     }
 
@@ -77,13 +77,13 @@ void main() {
       dynamic index = '-';
       try {
         final unwrapped = unwrap(data, id);
-        expect(unwrapped, hasLength(expectations.length));
+        expect(unwrapped, hasLength(expectations.length), reason: 'length');
         for (var i = 0; i < unwrapped.length; i++) {
           index = i;
           final value = unwrapped[i];
           final expectation = expectations[i];
           if (expectation is TestNext) {
-            expect(value, isA<Uint8List>());
+            expect(value, isA<Uint8List>(), reason: 'is Uint8List');
             expectation(value as Uint8List, depth + 1);
           } else {
             expect(value, expectation);
@@ -238,18 +238,18 @@ void main() {
         when(cm.finalize()).thenAnswer((i) async => wrap(smMac, values));
         return cm;
       });
+    }
 
+    void setupRollsum(int blockSize) {
       when(mockCryptoManager.getChunker()).thenAnswer((i) {
         var ctr = 0;
         final chunker = MockRollsum();
         when(chunker.update(any)).thenAnswer((i) {
-          final [int ch] = i.positionalArguments;
-          ctr += ch;
+          ctr++;
         });
         when(chunker.split(any)).thenAnswer((i) {
-          final [int mask] = i.positionalArguments;
-          if (ctr > mask) {
-            ctr -= mask;
+          if (ctr >= blockSize) {
+            ctr -= blockSize;
             return true;
           }
           return false;
@@ -339,15 +339,22 @@ void main() {
         );
       });
 
+      test('constructs new revision from meta and empty', () async {
+        // TODO
+      });
+
       test('constructs new revision with multiple chunks', () async {
+        const testBlockSize = 32768;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
         const testMeta = EtebaseItemMetadata();
         final testContent = Uint8List.fromList(
           List.generate(
-            1024 * 1024, // 1 MB
+            16384 * 5,
             (i) => i % 256,
           ),
         );
+
+        setupRollsum(testBlockSize);
 
         final result = await EncryptedRevision.create(
           client: mockClient,
@@ -358,8 +365,130 @@ void main() {
         );
 
         expect(result.deleted, isFalse);
-        expect(result.chunks, hasLength(2));
-        expect(result.chunks.first.data, isNotNull);
+        expect(result.chunks, hasLength(4));
+        // swap last and first data chunk, because of the shuffle
+        // the final chunk contains data about the shuffle, so leave it
+        final [c3, c2, c1, c4] = result.chunks;
+
+        // chunk 1 - 1 byte smaller because of how the algorithm works
+        expect(c1.data, isNotNull);
+        expectWrapped(
+          base64.decode(c1.uid),
+          isWrapped('mac(content,key)', smCmMac, [
+            testContent.sublist(0, testBlockSize - 1),
+            isTrue,
+          ]),
+        );
+        expectWrapped(
+          c1.data!,
+          isWrapped('encrypted', smCmCrypt, [
+            isWrapped('padded(content)', smCryptoPad, [
+              testContent.sublist(0, testBlockSize - 1),
+            ]),
+            isNull,
+          ]),
+        );
+        // chunk 2
+        expect(c2.data, isNotNull);
+        expectWrapped(
+          base64.decode(c2.uid),
+          isWrapped('mac(content,key)', smCmMac, [
+            testContent.sublist(testBlockSize - 1, 2 * testBlockSize - 1),
+            isTrue,
+          ]),
+        );
+        expectWrapped(
+          c2.data!,
+          isWrapped('encrypted', smCmCrypt, [
+            isWrapped('padded(content)', smCryptoPad, [
+              testContent.sublist(testBlockSize - 1, 2 * testBlockSize - 1),
+            ]),
+            isNull,
+          ]),
+        );
+        // chunk 3
+        expect(c3.data, isNotNull);
+        expectWrapped(
+          base64.decode(c3.uid),
+          isWrapped('mac(content,key)', smCmMac, [
+            testContent.sublist(2 * testBlockSize - 1),
+            isTrue,
+          ]),
+        );
+        expectWrapped(
+          c3.data!,
+          isWrapped('encrypted', smCmCrypt, [
+            isWrapped('padded(content)', smCryptoPad, [
+              testContent.sublist(2 * testBlockSize - 1),
+            ]),
+            isNull,
+          ]),
+        );
+        // c4 - shuffle data
+        expect(c4.data, isNotNull);
+        expectWrapped(
+          base64.decode(c4.uid),
+          isWrapped('mac(content,key)', smCmMac, [
+            isWrapped('indices', smConverterEncodeRaw, [
+              [
+                // first and last swapped
+                [2, 1, 0],
+              ],
+            ]),
+            isTrue,
+          ]),
+        );
+        expectWrapped(
+          c4.data!,
+          isWrapped('encrypted', smCmCrypt, [
+            isWrapped('padded', smCryptoPad, [
+              isWrapped('indices', smConverterEncodeRaw, [
+                [
+                  // first and last swapped
+                  [2, 1, 0],
+                ],
+              ]),
+            ]),
+            isNull,
+          ]),
+        );
+
+        // id and metadata
+
+        final encryptedContents = [
+          isWrapped('padded', smCryptoPadSmall, [
+            isWrapped('encoded(meta)', smConverterEncode, [
+              testMeta.toJson(),
+            ]),
+          ]),
+          isWrapped('cryptoMac(key)', smMac, [
+            isTrue,
+            isWrapped('notDeleted', smMacUpdate, [
+              [0],
+            ]),
+            isWrapped('additionalData', smMacUpdateLen, [
+              testAd,
+            ]),
+            isWrapped('chunksHash', smMacUpdate, [
+              isWrapped('cryptoMac(noKey)', smMac, [
+                isFalse,
+                for (final (idx, chunk) in result.chunks.indexed)
+                  isWrapped('chunk[$idx].uid', smMacUpdate, [
+                    base64.decode(chunk.uid),
+                  ]),
+              ]),
+            ]),
+          ]),
+        ];
+
+        expectWrapped(
+          base64.decode(result.uid),
+          isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
+        );
+        expectWrapped(
+          result.meta,
+          isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
+        );
       });
     });
   });
