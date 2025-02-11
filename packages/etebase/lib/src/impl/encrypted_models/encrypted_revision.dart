@@ -24,7 +24,7 @@ class EncryptedRevision {
   late String uid;
   late Uint8List meta;
   bool deleted = false;
-  List<Chunk> chunks = [];
+  List<Chunk> chunks = const [];
 
   @internal
   EncryptedRevision();
@@ -37,7 +37,6 @@ class EncryptedRevision {
     required Uint8List content,
   }) async {
     final revision = EncryptedRevision();
-    // await revision.setMeta(client, cryptoManager, additionalData, meta);
     await revision.setContent(
       client,
       cryptoManager,
@@ -48,8 +47,11 @@ class EncryptedRevision {
     return revision;
   }
 
-  factory EncryptedRevision.fromJson(Map<String, dynamic> json) =>
-      _$EncryptedRevisionFromJson(json);
+  factory EncryptedRevision.fromJson(Map<String, dynamic> json) {
+    final instance = _$EncryptedRevisionFromJson(json);
+    instance.chunks = UnmodifiableListView(instance.chunks);
+    return instance;
+  }
 
   factory EncryptedRevision.cacheLoad(
     Client client,
@@ -60,14 +62,16 @@ class EncryptedRevision {
       ..uid = client.converter.base64Encode(cached.uid)
       ..meta = cached.meta
       ..deleted = cached.deleted
-      ..chunks = cached.chunks
-          .map(
-            (chunk) => Chunk(
-              client.converter.base64Encode(chunk.uid),
-              chunk.data,
-            ),
-          )
-          .toList();
+      ..chunks = UnmodifiableListView(
+        cached.chunks
+            .map(
+              (chunk) => Chunk(
+                client.converter.base64Encode(chunk.uid),
+                chunk.data,
+              ),
+            )
+            .toList(),
+      );
   }
 
   Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
@@ -140,7 +144,7 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
     required Uint8List content,
-    EtebaseItemMetadata? metaData,
+    @visibleForTesting EtebaseItemMetadata? metaData,
   }) async {
     final meta =
         metaData ?? await getMeta(client, cryptoManager, additionalData);
@@ -212,16 +216,18 @@ class EncryptedRevision {
     }
 
     // Encrypt all of the chunks
-    this.chunks = await Stream.fromIterable(chunks)
-        .asyncMap(
-          (chunk) async => Chunk(
-            chunk.uid,
-            await cryptoManager.encrypt(
-              await client.crypto.bufferPad(chunk.data!),
+    this.chunks = UnmodifiableListView(
+      await Stream.fromIterable(chunks)
+          .asyncMap(
+            (chunk) async => Chunk(
+              chunk.uid,
+              await cryptoManager.encrypt(
+                await client.crypto.bufferPad(chunk.data!),
+              ),
             ),
-          ),
-        )
-        .toList();
+          )
+          .toList(),
+    );
 
     await setMeta(client, cryptoManager, additionalData, meta);
   }
@@ -230,7 +236,7 @@ class EncryptedRevision {
     Client client,
     CollectionItemCryptoManager cryptoManager,
   ) async {
-    var indices = [0];
+    var indices = const [0];
     final decryptedChunks =
         await Stream.fromIterable(chunks).asyncMap((chunk) async {
       final Chunk(:uid, :data) = chunk;
@@ -285,7 +291,7 @@ class EncryptedRevision {
     final meta = await getMeta(client, cryptoManager, additionalData);
 
     if (!preserveContent) {
-      chunks = [];
+      chunks = UnmodifiableListView(const []);
     }
     deleted = true;
 
