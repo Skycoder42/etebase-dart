@@ -100,7 +100,7 @@ void main() {
       );
       addTearDown(collection.dispose);
 
-      expect(await collection.verify(), isTrue);
+      expect(collection.verify(), anyOf(completes, isNull));
       expect(collection.isDeleted, isFalse);
 
       expect(

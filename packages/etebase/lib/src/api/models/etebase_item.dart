@@ -33,7 +33,7 @@ abstract class EtebaseItem {
   /// Manually verify the integrity of the item.
   ///
   /// This is also done automatically by the API.
-  Future<bool> verify();
+  Future<void> verify();
 
   /// Set [meta]data for the item object
   Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta);

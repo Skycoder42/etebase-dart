@@ -157,7 +157,7 @@ abstract class CryptoManager implements CryptoManagerBase {
         ),
       );
 
-  FutureOr<bool> verify(
+  FutureOr<void> verify(
     Uint8List nonceCipherText,
     Uint8List mac, [
     Uint8List? additionalData,
@@ -172,7 +172,6 @@ abstract class CryptoManager implements CryptoManagerBase {
             mac,
             additionalData,
           );
-          return true;
         },
       );
 

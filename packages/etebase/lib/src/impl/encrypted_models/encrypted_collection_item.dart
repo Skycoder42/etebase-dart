@@ -134,7 +134,7 @@ class EncryptedCollectionItem {
     content.chunks[index] = chunk;
   }
 
-  Future<bool> verify(
+  Future<void> verify(
     Client client,
     CollectionItemCryptoManager cm,
   ) =>

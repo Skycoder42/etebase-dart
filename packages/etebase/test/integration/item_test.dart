@@ -56,7 +56,7 @@ void main() {
       );
       addTearDown(item.dispose);
 
-      expect(await item.verify(), isTrue);
+      expect(item.verify(), anyOf(completes, isNull));
       expect(item.isDeleted, isFalse);
 
       expect(item.etag, isNotEmpty);

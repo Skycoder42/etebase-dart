@@ -110,7 +110,7 @@ class EncryptedCollection {
 
   void markSaved() => item.markSaved();
 
-  Future<bool> verify(
+  Future<void> verify(
     Client client,
     MinimalCollectionCryptoManager cm,
   ) =>

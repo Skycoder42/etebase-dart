@@ -406,8 +406,7 @@ void main() {
       ]);
     });
 
-    test('verify decrypts data with cipher key, but only returns success',
-        () async {
+    test('verify decrypts data with cipher key', () async {
       final testAd = Uint8List.fromList([2, 3, 2]);
       final testNonce = Uint8List.fromList([4, 4, 3]);
       final testCipher = Uint8List.fromList([6, 55, 5]);
@@ -417,13 +416,11 @@ void main() {
       when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
           .thenReturn(testNonce.length);
 
-      final result = await sut.verify(
+      await sut.verify(
         testNonceCipher,
         testMac,
         testAd,
       );
-
-      expect(result, isTrue);
 
       verifyInOrder([
         mockCryptoExecutor.execSync<SecureKey>(any),

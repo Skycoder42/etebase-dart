@@ -38,7 +38,7 @@ class Item implements EtebaseItem {
   void dispose() => _cm.dispose();
 
   @override
-  Future<bool> verify() => encrypted.verify(_client, _cm);
+  Future<void> verify() => encrypted.verify(_client, _cm);
 
   @override
   Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta) =>

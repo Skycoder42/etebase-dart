@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
-import 'package:sodium/sodium_sumo.dart';
 
+import '../../api/exceptions/crypto_failure.dart';
 import '../../api/exceptions/integrity_compromised.dart';
 import '../../api/exceptions/missing_content.dart';
 import '../../api/models/etebase_item_metadata.dart';
@@ -89,7 +89,7 @@ class EncryptedRevision {
         ),
       );
 
-  Future<bool> verify(
+  Future<void> verify(
     Client client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
@@ -98,8 +98,8 @@ class EncryptedRevision {
     final adHash =
         await _calculateAdHash(client, cryptoManager, additionalData);
     try {
-      return await cryptoManager.verify(meta, mac, adHash);
-    } on SodiumException {
+      await cryptoManager.verify(meta, mac, adHash);
+    } on CryptoFailure {
       throw IntegrityCompromised('mac verification failed');
     }
   }
@@ -182,21 +182,22 @@ class EncryptedRevision {
 
     // Shuffle the items and save the ordering if we have more than one
     if (chunks.isNotEmpty) {
-      final indices = client.crypto.shuffle(chunks);
+      var indices = client.crypto.shuffle(chunks);
 
-      // Filter duplicates and construct the indice list.
-      final uidIndices = <String, int>{};
-      chunks = chunks.whereIndexed((i, chunk) {
-        final Chunk(:uid) = chunk;
-        final previousIndex = uidIndices[uid];
-        if (previousIndex != null) {
-          indices[i] = previousIndex;
-          return false;
-        } else {
-          uidIndices[uid] = i;
-          return true;
-        }
-      }).toList();
+      // // Filter duplicates and construct the indices list.
+      final uniqueChunksMap = <String, Chunk>{}; // uses LinkedHashMap
+
+      for (final chunk in chunks) {
+        uniqueChunksMap.putIfAbsent(chunk.uid, () => chunk);
+      }
+      final uniqueKeys = uniqueChunksMap.keys.toList(growable: false);
+
+      indices = indices.map((i) {
+        final Chunk(:uid) = chunks[i];
+        return uniqueKeys.indexOf(uid);
+      }).toList(growable: false);
+
+      chunks = uniqueChunksMap.values.toList();
 
       // If we have more than one chunk we need to encode the mapping header in
       // the last chunk
@@ -256,9 +257,9 @@ class EncryptedRevision {
     // If we have more than one chunk we have the mapping header in the last
     // chunk
     if (chunks.length > 1) {
-      final lastChunk = client.converter.decodeRaw(decryptedChunks.removeLast())
-          as List<List<int>>;
-      indices = lastChunk[0];
+      final [List<dynamic> rawIndices, ..._] = client.converter
+          .decodeRaw(decryptedChunks.removeLast()) as List<dynamic>;
+      indices = rawIndices.cast();
     }
 
     // We need to unshuffle the chunks
