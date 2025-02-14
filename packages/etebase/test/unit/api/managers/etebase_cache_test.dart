@@ -1,4 +1,5 @@
 import 'package:etebase/src/api/managers/etebase_cache.dart';
+import 'package:etebase/src/impl/cache/hive_cache.dart';
 import 'package:etebase/src/impl/managers/client.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -8,7 +9,7 @@ import '../../test_helpers.dart';
 @GenerateNiceMocks([MockSpec<Client>()])
 import 'etebase_cache_test.mocks.dart';
 
-class FakeEtebaseCache extends Fake implements EtebaseCache {}
+class FakeEtebaseCache extends Fake implements HiveCache {}
 
 void main() {
   group('$EtebaseCache', () {

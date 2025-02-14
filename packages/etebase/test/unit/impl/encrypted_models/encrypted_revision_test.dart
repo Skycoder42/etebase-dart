@@ -17,6 +17,7 @@ import 'package:etebase/src/impl/encrypted_models/cached/cached_revision.dart';
 import 'package:etebase/src/impl/encrypted_models/chunk.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_revision.dart';
 import 'package:etebase/src/impl/managers/client.dart';
+import 'package:meta/meta.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
@@ -34,6 +35,78 @@ import 'package:test/test.dart';
 import 'encrypted_revision_test.mocks.dart';
 
 typedef TestNext = void Function(Uint8List data, int depth);
+
+class TestEtebaseItemMetadataCopyWith implements EtebaseItemMetadataCopyWith {
+  final TestEtebaseItemMetadata _self;
+
+  TestEtebaseItemMetadataCopyWith(this._self);
+
+  @override
+  TestEtebaseItemMetadata call({
+    String? color,
+    String? description,
+    DateTime? mtime,
+    String? name,
+    String? itemType,
+    String? extra,
+  }) =>
+      TestEtebaseItemMetadata(
+        _self.copyWith(
+          color: color,
+          description: description,
+          mtime: mtime,
+          name: name,
+          itemType: itemType,
+        ),
+        extra ?? _self.extra,
+      );
+}
+
+@immutable
+class TestEtebaseItemMetadata implements EtebaseItemMetadata {
+  final EtebaseItemMetadata _self;
+  final String extra;
+
+  const TestEtebaseItemMetadata(this._self, this.extra);
+
+  TestEtebaseItemMetadata.fromJson(Map<String, dynamic> json)
+      : _self = EtebaseItemMetadata.fromJson(json),
+        extra = json['extra'] as String;
+
+  @override
+  String? get color => _self.color;
+
+  @override
+  String? get description => _self.description;
+
+  @override
+  String? get itemType => _self.itemType;
+
+  @override
+  DateTime? get mtime => _self.mtime;
+
+  @override
+  String? get name => _self.name;
+
+  @override
+  EtebaseItemMetadataCopyWith get copyWith =>
+      TestEtebaseItemMetadataCopyWith(this);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ..._self.toJson(),
+        'extra': extra,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      other is TestEtebaseItemMetadata &&
+      other._self == _self &&
+      other.extra == extra;
+
+  @override
+  int get hashCode => Object.hash(_self, extra);
+}
 
 void main() {
   group('$EncryptedRevision', () {
@@ -899,60 +972,138 @@ void main() {
       });
     });
 
-    test('setMeta update existing metadata', () async {
-      final testAd = Uint8List.fromList([6, 5, 2, 3, 11]);
-      const testMeta = EtebaseItemMetadata(
-        name: 'test-meta',
-        description: 'test-description',
-      );
-      final testChunks = [
-        Chunk(base64.encode([3, 2, 3]), null),
-      ];
+    group('setMeta', () {
+      test('updates existing metadata', () async {
+        final testAd = Uint8List.fromList([6, 5, 2, 3, 11]);
+        const testMeta = EtebaseItemMetadata(
+          name: 'test-meta',
+          description: 'test-description',
+        );
+        final testChunks = [
+          Chunk(base64.encode([3, 2, 3]), null),
+        ];
 
-      final sut = EncryptedRevision()
-        ..uid = 'default'
-        ..meta = Uint8List(0)
-        ..chunks = testChunks;
+        final sut = EncryptedRevision()
+          ..uid = 'default'
+          ..meta = Uint8List(0)
+          ..chunks = testChunks;
 
-      await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
+        await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
 
-      final encryptedContents = [
-        isWrapped('padded', smCryptoPadSmall, [
-          isWrapped('encoded(meta)', smConverterEncode, [
-            testMeta.toJson(),
+        final encryptedContents = [
+          isWrapped('padded', smCryptoPadSmall, [
+            isWrapped('encoded(meta)', smConverterEncode, [
+              testMeta.toJson(),
+            ]),
           ]),
-        ]),
-        isAdHash(testAd, testChunks),
-      ];
+          isAdHash(testAd, testChunks),
+        ];
 
-      expectWrapped(
-        base64.decode(sut.uid),
-        isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
-      );
-      expectWrapped(
-        sut.meta,
-        isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
-      );
+        expectWrapped(
+          base64.decode(sut.uid),
+          isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
+        );
+        expectWrapped(
+          sut.meta,
+          isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
+        );
+      });
+
+      test('can persist non default metadata', () async {
+        final testAd = Uint8List.fromList([6, 5, 2, 3, 11]);
+        const testMeta = TestEtebaseItemMetadata(
+          EtebaseItemMetadata(
+            name: 'test-meta',
+            description: 'test-description',
+          ),
+          'test-extra',
+        );
+        final testChunks = [
+          Chunk(base64.encode([3, 2, 3]), null),
+        ];
+
+        final sut = EncryptedRevision()
+          ..uid = 'default'
+          ..meta = Uint8List(0)
+          ..chunks = testChunks;
+
+        await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
+
+        final encryptedContents = [
+          isWrapped('padded', smCryptoPadSmall, [
+            isWrapped('encoded(meta)', smConverterEncode, [
+              testMeta.toJson(),
+            ]),
+          ]),
+          isAdHash(testAd, testChunks),
+        ];
+
+        expectWrapped(
+          base64.decode(sut.uid),
+          isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
+        );
+        expectWrapped(
+          sut.meta,
+          isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
+        );
+      });
     });
 
-    test('getMeta restore original metadata', () async {
-      final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
-      const testMeta = EtebaseItemMetadata(
-        name: 'test-meta',
-        color: '#AABBCC',
-      );
-      final testContent = Uint8List.fromList([5, 6, 5, 2, 1, 2, 1]);
+    group('getMeta', () {
+      test('restores original metadata', () async {
+        final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
+        const testMeta = EtebaseItemMetadata(
+          name: 'test-meta',
+          color: '#AABBCC',
+        );
+        final testContent = Uint8List.fromList([5, 6, 5, 2, 1, 2, 1]);
 
-      final sut = await EncryptedRevision.create(
-        client: mockClient,
-        cryptoManager: mockCryptoManager,
-        additionalData: testAd,
-        meta: testMeta,
-        content: testContent,
-      );
+        final sut = await EncryptedRevision.create(
+          client: mockClient,
+          cryptoManager: mockCryptoManager,
+          additionalData: testAd,
+          meta: testMeta,
+          content: testContent,
+        );
 
-      final meta = await sut.getMeta(mockClient, mockCryptoManager, testAd);
-      expect(meta, testMeta);
+        final meta = await sut.getMeta(mockClient, mockCryptoManager, testAd);
+        expect(meta, testMeta);
+      });
+
+      test('restores custom metadata', () async {
+        final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
+        const testMeta = TestEtebaseItemMetadata(
+          EtebaseItemMetadata(
+            name: 'test-meta',
+            color: '#AABBCC',
+          ),
+          'test-extra',
+        );
+        final testContent = Uint8List.fromList([5, 6, 5, 2, 1, 2, 1]);
+
+        provideDummy(testMeta);
+        when(mockMessagePackConverter.decode<TestEtebaseItemMetadata>(any))
+            .thenAnswer((i) {
+          final [Uint8List data] = i.positionalArguments;
+          final [Map<dynamic, dynamic> json] = unwrap(data, smConverterEncode);
+          return TestEtebaseItemMetadata.fromJson(json.cast());
+        });
+
+        final sut = await EncryptedRevision.create(
+          client: mockClient,
+          cryptoManager: mockCryptoManager,
+          additionalData: testAd,
+          meta: testMeta,
+          content: testContent,
+        );
+
+        final meta = await sut.getMeta<TestEtebaseItemMetadata>(
+          mockClient,
+          mockCryptoManager,
+          testAd,
+        );
+        expect(meta, testMeta);
+      });
     });
 
     group('setContent', () {
@@ -1311,6 +1462,7 @@ void main() {
       expect(result.meta, sut.meta);
       expect(result.deleted, sut.deleted);
       expect(result.chunks, sut.chunks);
+      expect(result.chunks, isNot(same(sut.chunks)));
     });
   });
 }

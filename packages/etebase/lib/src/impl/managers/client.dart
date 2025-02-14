@@ -6,12 +6,13 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
 import '../../api/managers/crypto_executor.dart';
-import '../../api/managers/etebase_cache.dart';
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../cache/hive_cache.dart';
 import '../codec/message_pack_converter.dart';
+import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_service.dart';
+import '../encrypted_models/encrypted_revision.dart';
 import '../online_managers/authenticator.dart';
 import '../online_managers/base_network.dart';
 
@@ -75,17 +76,31 @@ class Client implements EtebaseClient, NetworkClient {
   ) =>
       converter.addCustom<TMeta>(fromJson);
 
-  // factory methods for other types
-
-  Future<EtebaseCache> createCache(String username) async {
-    final cache = HiveCache(this, Hive, username);
-    await cache.initialize();
-    return cache;
-  }
+  // factory methods for internal types to simplify testing
 
   Future<Account> restoreAccount(
     Uint8List accountDataStored, [
     SecureKey? encryptionKey,
   ]) =>
       Account.restore(this, accountDataStored, encryptionKey);
+
+  Future<HiveCache> createCache(String username) async {
+    final cache = HiveCache(this, Hive, username);
+    await cache.initialize();
+    return cache;
+  }
+
+  Future<EncryptedRevision> createEncryptedRevision({
+    required CollectionItemCryptoManager cryptoManager,
+    required Uint8List additionalData,
+    required EtebaseItemMetadata meta,
+    required Uint8List content,
+  }) =>
+      EncryptedRevision.create(
+        client: this,
+        cryptoManager: cryptoManager,
+        additionalData: additionalData,
+        meta: meta,
+        content: content,
+      );
 }

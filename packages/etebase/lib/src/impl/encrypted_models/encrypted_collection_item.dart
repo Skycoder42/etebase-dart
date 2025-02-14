@@ -22,6 +22,8 @@ part 'encrypted_collection_item.g.dart';
 @JsonSerializable()
 @msgPackBytes
 class EncryptedCollectionItem {
+  static const _itemUidBytes = 24;
+
   late String uid;
   int version = CryptoUtils.currentVersion;
   @JsonKey(
@@ -50,6 +52,7 @@ class EncryptedCollectionItem {
 
   bool get _isLocallyChanged => _etag != content.uid;
 
+  @visibleForTesting
   EncryptedCollectionItem();
 
   static Future<(EncryptedCollectionItem, CollectionItemCryptoManager)> create(
@@ -59,11 +62,12 @@ class EncryptedCollectionItem {
     Uint8List content,
   ) async {
     final item = EncryptedCollectionItem()
-      ..uid = client.converter.base64Encode(client.crypto.randomBytes(24));
+      ..uid = client.converter.base64Encode(
+        client.crypto.randomBytes(_itemUidBytes),
+      );
     final cm = item.getCryptoManager(client, parentCm);
     try {
-      item.content = await EncryptedRevision.create(
-        client: client,
+      item.content = await client.createEncryptedRevision(
         cryptoManager: cm,
         additionalData: item._getAdditionalMacData(),
         meta: meta,

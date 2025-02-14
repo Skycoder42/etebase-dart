@@ -24,9 +24,9 @@ class EncryptedRevision {
   late String uid;
   late Uint8List meta;
   bool deleted = false;
-  List<Chunk> chunks = const [];
+  List<Chunk> chunks = [];
 
-  @internal
+  @visibleForTesting
   EncryptedRevision();
 
   static Future<EncryptedRevision> create({
@@ -47,11 +47,8 @@ class EncryptedRevision {
     return revision;
   }
 
-  factory EncryptedRevision.fromJson(Map<String, dynamic> json) {
-    final instance = _$EncryptedRevisionFromJson(json);
-    instance.chunks = UnmodifiableListView(instance.chunks);
-    return instance;
-  }
+  factory EncryptedRevision.fromJson(Map<String, dynamic> json) =>
+      _$EncryptedRevisionFromJson(json);
 
   factory EncryptedRevision.cacheLoad(
     Client client,
@@ -62,16 +59,14 @@ class EncryptedRevision {
       ..uid = client.converter.base64Encode(cached.uid)
       ..meta = cached.meta
       ..deleted = cached.deleted
-      ..chunks = UnmodifiableListView(
-        cached.chunks
-            .map(
-              (chunk) => Chunk(
-                client.converter.base64Encode(chunk.uid),
-                chunk.data,
-              ),
-            )
-            .toList(),
-      );
+      ..chunks = cached.chunks
+          .map(
+            (chunk) => Chunk(
+              client.converter.base64Encode(chunk.uid),
+              chunk.data,
+            ),
+          )
+          .toList();
   }
 
   Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
@@ -216,18 +211,16 @@ class EncryptedRevision {
     }
 
     // Encrypt all of the chunks
-    this.chunks = UnmodifiableListView(
-      await Stream.fromIterable(chunks)
-          .asyncMap(
-            (chunk) async => Chunk(
-              chunk.uid,
-              await cryptoManager.encrypt(
-                await client.crypto.bufferPad(chunk.data!),
-              ),
+    this.chunks = await Stream.fromIterable(chunks)
+        .asyncMap(
+          (chunk) async => Chunk(
+            chunk.uid,
+            await cryptoManager.encrypt(
+              await client.crypto.bufferPad(chunk.data!),
             ),
-          )
-          .toList(),
-    );
+          ),
+        )
+        .toList();
 
     await setMeta(client, cryptoManager, additionalData, meta);
   }
@@ -291,7 +284,7 @@ class EncryptedRevision {
     final meta = await getMeta(client, cryptoManager, additionalData);
 
     if (!preserveContent) {
-      chunks = UnmodifiableListView(const []);
+      chunks = [];
     }
     deleted = true;
 
@@ -302,7 +295,7 @@ class EncryptedRevision {
     ..uid = uid
     ..meta = meta
     ..deleted = deleted
-    ..chunks = chunks;
+    ..chunks = [...chunks];
 
   Future<Uint8List> _calculateAdHash(
     Client client,
