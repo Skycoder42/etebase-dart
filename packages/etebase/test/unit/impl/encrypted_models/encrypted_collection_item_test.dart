@@ -398,128 +398,249 @@ void main() {
 
           verify(mockRevision.verify(mockClient, mockItemCm, testUidUtf8));
         });
+      });
 
-        group('setMeta', () {
-          test('updates revision if it is already locally changed', () async {
-            const newMeta = EtebaseItemMetadata(name: 'new-meta');
+      group('setMeta', () {
+        test('updates revision if it is already locally changed', () async {
+          const newMeta = EtebaseItemMetadata(name: 'new-meta');
 
-            await sut.setMeta(mockClient, mockItemCm, newMeta);
+          await sut.setMeta(mockClient, mockItemCm, newMeta);
 
-            verify(
-              mockRevision.setMeta(
-                mockClient,
-                mockItemCm,
-                testUidUtf8,
-                newMeta,
-              ),
-            );
-            verifyNever(mockRevision.clone());
-          });
-
-          test('clones revision if it has not been changed yet', () async {
-            const newMeta = EtebaseItemMetadata(name: 'new-meta');
-            final newRevision = MockEncryptedRevision();
-
-            sut.markSaved();
-
-            when(mockRevision.clone()).thenReturn(newRevision);
-
-            await sut.setMeta(mockClient, mockItemCm, newMeta);
-
-            verifyInOrder([
-              mockRevision.clone(),
-              newRevision.setMeta(
-                mockClient,
-                mockItemCm,
-                testUidUtf8,
-                newMeta,
-              ),
-            ]);
-          });
-
-          test('can handle custom metadata classes', () async {
-            final otherMeta = FakeEtebaseItemMetadata();
-
-            await sut.setMeta(mockClient, mockItemCm, otherMeta);
-
-            verify(
-              mockRevision.setMeta(
-                mockClient,
-                mockItemCm,
-                testUidUtf8,
-                otherMeta,
-              ),
-            );
-          });
-        });
-
-        group('getMeta', () {
-          test('verifies the data and returns the metadata from the revision',
-              () async {
-            when(mockRevision.getMeta(any, any, any)).thenReturnAsync(testMeta);
-
-            final result = await sut.getMeta(mockClient, mockItemCm);
-
-            expect(result, testMeta);
-
-            verifyInOrder([
-              mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
-              mockRevision.getMeta(mockClient, mockItemCm, testUidUtf8),
-            ]);
-          });
-
-          test('can handle custom metadata classes', () async {
-            final otherMeta = FakeEtebaseItemMetadata();
-
-            when(mockRevision.getMeta<FakeEtebaseItemMetadata>(any, any, any))
-                .thenReturnAsync(otherMeta);
-
-            final result = await sut.getMeta<FakeEtebaseItemMetadata>(
+          verify(
+            mockRevision.setMeta(
               mockClient,
               mockItemCm,
-            );
-
-            expect(result, otherMeta);
-          });
+              testUidUtf8,
+              newMeta,
+            ),
+          );
+          verifyNever(mockRevision.clone());
         });
 
-        group('setContent', () {
-          test('updates revision if it is already locally changed', () async {
-            final newContent = Uint8List.fromList([6, 4, 5, 6, 2, 1, 1]);
+        test('clones revision if it has not been changed yet', () async {
+          const newMeta = EtebaseItemMetadata(name: 'new-meta');
+          final newRevision = MockEncryptedRevision();
 
-            await sut.setContent(mockClient, mockItemCm, newContent);
+          sut.markSaved();
 
-            verify(
-              mockRevision.setContent(
-                mockClient,
-                mockItemCm,
-                additionalData: testUidUtf8,
-                content: newContent,
-              ),
-            );
-            verifyNever(mockRevision.clone());
-          });
+          when(mockRevision.clone()).thenReturn(newRevision);
 
-          test('clones revision if it has not been changed yet', () async {
-            final newContent = Uint8List.fromList([6, 4, 5, 6, 2, 1, 1]);
-            final newRevision = MockEncryptedRevision();
+          await sut.setMeta(mockClient, mockItemCm, newMeta);
 
-            sut.markSaved();
+          verifyInOrder([
+            mockRevision.clone(),
+            newRevision.setMeta(
+              mockClient,
+              mockItemCm,
+              testUidUtf8,
+              newMeta,
+            ),
+          ]);
+          verifyNever(
+            mockRevision.setMeta(
+              any,
+              any,
+              any,
+              any,
+            ),
+          );
+        });
 
-            when(mockRevision.clone()).thenReturn(newRevision);
+        test('can handle custom metadata classes', () async {
+          final otherMeta = FakeEtebaseItemMetadata();
 
-            await sut.setContent(mockClient, mockItemCm, newContent);
+          await sut.setMeta(mockClient, mockItemCm, otherMeta);
 
-            verifyInOrder([
-              mockRevision.clone(),
-              newRevision.setContent(
-                mockClient,
-                mockItemCm,
-                additionalData: testUidUtf8,
-                content: newContent,
-              ),
-            ]);
-          });
+          verify(
+            mockRevision.setMeta(
+              mockClient,
+              mockItemCm,
+              testUidUtf8,
+              otherMeta,
+            ),
+          );
+        });
+      });
+
+      group('getMeta', () {
+        test('verifies the data and returns the metadata from the revision',
+            () async {
+          when(mockRevision.getMeta(any, any, any)).thenReturnAsync(testMeta);
+
+          final result = await sut.getMeta(mockClient, mockItemCm);
+
+          expect(result, testMeta);
+
+          verifyInOrder([
+            mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
+            mockRevision.getMeta(mockClient, mockItemCm, testUidUtf8),
+          ]);
+        });
+
+        test('can handle custom metadata classes', () async {
+          final otherMeta = FakeEtebaseItemMetadata();
+
+          when(mockRevision.getMeta<FakeEtebaseItemMetadata>(any, any, any))
+              .thenReturnAsync(otherMeta);
+
+          final result = await sut.getMeta<FakeEtebaseItemMetadata>(
+            mockClient,
+            mockItemCm,
+          );
+
+          expect(result, otherMeta);
+        });
+      });
+
+      group('setContent', () {
+        test('updates revision if it is already locally changed', () async {
+          final newContent = Uint8List.fromList([6, 4, 5, 6, 2, 1, 1]);
+
+          await sut.setContent(mockClient, mockItemCm, newContent);
+
+          verify(
+            mockRevision.setContent(
+              mockClient,
+              mockItemCm,
+              additionalData: testUidUtf8,
+              content: newContent,
+            ),
+          );
+          verifyNever(mockRevision.clone());
+        });
+
+        test('clones revision if it has not been changed yet', () async {
+          final newContent = Uint8List.fromList([6, 4, 5, 6, 2, 1, 1]);
+          final newRevision = MockEncryptedRevision();
+
+          sut.markSaved();
+
+          when(mockRevision.clone()).thenReturn(newRevision);
+
+          await sut.setContent(mockClient, mockItemCm, newContent);
+
+          verifyInOrder([
+            mockRevision.clone(),
+            newRevision.setContent(
+              mockClient,
+              mockItemCm,
+              additionalData: testUidUtf8,
+              content: newContent,
+            ),
+          ]);
+          verifyNever(
+            mockRevision.setContent(
+              any,
+              any,
+              additionalData: anyNamed('additionalData'),
+              content: anyNamed('content'),
+            ),
+          );
+        });
+      });
+
+      test('getContent', () async {
+        when(mockRevision.getContent(any, any)).thenReturnAsync(testContent);
+
+        final result = await sut.getContent(mockClient, mockItemCm);
+
+        expect(result, testContent);
+
+        verifyInOrder([
+          mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
+          mockRevision.getContent(mockClient, mockItemCm),
+        ]);
+      });
+
+      group('delete', () {
+        test('updates revision if it is already locally changed', () async {
+          await sut.delete(mockClient, mockItemCm, preserveContent: true);
+
+          verify(
+            mockRevision.delete(
+              mockClient,
+              mockItemCm,
+              testUidUtf8,
+              preserveContent: true,
+            ),
+          );
+          verifyNever(mockRevision.clone());
+        });
+
+        test('clones revision if it has not been changed yet', () async {
+          final newRevision = MockEncryptedRevision();
+
+          sut.markSaved();
+
+          when(mockRevision.clone()).thenReturn(newRevision);
+
+          await sut.delete(mockClient, mockItemCm, preserveContent: false);
+
+          verifyInOrder([
+            mockRevision.clone(),
+            newRevision.delete(
+              mockClient,
+              mockItemCm,
+              testUidUtf8,
+              preserveContent: false,
+            ),
+          ]);
+          verifyNever(
+            mockRevision.delete(
+              any,
+              any,
+              any,
+              preserveContent: anyNamed('preserveContent'),
+            ),
+          );
+        });
+
+        group('withCm', () {
+          test(
+            'execute the callback with the derived item crypto manager',
+            () async {
+              final cb = expectAsync1<bool, CollectionItemCryptoManager>((cm) {
+                expect(cm, same(mockItemCm));
+                return true;
+              });
+
+              final result = await sut.withCm(mockClient, mockParentCm, cb);
+              expect(result, isTrue);
+
+              verifyInOrder([
+                mockCryptoService.createCollectionItemCryptoManager(testKey),
+                mockItemCm.dispose(),
+              ]);
+            },
+          );
+
+          test(
+            'disposes item cm if callback throws',
+            () async {
+              final testException = Exception('test');
+              final cb = expectAsync1<bool, CollectionItemCryptoManager>(
+                (cm) => throw testException,
+              );
+
+              await expectLater(
+                () => sut.withCm(mockClient, mockParentCm, cb),
+                throwsA(testException),
+              );
+
+              verifyInOrder([
+                mockCryptoService.createCollectionItemCryptoManager(testKey),
+                mockItemCm.dispose(),
+              ]);
+            },
+          );
+        });
+
+        test('getCryptoManager returns item manager', () {
+          final result = sut.getCryptoManager(mockClient, mockParentCm);
+          expect(result, same(mockItemCm));
+
+          verify(mockCryptoService.createCollectionItemCryptoManager(testKey));
+          verifyNever(mockItemCm.dispose());
         });
       });
     });

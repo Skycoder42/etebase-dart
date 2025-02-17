@@ -215,6 +215,15 @@ class EncryptedCollectionItem {
     }
   }
 
+  CollectionItemCryptoManager getCryptoManager(
+    Client client,
+    MinimalCollectionCryptoManager parentCm,
+  ) =>
+      client.crypto.createCollectionItemCryptoManager(
+        _getEncryptionKey(client, parentCm),
+        version: version,
+      );
+
   Future<void> _cloneOrUpdateRevision(
     FutureOr<void> Function(EncryptedRevision rev) callback,
   ) async {
@@ -235,13 +244,4 @@ class EncryptedCollectionItem {
       return parentCm.deriveSubkey(_getAdditionalMacData());
     }
   }
-
-  CollectionItemCryptoManager getCryptoManager(
-    Client client,
-    MinimalCollectionCryptoManager parentCm,
-  ) =>
-      client.crypto.createCollectionItemCryptoManager(
-        _getEncryptionKey(client, parentCm),
-        version: version,
-      );
 }
