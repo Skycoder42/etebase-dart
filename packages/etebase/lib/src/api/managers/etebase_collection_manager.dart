@@ -87,10 +87,7 @@ abstract class EtebaseCollectionManager {
   /// with it's content. If set to `false`, only the metadata is stored and the
   /// content has to be restored using [EtebaseItemManager.downloadContent].
   /// {@endtemplate}
-  Uint8List cacheSave(
-    EtebaseCollection collection, {
-    bool saveContent = true,
-  });
+  Uint8List cacheSave(EtebaseCollection collection, {bool saveContent = true});
 
   /// Load and return a cached [EtebaseCollection] object from the [cached]
   /// bytes originally saved via [cacheSave].

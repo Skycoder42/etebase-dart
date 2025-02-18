@@ -18,8 +18,7 @@ abstract interface class EtebaseAccount {
     EtebaseClient client,
     String username,
     String password,
-  ) async =>
-      await Account.login(client as Client, username, password);
+  ) async => await Account.login(client as Client, username, password);
 
   /// Creates a new user on the server and returns a handle to it.
   ///
@@ -28,8 +27,7 @@ abstract interface class EtebaseAccount {
     EtebaseClient client,
     EtebaseUser user,
     String password,
-  ) async =>
-      await Account.signup(client as Client, user, password);
+  ) async => await Account.signup(client as Client, user, password);
 
   /// Deserialize and return the [EtebaseAccount] object from the
   /// [accountDataStored] obtained using [save].
@@ -39,8 +37,7 @@ abstract interface class EtebaseAccount {
     EtebaseClient client,
     Uint8List accountDataStored, [
     SecureKey? encryptionKey,
-  ]) =>
-      (client as Client).restoreAccount(accountDataStored, encryptionKey);
+  ]) => (client as Client).restoreAccount(accountDataStored, encryptionKey);
 
   /// Return a [EtebaseCollectionManager] for creating, fetching and uploading
   /// collections.

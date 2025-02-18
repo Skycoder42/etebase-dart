@@ -32,23 +32,22 @@ class LoginCryptoManager implements CryptoManagerBase {
   }
 
   FutureOr<Uint8List> signDetached(Uint8List message) => executor.exec(
-        secureKeys: [keyPair.secretKey],
-        (sodium, secureKeys, _) => sodium.crypto.sign.detached(
-          message: message,
-          secretKey: secureKeys.single,
-        ),
-      );
+    secureKeys: [keyPair.secretKey],
+    (sodium, secureKeys, _) => sodium.crypto.sign.detached(
+      message: message,
+      secretKey: secureKeys.single,
+    ),
+  );
 
   FutureOr<bool> verifyDetached({
     required Uint8List message,
     required Uint8List signature,
     required Uint8List pubkey,
-  }) =>
-      executor.exec(
-        (sodium, _, __) => sodium.crypto.sign.verifyDetached(
-          message: message,
-          signature: signature,
-          publicKey: pubkey,
-        ),
-      );
+  }) => executor.exec(
+    (sodium, _, _) => sodium.crypto.sign.verifyDetached(
+      message: message,
+      signature: signature,
+      publicKey: pubkey,
+    ),
+  );
 }

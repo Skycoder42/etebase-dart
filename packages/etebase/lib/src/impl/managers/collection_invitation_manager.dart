@@ -30,14 +30,12 @@ class CollectionInvitationManager
   @override
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming([
     EtebaseIteratorFetchOptions? fetchOptions,
-  ]) =>
-      _online.listIncoming(fetchOptions);
+  ]) => _online.listIncoming(fetchOptions);
 
   @override
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing([
     EtebaseIteratorFetchOptions? fetchOptions,
-  ]) =>
-      _online.listOutgoing(fetchOptions);
+  ]) => _online.listOutgoing(fetchOptions);
 
   @override
   Future<void> accept(covariant SignedInvitationRead invitation) async {
@@ -49,10 +47,13 @@ class CollectionInvitationManager
         ),
       ),
     );
-    final colTypeUid =
-        _account.accountCryptoManager.colTypeToUid(content.collectionType);
-    final encryptedEncryptionKey = await _account.accountCryptoManager
-        .encrypt(content.encryptionKey, colTypeUid);
+    final colTypeUid = _account.accountCryptoManager.colTypeToUid(
+      content.collectionType,
+    );
+    final encryptedEncryptionKey = await _account.accountCryptoManager.encrypt(
+      content.encryptionKey,
+      colTypeUid,
+    );
     await _online.accept(
       invitation,
       InvitationAcceptRequest(

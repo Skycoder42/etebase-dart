@@ -57,12 +57,10 @@ base class BaseNetwork {
   @protected
   Uri get baseUri => client.baseUri;
 
-  BaseNetwork({
-    required this.client,
-    Iterable<String> path = const [],
-  }) : _apiUri = client.baseUri.replace(
-          pathSegments: client.baseUri.pathSegments.followedBy(path),
-        );
+  BaseNetwork({required this.client, Iterable<String> path = const []})
+    : _apiUri = client.baseUri.replace(
+        pathSegments: client.baseUri.pathSegments.followedBy(path),
+      );
 
   @nonVirtual
   Future<T> invoke<T>({
@@ -111,18 +109,15 @@ base class BaseNetwork {
         ...path,
         '', // ensures the path has a trailing /
       ],
-      queryParameters: query.isNotEmpty
-          ? {
-              ..._apiUri.queryParametersAll,
-              ...query,
-            }
-          : null,
+      queryParameters:
+          query.isNotEmpty ? {..._apiUri.queryParametersAll, ...query} : null,
     );
 
-    final request = http.Request(method.verb, requestUri)
-      ..headers[_userAgentHeader] = client.userAgent
-      ..headers[_acceptHeader] = _msgPackContentType
-      ..headers.addAll(headers);
+    final request =
+        http.Request(method.verb, requestUri)
+          ..headers[_userAgentHeader] = client.userAgent
+          ..headers[_acceptHeader] = _msgPackContentType
+          ..headers.addAll(headers);
     if (authToken != null) {
       request.headers[_authorizationHeader] = authToken.header;
     }
@@ -156,9 +151,10 @@ base class BaseNetwork {
       _msgPackContentType => converter.decode<T>(response.bodyBytes),
       _binaryContentType => response.bodyBytes as T,
       _plainTextContentType => response.body as T,
-      final contentType => throw InvalidMessagePackData(
+      final contentType =>
+        throw InvalidMessagePackData(
           'Content type $contentType is not supported',
-        )
+        ),
     };
   }
 
@@ -171,8 +167,7 @@ base class BaseNetwork {
       Conflict.statusCode => Conflict(message, error),
       502 ||
       503 ||
-      504 =>
-        TemporaryServerProblem(response.statusCode, message, error),
+      504 => TemporaryServerProblem(response.statusCode, message, error),
       >= 500 && < 600 => ServerProblem(response.statusCode, message, error),
       _ => HttpFailure(response.statusCode, message, error),
     };

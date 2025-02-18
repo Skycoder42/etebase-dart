@@ -62,24 +62,26 @@ void main() {
     });
 
     test(
-        'createIdentityCryptoManager creates box manager with derived key pair',
-        () {
-      final testPrivKey = FakeSecureKey(54);
-      final testPubKey = Uint8List.fromList([5, 4]);
+      'createIdentityCryptoManager creates box manager with derived key pair',
+      () {
+        final testPrivKey = FakeSecureKey(54);
+        final testPubKey = Uint8List.fromList([5, 4]);
 
-      when(mockSodium.crypto.scalarmult.base(n: anyNamed('n')))
-          .thenReturn(testPubKey);
+        when(
+          mockSodium.crypto.scalarmult.base(n: anyNamed('n')),
+        ).thenReturn(testPubKey);
 
-      final result = sut.createIdentityCryptoManager(testPrivKey);
+        final result = sut.createIdentityCryptoManager(testPrivKey);
 
-      expect(result.executor, mockCryptoExecutor);
-      expect(result.privkey, testPrivKey);
-      expect(result.pubkey, testPubKey);
+        expect(result.executor, mockCryptoExecutor);
+        expect(result.privkey, testPrivKey);
+        expect(result.pubkey, testPubKey);
 
-      verifyInOrder([
-        mockCryptoExecutor.execSync<KeyPair>(any),
-        mockSodium.crypto.scalarmult.base(n: testPrivKey),
-      ]);
-    });
+        verifyInOrder([
+          mockCryptoExecutor.execSync<KeyPair>(any),
+          mockSodium.crypto.scalarmult.base(n: testPrivKey),
+        ]);
+      },
+    );
   });
 }

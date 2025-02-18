@@ -25,10 +25,7 @@ abstract class EtebaseCache {
   /// ```dart
   /// Hive.init('.../path/to/hive/dir');
   /// ```
-  static Future<EtebaseCache> create(
-    EtebaseClient client,
-    String username,
-  ) =>
+  static Future<EtebaseCache> create(EtebaseClient client, String username) =>
       (client as Client).createCache(username);
 
   /// Disposes of the instance and closes all hive boxes.
@@ -49,10 +46,7 @@ abstract class EtebaseCache {
   /// Load it later using [loadAccount].
   ///
   /// {@macro encryption_key}
-  Future<void> saveAccount(
-    EtebaseAccount account, [
-    SecureKey? encryptionKey,
-  ]);
+  Future<void> saveAccount(EtebaseAccount account, [SecureKey? encryptionKey]);
 
   /// Load the [EtebaseAccount] object from cache.
   ///
@@ -121,10 +115,7 @@ abstract class EtebaseCache {
 
   /// Remove an item identified by [itemUid] of the collection identified by
   /// [colUid] from cache.
-  Future<void> itemUnset(
-    String colUid,
-    String itemUid,
-  );
+  Future<void> itemUnset(String colUid, String itemUid);
 
   /// Load an [EtebaseItem] identified by [itemUid] of the collection identified
   /// by [colUid] from cache.

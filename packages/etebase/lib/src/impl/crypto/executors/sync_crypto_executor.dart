@@ -24,26 +24,18 @@ class SyncCryptoExecutor implements CryptoExecutor {
     AsyncCallback<T> callback, {
     List<SecureKey> secureKeys = const [],
     List<KeyPair> keyPairs = const [],
-  }) =>
-      CryptoFailure.wrap<Future<T>, T>(
-        () => _sodium.runIsolated(
-          callback,
-          secureKeys: secureKeys,
-          keyPairs: keyPairs,
-        ),
-      );
+  }) => CryptoFailure.wrap<Future<T>, T>(
+    () => _sodium.runIsolated(
+      callback,
+      secureKeys: secureKeys,
+      keyPairs: keyPairs,
+    ),
+  );
 
   @override
   T exec<T>(
     AsyncCallback<T> callback, {
     List<SecureKey> secureKeys = const [],
     List<KeyPair> keyPairs = const [],
-  }) =>
-      CryptoFailure.wrap<T, T>(
-        () => callback(
-          _sodium,
-          secureKeys,
-          keyPairs,
-        ),
-      );
+  }) => CryptoFailure.wrap<T, T>(() => callback(_sodium, secureKeys, keyPairs));
 }

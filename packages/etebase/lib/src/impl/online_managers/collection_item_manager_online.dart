@@ -27,18 +27,13 @@ final class CollectionItemManagerOnline extends BaseManager {
   Future<EncryptedCollectionItem> fetch(
     String itemUid,
     EtebaseItemFetchOptions? options,
-  ) =>
-      invokeApi<EncryptedCollectionItem>(
-        path: [itemUid],
-        options: options,
-      );
+  ) => invokeApi<EncryptedCollectionItem>(path: [itemUid], options: options);
 
   Future<EtebaseItemListResponse<EncryptedCollectionItem>> list(
     EtebaseItemFetchOptions? options,
-  ) =>
-      invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
-        options: options,
-      );
+  ) => invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
+    options: options,
+  );
 
   Future<EtebaseIteratorListResponse<EncryptedCollectionItem>> itemRevisions(
     EncryptedCollectionItem item,
@@ -46,68 +41,62 @@ final class CollectionItemManagerOnline extends BaseManager {
   ) async {
     final response =
         await invokeApi<EtebaseIteratorListResponse<EncryptedRevision>>(
-      path: [item.uid, 'revision'],
-      options: options,
-    );
+          path: [item.uid, 'revision'],
+          options: options,
+        );
     return response.map((rev) => item.cloneWithRevision(rev));
   }
 
-  Future<void> create(EncryptedCollectionItem item) => invokeApi<void>(
-        method: HttpMethod.post,
-        body: item,
-      );
+  Future<void> create(EncryptedCollectionItem item) =>
+      invokeApi<void>(method: HttpMethod.post, body: item);
 
   Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchUpdates(
     List<EncryptedCollectionItem> items,
     EtebaseItemFetchOptions? options,
-  ) =>
-      invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
-        method: HttpMethod.post,
-        path: const ['fetch_updates'],
-        body: items.toFetchInfo(wantEtag: options?.stoken == null),
-        options: options,
-      );
+  ) => invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
+    method: HttpMethod.post,
+    path: const ['fetch_updates'],
+    body: items.toFetchInfo(wantEtag: options?.stoken == null),
+    options: options,
+  );
 
   Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchMulti(
     List<String> items,
     EtebaseItemFetchOptions? options,
-  ) =>
-      invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
-        method: HttpMethod.post,
-        path: const ['fetch_updates'],
-        body: items.map(CollectionItemFetchInfo.new).toList(),
-        options: options,
-      );
+  ) => invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
+    method: HttpMethod.post,
+    path: const ['fetch_updates'],
+    body: items.map(CollectionItemFetchInfo.new).toList(),
+    options: options,
+  );
 
   Future<void> batch(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
     /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
-  ) =>
-      invokeApi<void>(
-        method: HttpMethod.post,
-        path: const ['batch'],
-        body: ItemBatchRequest(
-          items: items,
-          deps: deps?.toFetchInfo(wantEtag: true),
-        ),
-        options: options,
-      );
+  ) => invokeApi<void>(
+    method: HttpMethod.post,
+    path: const ['batch'],
+    body: ItemBatchRequest(
+      items: items,
+      deps: deps?.toFetchInfo(wantEtag: true),
+    ),
+    options: options,
+  );
 
   Future<void> transaction(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
     /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
-  ) =>
-      invokeApi<void>(
-        method: HttpMethod.post,
-        path: const ['transaction'],
-        body: ItemBatchRequest(
-          items: items,
-          deps: deps?.toFetchInfo(wantEtag: true),
-        ),
-        options: options,
-      );
+  ) => invokeApi<void>(
+    method: HttpMethod.post,
+    path: const ['transaction'],
+    body: ItemBatchRequest(
+      items: items,
+      deps: deps?.toFetchInfo(wantEtag: true),
+    ),
+    options: options,
+  );
 
   Future<void> chunkUpload(
     EncryptedCollectionItem item,
@@ -130,11 +119,10 @@ final class CollectionItemManagerOnline extends BaseManager {
     EncryptedCollectionItem item,
     String chunkUid,
     EtebaseItemFetchOptions? options,
-  ) =>
-      invokeApi<Uint8List>(
-        path: [item.uid, 'chunk', chunkUid, 'download'],
-        options: options,
-      );
+  ) => invokeApi<Uint8List>(
+    path: [item.uid, 'chunk', chunkUid, 'download'],
+    options: options,
+  );
 
   Stream<EtebaseItemListResponse<EncryptedCollectionItem>> subscribeChanges(
     EtebaseItemFetchOptions? options,

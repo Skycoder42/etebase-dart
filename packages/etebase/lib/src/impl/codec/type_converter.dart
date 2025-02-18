@@ -10,10 +10,11 @@ typedef FromJsonList<T> = T Function(List<dynamic> json);
 
 /// @nodoc
 @internal
-typedef ContainerFromJson<TContainer, TData> = TContainer Function(
-  Map<String, dynamic> json,
-  TData Function(Object?) fromJson,
-);
+typedef ContainerFromJson<TContainer, TData> =
+    TContainer Function(
+      Map<String, dynamic> json,
+      TData Function(Object?) fromJson,
+    );
 
 @internal
 sealed class TypeConverter<T> {
@@ -25,8 +26,7 @@ sealed class TypeConverter<T> {
   static TypeConverter<TContainer> generic<TContainer, TData>(
     ContainerFromJson<TContainer, TData> containerFromJson,
     FromJson<TData> fromJson,
-  ) =>
-      _GenericTypeConverter<TContainer, TData>(containerFromJson, fromJson);
+  ) => _GenericTypeConverter<TContainer, TData>(containerFromJson, fromJson);
 
   T call(dynamic data);
 }
@@ -58,7 +58,7 @@ class _GenericTypeConverter<TContainer, TData>
 
   @override
   TContainer call(dynamic data) => _containerFromJson(
-        (data as Map).cast(),
-        (data) => _fromJson((data! as Map).cast()),
-      );
+    (data as Map).cast(),
+    (data) => _fromJson((data! as Map).cast()),
+  );
 }

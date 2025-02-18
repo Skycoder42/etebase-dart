@@ -27,7 +27,8 @@ sealed class _CryptoJob with _$CryptoJob {
       SodiumSumo cryptoManager,
       List<SecureKey> secureKeys,
       List<KeyPair> keyPairs,
-    ) callback,
+    )
+    callback,
     required List<TransferrableSecureKey> secureKeys,
     required List<TransferrableKeyPair> keyPairs,
   }) = _CryptoJobRun;
@@ -68,7 +69,9 @@ class AsyncCryptoExecutor implements CryptoExecutor {
         _receivePort.cast<_CryptoJobResult>().asBroadcastStream();
 
     _errorPort = ReceivePort('AsyncCryptoExecutor.error')
-      ..cast<List<dynamic>>().map((l) => l.cast<String>()).listen(
+      ..cast<List<dynamic>>()
+          .map((l) => l.cast<String>())
+          .listen(
             (error) => Zone.current.handleUncaughtError(
               AsyncCryptoExecutorIsolateFailure(error[0]),
               StackTrace.fromString(error[1]),
@@ -119,30 +122,24 @@ class AsyncCryptoExecutor implements CryptoExecutor {
     AsyncCallback<T> callback, {
     List<SecureKey> secureKeys = const [],
     List<KeyPair> keyPairs = const [],
-  }) =>
-      CryptoFailure.wrap<Future<T>, T>(
-        () => _exec<T>(
-          _CryptoJob.run(
-            id: _nextJobId,
-            callback: callback,
-            secureKeys:
-                secureKeys.map(_sodium.createTransferrableSecureKey).toList(),
-            keyPairs: keyPairs.map(_sodium.createTransferrableKeyPair).toList(),
-          ),
-        ),
-      );
+  }) => CryptoFailure.wrap<Future<T>, T>(
+    () => _exec<T>(
+      _CryptoJob.run(
+        id: _nextJobId,
+        callback: callback,
+        secureKeys:
+            secureKeys.map(_sodium.createTransferrableSecureKey).toList(),
+        keyPairs: keyPairs.map(_sodium.createTransferrableKeyPair).toList(),
+      ),
+    ),
+  );
 
   @override
   Future<T> exec<T>(
     AsyncCallback<T> callback, {
     List<SecureKey> secureKeys = const [],
     List<KeyPair> keyPairs = const [],
-  }) =>
-      execAsync(
-        callback,
-        secureKeys: secureKeys,
-        keyPairs: keyPairs,
-      );
+  }) => execAsync(callback, secureKeys: secureKeys, keyPairs: keyPairs);
 
   int get _nextJobId => _jobIdCtr++;
 
@@ -154,26 +151,30 @@ class AsyncCryptoExecutor implements CryptoExecutor {
           .then(_sodium.materializeTransferrableSecureKey)
           .then((k) => k as TResult),
       // ignore: type_literal_in_constant_pattern
-      KeyPair => _waitForResult<TransferrableKeyPair>(job.id)
-          .then(_sodium.materializeTransferrableKeyPair)
-          .then((k) => k as TResult),
+      KeyPair => _waitForResult<TransferrableKeyPair>(
+        job.id,
+      ).then(_sodium.materializeTransferrableKeyPair).then((k) => k as TResult),
       // ignore: type_literal_in_constant_pattern
-      Uint8List => _waitForResult<TransferableTypedData>(job.id)
-          .then((d) => d.materialize().asUint8List() as TResult),
+      Uint8List => _waitForResult<TransferableTypedData>(
+        job.id,
+      ).then((d) => d.materialize().asUint8List() as TResult),
       _ => _waitForResult<TResult>(job.id),
     };
   }
 
-  Future<TResult> _waitForResult<TResult>(int jobId) => _receivePortStream
-      .where((r) => r.id == jobId)
-      .map(
-        (r) => switch (r) {
-          _CryptoJobResultSuccess() => r.result as TResult,
-          _CryptoJobResultError() =>
-            Error.throwWithStackTrace(r.error, r.stackTrace),
-        },
-      )
-      .first;
+  Future<TResult> _waitForResult<TResult>(int jobId) =>
+      _receivePortStream
+          .where((r) => r.id == jobId)
+          .map(
+            (r) => switch (r) {
+              _CryptoJobResultSuccess() => r.result as TResult,
+              _CryptoJobResultError() => Error.throwWithStackTrace(
+                r.error,
+                r.stackTrace,
+              ),
+            },
+          )
+          .first;
 
   static void _finalize((Isolate, ReceivePort, ReceivePort) token) {
     final (isolate, dataPort, errPort) = token;
@@ -210,10 +211,7 @@ Future<void> _isolateMain(_IsolateMessage message) async {
   }
 }
 
-_CryptoJobResult _processRunJob(
-  SodiumSumo sodium,
-  _CryptoJobRun job,
-) {
+_CryptoJobResult _processRunJob(SodiumSumo sodium, _CryptoJobRun job) {
   List<SecureKey>? keys;
   List<KeyPair>? pairs;
 
@@ -238,10 +236,7 @@ _CryptoJobResult _processRunJob(
         transferrableResult = result;
     }
 
-    return _CryptoJobResult.success(
-      job.id,
-      transferrableResult,
-    );
+    return _CryptoJobResult.success(job.id, transferrableResult);
   } finally {
     for (final key in keys ?? const <SecureKey>[]) {
       key.dispose();

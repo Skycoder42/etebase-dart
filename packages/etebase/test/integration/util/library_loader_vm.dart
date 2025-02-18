@@ -11,10 +11,7 @@ DynamicLibrary getLibsodium() {
         Process.runSync('pkgconf', const ['--path', 'libsodium']).stdout
             as String;
     final libPath = path.canonicalize(
-      path.join(
-        path.dirname(pkgConfPath),
-        '../libsodium.so',
-      ),
+      path.join(path.dirname(pkgConfPath), '../libsodium.so'),
     );
     return DynamicLibrary.open(libPath);
   } else if (Platform.isMacOS) {

@@ -36,11 +36,11 @@ sealed class CachedCollectionItem with _$CachedCollectionItem {
   const CachedCollectionItem._();
 
   List<dynamic> toJson() => [
-        _cacheFormatVersion,
-        uid,
-        version,
-        encryptionKey,
-        etag,
-        revision,
-      ];
+    _cacheFormatVersion,
+    uid,
+    version,
+    encryptionKey,
+    etag,
+    revision,
+  ];
 }

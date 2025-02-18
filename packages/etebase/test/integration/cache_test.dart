@@ -25,10 +25,7 @@ void main() {
     final username = generateUsername('fs-cache-test-user');
     account = await EtebaseAccount.signup(
       client,
-      EtebaseUser(
-        username: username,
-        email: '$username@test.com',
-      ),
+      EtebaseUser(username: username, email: '$username@test.com'),
       'password',
     );
     addTearDown(account.dispose);
@@ -44,10 +41,7 @@ void main() {
       addTearDown(Hive.close);
     }
 
-    cache = await EtebaseCache.create(
-      client,
-      username,
-    );
+    cache = await EtebaseCache.create(client, username);
     addTearDown(cache.dispose);
   });
 
@@ -73,10 +67,7 @@ void main() {
     addTearDown(collection.dispose);
     await collectionManager.upload(collection);
 
-    await expectLater(
-      () => cache.loadStoken(),
-      throwsA(isA<NotFound>()),
-    );
+    await expectLater(() => cache.loadStoken(), throwsA(isA<NotFound>()));
 
     final response = await collectionManager.list(testCollectionType);
     await cache.saveStoken(response.stoken!);
@@ -130,10 +121,7 @@ void main() {
       () => cache.collectionLoadStoken(collectionId),
       throwsA(isA<NotFound>()),
     );
-    await cache.collectionSaveStoken(
-      collectionId,
-      collection.stoken!,
-    );
+    await cache.collectionSaveStoken(collectionId, collection.stoken!);
     final restoredToken = await cache.collectionLoadStoken(collectionId);
 
     expect(restoredToken, collection.stoken);
@@ -167,10 +155,7 @@ void main() {
 
     const itemMeta = EtebaseItemMetadata(color: 'AABBCC');
     final itemContent = Uint8List.fromList(List.filled(42, 42));
-    final item = await itemManager.create(
-      itemMeta,
-      itemContent,
-    );
+    final item = await itemManager.create(itemMeta, itemContent);
     addTearDown(item.dispose);
     await itemManager.batch([item]);
     final itemId = item.uid;
@@ -197,15 +182,9 @@ void main() {
 
   test('can clear cache data', () async {
     await cache.clearUser(reInitialize: true);
-    await expectLater(
-      () => cache.loadAccount(),
-      throwsA(isA<NotFound>()),
-    );
+    await expectLater(() => cache.loadAccount(), throwsA(isA<NotFound>()));
 
     await cache.clearUser();
-    await expectLater(
-      () => cache.loadAccount(),
-      throwsA(isA<HiveError>()),
-    );
+    await expectLater(() => cache.loadAccount(), throwsA(isA<HiveError>()));
   });
 }

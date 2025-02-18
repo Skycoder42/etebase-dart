@@ -4,8 +4,8 @@ version: 2.0.0
 homepage: https://github.com/Skycoder42/etebase-dart
 
 environment:
-  sdk: ^3.6.0
-  flutter: ">=3.27.0"
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
 resolution: workspace
 
 dependencies:
@@ -13,14 +13,14 @@ dependencies:
   flutter:
     sdk: flutter
   hive_ce_flutter: ^2.2.0
-  meta: ^1.15.0
+  meta: ^1.16.0
   package_info_plus: ^8.2.1
   sodium_libs: ^3.4.3+1
 
 dev_dependencies:
-  custom_lint: ^0.7.0
-  dart_pre_commit: ^5.4.2
-  dart_test_tools: ^6.0.2+2
+  custom_lint: ^0.7.3
+  dart_pre_commit: ^5.4.3
+  dart_test_tools: ^6.1.0
 
 cider:
   link_template:

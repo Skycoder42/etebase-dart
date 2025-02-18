@@ -150,33 +150,31 @@ class ItemManager implements EtebaseItemManager {
   @override
   Stream<EtebaseItemListResponse<Item>> subscribeChanges([
     EtebaseItemFetchOptions? options,
-  ]) =>
-      _online
-          .subscribeChanges(options)
-          // ignore: discarded_futures
-          .asyncMap((res) => res.map(_createItem));
+  ]) => _online
+      .subscribeChanges(options)
+      // ignore: discarded_futures
+      .asyncMap((res) => res.map(_createItem));
 
   Item _createItem(
     EncryptedCollectionItem encrypted, [
     CollectionItemCryptoManager? cm,
-  ]) =>
-      Item(
-        _client,
-        cm ?? encrypted.getCryptoManager(_client, _cryptoManager),
-        encrypted,
-        _colUid,
-      );
+  ]) => Item(
+    _client,
+    cm ?? encrypted.getCryptoManager(_client, _cryptoManager),
+    encrypted,
+    _colUid,
+  );
 
   List<EncryptedCollectionItem> _prepareForUpload(Iterable<Item> items) => [
-        for (final item in items)
-          if (item.colUid != _colUid)
-            throw ApiMissuse(
-              'Uploading an item belonging to collection ${item.colUid} '
-              'to another collection ($_colUid) is not allowed!',
-            )
-          else
-            item.encrypted,
-      ];
+    for (final item in items)
+      if (item.colUid != _colUid)
+        throw ApiMissuse(
+          'Uploading an item belonging to collection ${item.colUid} '
+          'to another collection ($_colUid) is not allowed!',
+        )
+      else
+        item.encrypted,
+  ];
 
   Future<void> _uploadIgnoringConflicts(
     EncryptedCollectionItem item,
@@ -189,10 +187,7 @@ class ItemManager implements EtebaseItemManager {
     }
   }
 
-  Future<void> _download(
-    EncryptedCollectionItem item,
-    Chunk chunk,
-  ) async {
+  Future<void> _download(EncryptedCollectionItem item, Chunk chunk) async {
     final data = await _online.chunkDownload(item, chunk.uid, null);
     item.updateChunk(chunk.copyWith(data: data));
   }

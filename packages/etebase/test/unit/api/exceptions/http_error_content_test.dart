@@ -19,7 +19,7 @@ void main() {
             ],
           ),
           true,
-          'Unknown error\n | FLD1: Field 1\n | FLD2: Field 2'
+          'Unknown error\n | FLD1: Field 1\n | FLD2: Field 2',
         ),
         (
           HttpErrorContent(
@@ -34,69 +34,57 @@ void main() {
         (
           HttpErrorContent(code: 'TST4', detail: 'Test 4'),
           true,
-          'TST4: Test 4'
+          'TST4: Test 4',
         ),
         (
           HttpErrorContent(
             code: 'TST5',
-            errors: [
-              HttpFieldError(code: 'FLD3', detail: 'Field 3'),
-            ],
+            errors: [HttpFieldError(code: 'FLD3', detail: 'Field 3')],
           ),
           true,
-          'TST5\n | FLD3: Field 3'
+          'TST5\n | FLD3: Field 3',
         ),
         (
           HttpErrorContent(
             code: 'TST5',
-            errors: [
-              HttpFieldError(code: 'FLD3', detail: 'Field 3'),
-            ],
+            errors: [HttpFieldError(code: 'FLD3', detail: 'Field 3')],
           ),
           false,
-          'TST5'
+          'TST5',
         ),
         (
           HttpErrorContent(
             detail: 'Test 6',
-            errors: [
-              HttpFieldError(code: 'FLD3', detail: 'Field 3'),
-            ],
+            errors: [HttpFieldError(code: 'FLD3', detail: 'Field 3')],
           ),
           true,
-          'Test 6\n | FLD3: Field 3'
+          'Test 6\n | FLD3: Field 3',
         ),
         (
           HttpErrorContent(
             detail: 'Test 6',
-            errors: [
-              HttpFieldError(code: 'FLD3', detail: 'Field 3'),
-            ],
+            errors: [HttpFieldError(code: 'FLD3', detail: 'Field 3')],
           ),
           false,
-          'Test 6'
+          'Test 6',
         ),
         (
           HttpErrorContent(
             code: 'TST7',
             detail: 'Test 7',
-            errors: [
-              HttpFieldError(code: 'FLD4', detail: 'Field 4'),
-            ],
+            errors: [HttpFieldError(code: 'FLD4', detail: 'Field 4')],
           ),
           true,
-          'TST7: Test 7\n | FLD4: Field 4'
+          'TST7: Test 7\n | FLD4: Field 4',
         ),
         (
           HttpErrorContent(
             code: 'TST7',
             detail: 'Test 7',
-            errors: [
-              HttpFieldError(code: 'FLD4', detail: 'Field 4'),
-            ],
+            errors: [HttpFieldError(code: 'FLD4', detail: 'Field 4')],
           ),
           false,
-          'TST7: Test 7'
+          'TST7: Test 7',
         ),
       ],
       (fixture) {

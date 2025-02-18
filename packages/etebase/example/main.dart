@@ -26,10 +26,7 @@ void main(List<String> args) async {
   {
     final account = await EtebaseAccount.signup(
       client,
-      EtebaseUser(
-        username: userName,
-        email: '$userName@mail.de',
-      ),
+      EtebaseUser(username: userName, email: '$userName@mail.de'),
       userName,
     );
     print('signup successful');
@@ -67,8 +64,11 @@ void main(List<String> args) async {
   await account.fetchToken();
   print('fetchToken successful');
 
-  final col1 = await account.collectionManager
-      .create('test1', const EtebaseItemMetadata(), Uint8List(0));
+  final col1 = await account.collectionManager.create(
+    'test1',
+    const EtebaseItemMetadata(),
+    Uint8List(0),
+  );
   await col1.setMeta(const EtebaseItemMetadata(name: 'Test-1'));
   await col1.setContent(utf8.encode('Hello, World!'));
   await account.collectionManager.upload(col1);

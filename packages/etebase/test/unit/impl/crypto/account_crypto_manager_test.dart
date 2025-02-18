@@ -23,8 +23,9 @@ void main() {
       mockSodium.resetAndSetup();
       mockCryptoExecutor.resetAndSetup();
 
-      when(mockSodium.crypto.kdf.contextBytes)
-          .thenReturn(accountContextPadded.length);
+      when(
+        mockSodium.crypto.kdf.contextBytes,
+      ).thenReturn(accountContextPadded.length);
 
       sut = AccountCryptoManager(mockCryptoExecutor, testMasterKey, 23);
     });
@@ -49,8 +50,9 @@ void main() {
           outLen: anyNamed('outLen'),
         ),
       ).thenReturn(testHash);
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
           message: anyNamed('message'),
@@ -106,8 +108,9 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
       when(mockSodium.unpad(any, any)).thenReturn(testColIdBytes);
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
           cipherText: anyNamed('cipherText'),
@@ -156,8 +159,10 @@ void main() {
 
       test('creates manager with custom version', () {
         const testVersion = 4711;
-        final cm =
-            sut.createCollectionCryptoManager(testCmKey, version: testVersion);
+        final cm = sut.createCollectionCryptoManager(
+          testCmKey,
+          version: testVersion,
+        );
 
         expect(cm.executor, mockCryptoExecutor);
         expect(cm.accountCryptoManager, sut);

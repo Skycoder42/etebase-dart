@@ -22,10 +22,9 @@ sealed class CollectionItemFetchInfo with _$CollectionItemFetchInfo {
 @internal
 extension CollectionItemFetchInfoFromListX
     on Iterable<EncryptedCollectionItem> {
-  List<CollectionItemFetchInfo> toFetchInfo({required bool wantEtag}) => map(
-        (i) => CollectionItemFetchInfo(
-          i.uid,
-          etag: wantEtag ? i.lastEtag : null,
-        ),
+  List<CollectionItemFetchInfo> toFetchInfo({required bool wantEtag}) =>
+      map(
+        (i) =>
+            CollectionItemFetchInfo(i.uid, etag: wantEtag ? i.lastEtag : null),
       ).toList();
 }

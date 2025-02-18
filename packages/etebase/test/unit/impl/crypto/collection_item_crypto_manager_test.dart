@@ -16,11 +16,7 @@ void main() {
       mockSodium.resetAndSetup();
       mockCryptoExecutor.resetAndSetup();
 
-      sut = CollectionItemCryptoManager(
-        mockCryptoExecutor,
-        testMasterKey,
-        23,
-      );
+      sut = CollectionItemCryptoManager(mockCryptoExecutor, testMasterKey, 23);
     });
 
     test('sets correct context', () {

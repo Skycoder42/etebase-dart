@@ -27,27 +27,18 @@ void main() {
     test('can create new account', () async {
       final account = await EtebaseAccount.signup(
         client,
-        EtebaseUser(
-          username: testUsername,
-          email: testEmail,
-        ),
+        EtebaseUser(username: testUsername, email: testEmail),
         testPassword,
       );
       addTearDown(account.dispose);
 
       // local test server does not have a dashboard
-      expect(
-        () => account.fetchDashboardUrl(),
-        throwsA(isA<HttpFailure>()),
-      );
+      expect(() => account.fetchDashboardUrl(), throwsA(isA<HttpFailure>()));
 
       await account.logout();
 
       // after logout this should be unauthorized
-      expect(
-        () => account.fetchDashboardUrl(),
-        throwsA(isA<Unauthorized>()),
-      );
+      expect(() => account.fetchDashboardUrl(), throwsA(isA<Unauthorized>()));
     });
 
     test('can login with existing account', () async {

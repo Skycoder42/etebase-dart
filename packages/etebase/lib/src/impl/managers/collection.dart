@@ -15,11 +15,7 @@ class Collection implements EtebaseCollection {
   final CollectionCryptoManager _cm;
   final EncryptedCollection encrypted;
 
-  Collection(
-    this._client,
-    this._cm,
-    this.encrypted,
-  );
+  Collection(this._client, this._cm, this.encrypted);
 
   @override
   String get uid => encrypted.uid;

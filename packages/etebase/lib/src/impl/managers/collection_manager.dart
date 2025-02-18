@@ -23,11 +23,7 @@ class CollectionManager implements EtebaseCollectionManager {
   final AccountCryptoManager _cryptoManager;
   final CollectionManagerOnline _online;
 
-  CollectionManager(
-    this._client,
-    this._cryptoManager,
-    this._online,
-  );
+  CollectionManager(this._client, this._cryptoManager, this._online);
 
   @override
   Future<Collection> create<TMeta extends EtebaseItemMetadata>(
@@ -62,8 +58,7 @@ class CollectionManager implements EtebaseCollectionManager {
   Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
     String collectionType, [
     EtebaseFetchOptions? fetchOptions,
-  ]) =>
-      listMulti([collectionType], fetchOptions);
+  ]) => listMulti([collectionType], fetchOptions);
 
   @override
   Future<EtebaseCollectionListResponse<EtebaseCollection>> listMulti(
@@ -118,8 +113,7 @@ class CollectionManager implements EtebaseCollectionManager {
   Uint8List cacheSave(
     covariant Collection collection, {
     bool saveContent = true,
-  }) =>
-      collection.encrypted.cacheSave(_client, saveContent: saveContent);
+  }) => collection.encrypted.cacheSave(_client, saveContent: saveContent);
 
   @override
   EtebaseCollection cacheLoad(Uint8List cached) {
@@ -133,15 +127,15 @@ class CollectionManager implements EtebaseCollectionManager {
 
   @override
   ItemManager getItemManager(covariant Collection col) => ItemManager(
-        _client,
-        col.encrypted.getCryptoManager(_client, _cryptoManager),
-        CollectionItemManagerOnline(
-          client: _client,
-          authTokenSource: _online.authTokenSource,
-          colUid: col.uid,
-        ),
-        col.uid,
-      );
+    _client,
+    col.encrypted.getCryptoManager(_client, _cryptoManager),
+    CollectionItemManagerOnline(
+      client: _client,
+      authTokenSource: _online.authTokenSource,
+      colUid: col.uid,
+    ),
+    col.uid,
+  );
 
   @override
   CollectionMemberManager getMemberManager(covariant Collection col) =>

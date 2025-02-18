@@ -16,11 +16,7 @@ void main() {
       mockSodium.resetAndSetup();
       mockCryptoExecutor.resetAndSetup();
 
-      sut = StorageCryptoManager(
-        mockCryptoExecutor,
-        testMasterKey,
-        23,
-      );
+      sut = StorageCryptoManager(mockCryptoExecutor, testMasterKey, 23);
     });
 
     test('sets correct context', () {

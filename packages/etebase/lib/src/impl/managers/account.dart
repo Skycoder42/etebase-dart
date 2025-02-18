@@ -84,12 +84,15 @@ class Account implements EtebaseAccount, AuthTokenSource {
         salt: salt,
       );
 
-      final mainCryptoManager =
-          arena(client.crypto.createMainCryptoManager(mainKey));
-      final loginCryptoManager =
-          arena(mainCryptoManager.createLoginCryptoManager());
-      final identityCryptoManager =
-          arena(client.crypto.createIdentityCryptoManager());
+      final mainCryptoManager = arena(
+        client.crypto.createMainCryptoManager(mainKey),
+      );
+      final loginCryptoManager = arena(
+        mainCryptoManager.createLoginCryptoManager(),
+      );
+      final identityCryptoManager = arena(
+        client.crypto.createIdentityCryptoManager(),
+      );
 
       final encryptedKeys = mainCryptoManager.encryptKey(
         arena(
@@ -110,12 +113,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return Account._create(
-        arena,
-        client,
-        mainCryptoManager,
-        response,
-      );
+      return Account._create(arena, client, mainCryptoManager, response);
     } finally {
       arena.dispose();
     }
@@ -128,8 +126,9 @@ class Account implements EtebaseAccount, AuthTokenSource {
   ) async {
     final arena = CryptoArena();
     try {
-      final challenge = await client.authenticator
-          .loginChallenge(ChallengeRequest(username: username));
+      final challenge = await client.authenticator.loginChallenge(
+        ChallengeRequest(username: username),
+      );
 
       final mainKey = await client.crypto.keyDerivator(
         password: password,
@@ -155,12 +154,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return Account._create(
-        arena,
-        client,
-        mainCryptoManager,
-        loginResponse,
-      );
+      return Account._create(arena, client, mainCryptoManager, loginResponse);
     } finally {
       arena.dispose();
     }
@@ -210,10 +204,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         arena,
         client,
         mainCryptoManager,
-        LoginResponse(
-          token: accountData.authToken,
-          user: accountData.user,
-        ),
+        LoginResponse(token: accountData.authToken, user: accountData.user),
       );
     } finally {
       arena.dispose();
@@ -232,26 +223,21 @@ class Account implements EtebaseAccount, AuthTokenSource {
   late final collectionManager = CollectionManager(
     _client,
     accountCryptoManager,
-    CollectionManagerOnline(
-      client: _client,
-      authTokenSource: this,
-    ),
+    CollectionManagerOnline(client: _client, authTokenSource: this),
   );
 
   @override
   late final invitationManager = CollectionInvitationManager(
     _client,
     this,
-    CollectionInvitationManagerOnline(
-      client: _client,
-      authTokenSource: this,
-    ),
+    CollectionInvitationManagerOnline(client: _client, authTokenSource: this),
   );
 
   @override
   Future<void> fetchToken() async {
-    final challenge = await _client.authenticator
-        .loginChallenge(ChallengeRequest(username: _user.username));
+    final challenge = await _client.authenticator.loginChallenge(
+      ChallengeRequest(username: _user.username),
+    );
 
     final loginResponse = await _client.authenticator.login(
       await _signChallenge(
@@ -276,17 +262,20 @@ class Account implements EtebaseAccount, AuthTokenSource {
   Future<void> changePassword(String password) async {
     final arena = CryptoArena();
     try {
-      final challenge = await _client.authenticator
-          .loginChallenge(ChallengeRequest(username: _user.username));
+      final challenge = await _client.authenticator.loginChallenge(
+        ChallengeRequest(username: _user.username),
+      );
 
       final newMainKey = await _client.crypto.keyDerivator(
         password: password,
         salt: challenge.salt,
       );
-      final newMainCryptoManager =
-          arena(_client.crypto.createMainCryptoManager(newMainKey));
-      final newLoginCryptoManager =
-          arena(newMainCryptoManager.createLoginCryptoManager());
+      final newMainCryptoManager = arena(
+        _client.crypto.createMainCryptoManager(newMainKey),
+      );
+      final newLoginCryptoManager = arena(
+        newMainCryptoManager.createLoginCryptoManager(),
+      );
 
       final newEncryptedContent = await newMainCryptoManager.encrypt(
         await _mainCryptoManager.decrypt(_user.encryptedContent),
@@ -323,8 +312,9 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final cryptoManager = arena(
         _client.crypto.createStorageCryptoManager(
           encryptionKey?.copy() ??
-              _client.crypto
-                  .secureCopy(Uint8List(CryptoUtils.symmetricKeySize)),
+              _client.crypto.secureCopy(
+                Uint8List(CryptoUtils.symmetricKeySize),
+              ),
         ),
       );
 
@@ -370,10 +360,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
     try {
       final encodedResponse = client.converter.encode(response);
       final signature = await loginCryptoManager.signDetached(encodedResponse);
-      return LoginRequest(
-        response: encodedResponse,
-        signature: signature,
-      );
+      return LoginRequest(response: encodedResponse, signature: signature);
     } finally {
       loginCryptoManager.dispose();
     }

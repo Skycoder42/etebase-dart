@@ -17,32 +17,29 @@ final class CollectionInvitationManagerOnline extends BaseManager {
 
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming(
     EtebaseIteratorFetchOptions? options,
-  ) =>
-      invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
-        path: const ['incoming'],
-      );
+  ) => invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
+    path: const ['incoming'],
+  );
 
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing(
     EtebaseIteratorFetchOptions? options,
-  ) =>
-      invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
-        path: const ['outgoing'],
-      );
+  ) => invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
+    path: const ['outgoing'],
+  );
 
   Future<void> accept(
     SignedInvitationRead invitation,
     InvitationAcceptRequest body,
-  ) =>
-      invokeApi<void>(
-        method: HttpMethod.post,
-        path: ['incoming', invitation.uid, 'accept'],
-        body: body,
-      );
+  ) => invokeApi<void>(
+    method: HttpMethod.post,
+    path: ['incoming', invitation.uid, 'accept'],
+    body: body,
+  );
 
   Future<void> reject(SignedInvitationRead invitation) => invokeApi<void>(
-        method: HttpMethod.delete,
-        path: ['incoming', invitation.uid],
-      );
+    method: HttpMethod.delete,
+    path: ['incoming', invitation.uid],
+  );
 
   Future<EtebaseUserProfile> fetchUserProfile(String username) =>
       invokeApi<EtebaseUserProfile>(
@@ -51,13 +48,13 @@ final class CollectionInvitationManagerOnline extends BaseManager {
       );
 
   Future<void> invite(SignedInvitationWrite invitation) => invokeApi<void>(
-        method: HttpMethod.post,
-        path: const ['outgoing'],
-        body: invitation,
-      );
+    method: HttpMethod.post,
+    path: const ['outgoing'],
+    body: invitation,
+  );
 
   Future<void> disinvite(SignedInvitationRead invitation) => invokeApi<void>(
-        method: HttpMethod.delete,
-        path: ['outgoing', invitation.uid],
-      );
+    method: HttpMethod.delete,
+    path: ['outgoing', invitation.uid],
+  );
 }

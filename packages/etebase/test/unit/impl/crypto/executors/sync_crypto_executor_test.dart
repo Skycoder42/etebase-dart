@@ -74,7 +74,7 @@ void main() {
       test('runs callback asynchronously', () async {
         var isInvokedLater = false;
 
-        bool callback(SodiumSumo sodium, _, __) {
+        bool callback(SodiumSumo sodium, _, _) {
           expect(sodium, same(mockSodiumSumo));
           return isInvokedLater;
         }
@@ -118,7 +118,7 @@ void main() {
 
       test('wraps sodium exception as crypto failure', () async {
         expect(
-          () => sut.execAsync<bool>((_, __, ___) => throw SodiumException()),
+          () => sut.execAsync<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),
         );
       });
@@ -128,7 +128,7 @@ void main() {
       test('runs callback synchronously', () async {
         var isInvokedLater = false;
 
-        bool callback(SodiumSumo sodium, _, __) {
+        bool callback(SodiumSumo sodium, _, _) {
           expect(sodium, same(mockSodiumSumo));
           return isInvokedLater;
         }
@@ -166,7 +166,7 @@ void main() {
 
       test('wraps sodium exception as crypto failure', () async {
         expect(
-          () => sut.exec<bool>((_, __, ___) => throw SodiumException()),
+          () => sut.exec<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),
         );
       });

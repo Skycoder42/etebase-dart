@@ -23,21 +23,15 @@ void main() {
           base64UrlNoPad.encode(Uint8List.fromList(fixture.$1)),
           fixture.$2,
         );
-        expect(
-          base64UrlNoPad.decode(fixture.$2),
-          fixture.$1,
-        );
+        expect(base64UrlNoPad.decode(fixture.$2), fixture.$1);
       },
     );
   });
 
   group('msgPack64UrlNoPad', () {
-    test(
-      'converts from and to message pack in base64 url no pad format',
-      () {
-        expect(msgPack64UrlNoPad.encode(42), 'Kg');
-        expect(msgPack64UrlNoPad.decode('Kg'), 42);
-      },
-    );
+    test('converts from and to message pack in base64 url no pad format', () {
+      expect(msgPack64UrlNoPad.encode(42), 'Kg');
+      expect(msgPack64UrlNoPad.decode('Kg'), 42);
+    });
   });
 }

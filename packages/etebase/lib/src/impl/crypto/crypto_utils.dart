@@ -44,21 +44,20 @@ abstract base class CryptoUtils {
         });
 
   static (Uint8List, Uint8List) split2(Uint8List data, int split) => (
-        Uint8List.sublistView(data, 0, split),
-        Uint8List.sublistView(data, split)
-      );
+    Uint8List.sublistView(data, 0, split),
+    Uint8List.sublistView(data, split),
+  );
 
   static (SecureKey, SecureKey) split2Secure(
     CryptoService service,
     SecureKey key,
     int split,
-  ) =>
-      key.runUnlockedSync(
-        (data) => (
-          service.secureCopy(Uint8List.sublistView(data, 0, split)),
-          service.secureCopy(Uint8List.sublistView(data, split)),
-        ),
-      );
+  ) => key.runUnlockedSync(
+    (data) => (
+      service.secureCopy(Uint8List.sublistView(data, 0, split)),
+      service.secureCopy(Uint8List.sublistView(data, split)),
+    ),
+  );
 
   static Uint8List uint32ToUint8List(int value) {
     final bd = ByteData(4)..setUint32(0, value, Endian.little);

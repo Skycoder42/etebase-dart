@@ -22,25 +22,25 @@ sealed class FetchOptions with _$FetchOptions {
 @internal
 extension EtebaseFetchOptionsX on EtebaseFetchOptionsBase {
   FetchOptions asFetchOptions() => switch (this) {
-        final EtebaseFetchOptions o => FetchOptions(
-            limit: o.limit,
-            stoken: o.stoken,
-            prefetch: o.prefetch,
-          ),
-        final EtebaseItemFetchOptions o => FetchOptions(
-            limit: o.limit,
-            stoken: o.stoken,
-            prefetch: o.prefetch,
-            withCollection: o.withCollection,
-          ),
-        final EtebaseIteratorFetchOptions o => FetchOptions(
-            limit: o.limit,
-            iterator: o.iterator,
-          ),
-        final EtebaseRevisionFetchOptions o => FetchOptions(
-            limit: o.limit,
-            iterator: o.iterator,
-            prefetch: o.prefetch,
-          ),
-      };
+    final EtebaseFetchOptions o => FetchOptions(
+      limit: o.limit,
+      stoken: o.stoken,
+      prefetch: o.prefetch,
+    ),
+    final EtebaseItemFetchOptions o => FetchOptions(
+      limit: o.limit,
+      stoken: o.stoken,
+      prefetch: o.prefetch,
+      withCollection: o.withCollection,
+    ),
+    final EtebaseIteratorFetchOptions o => FetchOptions(
+      limit: o.limit,
+      iterator: o.iterator,
+    ),
+    final EtebaseRevisionFetchOptions o => FetchOptions(
+      limit: o.limit,
+      iterator: o.iterator,
+      prefetch: o.prefetch,
+    ),
+  };
 }

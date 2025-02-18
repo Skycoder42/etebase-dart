@@ -11,7 +11,7 @@ class Unauthorized extends HttpFailure {
 
   /// Default constructor.
   Unauthorized(String message, [HttpErrorContent? error])
-      : super(statusCode, message, error);
+    : super(statusCode, message, error);
 
   @override
   String get name => 'Unauthorized';

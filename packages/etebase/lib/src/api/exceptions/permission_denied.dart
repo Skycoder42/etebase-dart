@@ -11,7 +11,7 @@ class PermissionDenied extends HttpFailure {
 
   /// Default constructor.
   PermissionDenied(String message, [HttpErrorContent? error])
-      : super(statusCode, message, error);
+    : super(statusCode, message, error);
 
   @override
   String get name => 'PermissionDenied';

@@ -50,12 +50,12 @@ class Client implements EtebaseClient, NetworkClient {
     CryptoExecutor cryptoExecutor,
     String clientName, [
     Uri? serverUrl,
-  ])  : httpClient = http.Client(),
-        userAgent = UserAgent.build(clientName),
-        converter = MessagePackConverter(),
-        baseUri = serverUrl ?? defaultUrl,
-        crypto = CryptoService(cryptoExecutor),
-        _ownedClient = true;
+  ]) : httpClient = http.Client(),
+       userAgent = UserAgent.build(clientName),
+       converter = MessagePackConverter(),
+       baseUri = serverUrl ?? defaultUrl,
+       crypto = CryptoService(cryptoExecutor),
+       _ownedClient = true;
 
   Authenticator get authenticator => Authenticator(client: this);
 
@@ -73,16 +73,14 @@ class Client implements EtebaseClient, NetworkClient {
   @override
   void registerCustomMetadata<TMeta extends EtebaseItemMetadata>(
     MetaFromJson<TMeta> fromJson,
-  ) =>
-      converter.addCustom<TMeta>(fromJson);
+  ) => converter.addCustom<TMeta>(fromJson);
 
   // factory methods for internal types to simplify testing
 
   Future<Account> restoreAccount(
     Uint8List accountDataStored, [
     SecureKey? encryptionKey,
-  ]) =>
-      Account.restore(this, accountDataStored, encryptionKey);
+  ]) => Account.restore(this, accountDataStored, encryptionKey);
 
   Future<HiveCache> createCache(String username) async {
     final cache = HiveCache(this, Hive, username);
@@ -95,12 +93,11 @@ class Client implements EtebaseClient, NetworkClient {
     required Uint8List additionalData,
     required EtebaseItemMetadata meta,
     required Uint8List content,
-  }) =>
-      EncryptedRevision.create(
-        client: this,
-        cryptoManager: cryptoManager,
-        additionalData: additionalData,
-        meta: meta,
-        content: content,
-      );
+  }) => EncryptedRevision.create(
+    client: this,
+    cryptoManager: cryptoManager,
+    additionalData: additionalData,
+    meta: meta,
+    content: content,
+  );
 }

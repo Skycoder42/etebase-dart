@@ -50,11 +50,7 @@ void main() {
         final testKey = FakeSecureKey(21);
         const testLength = 11;
 
-        CryptoMac(
-          mockCryptoExecutor,
-          key: testKey,
-          length: testLength,
-        );
+        CryptoMac(mockCryptoExecutor, key: testKey, length: testLength);
 
         verifyInOrder([
           mockCryptoExecutor.execSync<GenericHashConsumer>(any),
@@ -104,10 +100,7 @@ void main() {
         test('wrap exception if close throws', () async {
           when(mockGenericHashConsumer.close()).thenThrow(SodiumException());
 
-          expect(
-            () => sut.finalize(),
-            throwsA(isA<CryptoFailure>()),
-          );
+          expect(() => sut.finalize(), throwsA(isA<CryptoFailure>()));
         });
       });
     });

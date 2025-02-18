@@ -215,10 +215,7 @@ void main() {
 
       testData(
         'randomizes the input list and returns indices of randomized data',
-        List.generate(
-          50,
-          (i) => List.generate(i, (j) => j),
-        ),
+        List.generate(50, (i) => List.generate(i, (j) => j)),
         (fixture) {
           final indices = sut.shuffle(fixture);
           for (var i = 0; i < fixture.length; ++i) {
@@ -351,8 +348,10 @@ void main() {
       });
 
       test('creates crypto manager with custom version', () {
-        final result =
-            sut.createCollectionItemCryptoManager(testKey, version: 34);
+        final result = sut.createCollectionItemCryptoManager(
+          testKey,
+          version: 34,
+        );
 
         expect(result.executor, same(mockCryptoExecutor));
         expect(result.key, testKey);
@@ -372,8 +371,10 @@ void main() {
       });
 
       test('creates crypto manager with custom version', () {
-        final result =
-            sut.createMinimalCollectionCryptoManager(testKey, version: 34);
+        final result = sut.createMinimalCollectionCryptoManager(
+          testKey,
+          version: 34,
+        );
 
         expect(result.executor, same(mockCryptoExecutor));
         expect(result.key, testKey);

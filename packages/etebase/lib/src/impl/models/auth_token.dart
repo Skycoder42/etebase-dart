@@ -10,7 +10,8 @@ class AuthToken {
 
   const AuthToken(this.value);
 
-  String get header => value.isEmpty
-      ? throw Unauthorized('The account is logged out!')
-      : 'Token $value';
+  String get header =>
+      value.isEmpty
+          ? throw Unauthorized('The account is logged out!')
+          : 'Token $value';
 }

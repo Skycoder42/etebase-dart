@@ -11,7 +11,7 @@ class Conflict extends HttpFailure {
 
   /// Default constructor.
   Conflict(String message, [HttpErrorContent? error])
-      : super(statusCode, message, error);
+    : super(statusCode, message, error);
 
   @override
   String get name => 'Conflict';

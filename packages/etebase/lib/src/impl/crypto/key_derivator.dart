@@ -7,11 +7,7 @@ import '../../api/managers/crypto_executor.dart';
 import 'crypto_utils.dart';
 
 @internal
-enum KeyDerivationDifficulty {
-  hard,
-  medium,
-  easy,
-}
+enum KeyDerivationDifficulty { hard, medium, easy }
 
 @internal
 class KeyDerivator {
@@ -21,28 +17,25 @@ class KeyDerivator {
   KeyDerivator(this.executor);
 
   Uint8List randomSalt() => executor.execSync(
-        (sodium) => sodium.randombytes.buf(sodium.crypto.pwhash.saltBytes),
-      );
+    (sodium) => sodium.randombytes.buf(sodium.crypto.pwhash.saltBytes),
+  );
 
   Future<SecureKey> call({
     required Uint8List salt,
     required String password,
     KeyDerivationDifficulty difficulty = KeyDerivationDifficulty.hard,
-  }) =>
-      executor.execAsync(
-        (sodium, _, __) => sodium.crypto.pwhash(
-          outLen: CryptoUtils.symmetricKeySize,
-          password: password.toCharArray(),
-          salt: salt,
-          opsLimit: switch (difficulty) {
-            KeyDerivationDifficulty.hard =>
-              sodium.crypto.pwhash.opsLimitSensitive,
-            KeyDerivationDifficulty.medium =>
-              sodium.crypto.pwhash.opsLimitModerate,
-            KeyDerivationDifficulty.easy =>
-              sodium.crypto.pwhash.opsLimitInteractive,
-          },
-          memLimit: sodium.crypto.pwhash.memLimitModerate,
-        ),
-      );
+  }) => executor.execAsync(
+    (sodium, _, _) => sodium.crypto.pwhash(
+      outLen: CryptoUtils.symmetricKeySize,
+      password: password.toCharArray(),
+      salt: salt,
+      opsLimit: switch (difficulty) {
+        KeyDerivationDifficulty.hard => sodium.crypto.pwhash.opsLimitSensitive,
+        KeyDerivationDifficulty.medium => sodium.crypto.pwhash.opsLimitModerate,
+        KeyDerivationDifficulty.easy =>
+          sodium.crypto.pwhash.opsLimitInteractive,
+      },
+      memLimit: sodium.crypto.pwhash.memLimitModerate,
+    ),
+  );
 }

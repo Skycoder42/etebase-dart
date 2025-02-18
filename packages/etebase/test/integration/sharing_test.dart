@@ -28,10 +28,7 @@ void main() {
 
     final account1 = await EtebaseAccount.signup(
       client,
-      EtebaseUser(
-        username: userName1,
-        email: 'sharing1@test.com',
-      ),
+      EtebaseUser(username: userName1, email: 'sharing1@test.com'),
       'password',
     );
     addTearDown(account1.dispose);
@@ -41,10 +38,7 @@ void main() {
 
     final account2 = await EtebaseAccount.signup(
       client,
-      EtebaseUser(
-        username: userName2,
-        email: 'sharing2@test.com',
-      ),
+      EtebaseUser(username: userName2, email: 'sharing2@test.com'),
       'password',
     );
     addTearDown(account2.dispose);
@@ -98,15 +92,9 @@ void main() {
     final outInvitations = outResponse.data;
     expect(outInvitations, hasLength(1));
     final outInvitation = outInvitations[0];
-    expect(
-      outInvitation.accessLevel,
-      EtebaseCollectionAccessLevel.readWrite,
-    );
+    expect(outInvitation.accessLevel, EtebaseCollectionAccessLevel.readWrite);
     expect(outInvitation.collection, collection.uid);
-    expect(
-      outInvitation.fromPubKey,
-      invitationManager1.pubkey,
-    );
+    expect(outInvitation.fromPubKey, invitationManager1.pubkey);
     expect(outInvitation.fromUsername, userName1);
     expect(outInvitation.uid, isNotEmpty);
     expect(outInvitation.username, userName2);
@@ -119,15 +107,9 @@ void main() {
     final inInvitations = inResponse.data;
     expect(inInvitations, hasLength(1));
     final inInvitation = inInvitations[0];
-    expect(
-      inInvitation.accessLevel,
-      EtebaseCollectionAccessLevel.readWrite,
-    );
+    expect(inInvitation.accessLevel, EtebaseCollectionAccessLevel.readWrite);
     expect(inInvitation.collection, collection.uid);
-    expect(
-      inInvitation.fromPubKey,
-      invitationManager1.pubkey,
-    );
+    expect(inInvitation.fromPubKey, invitationManager1.pubkey);
     expect(inInvitation.fromUsername, userName1);
     expect(inInvitation.uid, outInvitation.uid);
     expect(inInvitation.username, userName2);
@@ -236,10 +218,7 @@ void main() {
     // leave collection
     final sharedCollection = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection.dispose);
-    expect(
-      sharedCollection.accessLevel,
-      EtebaseCollectionAccessLevel.readOnly,
-    );
+    expect(sharedCollection.accessLevel, EtebaseCollectionAccessLevel.readOnly);
 
     final memberManager = collectionManager2.getMemberManager(sharedCollection);
     await memberManager.leave();
@@ -291,10 +270,7 @@ void main() {
     expect(member1.accessLevel, EtebaseCollectionAccessLevel.admin);
     final member2 = members[1];
     expect(member2.username, userName2);
-    expect(
-      member2.accessLevel,
-      EtebaseCollectionAccessLevel.readOnly,
-    );
+    expect(member2.accessLevel, EtebaseCollectionAccessLevel.readOnly);
 
     // edit member access
     await memberManager.modifyAccessLevel(

@@ -18,27 +18,25 @@ class AccountCryptoManager extends CryptoManager {
   String get context => 'Acct';
 
   Uint8List colTypeToUid(String colId) => deterministicEncrypt(
-        executor.execSync(
-          (sodium) => sodium.pad(
-            colId.toCharArray().unsignedView(),
-            _colTypePadSize,
-          ),
-        ),
-      );
+    executor.execSync(
+      (sodium) =>
+          sodium.pad(colId.toCharArray().unsignedView(), _colTypePadSize),
+    ),
+  );
 
   String colTypeFromUid(Uint8List uid) {
     final paddedColType = deterministicDecrypt(uid);
     return executor.execSync(
-      (sodium) => sodium
-          .unpad(paddedColType, _colTypePadSize)
-          .signedView()
-          .toDartString(),
+      (sodium) =>
+          sodium
+              .unpad(paddedColType, _colTypePadSize)
+              .signedView()
+              .toDartString(),
     );
   }
 
   CollectionCryptoManager createCollectionCryptoManager(
     SecureKey key, {
     int? version,
-  }) =>
-      CollectionCryptoManager(executor, this, key, version ?? this.version);
+  }) => CollectionCryptoManager(executor, this, key, version ?? this.version);
 }

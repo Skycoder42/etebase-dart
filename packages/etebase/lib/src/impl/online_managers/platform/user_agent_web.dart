@@ -6,7 +6,7 @@ import 'user_agent_stub.dart' as stub;
 @internal
 abstract base class UserAgent {
   static String build(String clientName) => stub.UserAgent.buildFromValues(
-        clientName,
-        suffix: window.navigator.userAgent,
-      );
+    clientName,
+    suffix: window.navigator.userAgent,
+  );
 }

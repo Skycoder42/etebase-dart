@@ -49,17 +49,16 @@ class TestEtebaseItemMetadataCopyWith implements EtebaseItemMetadataCopyWith {
     String? name,
     String? itemType,
     String? extra,
-  }) =>
-      TestEtebaseItemMetadata(
-        _self.copyWith(
-          color: color,
-          description: description,
-          mtime: mtime,
-          name: name,
-          itemType: itemType,
-        ),
-        extra ?? _self.extra,
-      );
+  }) => TestEtebaseItemMetadata(
+    _self.copyWith(
+      color: color,
+      description: description,
+      mtime: mtime,
+      name: name,
+      itemType: itemType,
+    ),
+    extra ?? _self.extra,
+  );
 }
 
 @immutable
@@ -70,8 +69,8 @@ class TestEtebaseItemMetadata implements EtebaseItemMetadata {
   const TestEtebaseItemMetadata(this._self, this.extra);
 
   TestEtebaseItemMetadata.fromJson(Map<String, dynamic> json)
-      : _self = EtebaseItemMetadata.fromJson(json),
-        extra = json['extra'] as String;
+    : _self = EtebaseItemMetadata.fromJson(json),
+      extra = json['extra'] as String;
 
   @override
   String? get color => _self.color;
@@ -93,10 +92,7 @@ class TestEtebaseItemMetadata implements EtebaseItemMetadata {
       TestEtebaseItemMetadataCopyWith(this);
 
   @override
-  Map<String, dynamic> toJson() => {
-        ..._self.toJson(),
-        'extra': extra,
-      };
+  Map<String, dynamic> toJson() => {..._self.toJson(), 'extra': extra};
 
   @override
   bool operator ==(Object other) =>
@@ -131,11 +127,11 @@ void main() {
     final mockCryptoMacNoKey = MockCryptoMac();
 
     Uint8List wrap(int id, List<dynamic> data) => msgPack.encode([
-          // header
-          smartMockPrefix, id,
-          // data
-          ...data,
-        ]);
+      // header
+      smartMockPrefix, id,
+      // data
+      ...data,
+    ]);
 
     List<dynamic> unwrap(Uint8List raw, int id) {
       final decoded = msgPack.decode(raw);
@@ -182,25 +178,22 @@ void main() {
       Uint8List testAd,
       Iterable<Chunk> chunks, {
       int deleted = 0,
-    }) =>
-        isWrapped('cryptoMac(key)', smMac, [
-          isTrue,
-          isWrapped('notDeleted', smMacUpdate, [
-            [deleted],
-          ]),
-          isWrapped('additionalData', smMacUpdateLen, [
-            testAd,
-          ]),
-          isWrapped('chunksHash', smMacUpdate, [
-            isWrapped('cryptoMac(noKey)', smMac, [
-              isFalse,
-              for (final (idx, chunk) in chunks.indexed)
-                isWrapped('chunk[$idx].uid', smMacUpdate, [
-                  base64.decode(chunk.uid),
-                ]),
+    }) => isWrapped('cryptoMac(key)', smMac, [
+      isTrue,
+      isWrapped('notDeleted', smMacUpdate, [
+        [deleted],
+      ]),
+      isWrapped('additionalData', smMacUpdateLen, [testAd]),
+      isWrapped('chunksHash', smMacUpdate, [
+        isWrapped('cryptoMac(noKey)', smMac, [
+          isFalse,
+          for (final (idx, chunk) in chunks.indexed)
+            isWrapped('chunk[$idx].uid', smMacUpdate, [
+              base64.decode(chunk.uid),
             ]),
-          ]),
-        ]);
+        ]),
+      ]),
+    ]);
 
     void setupSmartMocks() {
       when(mockClient.converter).thenReturn(mockMessagePackConverter);
@@ -210,8 +203,9 @@ void main() {
         // ignore: avoid_dynamic_calls
         return wrap(smConverterEncode, [data.toJson()]);
       });
-      when(mockMessagePackConverter.decode<EtebaseItemMetadata>(any))
-          .thenAnswer((i) {
+      when(
+        mockMessagePackConverter.decode<EtebaseItemMetadata>(any),
+      ).thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
         final [Map<dynamic, dynamic> json] = unwrap(data, smConverterEncode);
         return EtebaseItemMetadata.fromJson(json.cast());
@@ -283,8 +277,10 @@ void main() {
       when(mockCryptoManager.decryptDetached(any, any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List mac, Uint8List? ad] =
             i.positionalArguments;
-        final [Uint8List msgC, Uint8List? adC] =
-            unwrap(cipher, smCmDetachedCrypt);
+        final [Uint8List msgC, Uint8List? adC] = unwrap(
+          cipher,
+          smCmDetachedCrypt,
+        );
         final [Uint8List msgM, Uint8List? adM] = unwrap(mac, smCmDetachedMac);
         expect(adC, ad);
         expect(adM, ad);
@@ -295,16 +291,19 @@ void main() {
       when(mockCryptoManager.verify(any, any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List mac, Uint8List? ad] =
             i.positionalArguments;
-        final [Uint8List msgC, Uint8List? adC] =
-            unwrap(cipher, smCmDetachedCrypt);
+        final [Uint8List msgC, Uint8List? adC] = unwrap(
+          cipher,
+          smCmDetachedCrypt,
+        );
         final [Uint8List msgM, Uint8List? adM] = unwrap(mac, smCmDetachedMac);
         expect(adC, ad);
         expect(adM, ad);
         expect(msgM, msgC);
       });
-      // ignore: discarded_futures
-      when(mockCryptoManager.calculateMac(any, withKey: anyNamed('withKey')))
-          .thenAnswer((i) {
+      when(
+        // ignore: discarded_futures
+        mockCryptoManager.calculateMac(any, withKey: anyNamed('withKey')),
+      ).thenAnswer((i) {
         final [Uint8List message] = i.positionalArguments;
         final {#withKey: bool withKey} = i.namedArguments;
         return wrap(smCmMac, [message, withKey]);
@@ -323,8 +322,9 @@ void main() {
         return msgC;
       });
 
-      when(mockCryptoManager.getCryptoMac(withKey: anyNamed('withKey')))
-          .thenAnswer((i) {
+      when(
+        mockCryptoManager.getCryptoMac(withKey: anyNamed('withKey')),
+      ).thenAnswer((i) {
         final {#withKey: bool withKey} = i.namedArguments;
         final values = <dynamic>[withKey];
         final cm = MockCryptoMac();
@@ -389,9 +389,7 @@ void main() {
 
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, result.chunks),
         ];
@@ -409,17 +407,12 @@ void main() {
         expect(result.chunks.first.data, isNotNull);
         expectWrapped(
           base64.decode(result.chunks.first.uid),
-          isWrapped('mac(content,key)', smCmMac, [
-            testContent,
-            isTrue,
-          ]),
+          isWrapped('mac(content,key)', smCmMac, [testContent, isTrue]),
         );
         expectWrapped(
           result.chunks.first.data!,
           isWrapped('encrypted', smCmCrypt, [
-            isWrapped('padded(content)', smCryptoPad, [
-              testContent,
-            ]),
+            isWrapped('padded(content)', smCryptoPad, [testContent]),
             isNull,
           ]),
         );
@@ -440,9 +433,7 @@ void main() {
 
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, []),
         ];
@@ -464,10 +455,7 @@ void main() {
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
         const testMeta = EtebaseItemMetadata();
         final testContent = Uint8List.fromList(
-          List.generate(
-            16384 * 5,
-            (i) => i % 256,
-          ),
+          List.generate(16384 * 5, (i) => i % 256),
         );
 
         setupRollsum(testBlockSize);
@@ -572,9 +560,7 @@ void main() {
         // id and metadata
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, result.chunks),
         ];
@@ -680,9 +666,7 @@ void main() {
         // id and metadata
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, result.chunks),
         ];
@@ -701,8 +685,9 @@ void main() {
         const testBlockSize = 70000;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
         const testMeta = EtebaseItemMetadata();
-        final testContent =
-            Uint8List.fromList(List.generate(testBlockSize, (i) => i % 256));
+        final testContent = Uint8List.fromList(
+          List.generate(testBlockSize, (i) => i % 256),
+        );
 
         setupRollsum(testBlockSize);
 
@@ -740,17 +725,12 @@ void main() {
         expect(c2.data, isNotNull);
         expectWrapped(
           base64.decode(c2.uid),
-          isWrapped('mac(content,key)', smCmMac, [
-            hasLength(1 << 16),
-            isTrue,
-          ]),
+          isWrapped('mac(content,key)', smCmMac, [hasLength(1 << 16), isTrue]),
         );
         expectWrapped(
           c2.data!,
           isWrapped('encrypted', smCmCrypt, [
-            isWrapped('padded(content)', smCryptoPad, [
-              hasLength(1 << 16),
-            ]),
+            isWrapped('padded(content)', smCryptoPad, [hasLength(1 << 16)]),
             isNull,
           ]),
         );
@@ -759,8 +739,9 @@ void main() {
       test('honor minimum chunk size', () async {
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
         const testMeta = EtebaseItemMetadata();
-        final testContent =
-            Uint8List.fromList(List.generate(20000, (i) => i % 256));
+        final testContent = Uint8List.fromList(
+          List.generate(20000, (i) => i % 256),
+        );
 
         setupRollsum(10);
 
@@ -798,17 +779,12 @@ void main() {
         expect(c2.data, isNotNull);
         expectWrapped(
           base64.decode(c2.uid),
-          isWrapped('mac(content,key)', smCmMac, [
-            hasLength(1 << 14),
-            isTrue,
-          ]),
+          isWrapped('mac(content,key)', smCmMac, [hasLength(1 << 14), isTrue]),
         );
         expectWrapped(
           c2.data!,
           isWrapped('encrypted', smCmCrypt, [
-            isWrapped('padded(content)', smCryptoPad, [
-              hasLength(1 << 14),
-            ]),
+            isWrapped('padded(content)', smCryptoPad, [hasLength(1 << 14)]),
             isNull,
           ]),
         );
@@ -823,10 +799,7 @@ void main() {
       final testJsonData = {
         'uid': testUid,
         'meta': testMeta,
-        'chunks': [
-          testChunk1.toJson(),
-          testChunk2.toJson(),
-        ],
+        'chunks': [testChunk1.toJson(), testChunk2.toJson()],
         'deleted': true,
       };
 
@@ -859,8 +832,9 @@ void main() {
       final testWrappedCached = wrap(184, testCached.toJson());
 
       provideDummy(testCached);
-      when(mockMessagePackConverter.decode<CachedRevision>(any))
-          .thenReturn(testCached);
+      when(
+        mockMessagePackConverter.decode<CachedRevision>(any),
+      ).thenReturn(testCached);
       when(mockMessagePackConverter.encode(any)).thenReturn(testWrappedCached);
 
       final revision = EncryptedRevision.cacheLoad(
@@ -886,9 +860,7 @@ void main() {
 
       expect(cachedWithContent, testWrappedCached);
 
-      verify(
-        mockMessagePackConverter.encode(testCached),
-      );
+      verify(mockMessagePackConverter.encode(testCached));
       clearInteractions(mockMessagePackConverter);
 
       // without content
@@ -934,42 +906,46 @@ void main() {
 
         await sut.verify(mockClient, mockCryptoManager, testAd);
 
-        final [Uint8List captured] = verify(
-          mockCryptoManager.verify(
-            sut.meta,
-            base64.decode(sut.uid),
-            captureAny,
-          ),
-        ).captured;
+        final [Uint8List captured] =
+            verify(
+              mockCryptoManager.verify(
+                sut.meta,
+                base64.decode(sut.uid),
+                captureAny,
+              ),
+            ).captured;
 
         expectWrapped(captured, isAdHash(testAd, sut.chunks));
       });
 
-      test('translates crypto failure to integrity compromised exception',
-          () async {
-        final testAd = Uint8List.fromList([4, 5, 4, 23, 1, 2]);
-        const testMeta = EtebaseItemMetadata(
-          name: 'test-meta',
-          description: 'test-description',
-        );
-        final testContent = Uint8List.fromList([5, 4, 2, 21, 1]);
+      test(
+        'translates crypto failure to integrity compromised exception',
+        () async {
+          final testAd = Uint8List.fromList([4, 5, 4, 23, 1, 2]);
+          const testMeta = EtebaseItemMetadata(
+            name: 'test-meta',
+            description: 'test-description',
+          );
+          final testContent = Uint8List.fromList([5, 4, 2, 21, 1]);
 
-        final sut = await EncryptedRevision.create(
-          client: mockClient,
-          cryptoManager: mockCryptoManager,
-          additionalData: testAd,
-          meta: testMeta,
-          content: testContent,
-        );
+          final sut = await EncryptedRevision.create(
+            client: mockClient,
+            cryptoManager: mockCryptoManager,
+            additionalData: testAd,
+            meta: testMeta,
+            content: testContent,
+          );
 
-        when(mockCryptoManager.verify(any, any, any))
-            .thenThrow(CryptoFailure());
+          when(
+            mockCryptoManager.verify(any, any, any),
+          ).thenThrow(CryptoFailure());
 
-        await expectLater(
-          sut.verify(mockClient, mockCryptoManager, testAd),
-          throwsA(isA<IntegrityCompromised>()),
-        );
-      });
+          await expectLater(
+            sut.verify(mockClient, mockCryptoManager, testAd),
+            throwsA(isA<IntegrityCompromised>()),
+          );
+        },
+      );
     });
 
     group('setMeta', () {
@@ -983,18 +959,17 @@ void main() {
           Chunk(base64.encode([3, 2, 3]), null),
         ];
 
-        final sut = EncryptedRevision()
-          ..uid = 'default'
-          ..meta = Uint8List(0)
-          ..chunks = testChunks;
+        final sut =
+            EncryptedRevision()
+              ..uid = 'default'
+              ..meta = Uint8List(0)
+              ..chunks = testChunks;
 
         await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
 
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, testChunks),
         ];
@@ -1022,18 +997,17 @@ void main() {
           Chunk(base64.encode([3, 2, 3]), null),
         ];
 
-        final sut = EncryptedRevision()
-          ..uid = 'default'
-          ..meta = Uint8List(0)
-          ..chunks = testChunks;
+        final sut =
+            EncryptedRevision()
+              ..uid = 'default'
+              ..meta = Uint8List(0)
+              ..chunks = testChunks;
 
         await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
 
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, testChunks),
         ];
@@ -1073,17 +1047,15 @@ void main() {
       test('restores custom metadata', () async {
         final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
         const testMeta = TestEtebaseItemMetadata(
-          EtebaseItemMetadata(
-            name: 'test-meta',
-            color: '#AABBCC',
-          ),
+          EtebaseItemMetadata(name: 'test-meta', color: '#AABBCC'),
           'test-extra',
         );
         final testContent = Uint8List.fromList([5, 6, 5, 2, 1, 2, 1]);
 
         provideDummy(testMeta);
-        when(mockMessagePackConverter.decode<TestEtebaseItemMetadata>(any))
-            .thenAnswer((i) {
+        when(
+          mockMessagePackConverter.decode<TestEtebaseItemMetadata>(any),
+        ).thenAnswer((i) {
           final [Uint8List data] = i.positionalArguments;
           final [Map<dynamic, dynamic> json] = unwrap(data, smConverterEncode);
           return TestEtebaseItemMetadata.fromJson(json.cast());
@@ -1126,9 +1098,7 @@ void main() {
 
         final oldEncryptedContent = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, []),
         ];
@@ -1156,9 +1126,7 @@ void main() {
 
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, sut.chunks),
         ];
@@ -1176,17 +1144,12 @@ void main() {
         expect(sut.chunks.first.data, isNotNull);
         expectWrapped(
           base64.decode(sut.chunks.first.uid),
-          isWrapped('mac(content,key)', smCmMac, [
-            testContent,
-            isTrue,
-          ]),
+          isWrapped('mac(content,key)', smCmMac, [testContent, isTrue]),
         );
         expectWrapped(
           sut.chunks.first.data!,
           isWrapped('encrypted', smCmCrypt, [
-            isWrapped('padded(content)', smCryptoPad, [
-              testContent,
-            ]),
+            isWrapped('padded(content)', smCryptoPad, [testContent]),
             isNull,
           ]),
         );
@@ -1237,10 +1200,7 @@ void main() {
         final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
         const testMeta = EtebaseItemMetadata();
         final testContent = Uint8List.fromList(
-          List.generate(
-            16384 * 5,
-            (i) => i % 256,
-          ),
+          List.generate(16384 * 5, (i) => i % 256),
         );
 
         setupRollsum(testBlockSize);
@@ -1286,124 +1246,129 @@ void main() {
         expect(content, testContent);
       });
 
-      test('throws MissingContent if at least one chunk is missing data',
-          () async {
-        const testBlockSize = 32768;
-        final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
-        final testContent = Uint8List.fromList(
-          List.generate(
-            16384 * 5,
-            (i) => i % 256,
-          ),
-        );
+      test(
+        'throws MissingContent if at least one chunk is missing data',
+        () async {
+          const testBlockSize = 32768;
+          final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
+          const testMeta = EtebaseItemMetadata();
+          final testContent = Uint8List.fromList(
+            List.generate(16384 * 5, (i) => i % 256),
+          );
 
-        setupRollsum(testBlockSize);
+          setupRollsum(testBlockSize);
 
-        final sut = await EncryptedRevision.create(
-          client: mockClient,
-          cryptoManager: mockCryptoManager,
-          additionalData: testAd,
-          meta: testMeta,
-          content: testContent,
-        );
+          final sut = await EncryptedRevision.create(
+            client: mockClient,
+            cryptoManager: mockCryptoManager,
+            additionalData: testAd,
+            meta: testMeta,
+            content: testContent,
+          );
 
-        expect(sut.chunks, hasLength(4));
-        sut.chunks = [
-          sut.chunks[0],
-          sut.chunks[1],
-          sut.chunks[2].copyWith(data: null),
-          sut.chunks[3],
-        ];
+          expect(sut.chunks, hasLength(4));
+          sut.chunks = [
+            sut.chunks[0],
+            sut.chunks[1],
+            sut.chunks[2].copyWith(data: null),
+            sut.chunks[3],
+          ];
 
-        expect(
-          () => sut.getContent(mockClient, mockCryptoManager),
-          throwsA(isA<MissingContent>()),
-        );
-      });
+          expect(
+            () => sut.getContent(mockClient, mockCryptoManager),
+            throwsA(isA<MissingContent>()),
+          );
+        },
+      );
 
-      test('throws IntegrityCompromised if plain data hash does not match uid',
-          () async {
-        final testAd = Uint8List.fromList([5, 4, 2, 5, 1]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
-        final testContent = Uint8List.fromList([34, 1, 4, 12]);
+      test(
+        'throws IntegrityCompromised if plain data hash does not match uid',
+        () async {
+          final testAd = Uint8List.fromList([5, 4, 2, 5, 1]);
+          const testMeta = EtebaseItemMetadata(name: 'test-meta');
+          final testContent = Uint8List.fromList([34, 1, 4, 12]);
 
-        final sut = await EncryptedRevision.create(
-          client: mockClient,
-          cryptoManager: mockCryptoManager,
-          additionalData: testAd,
-          meta: testMeta,
-          content: Uint8List.fromList([5, 4, 1, 2]),
-        );
+          final sut = await EncryptedRevision.create(
+            client: mockClient,
+            cryptoManager: mockCryptoManager,
+            additionalData: testAd,
+            meta: testMeta,
+            content: Uint8List.fromList([5, 4, 1, 2]),
+          );
 
-        final oldChunk = sut.chunks.single;
+          final oldChunk = sut.chunks.single;
 
-        await sut.setContent(
-          mockClient,
-          mockCryptoManager,
-          additionalData: testAd,
-          content: testContent,
-        );
+          await sut.setContent(
+            mockClient,
+            mockCryptoManager,
+            additionalData: testAd,
+            content: testContent,
+          );
 
-        // replace chunk id
-        sut.chunks = [sut.chunks.single.copyWith(uid: oldChunk.uid)];
+          // replace chunk id
+          sut.chunks = [sut.chunks.single.copyWith(uid: oldChunk.uid)];
 
-        // try to get content
-        expect(
-          () => sut.getContent(mockClient, mockCryptoManager),
-          throwsA(
-            isA<IntegrityCompromised>()
-                .having((m) => m.message, 'message', contains(oldChunk.uid)),
-          ),
-        );
-      });
+          // try to get content
+          expect(
+            () => sut.getContent(mockClient, mockCryptoManager),
+            throwsA(
+              isA<IntegrityCompromised>().having(
+                (m) => m.message,
+                'message',
+                contains(oldChunk.uid),
+              ),
+            ),
+          );
+        },
+      );
     });
 
     group('delete', () {
-      test('sets deleted to true and updates metadata if data should be kept',
-          () async {
-        final testAd = Uint8List.fromList([6, 4, 1, 2, 4, 1]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
-        final testContent = Uint8List.fromList([11, 34, 23]);
-
-        final sut = await EncryptedRevision.create(
-          client: mockClient,
-          cryptoManager: mockCryptoManager,
-          additionalData: testAd,
-          meta: testMeta,
-          content: testContent,
-        );
-
-        await sut.delete(
-          mockClient,
-          mockCryptoManager,
-          testAd,
-          preserveContent: true,
-        );
-
-        expect(sut.deleted, isTrue);
-        expect(sut.chunks, hasLength(1));
-
-        final encryptedContents = [
-          isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
-          ]),
-          isAdHash(testAd, sut.chunks, deleted: 1),
-        ];
-        expectWrapped(
-          base64.decode(sut.uid),
-          isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
-        );
-        expectWrapped(
-          sut.meta,
-          isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
-        );
-      });
-
       test(
-          'sets deleted to true, updates metadata and clears chunks '
+        'sets deleted to true and updates metadata if data should be kept',
+        () async {
+          final testAd = Uint8List.fromList([6, 4, 1, 2, 4, 1]);
+          const testMeta = EtebaseItemMetadata(name: 'test-meta');
+          final testContent = Uint8List.fromList([11, 34, 23]);
+
+          final sut = await EncryptedRevision.create(
+            client: mockClient,
+            cryptoManager: mockCryptoManager,
+            additionalData: testAd,
+            meta: testMeta,
+            content: testContent,
+          );
+
+          await sut.delete(
+            mockClient,
+            mockCryptoManager,
+            testAd,
+            preserveContent: true,
+          );
+
+          expect(sut.deleted, isTrue);
+          expect(sut.chunks, hasLength(1));
+
+          final encryptedContents = [
+            isWrapped('padded', smCryptoPadSmall, [
+              isWrapped('encoded(meta)', smConverterEncode, [
+                testMeta.toJson(),
+              ]),
+            ]),
+            isAdHash(testAd, sut.chunks, deleted: 1),
+          ];
+          expectWrapped(
+            base64.decode(sut.uid),
+            isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
+          );
+          expectWrapped(
+            sut.meta,
+            isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
+          );
+        },
+      );
+
+      test('sets deleted to true, updates metadata and clears chunks '
           'if data should not be kept', () async {
         final testAd = Uint8List.fromList([6, 4, 1, 2, 4, 1]);
         const testMeta = EtebaseItemMetadata(name: 'test-meta');
@@ -1429,9 +1394,7 @@ void main() {
 
         final encryptedContents = [
           isWrapped('padded', smCryptoPadSmall, [
-            isWrapped('encoded(meta)', smConverterEncode, [
-              testMeta.toJson(),
-            ]),
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
           ]),
           isAdHash(testAd, [], deleted: 1),
         ];
@@ -1447,14 +1410,15 @@ void main() {
     });
 
     test('clone creates new revision with identical data', () {
-      final sut = EncryptedRevision()
-        ..uid = 'default'
-        ..meta = Uint8List(0)
-        ..deleted = true
-        ..chunks = [
-          Chunk('chunk-1', Uint8List.fromList([33, 1])),
-          const Chunk('chunk-2', null),
-        ];
+      final sut =
+          EncryptedRevision()
+            ..uid = 'default'
+            ..meta = Uint8List(0)
+            ..deleted = true
+            ..chunks = [
+              Chunk('chunk-1', Uint8List.fromList([33, 1])),
+              const Chunk('chunk-2', null),
+            ];
 
       final result = sut.clone();
 

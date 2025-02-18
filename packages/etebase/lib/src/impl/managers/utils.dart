@@ -9,21 +9,12 @@ import 'client.dart';
 sealed class Utils {
   Utils._();
 
-  static Uint8List randombytes(
-    Client client,
-    int size,
-  ) =>
+  static Uint8List randombytes(Client client, int size) =>
       client.crypto.randomBytes(size);
 
-  static SecureKey randomKey(
-    Client client,
-    int size,
-  ) =>
+  static SecureKey randomKey(Client client, int size) =>
       client.crypto.secureRandom(size);
 
-  static String prettyFingerprint(
-    Client client,
-    Uint8List content,
-  ) =>
+  static String prettyFingerprint(Client client, Uint8List content) =>
       client.crypto.prettyFingerprint(content);
 }

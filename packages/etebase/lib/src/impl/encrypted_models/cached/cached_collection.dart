@@ -27,8 +27,9 @@ sealed class CachedCollection with _$CachedCollection {
 
     return CachedCollection(
       collectionKey: json[1] as Uint8List,
-      accessLevel: EtebaseCollectionAccessLevel.values
-          .singleWhere((e) => e.value == json[2] as int),
+      accessLevel: EtebaseCollectionAccessLevel.values.singleWhere(
+        (e) => e.value == json[2] as int,
+      ),
       stoken: json[3] as String?,
       item: json[4] as Uint8List,
       collectionType: json[5] as Uint8List,
@@ -38,11 +39,11 @@ sealed class CachedCollection with _$CachedCollection {
   const CachedCollection._();
 
   List<dynamic> toJson() => [
-        _cacheFormatVersion,
-        collectionKey,
-        accessLevel.value,
-        stoken,
-        item,
-        collectionType,
-      ];
+    _cacheFormatVersion,
+    collectionKey,
+    accessLevel.value,
+    stoken,
+    item,
+    collectionType,
+  ];
 }

@@ -16,8 +16,7 @@ class CollectionMemberManager implements EtebaseCollectionMemberManager {
   @override
   Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list([
     EtebaseIteratorFetchOptions? fetchOptions,
-  ]) =>
-      _online.list(fetchOptions);
+  ]) => _online.list(fetchOptions);
 
   @override
   Future<void> remove(String username) => _online.remove(username);
@@ -29,6 +28,5 @@ class CollectionMemberManager implements EtebaseCollectionMemberManager {
   Future<void> modifyAccessLevel(
     String username,
     EtebaseCollectionAccessLevel accessLevel,
-  ) =>
-      _online.modifyAccessLevel(username, accessLevel);
+  ) => _online.modifyAccessLevel(username, accessLevel);
 }

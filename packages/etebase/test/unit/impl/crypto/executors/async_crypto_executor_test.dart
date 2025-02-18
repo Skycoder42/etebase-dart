@@ -14,9 +14,7 @@ import 'package:mockito/mockito.dart';
 import 'package:sodium/sodium_sumo.dart';
 import 'package:test/test.dart';
 
-@GenerateNiceMocks([
-  MockSpec<SodiumSumo>(),
-])
+@GenerateNiceMocks([MockSpec<SodiumSumo>()])
 import 'async_crypto_executor_test.mocks.dart';
 
 class FakeSecureKey extends Fake implements SecureKey {
@@ -47,9 +45,7 @@ class FakeTransferrableKeyPair extends Fake implements TransferrableKeyPair {
 }
 
 void _createTransferMocks(MockSodiumSumo mockSodiumSumo) {
-  provideDummy(
-    KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey(-1)),
-  );
+  provideDummy(KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey(-1)));
 
   when(mockSodiumSumo.createTransferrableSecureKey(any)).thenAnswer(
     (i) => FakeTransferrableSecureKey(
@@ -102,7 +98,7 @@ void main() {
       await runZonedGuarded(
         () async {
           await sut.initialize();
-          await sut.execAsync<void>((_, __, ___) {
+          await sut.execAsync<void>((_, _, _) {
             scheduleMicrotask(() {
               throw Exception('Test Exception');
             });
@@ -129,7 +125,7 @@ void main() {
     test('dispose stops isolate and waits for finish', () async {
       await sut.initialize();
 
-      await sut.execAsync((_, __, ___) {
+      await sut.execAsync((_, _, _) {
         Future.delayed(
           const Duration(milliseconds: 500),
           () => throw Exception('Isolate not disposed!'),
@@ -140,10 +136,7 @@ void main() {
 
       await Future<void>.delayed(const Duration(seconds: 1));
 
-      expect(
-        () => sut.execAsync((_, __, ___) => false),
-        throwsA(isStateError),
-      );
+      expect(() => sut.execAsync((_, _, _) => false), throwsA(isStateError));
     });
 
     group('execSync', () {
@@ -176,7 +169,7 @@ void main() {
       });
 
       test('runs callback on different isolate', () async {
-        int callback(SodiumSumo sodium, _, __) {
+        int callback(SodiumSumo sodium, _, _) {
           if (sodium is MockSodiumSumo) {
             return Isolate.current.hashCode;
           } else {
@@ -190,7 +183,7 @@ void main() {
       });
 
       test('runs multiple invocations on same isolate', () async {
-        int callback(SodiumSumo sodium, _, __) {
+        int callback(SodiumSumo sodium, _, _) {
           if (sodium is MockSodiumSumo) {
             return Isolate.current.hashCode;
           } else {
@@ -207,7 +200,7 @@ void main() {
       });
 
       test('runs correct result for every invocation', () async {
-        AsyncCallback<int> createCb(int ctr) => (sodium, _, __) => ctr;
+        AsyncCallback<int> createCb(int ctr) => (sodium, _, _) => ctr;
 
         final results = <Future<int>>[];
         for (var i = 0; i < 5; ++i) {
@@ -220,16 +213,13 @@ void main() {
       });
 
       test('runs callback with keys and key pairs', () async {
-        bool callback(
-          SodiumSumo sodium,
-          List<SecureKey> sk,
-          List<KeyPair> kp,
-        ) {
+        bool callback(SodiumSumo sodium, List<SecureKey> sk, List<KeyPair> kp) {
           // ensure keys get disposed
           scheduleMicrotask(() {
-            final allKeys = sk
-                .followedBy(kp.map((kp) => kp.secretKey))
-                .cast<FakeSecureKey>();
+            final allKeys =
+                sk
+                    .followedBy(kp.map((kp) => kp.secretKey))
+                    .cast<FakeSecureKey>();
             for (final key in allKeys) {
               if (!key.disposed) {
                 throw Exception('Key $key was not disposed!');
@@ -237,27 +227,25 @@ void main() {
             }
           });
 
-          if (sk
-              case [
-                FakeSecureKey(id: 1, disposed: false),
-                FakeSecureKey(id: 2, disposed: false)
-              ]) {
+          if (sk case [
+            FakeSecureKey(id: 1, disposed: false),
+            FakeSecureKey(id: 2, disposed: false),
+          ]) {
             // ok
           } else {
             throw Exception('Unexpected value for sk: $sk');
           }
 
-          if (kp
-              case [
-                KeyPair(
-                  publicKey: [3],
-                  secretKey: FakeSecureKey(id: 4, disposed: false)
-                ),
-                KeyPair(
-                  publicKey: [5],
-                  secretKey: FakeSecureKey(id: 6, disposed: false)
-                ),
-              ]) {
+          if (kp case [
+            KeyPair(
+              publicKey: [3],
+              secretKey: FakeSecureKey(id: 4, disposed: false),
+            ),
+            KeyPair(
+              publicKey: [5],
+              secretKey: FakeSecureKey(id: 6, disposed: false),
+            ),
+          ]) {
             // ok
           } else {
             throw Exception('Unexpected value for kp: $kp');
@@ -298,7 +286,7 @@ void main() {
       });
 
       test('returns copy of byte arrays', () async {
-        Uint8List callback(SodiumSumo sodium, _, __) =>
+        Uint8List callback(SodiumSumo sodium, _, _) =>
             Uint8List.fromList([47, 11]);
 
         final result = await sut.execAsync(callback);
@@ -307,7 +295,7 @@ void main() {
       });
 
       test('returns secure key as transferrable key', () async {
-        SecureKey callback(SodiumSumo sodium, _, __) {
+        SecureKey callback(SodiumSumo sodium, _, _) {
           final key = FakeSecureKey(42);
           // ensure key gets disposed
           scheduleMicrotask(() {
@@ -332,7 +320,7 @@ void main() {
       });
 
       test('returns key pair as transferrable key pair', () async {
-        KeyPair callback(SodiumSumo sodium, _, __) {
+        KeyPair callback(SodiumSumo sodium, _, _) {
           final key = KeyPair(
             publicKey: Uint8List.fromList([1, 21]),
             secretKey: FakeSecureKey(11),
@@ -354,11 +342,7 @@ void main() {
         expect(
           result,
           isA<KeyPair>()
-              .having(
-                (m) => m.publicKey,
-                'publicKey',
-                equals([1, 21]),
-              )
+              .having((m) => m.publicKey, 'publicKey', equals([1, 21]))
               .having(
                 (m) => m.secretKey,
                 'secretKey',
@@ -371,7 +355,7 @@ void main() {
 
       test('wraps sodium exception as crypto failure', () async {
         expect(
-          () => sut.execAsync<bool>((_, __, ___) => throw SodiumException()),
+          () => sut.execAsync<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),
         );
       });
@@ -387,7 +371,7 @@ void main() {
       });
 
       test('runs callback on different isolate', () async {
-        int callback(SodiumSumo sodium, _, __) {
+        int callback(SodiumSumo sodium, _, _) {
           if (sodium is MockSodiumSumo) {
             return Isolate.current.hashCode;
           } else {
@@ -401,7 +385,7 @@ void main() {
       });
 
       test('runs multiple invocations on same isolate', () async {
-        int callback(SodiumSumo sodium, _, __) {
+        int callback(SodiumSumo sodium, _, _) {
           if (sodium is MockSodiumSumo) {
             return Isolate.current.hashCode;
           } else {
@@ -418,7 +402,7 @@ void main() {
       });
 
       test('runs correct result for every invocation', () async {
-        AsyncCallback<int> createCb(int ctr) => (sodium, _, __) => ctr;
+        AsyncCallback<int> createCb(int ctr) => (sodium, _, _) => ctr;
 
         final results = <Future<int>>[];
         for (var i = 0; i < 5; ++i) {
@@ -431,16 +415,13 @@ void main() {
       });
 
       test('runs callback with keys and key pairs', () async {
-        bool callback(
-          SodiumSumo sodium,
-          List<SecureKey> sk,
-          List<KeyPair> kp,
-        ) {
+        bool callback(SodiumSumo sodium, List<SecureKey> sk, List<KeyPair> kp) {
           // ensure keys get disposed
           scheduleMicrotask(() {
-            final allKeys = sk
-                .followedBy(kp.map((kp) => kp.secretKey))
-                .cast<FakeSecureKey>();
+            final allKeys =
+                sk
+                    .followedBy(kp.map((kp) => kp.secretKey))
+                    .cast<FakeSecureKey>();
             for (final key in allKeys) {
               if (!key.disposed) {
                 throw Exception('Key $key was not disposed!');
@@ -448,27 +429,25 @@ void main() {
             }
           });
 
-          if (sk
-              case [
-                FakeSecureKey(id: 1, disposed: false),
-                FakeSecureKey(id: 2, disposed: false)
-              ]) {
+          if (sk case [
+            FakeSecureKey(id: 1, disposed: false),
+            FakeSecureKey(id: 2, disposed: false),
+          ]) {
             // ok
           } else {
             throw Exception('Unexpected value for sk: $sk');
           }
 
-          if (kp
-              case [
-                KeyPair(
-                  publicKey: [3],
-                  secretKey: FakeSecureKey(id: 4, disposed: false)
-                ),
-                KeyPair(
-                  publicKey: [5],
-                  secretKey: FakeSecureKey(id: 6, disposed: false)
-                ),
-              ]) {
+          if (kp case [
+            KeyPair(
+              publicKey: [3],
+              secretKey: FakeSecureKey(id: 4, disposed: false),
+            ),
+            KeyPair(
+              publicKey: [5],
+              secretKey: FakeSecureKey(id: 6, disposed: false),
+            ),
+          ]) {
             // ok
           } else {
             throw Exception('Unexpected value for kp: $kp');
@@ -509,7 +488,7 @@ void main() {
       });
 
       test('returns copy of byte arrays', () async {
-        Uint8List callback(SodiumSumo sodium, _, __) =>
+        Uint8List callback(SodiumSumo sodium, _, _) =>
             Uint8List.fromList([47, 11]);
 
         final result = await sut.execAsync(callback);
@@ -518,7 +497,7 @@ void main() {
       });
 
       test('returns secure key as transferrable key', () async {
-        SecureKey callback(SodiumSumo sodium, _, __) {
+        SecureKey callback(SodiumSumo sodium, _, _) {
           final key = FakeSecureKey(42);
           // ensure key gets disposed
           scheduleMicrotask(() {
@@ -543,7 +522,7 @@ void main() {
       });
 
       test('returns key pair as transferrable key pair', () async {
-        KeyPair callback(SodiumSumo sodium, _, __) {
+        KeyPair callback(SodiumSumo sodium, _, _) {
           final key = KeyPair(
             publicKey: Uint8List.fromList([1, 21]),
             secretKey: FakeSecureKey(11),
@@ -565,11 +544,7 @@ void main() {
         expect(
           result,
           isA<KeyPair>()
-              .having(
-                (m) => m.publicKey,
-                'publicKey',
-                equals([1, 21]),
-              )
+              .having((m) => m.publicKey, 'publicKey', equals([1, 21]))
               .having(
                 (m) => m.secretKey,
                 'secretKey',
@@ -582,7 +557,7 @@ void main() {
 
       test('wraps sodium exception as crypto failure', () async {
         expect(
-          () => sut.exec<bool>((_, __, ___) => throw SodiumException()),
+          () => sut.exec<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),
         );
       });

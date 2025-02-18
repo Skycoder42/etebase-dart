@@ -168,10 +168,7 @@ void main() {
 
       final json = sut.toJson();
 
-      expect(json, {
-        ...testJsonData,
-        'etag': testRevUid,
-      });
+      expect(json, {...testJsonData, 'etag': testRevUid});
     });
 
     test('cacheLoad/cacheSave correctly loads/saves data from/to cache', () {
@@ -211,8 +208,9 @@ void main() {
         mockMessagePackConverter.decode<CachedCollectionItem>(testEncodedItem),
       ).thenReturn(testItemCacheData);
       provideDummy(testRevisionCacheData);
-      when(mockMessagePackConverter.decode<CachedRevision>(testEncodedContent))
-          .thenReturn(testRevisionCacheData);
+      when(
+        mockMessagePackConverter.decode<CachedRevision>(testEncodedContent),
+      ).thenReturn(testRevisionCacheData);
 
       final sut = EncryptedCollectionItem.cacheLoad(
         mockClient,
@@ -232,10 +230,12 @@ void main() {
       clearInteractions(mockMessagePackConverter);
 
       // with content
-      when(mockMessagePackConverter.encode(testItemCacheData))
-          .thenReturn(testEncodedItem);
-      when(mockMessagePackConverter.encode(testRevisionCacheData))
-          .thenReturn(testEncodedContent);
+      when(
+        mockMessagePackConverter.encode(testItemCacheData),
+      ).thenReturn(testEncodedItem);
+      when(
+        mockMessagePackConverter.encode(testRevisionCacheData),
+      ).thenReturn(testEncodedContent);
 
       final cachedWithContent = sut.cacheSave(mockClient, saveContent: true);
       expect(cachedWithContent, testEncodedItem);
@@ -255,8 +255,9 @@ void main() {
           CachedChunk(Uint8List.fromList([2])),
         ],
       );
-      when(mockMessagePackConverter.encode(testRevisionWithoutContentCacheData))
-          .thenReturn(testEncodedContent);
+      when(
+        mockMessagePackConverter.encode(testRevisionWithoutContentCacheData),
+      ).thenReturn(testEncodedContent);
 
       final cachedWithoutContent = sut.cacheSave(
         mockClient,
@@ -392,12 +393,14 @@ void main() {
           expect(() => sut.updateChunk(c4), throwsA(isA<ApiMissuse>()));
         });
 
-        test('verify calls revision.verify with item uid as additional data',
-            () async {
-          await sut.verify(mockClient, mockItemCm);
+        test(
+          'verify calls revision.verify with item uid as additional data',
+          () async {
+            await sut.verify(mockClient, mockItemCm);
 
-          verify(mockRevision.verify(mockClient, mockItemCm, testUidUtf8));
-        });
+            verify(mockRevision.verify(mockClient, mockItemCm, testUidUtf8));
+          },
+        );
       });
 
       group('setMeta', () {
@@ -407,12 +410,7 @@ void main() {
           await sut.setMeta(mockClient, mockItemCm, newMeta);
 
           verify(
-            mockRevision.setMeta(
-              mockClient,
-              mockItemCm,
-              testUidUtf8,
-              newMeta,
-            ),
+            mockRevision.setMeta(mockClient, mockItemCm, testUidUtf8, newMeta),
           );
           verifyNever(mockRevision.clone());
         });
@@ -429,21 +427,9 @@ void main() {
 
           verifyInOrder([
             mockRevision.clone(),
-            newRevision.setMeta(
-              mockClient,
-              mockItemCm,
-              testUidUtf8,
-              newMeta,
-            ),
+            newRevision.setMeta(mockClient, mockItemCm, testUidUtf8, newMeta),
           ]);
-          verifyNever(
-            mockRevision.setMeta(
-              any,
-              any,
-              any,
-              any,
-            ),
-          );
+          verifyNever(mockRevision.setMeta(any, any, any, any));
         });
 
         test('can handle custom metadata classes', () async {
@@ -463,25 +449,28 @@ void main() {
       });
 
       group('getMeta', () {
-        test('verifies the data and returns the metadata from the revision',
-            () async {
-          when(mockRevision.getMeta(any, any, any)).thenReturnAsync(testMeta);
+        test(
+          'verifies the data and returns the metadata from the revision',
+          () async {
+            when(mockRevision.getMeta(any, any, any)).thenReturnAsync(testMeta);
 
-          final result = await sut.getMeta(mockClient, mockItemCm);
+            final result = await sut.getMeta(mockClient, mockItemCm);
 
-          expect(result, testMeta);
+            expect(result, testMeta);
 
-          verifyInOrder([
-            mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
-            mockRevision.getMeta(mockClient, mockItemCm, testUidUtf8),
-          ]);
-        });
+            verifyInOrder([
+              mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
+              mockRevision.getMeta(mockClient, mockItemCm, testUidUtf8),
+            ]);
+          },
+        );
 
         test('can handle custom metadata classes', () async {
           final otherMeta = FakeEtebaseItemMetadata();
 
-          when(mockRevision.getMeta<FakeEtebaseItemMetadata>(any, any, any))
-              .thenReturnAsync(otherMeta);
+          when(
+            mockRevision.getMeta<FakeEtebaseItemMetadata>(any, any, any),
+          ).thenReturnAsync(otherMeta);
 
           final result = await sut.getMeta<FakeEtebaseItemMetadata>(
             mockClient,
@@ -614,25 +603,22 @@ void main() {
             },
           );
 
-          test(
-            'disposes item cm if callback throws',
-            () async {
-              final testException = Exception('test');
-              final cb = expectAsync1<bool, CollectionItemCryptoManager>(
-                (cm) => throw testException,
-              );
+          test('disposes item cm if callback throws', () async {
+            final testException = Exception('test');
+            final cb = expectAsync1<bool, CollectionItemCryptoManager>(
+              (cm) => throw testException,
+            );
 
-              await expectLater(
-                () => sut.withCm(mockClient, mockParentCm, cb),
-                throwsA(testException),
-              );
+            await expectLater(
+              () => sut.withCm(mockClient, mockParentCm, cb),
+              throwsA(testException),
+            );
 
-              verifyInOrder([
-                mockCryptoService.createCollectionItemCryptoManager(testKey),
-                mockItemCm.dispose(),
-              ]);
-            },
-          );
+            verifyInOrder([
+              mockCryptoService.createCollectionItemCryptoManager(testKey),
+              mockItemCm.dispose(),
+            ]);
+          });
         });
 
         test('getCryptoManager returns item manager', () {

@@ -17,11 +17,9 @@ class CryptoMac {
     SecureKey? key,
     int length = CryptoUtils.hashSize,
   }) : _consumer = executor.execSync(
-          (sodium) => sodium.crypto.genericHash.createConsumer(
-            outLen: length,
-            key: key,
-          ),
-        );
+         (sodium) =>
+             sodium.crypto.genericHash.createConsumer(outLen: length, key: key),
+       );
 
   void updateWithLenPrefix(Uint8List messageChunk) {
     _consumer

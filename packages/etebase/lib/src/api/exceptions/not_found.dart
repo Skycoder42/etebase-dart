@@ -11,7 +11,7 @@ class NotFound extends HttpFailure {
 
   /// Default constructor.
   NotFound(String message, [HttpErrorContent? error])
-      : super(statusCode, message, error);
+    : super(statusCode, message, error);
 
   @override
   String get name => 'NotFound';

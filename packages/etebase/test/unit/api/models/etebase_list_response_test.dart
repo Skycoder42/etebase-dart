@@ -26,9 +26,7 @@ void main() {
           data: [1, 2, 3],
           isDone: true,
           stoken: 'test_token',
-          removedMemberships: [
-            EtebaseRemovedCollection('test_removed'),
-          ],
+          removedMemberships: [EtebaseRemovedCollection('test_removed')],
         );
 
         final mapped = original.map((v) => v * v);

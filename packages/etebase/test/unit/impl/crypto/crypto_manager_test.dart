@@ -35,11 +35,15 @@ void main() {
       mockSodium.resetAndSetup();
       mockCryptoExecutor.resetAndSetup();
 
-      when(mockSodium.crypto.kdf.contextBytes)
-          .thenReturn(testContextPadded.length);
+      when(
+        mockSodium.crypto.kdf.contextBytes,
+      ).thenReturn(testContextPadded.length);
 
-      sut =
-          TestableCryptoManager(mockCryptoExecutor, testMasterKey, testVersion);
+      sut = TestableCryptoManager(
+        mockCryptoExecutor,
+        testMasterKey,
+        testVersion,
+      );
     });
 
     group('key generation', () {
@@ -126,8 +130,9 @@ void main() {
       final testCipher = Uint8List.fromList([6, 55, 5]);
 
       when(mockSodium.randombytes.buf(any)).thenReturn(testNonce);
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
           message: anyNamed('message'),
@@ -172,8 +177,9 @@ void main() {
       final testCipher = Uint8List.fromList([6, 55, 5]);
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
           cipherText: anyNamed('cipherText'),
@@ -217,8 +223,9 @@ void main() {
       final testCipher = Uint8List.fromList([6, 55, 5]);
 
       when(mockSodium.randombytes.buf(any)).thenReturn(testNonce);
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
           message: anyNamed('message'),
@@ -253,8 +260,9 @@ void main() {
       ]);
     });
 
-    testData('decryptKey decrypts secure key with cipher key', [null, 2],
-        (fixture) {
+    testData('decryptKey decrypts secure key with cipher key', [null, 2], (
+      fixture,
+    ) {
       final testKey = FakeSecureKey(33);
       final testKeyBytes = Uint8List.fromList([1, 10, 100]);
       final testAd = Uint8List.fromList([2, 3, 2]);
@@ -263,8 +271,9 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
       when(mockSodium.secureCopy(any)).thenReturn(testKey);
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
           cipherText: anyNamed('cipherText'),
@@ -274,11 +283,7 @@ void main() {
         ),
       ).thenReturn(testKeyBytes);
 
-      final result = sut.decryptKey(
-        testNonceCipher,
-        testAd,
-        fixture,
-      );
+      final result = sut.decryptKey(testNonceCipher, testAd, fixture);
 
       expect(result, testKey);
 
@@ -314,8 +319,9 @@ void main() {
       final testMac = Uint8List.fromList([7, 4, 9]);
 
       when(mockSodium.randombytes.buf(any)).thenReturn(testNonce);
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encryptDetached(
           message: anyNamed('message'),
@@ -362,8 +368,9 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
       final testMac = Uint8List.fromList([7, 4, 9]);
 
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decryptDetached(
           cipherText: anyNamed('cipherText'),
@@ -413,14 +420,11 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
       final testMac = Uint8List.fromList([7, 4, 9]);
 
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
 
-      await sut.verify(
-        testNonceCipher,
-        testMac,
-        testAd,
-      );
+      await sut.verify(testNonceCipher, testMac, testAd);
 
       verifyInOrder([
         mockCryptoExecutor.execSync<SecureKey>(any),
@@ -608,97 +612,52 @@ void main() {
       });
     });
 
-    test(
-      'deterministicEncrypt encrypts data with deterministicEncryptionKey '
-      'and calculated nonce',
-      () {
-        final testMessage = Uint8List.fromList([1, 2, 3, 4, 5]);
-        final testAd = Uint8List.fromList([2, 3, 2]);
-        final testHash = Uint8List.fromList([4, 4, 3, 6, 5, 7]);
-        final testNonce = Uint8List.fromList([4, 4, 3]);
-        final testCipher = Uint8List.fromList([6, 55, 5]);
-
-        when(
-          mockSodium.crypto.genericHash.call(
-            message: anyNamed('message'),
-            key: anyNamed('key'),
-            outLen: anyNamed('outLen'),
-          ),
-        ).thenReturn(testHash);
-        when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-            .thenReturn(testNonce.length);
-        when(
-          mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
-            message: anyNamed('message'),
-            additionalData: anyNamed('additionalData'),
-            nonce: anyNamed('nonce'),
-            key: anyNamed('key'),
-          ),
-        ).thenReturn(testCipher);
-
-        final result = sut.deterministicEncrypt(testMessage, testAd);
-
-        expect(result, concatenated(testNonce, testCipher));
-
-        verifyInOrder([
-          mockCryptoExecutor.execSync<Uint8List>(any),
-          mockCryptoExecutor.execSync<SecureKey>(any),
-          mockSodium.crypto.kdf.contextBytes,
-          mockSodium.crypto.kdf.deriveFromKey(
-            masterKey: testMasterKey,
-            context: testContextPadded,
-            subkeyId: BigInt.from(2),
-            subkeyLen: CryptoUtils.symmetricKeySize,
-          ),
-          mockSodium.crypto.genericHash.call(
-            message: testMessage,
-            key: argThat(isKey(2), named: 'key'),
-            outLen: CryptoUtils.symmetricKeySize,
-          ),
-          mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-          mockCryptoExecutor.execSync<SecureKey>(any),
-          mockSodium.crypto.kdf.contextBytes,
-          mockSodium.crypto.kdf.deriveFromKey(
-            masterKey: testMasterKey,
-            context: testContextPadded,
-            subkeyId: BigInt.from(5),
-            subkeyLen: CryptoUtils.symmetricKeySize,
-          ),
-          mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
-            message: testMessage,
-            additionalData: testAd,
-            nonce: testNonce,
-            key: argThat(isKey(5), named: 'key'),
-          ),
-        ]);
-      },
-    );
-
-    test('deterministicDecrypt decrypts data with deterministicEncryptionKey',
-        () {
+    test('deterministicEncrypt encrypts data with deterministicEncryptionKey '
+        'and calculated nonce', () {
       final testMessage = Uint8List.fromList([1, 2, 3, 4, 5]);
       final testAd = Uint8List.fromList([2, 3, 2]);
+      final testHash = Uint8List.fromList([4, 4, 3, 6, 5, 7]);
       final testNonce = Uint8List.fromList([4, 4, 3]);
       final testCipher = Uint8List.fromList([6, 55, 5]);
-      final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
-      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
-          .thenReturn(testNonce.length);
       when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
-          cipherText: anyNamed('cipherText'),
+        mockSodium.crypto.genericHash.call(
+          message: anyNamed('message'),
+          key: anyNamed('key'),
+          outLen: anyNamed('outLen'),
+        ),
+      ).thenReturn(testHash);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+      ).thenReturn(testNonce.length);
+      when(
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
+          message: anyNamed('message'),
           additionalData: anyNamed('additionalData'),
           nonce: anyNamed('nonce'),
           key: anyNamed('key'),
         ),
-      ).thenReturn(testMessage);
+      ).thenReturn(testCipher);
 
-      final result = sut.deterministicDecrypt(testNonceCipher, testAd);
+      final result = sut.deterministicEncrypt(testMessage, testAd);
 
-      expect(result, testMessage);
+      expect(result, concatenated(testNonce, testCipher));
 
       verifyInOrder([
         mockCryptoExecutor.execSync<Uint8List>(any),
+        mockCryptoExecutor.execSync<SecureKey>(any),
+        mockSodium.crypto.kdf.contextBytes,
+        mockSodium.crypto.kdf.deriveFromKey(
+          masterKey: testMasterKey,
+          context: testContextPadded,
+          subkeyId: BigInt.from(2),
+          subkeyLen: CryptoUtils.symmetricKeySize,
+        ),
+        mockSodium.crypto.genericHash.call(
+          message: testMessage,
+          key: argThat(isKey(2), named: 'key'),
+          outLen: CryptoUtils.symmetricKeySize,
+        ),
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
         mockCryptoExecutor.execSync<SecureKey>(any),
         mockSodium.crypto.kdf.contextBytes,
@@ -708,13 +667,59 @@ void main() {
           subkeyId: BigInt.from(5),
           subkeyLen: CryptoUtils.symmetricKeySize,
         ),
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
-          cipherText: testCipher,
+        mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
+          message: testMessage,
           additionalData: testAd,
           nonce: testNonce,
           key: argThat(isKey(5), named: 'key'),
         ),
       ]);
     });
+
+    test(
+      'deterministicDecrypt decrypts data with deterministicEncryptionKey',
+      () {
+        final testMessage = Uint8List.fromList([1, 2, 3, 4, 5]);
+        final testAd = Uint8List.fromList([2, 3, 2]);
+        final testNonce = Uint8List.fromList([4, 4, 3]);
+        final testCipher = Uint8List.fromList([6, 55, 5]);
+        final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
+
+        when(
+          mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+        ).thenReturn(testNonce.length);
+        when(
+          mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
+            cipherText: anyNamed('cipherText'),
+            additionalData: anyNamed('additionalData'),
+            nonce: anyNamed('nonce'),
+            key: anyNamed('key'),
+          ),
+        ).thenReturn(testMessage);
+
+        final result = sut.deterministicDecrypt(testNonceCipher, testAd);
+
+        expect(result, testMessage);
+
+        verifyInOrder([
+          mockCryptoExecutor.execSync<Uint8List>(any),
+          mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
+          mockCryptoExecutor.execSync<SecureKey>(any),
+          mockSodium.crypto.kdf.contextBytes,
+          mockSodium.crypto.kdf.deriveFromKey(
+            masterKey: testMasterKey,
+            context: testContextPadded,
+            subkeyId: BigInt.from(5),
+            subkeyLen: CryptoUtils.symmetricKeySize,
+          ),
+          mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
+            cipherText: testCipher,
+            additionalData: testAd,
+            nonce: testNonce,
+            key: argThat(isKey(5), named: 'key'),
+          ),
+        ]);
+      },
+    );
   });
 }

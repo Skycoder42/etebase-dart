@@ -29,10 +29,10 @@ class Rollsum {
   int _wofs;
 
   Rollsum()
-      : _s1 = _windowSize * _charOffset,
-        _s2 = _windowSize * (_windowSize - 1) * _charOffset,
-        _window = Uint8List(_windowSize),
-        _wofs = 0;
+    : _s1 = _windowSize * _charOffset,
+      _s2 = _windowSize * (_windowSize - 1) * _charOffset,
+      _window = Uint8List(_windowSize),
+      _wofs = 0;
 
   void update(int ch) {
     _rollsumAdd(_window[_wofs], ch);

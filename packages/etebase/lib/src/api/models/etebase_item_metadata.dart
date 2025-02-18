@@ -9,8 +9,8 @@ part 'etebase_item_metadata.freezed.dart';
 part 'etebase_item_metadata.g.dart';
 
 /// The type definition of the [EtebaseItemMetadata.copyWith] method
-typedef EtebaseItemMetadataCopyWith
-    = _$EtebaseItemMetadataImplCopyWith<EtebaseItemMetadata>;
+typedef EtebaseItemMetadataCopyWith =
+    _$EtebaseItemMetadataImplCopyWith<EtebaseItemMetadata>;
 
 /// Metadata of the item.
 abstract interface class EtebaseItemMetadata {

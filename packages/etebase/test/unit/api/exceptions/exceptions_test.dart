@@ -23,9 +23,7 @@ void main() {
     const testErrorContent = HttpErrorContent(
       code: 'ERR_TST',
       detail: 'Test Error',
-      errors: [
-        HttpFieldError(code: 'ERR_TST_FLD', detail: 'Test Field Error'),
-      ],
+      errors: [HttpFieldError(code: 'ERR_TST_FLD', detail: 'Test Field Error')],
     );
 
     testData(
@@ -36,11 +34,11 @@ void main() {
         (Conflict('test'), '$Conflict(409): test'),
         (
           ConnectionProblem(Exception('test')),
-          '$ConnectionProblem: Exception: test'
+          '$ConnectionProblem: Exception: test',
         ),
         (
           CryptoFailure(originalMessage: 'test'),
-          '$CryptoFailure: A low level cryptographic operation has failed'
+          '$CryptoFailure: A low level cryptographic operation has failed',
         ),
         (IntegrityCompromised('test'), '$IntegrityCompromised: test'),
         (InvalidMessagePackData('test'), '$InvalidMessagePackData: test'),
@@ -50,7 +48,7 @@ void main() {
         (ServerProblem(512, 'test'), '$ServerProblem(512): test'),
         (
           TemporaryServerProblem(513, 'test'),
-          '$TemporaryServerProblem(513): test'
+          '$TemporaryServerProblem(513): test',
         ),
         (Unauthorized('test'), '$Unauthorized(401): test'),
       ],
@@ -64,27 +62,27 @@ void main() {
       [
         (
           Conflict('test', testErrorContent),
-          '$Conflict(409): $testErrorContent'
+          '$Conflict(409): $testErrorContent',
         ),
         (
           NotFound('test', testErrorContent),
-          '$NotFound(404): $testErrorContent'
+          '$NotFound(404): $testErrorContent',
         ),
         (
           PermissionDenied('test', testErrorContent),
-          '$PermissionDenied(403): $testErrorContent'
+          '$PermissionDenied(403): $testErrorContent',
         ),
         (
           ServerProblem(512, 'test', testErrorContent),
-          '$ServerProblem(512): $testErrorContent'
+          '$ServerProblem(512): $testErrorContent',
         ),
         (
           TemporaryServerProblem(513, 'test', testErrorContent),
-          '$TemporaryServerProblem(513): $testErrorContent'
+          '$TemporaryServerProblem(513): $testErrorContent',
         ),
         (
           Unauthorized('test', testErrorContent),
-          '$Unauthorized(401): $testErrorContent'
+          '$Unauthorized(401): $testErrorContent',
         ),
       ],
       (fixture) {

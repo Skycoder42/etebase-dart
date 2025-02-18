@@ -18,9 +18,7 @@ export 'library_loader_stub.dart'
     show getLibsodium, kIsWeb;
 
 final _rng = Random.secure();
-final _uuid = Uuid(
-  goptions: GlobalOptions(CryptoRNG()),
-);
+final _uuid = Uuid(goptions: GlobalOptions(CryptoRNG()));
 
 final serverUri = Uri.http('localhost:3735', '/');
 
@@ -32,15 +30,15 @@ Future<EtebaseClient> createClient({bool useDefaultServer = false}) async {
 
   return useAsync
       ? await EtebaseClient.createAsync(
-          await SodiumSumoInit.init(getLibsodium),
-          'package:etebase/test/integration',
-          useDefaultServer ? null : serverUri,
-        )
+        await SodiumSumoInit.init(getLibsodium),
+        'package:etebase/test/integration',
+        useDefaultServer ? null : serverUri,
+      )
       : EtebaseClient.create(
-          await SodiumSumoInit.init(getLibsodium),
-          'package:etebase/test/integration',
-          useDefaultServer ? null : serverUri,
-        );
+        await SodiumSumoInit.init(getLibsodium),
+        'package:etebase/test/integration',
+        useDefaultServer ? null : serverUri,
+      );
 }
 
 Future<EtebaseAccount> createAccount(

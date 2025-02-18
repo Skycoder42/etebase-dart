@@ -31,7 +31,7 @@ class HiveCache implements EtebaseCache {
   late final LazyBox<Uint8List> _collectionBox;
 
   HiveCache(this._client, this._hive, String username)
-      : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
+    : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
 
   Future<void> initialize() async {
     _metaBox = await _hive.openLazyBox(_boxName(_metaBoxName));
@@ -77,9 +77,7 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<EtebaseAccount> loadAccount([
-    SecureKey? encryptionKey,
-  ]) async {
+  Future<EtebaseAccount> loadAccount([SecureKey? encryptionKey]) async {
     final accountData = await _metaBox.get(_accountDataKey).cast<Uint8List?>();
     if (accountData == null) {
       throw NotFound('No account has been cached');
@@ -106,11 +104,11 @@ class HiveCache implements EtebaseCache {
 
   @override
   Stream<String> get persistedCollectionStokenUids => Stream.fromIterable(
-        _metaBox.keys
-            .cast<String>()
-            .where((key) => key.startsWith(_accountColStokenKeyPrefix))
-            .map((key) => key.substring(_accountColStokenKeyPrefix.length)),
-      );
+    _metaBox.keys
+        .cast<String>()
+        .where((key) => key.startsWith(_accountColStokenKeyPrefix))
+        .map((key) => key.substring(_accountColStokenKeyPrefix.length)),
+  );
 
   @override
   Future<void> collectionSaveStoken(String colUid, String stoken) =>
@@ -162,10 +160,10 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Stream<String> persistedItemUids(String colUid) =>
-      // ignore: discarded_futures
-      Stream.fromFuture(_itemBox(colUid))
-          .expand((itemBox) => itemBox?.keys.cast() ?? const []);
+  Stream<String> persistedItemUids(String colUid) => Stream.fromFuture(
+    // ignore: discarded_futures
+    _itemBox(colUid),
+  ).expand((itemBox) => itemBox?.keys.cast() ?? const []);
 
   @override
   Future<void> itemSet(
@@ -208,9 +206,10 @@ class HiveCache implements EtebaseCache {
   String _collectionStokenKey(String colUid) =>
       '$_accountColStokenKeyPrefix$colUid';
 
-  Iterable<String> get _knownItemBoxNames => _collectionBox.isOpen
-      ? _collectionBox.keys.cast<String>().map(_itemBoxName)
-      : const [];
+  Iterable<String> get _knownItemBoxNames =>
+      _collectionBox.isOpen
+          ? _collectionBox.keys.cast<String>().map(_itemBoxName)
+          : const [];
 
   Future<LazyBox<Uint8List>?> _itemBox(
     String colUid, {

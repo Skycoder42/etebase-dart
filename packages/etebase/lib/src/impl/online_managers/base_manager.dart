@@ -30,15 +30,14 @@ base class BaseManager extends BaseNetwork {
     EtebaseFetchOptionsBase? options,
     Map<String, String>? query,
     dynamic body,
-  }) =>
-      invoke<T>(
-        method: method,
-        path: path,
-        headers: headers,
-        query: queryFromOptions(options, query),
-        body: body,
-        authToken: authTokenSource.authToken,
-      );
+  }) => invoke<T>(
+    method: method,
+    path: path,
+    headers: headers,
+    query: queryFromOptions(options, query),
+    body: body,
+    authToken: authTokenSource.authToken,
+  );
 
   @protected
   Map<String, String> queryFromOptions(

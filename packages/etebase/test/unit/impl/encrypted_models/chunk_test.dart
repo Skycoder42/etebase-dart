@@ -15,7 +15,7 @@ void main() {
           [
             'uid2',
             Uint8List.fromList([1, 2, 3]),
-          ]
+          ],
         ),
       ],
       (fixture) {

@@ -12,18 +12,12 @@ sealed class EtebaseUtils {
 
   /// Return a buffer of [size] (in bytes) filled with cryptographically random
   /// bytes.
-  static Uint8List randombytes(
-    EtebaseClient client,
-    int size,
-  ) =>
+  static Uint8List randombytes(EtebaseClient client, int size) =>
       Utils.randombytes(client as Client, size);
 
   /// Return a buffer of [size] (in bytes) filled with cryptographically random
   /// bytes as a [SecureKey].
-  static SecureKey randomKey(
-    EtebaseClient client,
-    int size,
-  ) =>
+  static SecureKey randomKey(EtebaseClient client, int size) =>
       Utils.randomKey(client as Client, size);
 
   /// Return a pretty formatted fingerprint of the [content].
@@ -34,9 +28,6 @@ sealed class EtebaseUtils {
   /// 19189   84243   25687   20837
   /// 47924   46071   54113   18789
   /// ```
-  static String prettyFingerprint(
-    EtebaseClient client,
-    Uint8List content,
-  ) =>
+  static String prettyFingerprint(EtebaseClient client, Uint8List content) =>
       Utils.prettyFingerprint(client as Client, content);
 }

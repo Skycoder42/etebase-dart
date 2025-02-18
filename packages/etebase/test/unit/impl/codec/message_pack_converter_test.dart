@@ -28,9 +28,9 @@ class CustomType {
 
   @override
   bool operator ==(Object other) => switch (other) {
-        CustomType(:final value) when value == this.value => true,
-        _ => false,
-      };
+    CustomType(:final value) when value == this.value => true,
+    _ => false,
+  };
 
   @override
   int get hashCode => value.hashCode;
@@ -38,8 +38,9 @@ class CustomType {
 
 void main() {
   group('$MessagePackConverter', () {
-    final userProfile =
-        EtebaseUserProfile(pubkey: Uint8List.fromList([1, 2, 4, 9]));
+    final userProfile = EtebaseUserProfile(
+      pubkey: Uint8List.fromList([1, 2, 4, 9]),
+    );
     final userProfileMsgPack = Uint8List.fromList([
       // map
       0x81, // 1000XXXX + 1
@@ -153,35 +154,39 @@ void main() {
           );
         });
 
-        test('throws InvalidMessagePackData if message pack data is invalid',
-            () {
-          expect(
-            () => sut.decode<EtebaseUserProfile>(Uint8List.fromList([0xc1])),
-            throwsA(
-              isA<InvalidMessagePackData>().having(
-                (m) => m.innerError,
-                'innerError',
-                isA<MsgpackFormatException>(),
+        test(
+          'throws InvalidMessagePackData if message pack data is invalid',
+          () {
+            expect(
+              () => sut.decode<EtebaseUserProfile>(Uint8List.fromList([0xc1])),
+              throwsA(
+                isA<InvalidMessagePackData>().having(
+                  (m) => m.innerError,
+                  'innerError',
+                  isA<MsgpackFormatException>(),
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
 
-        test('throws InvalidMessagePackData if data does not match the model',
-            () {
-          expect(
-            () => sut.decode<EtebaseUserProfile>(
-              Uint8List.fromList(userProfileMsgPack.sublist(0, 8) + [42]),
-            ),
-            throwsA(
-              isA<InvalidMessagePackData>().having(
-                (m) => m.innerError,
-                'innerError',
-                isA<CheckedFromJsonException>(),
+        test(
+          'throws InvalidMessagePackData if data does not match the model',
+          () {
+            expect(
+              () => sut.decode<EtebaseUserProfile>(
+                Uint8List.fromList(userProfileMsgPack.sublist(0, 8) + [42]),
               ),
-            ),
-          );
-        });
+              throwsA(
+                isA<InvalidMessagePackData>().having(
+                  (m) => m.innerError,
+                  'innerError',
+                  isA<CheckedFromJsonException>(),
+                ),
+              ),
+            );
+          },
+        );
 
         test('throws InvalidMessagePackData if it throws format exception', () {
           sut.addCustom(CustomType.withFormatException);

@@ -18,28 +18,22 @@ final class CollectionMemberManagerOnline extends BaseManager {
 
   Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list(
     EtebaseIteratorFetchOptions? options,
-  ) =>
-      invokeApi<EtebaseIteratorListResponse<EtebaseCollectionMember>>(
-        options: options,
-      );
+  ) => invokeApi<EtebaseIteratorListResponse<EtebaseCollectionMember>>(
+    options: options,
+  );
 
-  Future<void> remove(String username) => invokeApi<void>(
-        method: HttpMethod.delete,
-        path: [username],
-      );
+  Future<void> remove(String username) =>
+      invokeApi<void>(method: HttpMethod.delete, path: [username]);
 
-  Future<void> leave() => invokeApi<void>(
-        method: HttpMethod.post,
-        path: ['leave'],
-      );
+  Future<void> leave() =>
+      invokeApi<void>(method: HttpMethod.post, path: ['leave']);
 
   Future<void> modifyAccessLevel(
     String username,
     EtebaseCollectionAccessLevel level,
-  ) =>
-      invokeApi<void>(
-        method: HttpMethod.patch,
-        path: [username],
-        body: ModifyAccessLevelRequest(level),
-      );
+  ) => invokeApi<void>(
+    method: HttpMethod.patch,
+    path: [username],
+    body: ModifyAccessLevelRequest(level),
+  );
 }

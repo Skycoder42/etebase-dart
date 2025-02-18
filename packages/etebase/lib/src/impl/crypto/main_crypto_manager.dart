@@ -16,11 +16,11 @@ class MainCryptoManager extends CryptoManager {
   SecureKey get mainKey => super.key;
 
   LoginCryptoManager createLoginCryptoManager() => LoginCryptoManager(
-        executor,
-        executor.execSync(
-          (sodium) => sodium.crypto.sign.seedKeyPair(asymmetricKeySeed),
-        ),
-      );
+    executor,
+    executor.execSync(
+      (sodium) => sodium.crypto.sign.seedKeyPair(asymmetricKeySeed),
+    ),
+  );
 
   AccountCryptoManager createAccountCryptoManager(SecureKey privkey) =>
       AccountCryptoManager(executor, privkey, version);

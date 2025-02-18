@@ -65,27 +65,30 @@ void main() {
       final testKey = FakeSecureKey(0x42);
 
       when(mockCryptoService.secureCopy(any)).thenAnswer(
-        (i) => FakeSecureKey(0)
-          ..writeBuffer = i.positionalArguments.single as Uint8List,
+        (i) =>
+            FakeSecureKey(0)
+              ..writeBuffer = i.positionalArguments.single as Uint8List,
       );
 
-      final (split1, split2) =
-          CryptoUtils.split2Secure(mockCryptoService, testKey, 3);
+      final (split1, split2) = CryptoUtils.split2Secure(
+        mockCryptoService,
+        testKey,
+        3,
+      );
       expect(
         split1,
-        isA<FakeSecureKey>().having(
-          (m) => m.writeBuffer,
-          'writeBuffer',
-          [0xDE, 0xAD, 0xBE],
-        ),
+        isA<FakeSecureKey>().having((m) => m.writeBuffer, 'writeBuffer', [
+          0xDE,
+          0xAD,
+          0xBE,
+        ]),
       );
       expect(
         split2,
-        isA<FakeSecureKey>().having(
-          (m) => m.writeBuffer,
-          'writeBuffer',
-          [0xEF, 0x42],
-        ),
+        isA<FakeSecureKey>().having((m) => m.writeBuffer, 'writeBuffer', [
+          0xEF,
+          0x42,
+        ]),
       );
     });
 

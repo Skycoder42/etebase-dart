@@ -15,12 +15,7 @@ class Item implements EtebaseItem {
   final EncryptedCollectionItem encrypted;
   final String colUid;
 
-  Item(
-    this._client,
-    this._cm,
-    this.encrypted,
-    this.colUid,
-  );
+  Item(this._client, this._cm, this.encrypted, this.colUid);
 
   @override
   String get uid => encrypted.uid;

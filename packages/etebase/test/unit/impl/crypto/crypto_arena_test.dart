@@ -34,10 +34,7 @@ void main() {
 
       test('key pair', () {
         final secretKey = FakeSecureKey(1);
-        final keyPair = KeyPair(
-          publicKey: Uint8List(0),
-          secretKey: secretKey,
-        );
+        final keyPair = KeyPair(publicKey: Uint8List(0), secretKey: secretKey);
 
         expect(sut(keyPair), same(keyPair));
         expect(secretKey.disposed, isFalse);

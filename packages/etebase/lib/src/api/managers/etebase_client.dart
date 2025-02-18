@@ -7,9 +7,8 @@ import 'crypto_executor.dart';
 
 /// A callback that takes a [json] map and returns an instance of a type that
 /// implements [EtebaseItemMetadata].
-typedef MetaFromJson<TMeta extends EtebaseItemMetadata> = TMeta Function(
-  Map<String, dynamic> json,
-);
+typedef MetaFromJson<TMeta extends EtebaseItemMetadata> =
+    TMeta Function(Map<String, dynamic> json);
 
 /// The network client to use to interact with the Etebase server.
 ///
@@ -39,12 +38,7 @@ abstract interface class EtebaseClient {
     SodiumSumo sodium,
     String clientName, [
     Uri? serverUrl,
-  ]) =>
-      Client.create(
-        CryptoExecutor.sync(sodium),
-        clientName,
-        serverUrl,
-      );
+  ]) => Client.create(CryptoExecutor.sync(sodium), clientName, serverUrl);
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
@@ -63,11 +57,7 @@ abstract interface class EtebaseClient {
     String clientName, [
     Uri? serverUrl,
   ]) async =>
-      Client.create(
-        await CryptoExecutor.async(sodium),
-        clientName,
-        serverUrl,
-      );
+      Client.create(await CryptoExecutor.async(sodium), clientName, serverUrl);
 
   /// Creates a new client object for the server located at [serverUrl] with a
   /// custom [cryptoExecutor].

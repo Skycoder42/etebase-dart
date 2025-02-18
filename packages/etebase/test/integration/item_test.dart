@@ -79,11 +79,7 @@ void main() {
 
       final loadedMeta = await item.getMeta();
       await item.setContent(Uint8List(0));
-      await item.setMeta(
-        loadedMeta.copyWith(
-          mtime: DateTime.now(),
-        ),
-      );
+      await item.setMeta(loadedMeta.copyWith(mtime: DateTime.now()));
 
       await item.delete();
     });
@@ -92,10 +88,7 @@ void main() {
   group('item manager', () {
     test('can create items', () async {
       final item1 = await itemManager.create(
-        const EtebaseItemMetadata(
-          name: testItemName,
-          itemType: testItemTypeA,
-        ),
+        const EtebaseItemMetadata(name: testItemName, itemType: testItemTypeA),
         testItemContent1,
       );
       addTearDown(item1.dispose);
@@ -156,10 +149,7 @@ void main() {
 
       await item2.setContent(Uint8List.fromList([1, 2, 3]));
 
-      expect(
-        () => itemManager.transaction([item2]),
-        throwsA(isA<Conflict>()),
-      );
+      expect(() => itemManager.transaction([item2]), throwsA(isA<Conflict>()));
     });
 
     test('can modify multiple items', () async {
@@ -219,10 +209,7 @@ void main() {
       final meta = await item.getMeta();
 
       await item.setMeta(
-        meta.copyWith(
-          mtime: DateTime.now(),
-          description: '--deleted--',
-        ),
+        meta.copyWith(mtime: DateTime.now(), description: '--deleted--'),
       );
       await item.delete();
       expect(item.isDeleted, isTrue);
@@ -252,9 +239,7 @@ void main() {
         item,
         saveContent: false,
       );
-      final restoredWithoutContent = itemManager.cacheLoad(
-        savedWithoutContent,
-      );
+      final restoredWithoutContent = itemManager.cacheLoad(savedWithoutContent);
       addTearDown(restoredWithoutContent.dispose);
 
       expect(restoredWithoutContent.uid, itemId2);

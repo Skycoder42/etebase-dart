@@ -131,11 +131,11 @@ class MessagePackConverter {
 
   // ignore: avoid_dynamic_calls
   dynamic _toJson(dynamic data) => switch (data) {
-        List() => data.map(_toJson).toList(),
-        Map<String, dynamic>() => data.map((k, v) => MapEntry(k, _toJson(v))),
-        // ignore: avoid_dynamic_calls
-        _ => data.toJson(),
-      };
+    List() => data.map(_toJson).toList(),
+    Map<String, dynamic>() => data.map((k, v) => MapEntry(k, _toJson(v))),
+    // ignore: avoid_dynamic_calls
+    _ => data.toJson(),
+  };
 
   T _fromJson<T>(dynamic data) {
     final converter = _factories[T] as TypeConverter<T>?;

@@ -59,8 +59,9 @@ class EncryptedCollection {
   ) async {
     final arena = CryptoArena();
     try {
-      final col = EncryptedCollection()
-        .._collectionType = parentCm.colTypeToUid(collectionTypeName);
+      final col =
+          EncryptedCollection()
+            .._collectionType = parentCm.colTypeToUid(collectionTypeName);
 
       col._collectionKey = parentCm.encryptKey(
         arena(client.crypto.secureRandom(CryptoUtils.symmetricKeySize)),
@@ -110,53 +111,42 @@ class EncryptedCollection {
 
   void markSaved() => item.markSaved();
 
-  Future<void> verify(
-    Client client,
-    MinimalCollectionCryptoManager cm,
-  ) =>
+  Future<void> verify(Client client, MinimalCollectionCryptoManager cm) =>
       item.withCm(client, cm, (cm) => item.verify(client, cm));
 
   Future<void> setMeta(
     Client client,
     MinimalCollectionCryptoManager cm,
     EtebaseItemMetadata meta,
-  ) =>
-      item.withCm(client, cm, (cm) => item.setMeta(client, cm, meta));
+  ) => item.withCm(client, cm, (cm) => item.setMeta(client, cm, meta));
 
   Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
     Client client,
     MinimalCollectionCryptoManager cm,
-  ) =>
-      item.withCm(client, cm, (cm) => item.getMeta<TMeta>(client, cm));
+  ) => item.withCm(client, cm, (cm) => item.getMeta<TMeta>(client, cm));
 
   Future<void> setContent(
     Client client,
     MinimalCollectionCryptoManager cm,
     Uint8List content,
-  ) =>
-      item.withCm(client, cm, (cm) => item.setContent(client, cm, content));
+  ) => item.withCm(client, cm, (cm) => item.setContent(client, cm, content));
 
   Future<Uint8List> getContent(
     Client client,
     MinimalCollectionCryptoManager cm,
-  ) =>
-      item.withCm(client, cm, (cm) => item.getContent(client, cm));
+  ) => item.withCm(client, cm, (cm) => item.getContent(client, cm));
 
   Future<void> delete(
     Client client,
     MinimalCollectionCryptoManager cm, {
     required bool preserveContent,
-  }) =>
-      item.withCm(
-        client,
-        cm,
-        (cm) => item.delete(client, cm, preserveContent: preserveContent),
-      );
+  }) => item.withCm(
+    client,
+    cm,
+    (cm) => item.delete(client, cm, preserveContent: preserveContent),
+  );
 
-  String getCollectionType(
-    Client client,
-    AccountCryptoManager parentCm,
-  ) =>
+  String getCollectionType(Client client, AccountCryptoManager parentCm) =>
       parentCm.colTypeFromUid(_collectionType);
 
   Future<SignedInvitationWrite> createInvitation(
@@ -171,8 +161,9 @@ class EncryptedCollection {
     try {
       final uid = client.crypto.randomBytes(_invitationUidSize);
       final collectionType = getCollectionType(client, parentCm);
-      final signedEncryptionKey =
-          await encryptionKey.runUnlockedAsync((encryptionKeyBytes) async {
+      final signedEncryptionKey = await encryptionKey.runUnlockedAsync((
+        encryptionKeyBytes,
+      ) async {
         final rawContent = client.crypto.bufferPadSmall(
           client.converter.encode(
             SignedInvitationContent(
@@ -200,17 +191,13 @@ class EncryptedCollection {
     Client client,
     AccountCryptoManager parentCm, {
     int? version,
-  }) =>
-      client.crypto.createCollectionCryptoManager(
-        parentCm,
-        _getCollectionKey(client, parentCm),
-        version: version ?? CryptoUtils.currentVersion,
-      );
+  }) => client.crypto.createCollectionCryptoManager(
+    parentCm,
+    _getCollectionKey(client, parentCm),
+    version: version ?? CryptoUtils.currentVersion,
+  );
 
-  SecureKey _getCollectionKey(
-    Client client,
-    AccountCryptoManager parentCm,
-  ) =>
+  SecureKey _getCollectionKey(Client client, AccountCryptoManager parentCm) =>
       parentCm.decryptKey(
         _collectionKey,
         _collectionType,

@@ -72,9 +72,7 @@ void main() {
       sut = HiveCache(mockClient, mockHive, testUserName);
       await sut.initialize();
 
-      verify(
-        mockHive.openLazyBox<dynamic>('$testEncodedUserName.meta'),
-      );
+      verify(mockHive.openLazyBox<dynamic>('$testEncodedUserName.meta'));
       verify(
         mockHive.openLazyBox<Uint8List?>('$testEncodedUserName.collection'),
       );
@@ -120,58 +118,62 @@ void main() {
     });
 
     group('clearUser', () {
-      test('deletes account and collection box if not reinitializing',
-          () async {
-        const accountBoxName = 'accountBox';
-        const collectionBoxName = 'collectionBox';
+      test(
+        'deletes account and collection box if not reinitializing',
+        () async {
+          const accountBoxName = 'accountBox';
+          const collectionBoxName = 'collectionBox';
 
-        when(mockMetaBox.name).thenReturn(accountBoxName);
-        when(mockMetaBox.isOpen).thenReturn(true);
-        when(mockCollectionBox.name).thenReturn(collectionBoxName);
-        when(mockCollectionBox.isOpen).thenReturn(true);
+          when(mockMetaBox.name).thenReturn(accountBoxName);
+          when(mockMetaBox.isOpen).thenReturn(true);
+          when(mockCollectionBox.name).thenReturn(collectionBoxName);
+          when(mockCollectionBox.isOpen).thenReturn(true);
 
-        await sut.clearUser();
+          await sut.clearUser();
 
-        verifyInOrder([
-          mockMetaBox.isOpen,
-          mockMetaBox.close(),
-          mockMetaBox.name,
-          mockHive.deleteBoxFromDisk(accountBoxName),
-        ]);
-        verifyInOrder([
-          mockCollectionBox.isOpen,
-          mockCollectionBox.close(),
-          mockCollectionBox.name,
-          mockHive.deleteBoxFromDisk(collectionBoxName),
-        ]);
-      });
+          verifyInOrder([
+            mockMetaBox.isOpen,
+            mockMetaBox.close(),
+            mockMetaBox.name,
+            mockHive.deleteBoxFromDisk(accountBoxName),
+          ]);
+          verifyInOrder([
+            mockCollectionBox.isOpen,
+            mockCollectionBox.close(),
+            mockCollectionBox.name,
+            mockHive.deleteBoxFromDisk(collectionBoxName),
+          ]);
+        },
+      );
 
-      test('deletes account and collection box without closing if not open',
-          () async {
-        const accountBoxName = 'accountBox';
-        const collectionBoxName = 'collectionBox';
+      test(
+        'deletes account and collection box without closing if not open',
+        () async {
+          const accountBoxName = 'accountBox';
+          const collectionBoxName = 'collectionBox';
 
-        when(mockMetaBox.name).thenReturn(accountBoxName);
-        when(mockMetaBox.isOpen).thenReturn(false);
-        when(mockCollectionBox.name).thenReturn(collectionBoxName);
-        when(mockCollectionBox.isOpen).thenReturn(false);
+          when(mockMetaBox.name).thenReturn(accountBoxName);
+          when(mockMetaBox.isOpen).thenReturn(false);
+          when(mockCollectionBox.name).thenReturn(collectionBoxName);
+          when(mockCollectionBox.isOpen).thenReturn(false);
 
-        await sut.clearUser();
+          await sut.clearUser();
 
-        verifyInOrder([
-          mockMetaBox.isOpen,
-          mockMetaBox.name,
-          mockHive.deleteBoxFromDisk(accountBoxName),
-        ]);
-        verifyNoMoreInteractions(mockMetaBox);
-        verifyInOrder([
-          mockCollectionBox.isOpen,
-          mockCollectionBox.isOpen,
-          mockCollectionBox.name,
-          mockHive.deleteBoxFromDisk(collectionBoxName),
-        ]);
-        verifyNoMoreInteractions(mockCollectionBox);
-      });
+          verifyInOrder([
+            mockMetaBox.isOpen,
+            mockMetaBox.name,
+            mockHive.deleteBoxFromDisk(accountBoxName),
+          ]);
+          verifyNoMoreInteractions(mockMetaBox);
+          verifyInOrder([
+            mockCollectionBox.isOpen,
+            mockCollectionBox.isOpen,
+            mockCollectionBox.name,
+            mockHive.deleteBoxFromDisk(collectionBoxName),
+          ]);
+          verifyNoMoreInteractions(mockCollectionBox);
+        },
+      );
 
       test('clears account and collection box if reinitializing', () async {
         await sut.clearUser(reInitialize: true);
@@ -223,14 +225,16 @@ void main() {
         reset(mockAccount);
       });
 
-      test('hasAccount returns true if account box has account data key',
-          () async {
-        when(mockMetaBox.containsKey(any)).thenReturn(true);
+      test(
+        'hasAccount returns true if account box has account data key',
+        () async {
+          when(mockMetaBox.containsKey(any)).thenReturn(true);
 
-        expect(await sut.hasAccount, isTrue);
+          expect(await sut.hasAccount, isTrue);
 
-        verify(mockMetaBox.containsKey('account.data'));
-      });
+          verify(mockMetaBox.containsKey('account.data'));
+        },
+      );
 
       testData(
         'saveAccount saves account to account box',
@@ -248,29 +252,25 @@ void main() {
       );
 
       group('loadAccount', () {
-        testData(
-          'returns account data if it exists',
-          [null, FakeSecureKey()],
-          (fixture) async {
-            when(mockMetaBox.get(any)).thenReturnAsync(accountData);
-            when(mockClient.restoreAccount(any, any))
-                .thenReturnAsync(mockAccount);
+        testData('returns account data if it exists', [null, FakeSecureKey()], (
+          fixture,
+        ) async {
+          when(mockMetaBox.get(any)).thenReturnAsync(accountData);
+          when(
+            mockClient.restoreAccount(any, any),
+          ).thenReturnAsync(mockAccount);
 
-            final result = await sut.loadAccount(fixture);
-            expect(result, same(mockAccount));
+          final result = await sut.loadAccount(fixture);
+          expect(result, same(mockAccount));
 
-            verifyInOrder([
-              mockMetaBox.get('account.data'),
-              mockClient.restoreAccount(accountData, fixture),
-            ]);
-          },
-        );
+          verifyInOrder([
+            mockMetaBox.get('account.data'),
+            mockClient.restoreAccount(accountData, fixture),
+          ]);
+        });
 
         test('throws if account data does not exists', () async {
-          expect(
-            () => sut.loadAccount(),
-            throwsA(isA<NotFound>()),
-          );
+          expect(() => sut.loadAccount(), throwsA(isA<NotFound>()));
         });
       });
     });
@@ -303,10 +303,7 @@ void main() {
         });
 
         test('throws if stoken does not exists', () async {
-          expect(
-            () => sut.loadStoken(),
-            throwsA(isA<NotFound>()),
-          );
+          expect(() => sut.loadStoken(), throwsA(isA<NotFound>()));
         });
       });
     });
@@ -370,11 +367,7 @@ void main() {
       });
 
       test('persistedCollectionUids returns all keys in collection box', () {
-        when(mockCollectionBox.keys).thenReturn([
-          'col1',
-          'col2',
-          'col3',
-        ]);
+        when(mockCollectionBox.keys).thenReturn(['col1', 'col2', 'col3']);
 
         expect(
           sut.persistedCollectionUids,
@@ -386,8 +379,9 @@ void main() {
         'collectionSet persists collection in collection box',
         [false, true],
         (fixture) async {
-          when(mockColMgr.cacheSave(any, saveContent: anyNamed('saveContent')))
-              .thenReturn(testColData);
+          when(
+            mockColMgr.cacheSave(any, saveContent: anyNamed('saveContent')),
+          ).thenReturn(testColData);
 
           await sut.collectionSet(
             mockColMgr,
@@ -491,25 +485,22 @@ void main() {
           verifyNoMoreInteractions(mockHive);
         });
 
-        test(
-          'returns all keys in already opened item box',
-          () async {
-            when(mockHive.isBoxOpen(any)).thenReturn(true);
-            when(mockItemBox.keys).thenReturn(['item1', 'item2']);
+        test('returns all keys in already opened item box', () async {
+          when(mockHive.isBoxOpen(any)).thenReturn(true);
+          when(mockItemBox.keys).thenReturn(['item1', 'item2']);
 
-            await expectLater(
-              sut.persistedItemUids(testColUid),
-              emitsInAnyOrder(['item1', 'item2', emitsDone]),
-            );
+          await expectLater(
+            sut.persistedItemUids(testColUid),
+            emitsInAnyOrder(['item1', 'item2', emitsDone]),
+          );
 
-            verifyInOrder([
-              mockHive.isBoxOpen(testItemBoxName),
-              mockHive.lazyBox<Uint8List>(testItemBoxName),
-              mockItemBox.keys,
-            ]);
-            verifyNoMoreInteractions(mockHive);
-          },
-        );
+          verifyInOrder([
+            mockHive.isBoxOpen(testItemBoxName),
+            mockHive.lazyBox<Uint8List>(testItemBoxName),
+            mockItemBox.keys,
+          ]);
+          verifyNoMoreInteractions(mockHive);
+        });
 
         test(
           'returns all keys from newly opened box if not already open',
@@ -536,8 +527,9 @@ void main() {
       group('itemSet', () {
         testData('persists item in open box', [false, true], (fixture) async {
           when(mockHive.isBoxOpen(any)).thenReturn(true);
-          when(mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')))
-              .thenReturn(testItemData);
+          when(
+            mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')),
+          ).thenReturn(testItemData);
 
           await sut.itemSet(
             mockItemMgr,
@@ -555,10 +547,12 @@ void main() {
           verifyNoMoreInteractions(mockHive);
         });
 
-        testData('persists item in newly opened box', [false, true],
-            (fixture) async {
-          when(mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')))
-              .thenReturn(testItemData);
+        testData('persists item in newly opened box', [false, true], (
+          fixture,
+        ) async {
+          when(
+            mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')),
+          ).thenReturn(testItemData);
 
           await sut.itemSet(
             mockItemMgr,
@@ -622,8 +616,11 @@ void main() {
           when(mockItemBox.get(any)).thenReturnAsync(testItemData);
           when(mockItemMgr.cacheLoad(any)).thenReturn(testItem);
 
-          final result =
-              await sut.itemGet(mockItemMgr, testColUid, testItemUid);
+          final result = await sut.itemGet(
+            mockItemMgr,
+            testColUid,
+            testItemUid,
+          );
           expect(result, same(testItem));
 
           verifyInOrder([
@@ -635,25 +632,30 @@ void main() {
           verifyNoMoreInteractions(mockHive);
         });
 
-        test('restores item from closed box and opens it if it exists',
-            () async {
-          when(mockHive.boxExists(any)).thenReturnAsync(true);
-          when(mockItemBox.get(any)).thenReturnAsync(testItemData);
-          when(mockItemMgr.cacheLoad(any)).thenReturn(testItem);
+        test(
+          'restores item from closed box and opens it if it exists',
+          () async {
+            when(mockHive.boxExists(any)).thenReturnAsync(true);
+            when(mockItemBox.get(any)).thenReturnAsync(testItemData);
+            when(mockItemMgr.cacheLoad(any)).thenReturn(testItem);
 
-          final result =
-              await sut.itemGet(mockItemMgr, testColUid, testItemUid);
-          expect(result, same(testItem));
+            final result = await sut.itemGet(
+              mockItemMgr,
+              testColUid,
+              testItemUid,
+            );
+            expect(result, same(testItem));
 
-          verifyInOrder([
-            mockHive.isBoxOpen(testItemBoxName),
-            mockHive.boxExists(testItemBoxName),
-            mockHive.openLazyBox<Uint8List>(testItemBoxName),
-            mockItemBox.get(testItemUid),
-            mockItemMgr.cacheLoad(testItemData),
-          ]);
-          verifyNoMoreInteractions(mockHive);
-        });
+            verifyInOrder([
+              mockHive.isBoxOpen(testItemBoxName),
+              mockHive.boxExists(testItemBoxName),
+              mockHive.openLazyBox<Uint8List>(testItemBoxName),
+              mockItemBox.get(testItemUid),
+              mockItemMgr.cacheLoad(testItemData),
+            ]);
+            verifyNoMoreInteractions(mockHive);
+          },
+        );
 
         test('throws notFound if box exists but item does not', () async {
           when(mockHive.isBoxOpen(any)).thenReturn(true);

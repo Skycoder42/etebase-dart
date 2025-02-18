@@ -12,9 +12,8 @@ import 'base_network.dart';
 
 @internal
 final class Authenticator extends BaseNetwork {
-  Authenticator({
-    required super.client,
-  }) : super(path: const ['api', 'v1', 'authentication']);
+  Authenticator({required super.client})
+    : super(path: const ['api', 'v1', 'authentication']);
 
   Future<bool> isEtebase() async {
     try {
@@ -26,10 +25,10 @@ final class Authenticator extends BaseNetwork {
   }
 
   Future<LoginResponse> signup(SignupRequest body) => invoke<LoginResponse>(
-        method: HttpMethod.post,
-        path: ['signup'],
-        body: body,
-      );
+    method: HttpMethod.post,
+    path: ['signup'],
+    body: body,
+  );
 
   Future<LoginChallenge> loginChallenge(ChallengeRequest body) =>
       invoke<LoginChallenge>(
@@ -39,16 +38,16 @@ final class Authenticator extends BaseNetwork {
       );
 
   Future<LoginResponse> login(LoginRequest body) => invoke<LoginResponse>(
-        method: HttpMethod.post,
-        path: ['login'],
-        body: body,
-      );
+    method: HttpMethod.post,
+    path: ['login'],
+    body: body,
+  );
 
   Future<void> logout(AuthToken authToken) => invoke<void>(
-        method: HttpMethod.post,
-        authToken: authToken,
-        path: ['logout'],
-      );
+    method: HttpMethod.post,
+    authToken: authToken,
+    path: ['logout'],
+  );
 
   Future<void> changePassword(AuthToken authToken, LoginRequest body) =>
       invoke<void>(
@@ -59,8 +58,8 @@ final class Authenticator extends BaseNetwork {
       );
 
   Future<Uri> getDashboardUrl(AuthToken authToken) => invoke<DashboardUrl>(
-        method: HttpMethod.post,
-        authToken: authToken,
-        path: ['dashboard_url'],
-      ).then((r) => r.url);
+    method: HttpMethod.post,
+    authToken: authToken,
+    path: ['dashboard_url'],
+  ).then((r) => r.url);
 }

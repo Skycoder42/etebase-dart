@@ -14,7 +14,7 @@ class CryptoFailure extends EtebaseException {
 
   /// Default constructor.
   CryptoFailure({this.originalMessage})
-      : super('A low level cryptographic operation has failed');
+    : super('A low level cryptographic operation has failed');
 
   /// @nodoc
   @internal

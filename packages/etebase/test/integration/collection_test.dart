@@ -103,10 +103,7 @@ void main() {
       expect(collection.verify(), anyOf(completes, isNull));
       expect(collection.isDeleted, isFalse);
 
-      expect(
-        collection.accessLevel,
-        EtebaseCollectionAccessLevel.admin,
-      );
+      expect(collection.accessLevel, EtebaseCollectionAccessLevel.admin);
       expect(collection.collectionType, testCollectionType);
       expect(collection.etag, isNotEmpty);
       expect(collection.stoken, isNull);
@@ -130,11 +127,7 @@ void main() {
 
       final loadedMeta = await collection.getMeta();
       await collection.setContent(collectionTestContent2);
-      await collection.setMeta(
-        loadedMeta.copyWith(
-          mtime: DateTime.now(),
-        ),
-      );
+      await collection.setMeta(loadedMeta.copyWith(mtime: DateTime.now()));
 
       await collection.delete();
     });
@@ -201,18 +194,17 @@ void main() {
 
       final changedResponse = await collectionManager.list(
         testCollectionType,
-        EtebaseFetchOptions(
-          stoken: listResponse.stoken,
-        ),
+        EtebaseFetchOptions(stoken: listResponse.stoken),
       );
 
       expect(changedResponse.data, isEmpty);
     });
 
     test('can list multiple collections', () async {
-      final listResponse = await collectionManager.listMulti(
-        const [testCollectionType, '$testCollectionType-other'],
-      );
+      final listResponse = await collectionManager.listMulti(const [
+        testCollectionType,
+        '$testCollectionType-other',
+      ]);
 
       expect(listResponse.isDone, isTrue);
       expect(listResponse.stoken, allOf(isNotNull, isNotEmpty));
@@ -252,10 +244,7 @@ void main() {
       final meta = await collection.getMeta();
 
       await collection.setMeta(
-        meta.copyWith(
-          mtime: DateTime.now(),
-          description: '--deleted--',
-        ),
+        meta.copyWith(mtime: DateTime.now(), description: '--deleted--'),
       );
       await collection.setContent(collectionTestContent1);
       await collection.delete();
@@ -286,8 +275,9 @@ void main() {
         collection,
         saveContent: false,
       );
-      final restoredWithoutContent =
-          collectionManager.cacheLoad(savedWithoutContent);
+      final restoredWithoutContent = collectionManager.cacheLoad(
+        savedWithoutContent,
+      );
       addTearDown(restoredWithoutContent.dispose);
 
       expect(restoredWithoutContent.uid, colId2);

@@ -39,8 +39,7 @@ void main() {
       List<int> containerFromJson(
         Map<String, dynamic> json,
         int Function(Object?) fromJson,
-      ) =>
-          json.values.map(fromJson).toList();
+      ) => json.values.map(fromJson).toList();
 
       final sut = TypeConverter.generic(containerFromJson, fromJson);
 

@@ -61,10 +61,11 @@ class EncryptedCollectionItem {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) async {
-    final item = EncryptedCollectionItem()
-      ..uid = client.converter.base64Encode(
-        client.crypto.randomBytes(_itemUidBytes),
-      );
+    final item =
+        EncryptedCollectionItem()
+          ..uid = client.converter.base64Encode(
+            client.crypto.randomBytes(_itemUidBytes),
+          );
     final cm = item.getCryptoManager(client, parentCm);
     try {
       item.content = await client.createEncryptedRevision(
@@ -96,10 +97,7 @@ class EncryptedCollectionItem {
         final Uint8List etag => client.converter.base64Encode(etag),
         _ => null,
       }
-      ..content = EncryptedRevision.cacheLoad(
-        client,
-        cached.revision,
-      );
+      ..content = EncryptedRevision.cacheLoad(client, cached.revision);
   }
 
   Map<String, dynamic> toJson() => _$EncryptedCollectionItemToJson(this);
@@ -118,9 +116,7 @@ class EncryptedCollectionItem {
         ),
       );
 
-  EncryptedCollectionItem cloneWithRevision(
-    EncryptedRevision revision,
-  ) =>
+  EncryptedCollectionItem cloneWithRevision(EncryptedRevision revision) =>
       EncryptedCollectionItem()
         ..uid = uid
         .._encryptionKey = _encryptionKey
@@ -138,25 +134,16 @@ class EncryptedCollectionItem {
     content.chunks[index] = chunk;
   }
 
-  Future<void> verify(
-    Client client,
-    CollectionItemCryptoManager cm,
-  ) =>
+  Future<void> verify(Client client, CollectionItemCryptoManager cm) =>
       content.verify(client, cm, _getAdditionalMacData());
 
   Future<void> setMeta(
     Client client,
     CollectionItemCryptoManager cm,
     EtebaseItemMetadata meta,
-  ) =>
-      _cloneOrUpdateRevision(
-        (rev) => rev.setMeta(
-          client,
-          cm,
-          _getAdditionalMacData(),
-          meta,
-        ),
-      );
+  ) => _cloneOrUpdateRevision(
+    (rev) => rev.setMeta(client, cm, _getAdditionalMacData(), meta),
+  );
 
   Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
     Client client,
@@ -170,15 +157,14 @@ class EncryptedCollectionItem {
     Client client,
     CollectionItemCryptoManager cm,
     Uint8List content,
-  ) =>
-      _cloneOrUpdateRevision(
-        (rev) => rev.setContent(
-          client,
-          cm,
-          additionalData: _getAdditionalMacData(),
-          content: content,
-        ),
-      );
+  ) => _cloneOrUpdateRevision(
+    (rev) => rev.setContent(
+      client,
+      cm,
+      additionalData: _getAdditionalMacData(),
+      content: content,
+    ),
+  );
 
   Future<Uint8List> getContent(
     Client client,
@@ -192,15 +178,14 @@ class EncryptedCollectionItem {
     Client client,
     CollectionItemCryptoManager cm, {
     required bool preserveContent,
-  }) =>
-      _cloneOrUpdateRevision(
-        (rev) => rev.delete(
-          client,
-          cm,
-          _getAdditionalMacData(),
-          preserveContent: preserveContent,
-        ),
-      );
+  }) => _cloneOrUpdateRevision(
+    (rev) => rev.delete(
+      client,
+      cm,
+      _getAdditionalMacData(),
+      preserveContent: preserveContent,
+    ),
+  );
 
   Future<T> withCm<T>(
     Client client,
@@ -218,11 +203,10 @@ class EncryptedCollectionItem {
   CollectionItemCryptoManager getCryptoManager(
     Client client,
     MinimalCollectionCryptoManager parentCm,
-  ) =>
-      client.crypto.createCollectionItemCryptoManager(
-        _getEncryptionKey(client, parentCm),
-        version: version,
-      );
+  ) => client.crypto.createCollectionItemCryptoManager(
+    _getEncryptionKey(client, parentCm),
+    version: version,
+  );
 
   Future<void> _cloneOrUpdateRevision(
     FutureOr<void> Function(EncryptedRevision rev) callback,

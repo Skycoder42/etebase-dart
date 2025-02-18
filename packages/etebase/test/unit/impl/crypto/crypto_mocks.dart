@@ -205,25 +205,21 @@ TypeMatcher<FakeSecureKey> isKey(dynamic id, {dynamic disposed}) {
   return matcher;
 }
 
-Matcher isUnlockedKey(
-  dynamic id, {
-  bool async = false,
-}) =>
-    allOf(
-      isA<Uint8List>(),
-      equals([
-        // prefix
-        0xDE, 0xAD, 0xBE, if (async) 0xAD else 0xEF,
-        // id
-        id,
-      ]),
-    );
+Matcher isUnlockedKey(dynamic id, {bool async = false}) => allOf(
+  isA<Uint8List>(),
+  equals([
+    // prefix
+    0xDE, 0xAD, 0xBE, if (async) 0xAD else 0xEF,
+    // id
+    id,
+  ]),
+);
 
 Matcher concatenated(List<int> first, List<int> second) => allOf(
-      isA<Uint8List>().having(
-        (m) => m.length,
-        'length',
-        first.length + second.length,
-      ),
-      equals([...first, ...second]),
-    );
+  isA<Uint8List>().having(
+    (m) => m.length,
+    'length',
+    first.length + second.length,
+  ),
+  equals([...first, ...second]),
+);

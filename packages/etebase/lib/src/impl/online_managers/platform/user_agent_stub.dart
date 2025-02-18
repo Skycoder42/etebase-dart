@@ -1,7 +1,5 @@
 import 'package:meta/meta.dart';
 
-import '../../../gen/pubspec.g.dart';
-
 @internal
 abstract base class UserAgent {
   static String build(String clientName) => throw UnimplementedError();
@@ -11,12 +9,12 @@ abstract base class UserAgent {
     Iterable<String> values = const [],
     String? suffix,
   }) {
-    final sb = StringBuffer()
-      ..write(clientName)
-      ..write(' (');
+    final sb =
+        StringBuffer()
+          ..write(clientName)
+          ..write(' (');
 
-    final allValues = ['package:${Pubspec.name}/${Pubspec.version.canonical}']
-        .followedBy(values);
+    final allValues = ['package:etebase/2.0.0'].followedBy(values);
     var first = true;
     for (final value in allValues) {
       if (first) {

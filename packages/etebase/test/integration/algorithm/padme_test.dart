@@ -18,12 +18,7 @@ void main() {
   testData(
     'can pad/unpad random data of any size',
     [
-      for (var i = 0; i < 25; ++i)
-        [
-          (1 << i) - 1,
-          (1 << i),
-          (1 << i) + 1,
-        ],
+      for (var i = 0; i < 25; ++i) [(1 << i) - 1, (1 << i), (1 << i) + 1],
     ],
     dataToString: (e) => '[${e.first.bitLength}:${e.last.bitLength}]',
     (fixture) async {

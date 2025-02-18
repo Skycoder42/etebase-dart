@@ -27,9 +27,10 @@ class BoxCryptoManager implements CryptoManagerBase {
     final cm = BoxCryptoManager(
       executor,
       executor.execSync(
-        (sodium) => seed != null
-            ? sodium.crypto.box.seedKeyPair(seed)
-            : sodium.crypto.box.keyPair(),
+        (sodium) =>
+            seed != null
+                ? sodium.crypto.box.seedKeyPair(seed)
+                : sodium.crypto.box.keyPair(),
       ),
     );
     seed?.dispose();
@@ -52,37 +53,31 @@ class BoxCryptoManager implements CryptoManagerBase {
     required Uint8List message,
     required Uint8List pubkey,
   }) =>
-      executor.exec(
-        secureKeys: [_keyPair.secretKey],
-        (sodium, secureKeys, _) {
-          final nonce = sodium.randombytes.buf(sodium.crypto.box.nonceBytes);
-          final result = sodium.crypto.box.easy(
-            message: message,
-            nonce: nonce,
-            publicKey: pubkey,
-            secretKey: secureKeys.single,
-          );
-          return CryptoUtils.concat([nonce, result]);
-        },
-      );
+      executor.exec(secureKeys: [_keyPair.secretKey], (sodium, secureKeys, _) {
+        final nonce = sodium.randombytes.buf(sodium.crypto.box.nonceBytes);
+        final result = sodium.crypto.box.easy(
+          message: message,
+          nonce: nonce,
+          publicKey: pubkey,
+          secretKey: secureKeys.single,
+        );
+        return CryptoUtils.concat([nonce, result]);
+      });
 
   FutureOr<Uint8List> decrypt({
     required Uint8List nonceCipherText,
     required Uint8List pubkey,
   }) =>
-      executor.exec(
-        secureKeys: [_keyPair.secretKey],
-        (sodium, secureKeys, _) {
-          final (nonce, cipherText) = CryptoUtils.split2(
-            nonceCipherText,
-            sodium.crypto.box.nonceBytes,
-          );
-          return sodium.crypto.box.openEasy(
-            cipherText: cipherText,
-            nonce: nonce,
-            publicKey: pubkey,
-            secretKey: secureKeys.single,
-          );
-        },
-      );
+      executor.exec(secureKeys: [_keyPair.secretKey], (sodium, secureKeys, _) {
+        final (nonce, cipherText) = CryptoUtils.split2(
+          nonceCipherText,
+          sodium.crypto.box.nonceBytes,
+        );
+        return sodium.crypto.box.openEasy(
+          cipherText: cipherText,
+          nonce: nonce,
+          publicKey: pubkey,
+          secretKey: secureKeys.single,
+        );
+      });
 }
