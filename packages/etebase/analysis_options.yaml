@@ -2,7 +2,7 @@ include: package:dart_test_tools/package.yaml
 
 analyzer:
   exclude:
-    - lib/src/gen
+    - lib/gen
 
 linter:
   rules:
