@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 
+// ignore: no_self_package_imports
 import '../../../../gen/package_metadata.dart' as pubspec;
 
 @internal
