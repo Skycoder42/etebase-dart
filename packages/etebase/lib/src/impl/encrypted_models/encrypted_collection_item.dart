@@ -18,6 +18,11 @@ import 'encrypted_revision.dart';
 
 part 'encrypted_collection_item.g.dart';
 
+/// @nodoc
+@internal
+typedef WithCmCallback<T> =
+    FutureOr<T> Function(CollectionItemCryptoManager cm);
+
 @internal
 @JsonSerializable()
 @msgPackBytes
@@ -190,7 +195,7 @@ class EncryptedCollectionItem {
   Future<T> withCm<T>(
     Client client,
     MinimalCollectionCryptoManager parentCm,
-    FutureOr<T> Function(CollectionItemCryptoManager cm) callback,
+    WithCmCallback<T> callback,
   ) async {
     final cm = getCryptoManager(client, parentCm);
     try {

@@ -33,7 +33,9 @@ class EncryptedCollection {
   @JsonKey(name: 'collectionType', includeFromJson: true, includeToJson: true)
   late Uint8List _collectionType;
   late EncryptedCollectionItem item;
+  @JsonKey(includeFromJson: true, includeToJson: false)
   EtebaseCollectionAccessLevel accessLevel = EtebaseCollectionAccessLevel.admin;
+  @JsonKey(includeFromJson: true, includeToJson: false)
   String? stoken;
 
   String get uid => item.uid;
@@ -69,8 +71,7 @@ class EncryptedCollection {
       );
 
       final cm = arena(col.getCryptoManager(client, parentCm));
-      final (item, itemCm) = await EncryptedCollectionItem.create(
-        client,
+      final (item, itemCm) = await client.createEncryptedCollectionItem(
         cm,
         meta,
         content,

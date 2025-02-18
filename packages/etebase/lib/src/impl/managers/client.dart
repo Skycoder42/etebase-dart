@@ -12,6 +12,8 @@ import '../cache/hive_cache.dart';
 import '../codec/message_pack_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_service.dart';
+import '../crypto/minimal_collection_crypto_manager.dart';
+import '../encrypted_models/encrypted_collection_item.dart';
 import '../encrypted_models/encrypted_revision.dart';
 import '../online_managers/authenticator.dart';
 import '../online_managers/base_network.dart';
@@ -100,4 +102,11 @@ class Client implements EtebaseClient, NetworkClient {
     meta: meta,
     content: content,
   );
+
+  Future<(EncryptedCollectionItem, CollectionItemCryptoManager)>
+  createEncryptedCollectionItem(
+    MinimalCollectionCryptoManager parentCm,
+    EtebaseItemMetadata meta,
+    Uint8List content,
+  ) => EncryptedCollectionItem.create(this, parentCm, meta, content);
 }

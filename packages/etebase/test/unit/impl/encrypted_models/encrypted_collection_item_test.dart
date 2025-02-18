@@ -294,6 +294,11 @@ void main() {
           testContent,
         );
         sut = item;
+
+        clearInteractions(mockClient);
+        clearInteractions(mockCryptoService);
+        clearInteractions(mockMessagePackConverter);
+        clearInteractions(mockParentCm);
       });
 
       test('properties return correct default values', () {
