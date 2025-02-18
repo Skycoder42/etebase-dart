@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/etebase.dart';
+import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
+import 'package:etebase/src/api/models/etebase_item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
