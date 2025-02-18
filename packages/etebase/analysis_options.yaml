@@ -1,9 +1,5 @@
 include: package:dart_test_tools/package.yaml
 
-analyzer:
-  exclude:
-    - lib/gen
-
 linter:
   rules:
     document_ignores: false

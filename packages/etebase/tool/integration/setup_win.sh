@@ -30,7 +30,7 @@ curl \
   -fo "$RUNNER_TEMP/libsodium.zip.minisig " \
   "https://download.libsodium.org/libsodium/releases/libsodium-$version-stable-msvc.zip.minisig"
 
-"$RUNNER_TOOL_CACHE/minisign-win64/x86_64/minisign" \
+minisign \
   -VP RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 \
   -m "$RUNNER_TEMP/libsodium.zip"
 7z x -y "-o$RUNNER_TEMP" "$RUNNER_TEMP/libsodium.zip"
