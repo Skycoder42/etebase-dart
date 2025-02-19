@@ -9,7 +9,8 @@ part 'cached_collection_item.freezed.dart';
 @Freezed(fromJson: false, toJson: false)
 @internal
 sealed class CachedCollectionItem with _$CachedCollectionItem {
-  static const _cacheFormatVersion = 1;
+  @visibleForTesting
+  static const cacheFormatVersion = 1;
 
   const factory CachedCollectionItem({
     required Uint8List uid,
@@ -20,7 +21,7 @@ sealed class CachedCollectionItem with _$CachedCollectionItem {
   }) = _CachedCollectionItem;
 
   factory CachedCollectionItem.fromJson(List<dynamic> json) {
-    if (json[0] != _cacheFormatVersion) {
+    if (json[0] != cacheFormatVersion) {
       throw ApiMissuse('Cannot restore cache format version ${json[0]}');
     }
 
@@ -36,7 +37,7 @@ sealed class CachedCollectionItem with _$CachedCollectionItem {
   const CachedCollectionItem._();
 
   List<dynamic> toJson() => [
-    _cacheFormatVersion,
+    cacheFormatVersion,
     uid,
     version,
     encryptionKey,

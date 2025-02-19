@@ -11,7 +11,7 @@ sealed class CachedChunk with _$CachedChunk {
 
   factory CachedChunk.fromJson(List<dynamic> json) => CachedChunk(
     json[0] as Uint8List,
-    json.length >= 2 ? json[1] as Uint8List : null,
+    json.length >= 2 ? json[1] as Uint8List? : null,
   );
 
   const CachedChunk._();

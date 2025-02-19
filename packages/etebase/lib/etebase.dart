@@ -29,7 +29,7 @@ export 'src/api/managers/etebase_utils.dart';
 export 'src/api/models/etebase_collection.dart';
 export 'src/api/models/etebase_collection_access_level.dart';
 export 'src/api/models/etebase_collection_member.dart';
-export 'src/api/models/etebase_fetch_options.dart';
+export 'src/api/models/etebase_fetch_options.dart' hide EtebaseFetchOptionsBase;
 export 'src/api/models/etebase_item.dart';
 export 'src/api/models/etebase_item_metadata.dart';
 export 'src/api/models/etebase_list_response.dart';

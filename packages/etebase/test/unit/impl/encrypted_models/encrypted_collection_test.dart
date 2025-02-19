@@ -6,6 +6,7 @@ import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
 import 'package:etebase/src/api/models/etebase_item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
+import 'package:etebase/src/impl/crypto/box_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/crypto_service.dart';
@@ -17,6 +18,7 @@ import 'package:etebase/src/impl/encrypted_models/cached/cached_revision.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
 import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/models/signed_invitation_content.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -30,6 +32,7 @@ import '../crypto/crypto_mocks.dart';
   MockSpec<AccountCryptoManager>(),
   MockSpec<CollectionCryptoManager>(),
   MockSpec<CollectionItemCryptoManager>(),
+  MockSpec<BoxCryptoManager>(),
   MockSpec<MessagePackConverter>(),
   MockSpec<CryptoService>(),
 ])
@@ -512,6 +515,135 @@ void main() {
         expect(result, testColTypeName);
 
         verify(mockAccountCm.colTypeFromUid(testColType));
+      });
+
+      group('createInvitation', () {
+        const testUserName = 'test-user';
+        final testPubKey = Uint8List.fromList([45, 5, 112, 4]);
+
+        final mockIdCm = MockBoxCryptoManager();
+
+        setUp(() {
+          reset(mockIdCm);
+
+          when(mockMessagePackConverter.base64Encode(any)).thenAnswer(
+            (i) => base64.encode(i.positionalArguments.single as Uint8List),
+          );
+        });
+
+        test('creates invitation for peer', () async {
+          const testItemUid = 'test-item-uid';
+          final testInvitationId = Uint8List.fromList([5, 4, 1, 5, 12, 1]);
+          final testInvitationData = SignedInvitationContent(
+            encryptionKey: await testKey.runUnlockedAsync((b) => b),
+            collectionType: testColTypeName,
+          );
+          final testEncodedInvitationData = Uint8List.fromList([5, 12, 6, 77]);
+          final testPaddedInvitationData = Uint8List.fromList([9, 88, 5, 1]);
+          final testSignedInvitationData = Uint8List.fromList([4, 1, 2, 11]);
+
+          when(
+            mockMessagePackConverter.encode(any),
+          ).thenReturn(testEncodedInvitationData);
+          when(mockCryptoService.randomBytes(any)).thenReturn(testInvitationId);
+          when(
+            mockCryptoService.bufferPadSmall(any),
+          ).thenReturn(testPaddedInvitationData);
+          when(mockAccountCm.colTypeFromUid(any)).thenReturn(testColTypeName);
+          when(
+            mockIdCm.encrypt(
+              message: anyNamed('message'),
+              pubkey: anyNamed('pubkey'),
+            ),
+          ).thenReturn(testSignedInvitationData);
+          when(mockItem.uid).thenReturn(testItemUid);
+
+          final result = await sut.createInvitation(
+            mockClient,
+            mockAccountCm,
+            mockIdCm,
+            testUserName,
+            testPubKey,
+            EtebaseCollectionAccessLevel.readWrite,
+          );
+
+          expect(result.uid, base64.encode(testInvitationId));
+          expect(result.version, CryptoUtils.currentVersion);
+          expect(result.username, testUserName);
+          expect(result.collection, testItemUid);
+          expect(result.accessLevel, EtebaseCollectionAccessLevel.readWrite);
+          expect(result.signedEncryptionKey, testSignedInvitationData);
+
+          verifyInOrder([
+            mockAccountCm.decryptKey(
+              testEncKey,
+              testColType,
+              CryptoUtils.symmetricKeySize,
+            ),
+            mockCryptoService.randomBytes(32),
+            mockAccountCm.colTypeFromUid(testColType),
+            mockMessagePackConverter.encode(testInvitationData),
+            mockCryptoService.bufferPadSmall(testEncodedInvitationData),
+            mockIdCm.encrypt(
+              message: testPaddedInvitationData,
+              pubkey: testPubKey,
+            ),
+            mockMessagePackConverter.base64Encode(testInvitationId),
+            mockItem.uid,
+          ]);
+
+          expect(testKey.disposed, isTrue);
+        });
+
+        test('disposes encryption key on exception', () async {
+          final testException = Exception('test');
+
+          when(mockCryptoService.randomBytes(any)).thenThrow(testException);
+
+          await expectLater(
+            () => sut.createInvitation(
+              mockClient,
+              mockAccountCm,
+              mockIdCm,
+              testUserName,
+              testPubKey,
+              EtebaseCollectionAccessLevel.readOnly,
+            ),
+            throwsA(testException),
+          );
+
+          verifyInOrder([
+            mockAccountCm.decryptKey(
+              testEncKey,
+              testColType,
+              CryptoUtils.symmetricKeySize,
+            ),
+            mockCryptoService.randomBytes(32),
+          ]);
+          verifyZeroInteractions(mockIdCm);
+
+          expect(testKey.disposed, isTrue);
+        });
+      });
+
+      test('getCryptoManager creates collection crypto manager', () async {
+        final result = sut.getCryptoManager(mockClient, mockAccountCm);
+
+        expect(result, same(mockColCm));
+
+        verifyInOrder([
+          mockAccountCm.decryptKey(
+            testEncKey,
+            testColType,
+            CryptoUtils.symmetricKeySize,
+          ),
+          mockCryptoService.createCollectionCryptoManager(
+            mockAccountCm,
+            testKey,
+          ),
+        ]);
+
+        expect(testKey.disposed, isFalse);
       });
     });
   });
