@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:meta/meta.dart';
 
 import '../../api/exceptions/conflict.dart';
@@ -44,18 +45,14 @@ base class BaseNetwork {
   static const _contentTypeHeader = 'content-type';
   static const _authorizationHeader = 'authorization';
 
-  static const _msgPackContentType = 'application/msgpack';
-  static const _binaryContentType = 'application/octet-stream';
-  static const _plainTextContentType = 'text/plain';
+  static const _msgPackMimeType = 'application/msgpack';
+  static const _binaryMimeType = 'application/octet-stream';
+  static const _plainTextMimeType = 'text/plain';
 
   @protected
   final NetworkClient client;
-  final Uri _apiUri;
 
-  @protected
-  MessagePackConverter get converter => client.converter;
-  @protected
-  Uri get baseUri => client.baseUri;
+  final Uri _apiUri;
 
   BaseNetwork({required this.client, Iterable<String> path = const []})
     : _apiUri = client.baseUri.replace(
@@ -116,7 +113,7 @@ base class BaseNetwork {
     final request =
         http.Request(method.verb, requestUri)
           ..headers[_userAgentHeader] = client.userAgent
-          ..headers[_acceptHeader] = _msgPackContentType
+          ..headers[_acceptHeader] = _msgPackMimeType
           ..headers.addAll(headers);
     if (authToken != null) {
       request.headers[_authorizationHeader] = authToken.header;
@@ -130,27 +127,31 @@ base class BaseNetwork {
       case Map<String, String>():
         request.bodyFields = body;
       case Uint8List():
-        request.headers[_contentTypeHeader] = _binaryContentType;
-        request.bodyBytes = body;
+        request
+          ..headers[_contentTypeHeader] = _binaryMimeType
+          ..bodyBytes = body;
       default:
-        request.headers[_contentTypeHeader] = _msgPackContentType;
-        request.bodyBytes = converter.encode(body);
+        request
+          ..headers[_contentTypeHeader] = _msgPackMimeType
+          ..bodyBytes = client.converter.encode(body);
     }
     return request;
   }
 
-  String? _getContentType(http.Response response) =>
-      response.headers[_contentTypeHeader];
+  MediaType? _getContentType(http.Response response) {
+    final contentType = response.headers[_contentTypeHeader];
+    return contentType != null ? MediaType.parse(contentType) : null;
+  }
 
   T _convertResponse<T>(http.Response response) {
     if (_isVoid<T>()) {
       return null as T;
     }
 
-    return switch (_getContentType(response)) {
-      _msgPackContentType => converter.decode<T>(response.bodyBytes),
-      _binaryContentType => response.bodyBytes as T,
-      _plainTextContentType => response.body as T,
+    return switch (_getContentType(response)?.mimeType) {
+      _msgPackMimeType => client.converter.decode<T>(response.bodyBytes),
+      _binaryMimeType => response.bodyBytes as T,
+      _plainTextMimeType => response.body as T,
       final contentType =>
         throw InvalidMessagePackData(
           'Content type $contentType is not supported',
@@ -177,16 +178,19 @@ base class BaseNetwork {
     final fallbackMessage = 'HTTP Error ${response.statusCode}';
 
     switch (_getContentType(response)) {
-      case _plainTextContentType:
-        return (response.body, null);
-      case _msgPackContentType when response.bodyBytes.isNotEmpty:
+      case MediaType(mimeType: _msgPackMimeType)
+          when response.bodyBytes.isNotEmpty:
         break;
+      case MediaType(type: 'text') when response.body.isNotEmpty:
+        return (response.body, null);
       default:
         return (fallbackMessage, null);
     }
 
     try {
-      final error = converter.decode<HttpErrorContent>(response.bodyBytes);
+      final error = client.converter.decode<HttpErrorContent>(
+        response.bodyBytes,
+      );
       final message = error.toString(withErrors: false);
       return (message, error);
       // ignore: avoid_catches_without_on_clauses

@@ -132,13 +132,13 @@ final class CollectionItemManagerOnline extends BaseManager {
       path: ['subscription-ticket'],
     );
     final ws = WebSocketChannel.connect(
-      baseUri.replace(
-        scheme: baseUri.isScheme('http') ? 'ws' : 'wss',
-        pathSegments: baseUri.pathSegments
+      client.baseUri.replace(
+        scheme: client.baseUri.isScheme('http') ? 'ws' : 'wss',
+        pathSegments: client.baseUri.pathSegments
             .followedBy(BaseManager.apiBasePath)
             .followedBy(['ws', ticket.ticket]),
         queryParameters: {
-          ...baseUri.queryParameters,
+          ...client.baseUri.queryParameters,
           ...queryFromOptions(options),
         },
       ),
@@ -146,7 +146,7 @@ final class CollectionItemManagerOnline extends BaseManager {
 
     try {
       await ws.ready;
-      yield* ws.stream.cast<Uint8List>().map(converter.decode);
+      yield* ws.stream.cast<Uint8List>().map(client.converter.decode);
     } finally {
       await ws.sink.close(status.normalClosure);
     }
