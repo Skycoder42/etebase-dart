@@ -149,7 +149,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
           ChallengeResponse.login(
             username: username,
             challenge: challenge.challenge,
-            host: client.baseUri.host,
+            host: client.baseUrl.host,
           ),
         ),
       );
@@ -186,10 +186,10 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      if (accountData.serverUrl != client.baseUri) {
+      if (accountData.serverUrl != client.baseUrl) {
         throw ApiMissuse(
           'The account data belongs to ${accountData.serverUrl}, but the '
-          'current client used to restore it uses ${client.baseUri}',
+          'current client used to restore it uses ${client.baseUrl}',
         );
       }
 
@@ -244,7 +244,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ChallengeResponse.login(
           username: _user.username,
           challenge: challenge.challenge,
-          host: _client.baseUri.host,
+          host: _client.baseUrl.host,
         ),
       ),
     );
@@ -283,7 +283,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final response = ChallengeResponse.changePassword(
         username: _user.username,
         challenge: challenge.challenge,
-        host: _client.baseUri.host,
+        host: _client.baseUrl.host,
         loginPubkey: newLoginCryptoManager.pubkey,
         encryptedContent: newEncryptedContent,
       );
@@ -321,7 +321,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final accountData = AccountData(
         user: _user,
         authToken: _authToken.value,
-        serverUrl: _client.baseUri,
+        serverUrl: _client.baseUrl,
         version: CryptoUtils.currentVersion,
         key: cryptoManager.encryptKey(_mainCryptoManager.mainKey),
       );

@@ -32,10 +32,6 @@ import '../../test_helpers.dart';
 ])
 import 'base_network_test.mocks.dart';
 
-final class TestNetwork extends BaseNetwork {
-  TestNetwork({required super.client, super.path});
-}
-
 void main() {
   setUpAll(() {
     provideDummy(const ByteStream(Stream.empty()));
@@ -61,10 +57,28 @@ void main() {
 
       when(mockNetworkClient.converter).thenReturn(mockConverter);
       when(mockNetworkClient.httpClient).thenReturn(mockClient);
-      when(mockNetworkClient.baseUri).thenReturn(testBaseUri);
+      when(mockNetworkClient.baseUrl).thenReturn(testBaseUri);
       when(mockNetworkClient.userAgent).thenReturn(testUserAgent);
 
-      sut = TestNetwork(client: mockNetworkClient, path: testPath);
+      sut = BaseNetwork(client: mockNetworkClient, path: testPath);
+    });
+
+    test('apiUrl returns constructed url', () {
+      expect(
+        sut.apiUrl,
+        Uri.parse('http://example.com/base/test/path?v=1&x=a'),
+      );
+    });
+
+    test('asserts if baseUrl ends with /', () {
+      when(
+        mockNetworkClient.baseUrl,
+      ).thenReturn(Uri.https('test.com', '/base/'));
+
+      expect(
+        () => BaseNetwork(client: mockNetworkClient),
+        throwsA(isA<AssertionError>()),
+      );
     });
 
     group('invoke', () {

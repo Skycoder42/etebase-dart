@@ -11,55 +11,70 @@ import '../models/signup_request.dart';
 import 'base_network.dart';
 
 @internal
-final class Authenticator extends BaseNetwork {
-  Authenticator({required super.client})
-    : super(path: const ['api', 'v1', 'authentication']);
+class Authenticator {
+  final BaseNetwork _network;
+
+  Authenticator(NetworkClient client)
+    : _network = BaseNetwork(
+        client: client,
+        path: const ['api', 'v1', 'authentication'],
+      );
+
+  @visibleForTesting
+  Authenticator.fromNetwork(this._network);
+
+  @visibleForTesting
+  Uri get apiUrl => _network.apiUrl;
 
   Future<bool> isEtebase() async {
     try {
-      await invoke<void>(path: ['is_etebase']);
+      await _network.invoke<void>(path: ['is_etebase']);
       return true;
     } on NotFound {
       return false;
     }
   }
 
-  Future<LoginResponse> signup(SignupRequest body) => invoke<LoginResponse>(
-    method: HttpMethod.post,
-    path: ['signup'],
-    body: body,
-  );
+  Future<LoginResponse> signup(SignupRequest body) =>
+      _network.invoke<LoginResponse>(
+        method: HttpMethod.post,
+        path: ['signup'],
+        body: body,
+      );
 
   Future<LoginChallenge> loginChallenge(ChallengeRequest body) =>
-      invoke<LoginChallenge>(
+      _network.invoke<LoginChallenge>(
         method: HttpMethod.post,
         path: ['login_challenge'],
         body: body,
       );
 
-  Future<LoginResponse> login(LoginRequest body) => invoke<LoginResponse>(
-    method: HttpMethod.post,
-    path: ['login'],
-    body: body,
-  );
+  Future<LoginResponse> login(LoginRequest body) =>
+      _network.invoke<LoginResponse>(
+        method: HttpMethod.post,
+        path: ['login'],
+        body: body,
+      );
 
-  Future<void> logout(AuthToken authToken) => invoke<void>(
+  Future<void> logout(AuthToken authToken) => _network.invoke<void>(
     method: HttpMethod.post,
     authToken: authToken,
     path: ['logout'],
   );
 
   Future<void> changePassword(AuthToken authToken, LoginRequest body) =>
-      invoke<void>(
+      _network.invoke<void>(
         method: HttpMethod.post,
         authToken: authToken,
         path: ['change_password'],
         body: body,
       );
 
-  Future<Uri> getDashboardUrl(AuthToken authToken) => invoke<DashboardUrl>(
-    method: HttpMethod.post,
-    authToken: authToken,
-    path: ['dashboard_url'],
-  ).then((r) => r.url);
+  Future<Uri> getDashboardUrl(AuthToken authToken) => _network
+      .invoke<DashboardUrl>(
+        method: HttpMethod.post,
+        authToken: authToken,
+        path: ['dashboard_url'],
+      )
+      .then((r) => r.url);
 }

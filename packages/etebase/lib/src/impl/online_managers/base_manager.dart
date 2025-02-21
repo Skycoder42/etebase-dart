@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_prefetch_option.dart';
+import '../codec/message_pack_converter.dart';
 import '../models/auth_token.dart';
 import '../models/fetch_options.dart';
 import 'base_network.dart';
@@ -12,25 +13,39 @@ abstract interface class AuthTokenSource {
 }
 
 @internal
-base class BaseManager extends BaseNetwork {
+base class BaseManager {
   static const apiBasePath = ['api', 'v1'];
+
+  final BaseNetwork _network;
 
   final AuthTokenSource authTokenSource;
 
   BaseManager({
-    required super.client,
+    required NetworkClient client,
     required this.authTokenSource,
     List<String> path = const [],
-  }) : super(path: apiBasePath.followedBy(path));
+  }) : _network = BaseNetwork(
+         client: client,
+         path: apiBasePath.followedBy(path),
+       );
 
-  Future<T> invokeApi<T>({
+  NetworkClient get client => _network.client;
+
+  Uri get baseUrl => _network.client.baseUrl;
+
+  @visibleForTesting
+  Uri get apiUrl => _network.apiUrl;
+
+  MessagePackConverter get converter => _network.client.converter;
+
+  Future<T> invoke<T>({
     HttpMethod method = HttpMethod.get,
     List<String> path = const [],
     Map<String, String> headers = const {},
     EtebaseFetchOptionsBase? options,
     Map<String, String>? query,
     dynamic body,
-  }) => invoke<T>(
+  }) => _network.invoke<T>(
     method: method,
     path: path,
     headers: headers,

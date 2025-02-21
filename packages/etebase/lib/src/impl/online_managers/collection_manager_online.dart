@@ -27,12 +27,12 @@ final class CollectionManagerOnline extends BaseManager {
   Future<EncryptedCollection> fetch(
     String colUid,
     EtebaseFetchOptions? options,
-  ) => invokeApi<EncryptedCollection>(path: [colUid], options: options);
+  ) => invoke<EncryptedCollection>(path: [colUid], options: options);
 
   Future<EtebaseCollectionListResponse<EncryptedCollection>> list(
     List<Uint8List> collectionTypes,
     EtebaseFetchOptions? options,
-  ) => invokeApi<EtebaseCollectionListResponse<EncryptedCollection>>(
+  ) => invoke<EtebaseCollectionListResponse<EncryptedCollection>>(
     method: HttpMethod.post,
     path: const ['list_multi'],
     body: CollectionListRequest(collectionTypes),
@@ -42,9 +42,6 @@ final class CollectionManagerOnline extends BaseManager {
   Future<void> create(
     EncryptedCollection collection,
     EtebaseFetchOptions? options,
-  ) => invokeApi<void>(
-    method: HttpMethod.post,
-    body: collection,
-    options: options,
-  );
+  ) =>
+      invoke<void>(method: HttpMethod.post, body: collection, options: options);
 }

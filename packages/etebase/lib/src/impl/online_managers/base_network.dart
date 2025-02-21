@@ -35,11 +35,11 @@ abstract interface class NetworkClient {
   http.Client get httpClient;
   String get userAgent;
   MessagePackConverter get converter;
-  Uri get baseUri;
+  Uri get baseUrl;
 }
 
 @internal
-base class BaseNetwork {
+class BaseNetwork {
   static const _userAgentHeader = 'user-agent';
   static const _acceptHeader = 'accept';
   static const _contentTypeHeader = 'content-type';
@@ -49,14 +49,17 @@ base class BaseNetwork {
   static const _binaryMimeType = 'application/octet-stream';
   static const _plainTextMimeType = 'text/plain';
 
-  @protected
   final NetworkClient client;
 
-  final Uri _apiUri;
+  final Uri apiUrl;
 
   BaseNetwork({required this.client, Iterable<String> path = const []})
-    : _apiUri = client.baseUri.replace(
-        pathSegments: client.baseUri.pathSegments.followedBy(path),
+    : apiUrl = client.baseUrl.replace(
+        pathSegments: client.baseUrl.pathSegments.followedBy(path),
+      ),
+      assert(
+        !client.baseUrl.path.endsWith('/'),
+        'client.baseUrl must not end with /',
       );
 
   @nonVirtual
@@ -100,14 +103,14 @@ base class BaseNetwork {
     required dynamic body,
     required AuthToken? authToken,
   }) {
-    final requestUri = _apiUri.replace(
+    final requestUri = apiUrl.replace(
       pathSegments: [
-        ..._apiUri.pathSegments,
+        ...apiUrl.pathSegments,
         ...path,
         '', // ensures the path has a trailing /
       ],
       queryParameters:
-          query.isNotEmpty ? {..._apiUri.queryParametersAll, ...query} : null,
+          query.isNotEmpty ? {...apiUrl.queryParametersAll, ...query} : null,
     );
 
     final request =

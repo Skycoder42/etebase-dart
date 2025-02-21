@@ -27,11 +27,11 @@ final class CollectionItemManagerOnline extends BaseManager {
   Future<EncryptedCollectionItem> fetch(
     String itemUid,
     EtebaseItemFetchOptions? options,
-  ) => invokeApi<EncryptedCollectionItem>(path: [itemUid], options: options);
+  ) => invoke<EncryptedCollectionItem>(path: [itemUid], options: options);
 
   Future<EtebaseItemListResponse<EncryptedCollectionItem>> list(
     EtebaseItemFetchOptions? options,
-  ) => invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
+  ) => invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
     options: options,
   );
 
@@ -40,7 +40,7 @@ final class CollectionItemManagerOnline extends BaseManager {
     EtebaseRevisionFetchOptions? options,
   ) async {
     final response =
-        await invokeApi<EtebaseIteratorListResponse<EncryptedRevision>>(
+        await invoke<EtebaseIteratorListResponse<EncryptedRevision>>(
           path: [item.uid, 'revision'],
           options: options,
         );
@@ -48,12 +48,12 @@ final class CollectionItemManagerOnline extends BaseManager {
   }
 
   Future<void> create(EncryptedCollectionItem item) =>
-      invokeApi<void>(method: HttpMethod.post, body: item);
+      invoke<void>(method: HttpMethod.post, body: item);
 
   Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchUpdates(
     List<EncryptedCollectionItem> items,
     EtebaseItemFetchOptions? options,
-  ) => invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
+  ) => invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
     method: HttpMethod.post,
     path: const ['fetch_updates'],
     body: items.toFetchInfo(wantEtag: options?.stoken == null),
@@ -63,7 +63,7 @@ final class CollectionItemManagerOnline extends BaseManager {
   Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchMulti(
     List<String> items,
     EtebaseItemFetchOptions? options,
-  ) => invokeApi<EtebaseItemListResponse<EncryptedCollectionItem>>(
+  ) => invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
     method: HttpMethod.post,
     path: const ['fetch_updates'],
     body: items.map(CollectionItemFetchInfo.new).toList(),
@@ -74,7 +74,7 @@ final class CollectionItemManagerOnline extends BaseManager {
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
     /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
-  ) => invokeApi<void>(
+  ) => invoke<void>(
     method: HttpMethod.post,
     path: const ['batch'],
     body: ItemBatchRequest(
@@ -88,7 +88,7 @@ final class CollectionItemManagerOnline extends BaseManager {
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
     /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
-  ) => invokeApi<void>(
+  ) => invoke<void>(
     method: HttpMethod.post,
     path: const ['transaction'],
     body: ItemBatchRequest(
@@ -107,7 +107,7 @@ final class CollectionItemManagerOnline extends BaseManager {
     if (data == null) {
       throw ApiMissuse('Tried uploading a missing chunk');
     }
-    return invokeApi<void>(
+    return invoke<void>(
       method: HttpMethod.put,
       path: [item.uid, 'chunk', uid],
       body: data,
@@ -119,7 +119,7 @@ final class CollectionItemManagerOnline extends BaseManager {
     EncryptedCollectionItem item,
     String chunkUid,
     EtebaseItemFetchOptions? options,
-  ) => invokeApi<Uint8List>(
+  ) => invoke<Uint8List>(
     path: [item.uid, 'chunk', chunkUid, 'download'],
     options: options,
   );
@@ -127,18 +127,18 @@ final class CollectionItemManagerOnline extends BaseManager {
   Stream<EtebaseItemListResponse<EncryptedCollectionItem>> subscribeChanges(
     EtebaseItemFetchOptions? options,
   ) async* {
-    final ticket = await invokeApi<WebSocketTicketResponse>(
+    final ticket = await invoke<WebSocketTicketResponse>(
       method: HttpMethod.post,
       path: ['subscription-ticket'],
     );
     final ws = WebSocketChannel.connect(
-      client.baseUri.replace(
-        scheme: client.baseUri.isScheme('http') ? 'ws' : 'wss',
-        pathSegments: client.baseUri.pathSegments
+      baseUrl.replace(
+        scheme: baseUrl.isScheme('http') ? 'ws' : 'wss',
+        pathSegments: baseUrl.pathSegments
             .followedBy(BaseManager.apiBasePath)
             .followedBy(['ws', ticket.ticket]),
         queryParameters: {
-          ...client.baseUri.queryParameters,
+          ...baseUrl.queryParameters,
           ...queryFromOptions(options),
         },
       ),
@@ -146,7 +146,7 @@ final class CollectionItemManagerOnline extends BaseManager {
 
     try {
       await ws.ready;
-      yield* ws.stream.cast<Uint8List>().map(client.converter.decode);
+      yield* ws.stream.cast<Uint8List>().map(converter.decode);
     } finally {
       await ws.sink.close(status.normalClosure);
     }

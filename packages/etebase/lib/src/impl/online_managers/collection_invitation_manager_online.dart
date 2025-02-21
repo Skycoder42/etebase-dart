@@ -17,43 +17,43 @@ final class CollectionInvitationManagerOnline extends BaseManager {
 
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming(
     EtebaseIteratorFetchOptions? options,
-  ) => invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
+  ) => invoke<EtebaseIteratorListResponse<SignedInvitationRead>>(
     path: const ['incoming'],
   );
 
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing(
     EtebaseIteratorFetchOptions? options,
-  ) => invokeApi<EtebaseIteratorListResponse<SignedInvitationRead>>(
+  ) => invoke<EtebaseIteratorListResponse<SignedInvitationRead>>(
     path: const ['outgoing'],
   );
 
   Future<void> accept(
     SignedInvitationRead invitation,
     InvitationAcceptRequest body,
-  ) => invokeApi<void>(
+  ) => invoke<void>(
     method: HttpMethod.post,
     path: ['incoming', invitation.uid, 'accept'],
     body: body,
   );
 
-  Future<void> reject(SignedInvitationRead invitation) => invokeApi<void>(
+  Future<void> reject(SignedInvitationRead invitation) => invoke<void>(
     method: HttpMethod.delete,
     path: ['incoming', invitation.uid],
   );
 
   Future<EtebaseUserProfile> fetchUserProfile(String username) =>
-      invokeApi<EtebaseUserProfile>(
+      invoke<EtebaseUserProfile>(
         path: const ['outgoing', 'fetch_user_profile'],
         query: {'username': username},
       );
 
-  Future<void> invite(SignedInvitationWrite invitation) => invokeApi<void>(
+  Future<void> invite(SignedInvitationWrite invitation) => invoke<void>(
     method: HttpMethod.post,
     path: const ['outgoing'],
     body: invitation,
   );
 
-  Future<void> disinvite(SignedInvitationRead invitation) => invokeApi<void>(
+  Future<void> disinvite(SignedInvitationRead invitation) => invoke<void>(
     method: HttpMethod.delete,
     path: ['outgoing', invitation.uid],
   );

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
+import '../../api/exceptions/api_missuse.dart';
 import '../../api/managers/crypto_executor.dart';
 import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_item_metadata.dart';
@@ -36,17 +37,21 @@ class Client implements EtebaseClient, NetworkClient {
   @override
   final MessagePackConverter converter;
   @override
-  final Uri baseUri;
+  final Uri baseUrl;
   final CryptoService crypto;
 
   Client(
     this.httpClient,
     this.userAgent,
-    this.baseUri,
+    this.baseUrl,
     this.converter,
     this.crypto, {
     bool ownedClient = false,
-  }) : _ownedClient = ownedClient;
+  }) : _ownedClient = ownedClient {
+    if (baseUrl.path.endsWith('/')) {
+      throw ApiMissuse('The serverUrl must not end with /');
+    }
+  }
 
   Client.create(
     CryptoExecutor cryptoExecutor,
@@ -55,11 +60,11 @@ class Client implements EtebaseClient, NetworkClient {
   ]) : httpClient = http.Client(),
        userAgent = UserAgent.build(clientName),
        converter = MessagePackConverter(),
-       baseUri = serverUrl ?? defaultUrl,
+       baseUrl = serverUrl ?? defaultUrl,
        crypto = CryptoService(cryptoExecutor),
        _ownedClient = true;
 
-  Authenticator get authenticator => Authenticator(client: this);
+  Authenticator get authenticator => Authenticator(this);
 
   @override
   Future<void> dispose() async {

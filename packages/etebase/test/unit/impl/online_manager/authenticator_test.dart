@@ -1,25 +1,26 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
-import 'package:etebase/src/impl/codec/message_pack_converter.dart';
+import 'package:etebase/src/impl/models/auth_token.dart';
+import 'package:etebase/src/impl/models/challenge_request.dart';
+import 'package:etebase/src/impl/models/dashboard_url.dart';
+import 'package:etebase/src/impl/models/login_challenge.dart';
+import 'package:etebase/src/impl/models/login_request.dart';
 import 'package:etebase/src/impl/models/login_response.dart';
 import 'package:etebase/src/impl/models/signup_request.dart';
 import 'package:etebase/src/impl/models/user.dart';
 import 'package:etebase/src/impl/online_managers/authenticator.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
 import 'package:http/http.dart';
+import 'package:meta/meta.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 // ignore: directives_ordering
 import '../../test_helpers.dart';
-@GenerateNiceMocks([
-  MockSpec<NetworkClient>(),
-  MockSpec<MessagePackConverter>(),
-  MockSpec<Client>(),
-  MockSpec<StreamedResponse>(),
-])
+@GenerateNiceMocks([MockSpec<BaseNetwork>(), MockSpec<NetworkClient>()])
 import 'authenticator_test.mocks.dart';
 
 void main() {
@@ -30,112 +31,175 @@ void main() {
   group('$Authenticator', () {
     final testBaseUri = Uri.http('example.com', '/base');
 
-    final mockNetworkClient = MockNetworkClient();
-    final mockConverter = MockMessagePackConverter();
-    final mockClient = MockClient();
+    final mockNetwork = MockBaseNetwork();
 
     late Authenticator sut;
 
     setUp(() async {
-      reset(mockNetworkClient);
-      reset(mockConverter);
-      reset(mockClient);
+      reset(mockNetwork);
 
-      when(mockNetworkClient.converter).thenReturn(mockConverter);
-      when(mockNetworkClient.httpClient).thenReturn(mockClient);
-      when(mockNetworkClient.baseUri).thenReturn(testBaseUri);
-
-      sut = Authenticator(client: mockNetworkClient);
+      sut = Authenticator.fromNetwork(mockNetwork);
     });
 
-    void setupResponse<T>(T response, [int status = 200]) {
-      provideDummy(response);
-      final testData =
-          (ByteData(8)..setUint64(0, response.hashCode)).buffer.asUint8List();
-      when(
-        // ignore: discarded_futures
-        mockClient.send(any),
-      ).thenReturnAsync(
-        StreamedResponse(
-          Stream.value(testData),
-          status,
-          headers: {'content-type': 'application/msgpack'},
+    PostExpectation<Future<T>> whenInvoke<T>() => when(
+      // ignore: discarded_futures
+      mockNetwork.invoke<T>(
+        method: anyNamed('method'),
+        path: anyNamed('path'),
+        headers: anyNamed('headers'),
+        query: anyNamed('query'),
+        body: anyNamed('body'),
+        authToken: anyNamed('authToken'),
+      ),
+    );
+
+    @isTest
+    void testInvoke<TReq, TRes>(
+      String description, {
+      required TReq request,
+      required TRes response,
+      required Future<TRes> Function(TReq r) call,
+      HttpMethod method = HttpMethod.get,
+      List<String> path = const [],
+      Map<String, String> headers = const {},
+      Map<String, String> query = const {},
+      AuthToken? authToken,
+    }) => test(description, () async {
+      whenInvoke<TRes>().thenReturnAsync(response);
+
+      final result = await call(request);
+
+      expect(result, response);
+
+      verify(
+        mockNetwork.invoke<TRes>(
+          method: method,
+          path: path,
+          headers: headers,
+          query: query,
+          body: request,
+          authToken: authToken,
         ),
       );
+    });
 
-      when(mockConverter.decode<T>(testData)).thenReturn(response);
-    }
+    test('constructs base network from client and base path', () {
+      final mockNetworkClient = MockNetworkClient();
+      when(mockNetworkClient.baseUrl).thenReturn(testBaseUri);
 
-    Uint8List setupRequest<T>(T request) {
-      final testData =
-          (ByteData(8)..setUint64(0, request.hashCode)).buffer.asUint8List();
-      when(mockConverter.encode(request)).thenReturn(testData);
-      return testData;
-    }
+      final sut = Authenticator(mockNetworkClient);
 
-    Request verifySend() =>
-        // ignore: discarded_futures
-        verify(mockClient.send(captureAny)).captured.single as Request;
+      expect(
+        sut.apiUrl,
+        Uri.http('example.com', '/base/api/v1/authentication'),
+      );
+    });
 
     group('isEtebase', () {
       test('returns true if server does not respond with an error', () async {
-        setupResponse(null);
-
         final result = await sut.isEtebase();
 
         expect(result, isTrue);
 
-        final request = verifySend();
-        expect(
-          request.url,
-          Uri.http('example.com', '/base/api/v1/authentication/is_etebase/'),
-        );
+        verify(mockNetwork.invoke<void>(path: ['is_etebase']));
       });
 
       test('returns false if server returns not found', () async {
-        setupResponse(null, 404);
+        whenInvoke<void>().thenThrow(NotFound('test'));
 
         final result = await sut.isEtebase();
 
         expect(result, isFalse);
       });
+    });
 
-      test('signup sends request to backend', () async {
-        final testRequest = SignupRequest(
-          user: const EtebaseUser(
-            username: 'test-username',
-            email: 'test-email',
-          ),
-          salt: Uint8List(1),
-          loginPubkey: Uint8List(2),
-          pubkey: Uint8List(3),
-          encryptedContent: Uint8List(4),
-        );
-        final requestToken = setupRequest(testRequest);
+    testInvoke(
+      'signup sends request to backend',
+      request: SignupRequest(
+        user: const EtebaseUser(username: 'test-username', email: 'test-email'),
+        salt: Uint8List(1),
+        loginPubkey: Uint8List(2),
+        pubkey: Uint8List(3),
+        encryptedContent: Uint8List(4),
+      ),
+      response: LoginResponse(
+        token: 'test-token',
+        user: User(
+          username: 'test-username',
+          email: 'test-email',
+          pubkey: Uint8List(1),
+          encryptedContent: Uint8List(2),
+        ),
+      ),
+      call: (r) async => sut.signup(r),
+      method: HttpMethod.post,
+      path: ['signup'],
+    );
 
-        final testResponse = LoginResponse(
-          token: 'test-token',
-          user: User(
-            username: 'test-username',
-            email: 'test-email',
-            pubkey: Uint8List(1),
-            encryptedContent: Uint8List(2),
-          ),
-        );
-        setupResponse(testResponse);
+    testInvoke(
+      'loginChallenge sends request to backend',
+      request: const ChallengeRequest(username: 'username'),
+      response: LoginChallenge(
+        challenge: Uint8List(1),
+        salt: Uint8List(2),
+        version: 1,
+      ),
+      call: (r) async => sut.loginChallenge(r),
+      method: HttpMethod.post,
+      path: ['login_challenge'],
+    );
 
-        final response = await sut.signup(testRequest);
+    testInvoke(
+      'login sends request to backend',
+      request: LoginRequest(response: Uint8List(1), signature: Uint8List(2)),
+      response: LoginResponse(
+        token: 'test-token',
+        user: User(
+          username: 'test-username',
+          email: 'test-email',
+          pubkey: Uint8List(1),
+          encryptedContent: Uint8List(2),
+        ),
+      ),
+      call: (r) async => sut.login(r),
+      method: HttpMethod.post,
+      path: ['login'],
+    );
 
-        expect(response, testResponse);
+    testInvoke<void, void>(
+      'logout sends request to backend with auth token',
+      request: null,
+      response: null,
+      call: (r) async => sut.logout(const AuthToken('test')),
+      method: HttpMethod.post,
+      path: ['logout'],
+      authToken: const AuthToken('test'),
+    );
 
-        final request = verifySend();
-        expect(request.method, 'POST');
-        expect(
-          request.url,
-          Uri.http('example.com', '/base/api/v1/authentication/signup/'),
-        );
-        expect(request.bodyBytes, requestToken);
-      });
+    testInvoke<LoginRequest, void>(
+      'changePassword sends request to backend with auth token',
+      request: LoginRequest(response: Uint8List(1), signature: Uint8List(2)),
+      response: null,
+      call: (r) async => sut.changePassword(const AuthToken('test'), r),
+      method: HttpMethod.post,
+      path: ['change_password'],
+      authToken: const AuthToken('test'),
+    );
+    test('getDashboardUrl sends request to backend with auth token', () async {
+      final response = DashboardUrl(Uri.parse('http://example.com/dash'));
+      whenInvoke<DashboardUrl>().thenReturnAsync(response);
+
+      final result = await sut.getDashboardUrl(const AuthToken('test'));
+
+      expect(result, response.url);
+
+      verify(
+        mockNetwork.invoke<DashboardUrl>(
+          method: HttpMethod.post,
+          path: ['dashboard_url'],
+          authToken: const AuthToken('test'),
+        ),
+      );
     });
   });
 }
