@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -43,7 +45,7 @@ void main() {
     final mockMessagePackConverter = MockMessagePackConverter();
     final mockCryptoService = MockCryptoService();
 
-    setUp(() async {
+    setUp(() {
       reset(mockClient);
       reset(mockRevision);
       reset(mockParentCm);
@@ -113,7 +115,7 @@ void main() {
         verifyNever(mockItemCm.dispose());
       });
 
-      test('disposes item cm if creating the revision fails', () async {
+      test('disposes item cm if creating the revision fails', () {
         final testException = Exception('test-exception');
 
         when(

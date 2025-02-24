@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
@@ -269,7 +271,7 @@ void main() {
           ]);
         });
 
-        test('throws if account data does not exists', () async {
+        test('throws if account data does not exists', () {
           expect(() => sut.loadAccount(), throwsA(isA<NotFound>()));
         });
       });
@@ -302,7 +304,7 @@ void main() {
           verify(mockMetaBox.get('account.stoken'));
         });
 
-        test('throws if stoken does not exists', () async {
+        test('throws if stoken does not exists', () {
           expect(() => sut.loadStoken(), throwsA(isA<NotFound>()));
         });
       });
@@ -347,7 +349,7 @@ void main() {
           verify(mockMetaBox.get('col.stoken.$testColUid'));
         });
 
-        test('throws if stoken does not exists', () async {
+        test('throws if stoken does not exists', () {
           expect(
             () => sut.collectionLoadStoken('id'),
             throwsA(isA<NotFound>()),
@@ -447,7 +449,7 @@ void main() {
           ]);
         });
 
-        test('throws if collection does not exist', () async {
+        test('throws if collection does not exist', () {
           expect(
             () => sut.collectionGet(mockColMgr, testColUid),
             throwsA(isA<NotFound>()),
@@ -466,7 +468,7 @@ void main() {
       final mockItemMgr = MockEtebaseItemManager();
       final mockItemBox = MockLazyBox<Uint8List>();
 
-      setUp(() async {
+      setUp(() {
         reset(mockItemMgr);
         reset(mockItemBox);
 

@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 @TestOn('dart-vm')
 library;
 
@@ -168,7 +170,7 @@ void main() {
         await sut.dispose();
       });
 
-      test('runs callback on different isolate', () async {
+      test('runs callback on different isolate', () {
         int callback(SodiumSumo sodium, _, _) {
           if (sodium is MockSodiumSumo) {
             return Isolate.current.hashCode;
@@ -199,7 +201,7 @@ void main() {
         expect(results, everyElement(first));
       });
 
-      test('runs correct result for every invocation', () async {
+      test('runs correct result for every invocation', () {
         AsyncCallback<int> createCb(int ctr) => (sodium, _, _) => ctr;
 
         final results = <Future<int>>[];
@@ -353,7 +355,7 @@ void main() {
         );
       });
 
-      test('wraps sodium exception as crypto failure', () async {
+      test('wraps sodium exception as crypto failure', () {
         expect(
           () => sut.execAsync<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),
@@ -370,7 +372,7 @@ void main() {
         await sut.dispose();
       });
 
-      test('runs callback on different isolate', () async {
+      test('runs callback on different isolate', () {
         int callback(SodiumSumo sodium, _, _) {
           if (sodium is MockSodiumSumo) {
             return Isolate.current.hashCode;
@@ -401,7 +403,7 @@ void main() {
         expect(results, everyElement(first));
       });
 
-      test('runs correct result for every invocation', () async {
+      test('runs correct result for every invocation', () {
         AsyncCallback<int> createCb(int ctr) => (sodium, _, _) => ctr;
 
         final results = <Future<int>>[];
@@ -555,7 +557,7 @@ void main() {
         );
       });
 
-      test('wraps sodium exception as crypto failure', () async {
+      test('wraps sodium exception as crypto failure', () {
         expect(
           () => sut.exec<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),

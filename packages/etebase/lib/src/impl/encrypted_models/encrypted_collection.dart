@@ -164,7 +164,7 @@ class EncryptedCollection {
       final collectionType = getCollectionType(client, parentCm);
       final signedEncryptionKey = await encryptionKey.runUnlockedAsync((
         encryptionKeyBytes,
-      ) async {
+      ) {
         final rawContent = client.crypto.bufferPadSmall(
           client.converter.encode(
             SignedInvitationContent(

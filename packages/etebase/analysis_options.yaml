@@ -3,3 +3,4 @@ include: package:dart_test_tools/package.yaml
 linter:
   rules:
     document_ignores: false
+    avoid_futureor_void: false

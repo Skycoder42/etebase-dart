@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -53,7 +55,7 @@ void main() {
     });
 
     group('execAsync', () {
-      setUp(() async {
+      setUp(() {
         when(
           mockSodiumSumo.runIsolated<bool>(
             any,
@@ -61,7 +63,7 @@ void main() {
             keyPairs: anyNamed('keyPairs'),
           ),
         ).thenAnswer(
-          (i) async => Future(
+          (i) => Future(
             () => (i.positionalArguments.single as AsyncCallback<bool>).call(
               mockSodiumSumo,
               i.namedArguments[#secureKeys] as List<SecureKey>,
@@ -71,7 +73,7 @@ void main() {
         );
       });
 
-      test('runs callback asynchronously', () async {
+      test('runs callback asynchronously', () {
         var isInvokedLater = false;
 
         bool callback(SodiumSumo sodium, _, _) {
@@ -87,7 +89,7 @@ void main() {
         isInvokedLater = true;
       });
 
-      test('runs callback asynchronously with keys and key pairs', () async {
+      test('runs callback asynchronously with keys and key pairs', () {
         final secureKeys = [FakeSecureKey(), FakeSecureKey()];
         final keyPairs = [
           KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey()),
@@ -116,7 +118,7 @@ void main() {
         );
       });
 
-      test('wraps sodium exception as crypto failure', () async {
+      test('wraps sodium exception as crypto failure', () {
         expect(
           () => sut.execAsync<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),
@@ -125,7 +127,7 @@ void main() {
     });
 
     group('exec', () {
-      test('runs callback synchronously', () async {
+      test('runs callback synchronously', () {
         var isInvokedLater = false;
 
         bool callback(SodiumSumo sodium, _, _) {
@@ -141,7 +143,7 @@ void main() {
         expect(result, isFalse);
       });
 
-      test('runs callback synchronously with keys and key pairs', () async {
+      test('runs callback synchronously with keys and key pairs', () {
         final secureKeys = [FakeSecureKey(), FakeSecureKey()];
         final keyPairs = [
           KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey()),
@@ -164,7 +166,7 @@ void main() {
         verifyZeroInteractions(mockSodiumSumo);
       });
 
-      test('wraps sodium exception as crypto failure', () async {
+      test('wraps sodium exception as crypto failure', () {
         expect(
           () => sut.exec<bool>((_, _, _) => throw SodiumException()),
           throwsA(isA<CryptoFailure>()),

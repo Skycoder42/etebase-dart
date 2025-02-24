@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/crypto_failure.dart';
@@ -89,7 +91,7 @@ void main() {
       });
 
       group('finalize', () {
-        test('returns hash result', () async {
+        test('returns hash result', () {
           final testResult = Uint8List.fromList([3, 2, 3]);
 
           when(mockGenericHashConsumer.close()).thenReturnAsync(testResult);
@@ -97,7 +99,7 @@ void main() {
           expect(sut.finalize(), completion(testResult));
         });
 
-        test('wrap exception if close throws', () async {
+        test('wrap exception if close throws', () {
           when(mockGenericHashConsumer.close()).thenThrow(SodiumException());
 
           expect(() => sut.finalize(), throwsA(isA<CryptoFailure>()));

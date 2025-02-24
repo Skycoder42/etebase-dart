@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 @TestOn('!windows')
 library;
 
@@ -76,7 +78,7 @@ void main() {
     expect(collectionMeta3.color, isNull);
   });
 
-  test('fetch options can be created', () async {
+  test('fetch options can be created', () {
     const options = EtebaseFetchOptions(
       limit: 100,
       prefetch: EtebasePrefetchOption.medium,

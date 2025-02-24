@@ -177,7 +177,7 @@ void main() {
     expect(inResponse3.data, hasLength(1));
 
     await expectLater(
-      () async => collectionManager2.fetch(collection.uid),
+      () => collectionManager2.fetch(collection.uid),
       throwsA(isA<NotFound>()),
     );
 
@@ -191,7 +191,7 @@ void main() {
 
     // validate has no access
     await expectLater(
-      () async => collectionManager2.fetch(collection.uid),
+      () => collectionManager2.fetch(collection.uid),
       throwsA(isA<NotFound>()),
     );
   });
@@ -225,7 +225,7 @@ void main() {
 
     // validate has no access
     await expectLater(
-      () async => collectionManager2.fetch(collection.uid),
+      () => collectionManager2.fetch(collection.uid),
       throwsA(isA<NotFound>()),
     );
   });
@@ -301,7 +301,7 @@ void main() {
     expect(removedCollection.uid, collection.uid);
 
     await expectLater(
-      () async => collectionManager2.fetch(collection.uid),
+      () => collectionManager2.fetch(collection.uid),
       throwsA(isA<NotFound>()),
     );
   });

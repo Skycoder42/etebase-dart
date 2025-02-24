@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/etebase.dart';
+import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/impl/encrypted_models/cached/cached_collection_item.dart';
 import 'package:test/test.dart';
 

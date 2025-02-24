@@ -79,7 +79,7 @@ void main() {
       await restoredAccount.fetchToken();
 
       expect(
-        () async => account.save(EtebaseUtils.randomKey(client, 64)),
+        () => account.save(EtebaseUtils.randomKey(client, 64)),
         throwsA(isA<ArgumentError>()),
       );
 

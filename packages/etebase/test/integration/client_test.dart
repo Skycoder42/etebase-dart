@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:io';
 
 // ignore: no_self_package_imports
@@ -17,7 +19,7 @@ void main() {
     await sut.dispose();
   });
 
-  test('etebaseGetDefaultServerUrl returns correct server URL', () async {
+  test('etebaseGetDefaultServerUrl returns correct server URL', () {
     expect(sut.checkEtebaseServer(), completion(isTrue));
   });
 }

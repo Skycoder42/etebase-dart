@@ -1,5 +1,6 @@
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/etebase.dart';
+import 'package:etebase/src/api/models/etebase_fetch_options.dart';
+import 'package:etebase/src/api/models/etebase_prefetch_option.dart';
 import 'package:etebase/src/impl/models/fetch_options.dart';
 import 'package:test/test.dart';
 

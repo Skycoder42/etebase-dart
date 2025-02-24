@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/exceptions/async_crypto_executor_isolate_failure.dart';
@@ -114,14 +116,14 @@ void main() {
         });
 
         group('async', () {
-          test('returns callback result by default', () async {
+          test('returns callback result by default', () {
             expect(
               CryptoFailure.wrap<Future<int>, int>(() async => 42),
               completion(42),
             );
           });
 
-          test('rethrows immediate SodiumException as CryptoFailure', () async {
+          test('rethrows immediate SodiumException as CryptoFailure', () {
             expect(
               () => CryptoFailure.wrap<Future<int>, int>(
                 () => throw SodiumException('testMessage'),
@@ -136,7 +138,7 @@ void main() {
             );
           });
 
-          test('rethrows delayed SodiumException as CryptoFailure', () async {
+          test('rethrows delayed SodiumException as CryptoFailure', () {
             expect(
               () => CryptoFailure.wrap<Future<int>, int>(
                 () => Future.delayed(
@@ -162,7 +164,7 @@ void main() {
               'On web the trace looks the same, but is not identical',
             ),
           },
-          () async {
+          () {
             final testTrace = StackTrace.current;
             try {
               CryptoFailure.wrap<int, int>(

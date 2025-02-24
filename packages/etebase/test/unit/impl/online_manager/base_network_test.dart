@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -50,7 +52,7 @@ void main() {
 
     late BaseNetwork sut;
 
-    setUp(() async {
+    setUp(() {
       reset(mockNetworkClient);
       reset(mockConverter);
       reset(mockClient);
@@ -83,7 +85,7 @@ void main() {
 
     group('invoke', () {
       group('(requests)', () {
-        setUp(() async {
+        setUp(() {
           when(
             mockClient.send(any),
           ).thenReturnAsync(StreamedResponse(const Stream.empty(), 200));
@@ -239,7 +241,7 @@ void main() {
         testData(
           'is successful for 2XX status codes',
           [200, 201, 202, 204, 299],
-          (fixture) async {
+          (fixture) {
             when(
               mockClient.send(any),
             ).thenReturnAsync(StreamedResponse(const Stream.empty(), fixture));
@@ -316,7 +318,7 @@ void main() {
         testData(
           'throws for other, unsupported content types',
           [null, 'application/json', 'text/xml'],
-          (fixture) async {
+          (fixture) {
             when(mockClient.send(any)).thenReturnAsync(
               StreamedResponse(
                 const Stream.empty(),
@@ -358,7 +360,7 @@ void main() {
             599,
             600,
           ],
-          (fixture) async {
+          (fixture) {
             when(
               mockClient.send(any),
             ).thenReturnAsync(StreamedResponse(const Stream.empty(), fixture));
@@ -370,7 +372,7 @@ void main() {
         testData(
           'uses body as message if body is any kind of text',
           ['text/plain', 'text/xml', 'text/custom'],
-          (fixture) async {
+          (fixture) {
             const testMessage = 'test-error-message';
             when(mockClient.send(any)).thenReturnAsync(
               StreamedResponse(
@@ -479,7 +481,7 @@ void main() {
             (utf8.encode('message'), null),
             (utf8.encode('message'), 'application/json'),
           ],
-          (fixture) async {
+          (fixture) {
             when(mockClient.send(any)).thenReturnAsync(
               StreamedResponse(
                 Stream.value(fixture.$1),
@@ -524,7 +526,7 @@ void main() {
             (513, isA<ServerProblem>(), ServerProblem),
             (599, isA<ServerProblem>(), ServerProblem),
           ],
-          (fixture) async {
+          (fixture) {
             when(mockClient.send(any)).thenReturnAsync(
               StreamedResponse(const Stream.empty(), fixture.$1),
             );
@@ -545,7 +547,7 @@ void main() {
           },
         );
 
-        test('throws ConnectionProblem if sending the request fails', () async {
+        test('throws ConnectionProblem if sending the request fails', () {
           final testException = ClientException('test-error');
           when(mockClient.send(any)).thenThrow(testException);
 

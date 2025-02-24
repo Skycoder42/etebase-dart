@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -50,7 +52,7 @@ void main() {
     final mockMessagePackConverter = MockMessagePackConverter();
     final mockCryptoService = MockCryptoService();
 
-    setUp(() async {
+    setUp(() {
       reset(mockClient);
       reset(mockItem);
       reset(mockAccountCm);
@@ -328,11 +330,10 @@ void main() {
       late EncryptedCollection sut;
 
       void setupWithCm<T>() =>
-      // ignore: discarded_futures
-      when(mockItem.withCm<T>(any, any, any)).thenAnswer((i) async {
-        final [_, _, WithCmCallback<T> cb] = i.positionalArguments;
-        return await cb(mockItemCm);
-      });
+          when(mockItem.withCm<T>(any, any, any)).thenAnswer((i) async {
+            final [_, _, WithCmCallback<T> cb] = i.positionalArguments;
+            return await cb(mockItemCm);
+          });
 
       setUp(() async {
         when(mockCryptoService.secureRandom(any)).thenReturn(testKey);
@@ -626,7 +627,7 @@ void main() {
         });
       });
 
-      test('getCryptoManager creates collection crypto manager', () async {
+      test('getCryptoManager creates collection crypto manager', () {
         final result = sut.getCryptoManager(mockClient, mockAccountCm);
 
         expect(result, same(mockColCm));

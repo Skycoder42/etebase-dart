@@ -1,7 +1,10 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:etebase/etebase.dart';
+import 'package:etebase/src/api/exceptions/not_found.dart';
+import 'package:etebase/src/api/models/etebase_user.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/models/challenge_request.dart';
 import 'package:etebase/src/impl/models/dashboard_url.dart';
@@ -35,14 +38,13 @@ void main() {
 
     late Authenticator sut;
 
-    setUp(() async {
+    setUp(() {
       reset(mockNetwork);
 
       sut = Authenticator.fromNetwork(mockNetwork);
     });
 
     PostExpectation<Future<T>> whenInvoke<T>() => when(
-      // ignore: discarded_futures
       mockNetwork.invoke<T>(
         method: anyNamed('method'),
         path: anyNamed('path'),
@@ -131,7 +133,7 @@ void main() {
           encryptedContent: Uint8List(2),
         ),
       ),
-      call: (r) async => sut.signup(r),
+      call: (r) => sut.signup(r),
       method: HttpMethod.post,
       path: ['signup'],
     );
@@ -144,7 +146,7 @@ void main() {
         salt: Uint8List(2),
         version: 1,
       ),
-      call: (r) async => sut.loginChallenge(r),
+      call: (r) => sut.loginChallenge(r),
       method: HttpMethod.post,
       path: ['login_challenge'],
     );
@@ -161,7 +163,7 @@ void main() {
           encryptedContent: Uint8List(2),
         ),
       ),
-      call: (r) async => sut.login(r),
+      call: (r) => sut.login(r),
       method: HttpMethod.post,
       path: ['login'],
     );
@@ -170,7 +172,7 @@ void main() {
       'logout sends request to backend with auth token',
       request: null,
       response: null,
-      call: (r) async => sut.logout(const AuthToken('test')),
+      call: (r) => sut.logout(const AuthToken('test')),
       method: HttpMethod.post,
       path: ['logout'],
       authToken: const AuthToken('test'),
@@ -180,7 +182,7 @@ void main() {
       'changePassword sends request to backend with auth token',
       request: LoginRequest(response: Uint8List(1), signature: Uint8List(2)),
       response: null,
-      call: (r) async => sut.changePassword(const AuthToken('test'), r),
+      call: (r) => sut.changePassword(const AuthToken('test'), r),
       method: HttpMethod.post,
       path: ['change_password'],
       authToken: const AuthToken('test'),
