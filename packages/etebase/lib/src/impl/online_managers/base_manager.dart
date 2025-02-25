@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_prefetch_option.dart';
-import '../codec/message_pack_converter.dart';
 import '../models/auth_token.dart';
 import '../models/fetch_options.dart';
 import 'base_network.dart';
@@ -29,14 +28,15 @@ base class BaseManager {
          path: apiBasePath.followedBy(path),
        );
 
-  NetworkClient get client => _network.client;
+  @visibleForTesting
+  BaseManager.fromNetwork(this._network, this.authTokenSource);
 
-  Uri get baseUrl => _network.client.baseUrl;
+  @protected
+  @visibleForTesting
+  NetworkClient get client => _network.client;
 
   @visibleForTesting
   Uri get apiUrl => _network.apiUrl;
-
-  MessagePackConverter get converter => _network.client.converter;
 
   Future<T> invoke<T>({
     HttpMethod method = HttpMethod.get,

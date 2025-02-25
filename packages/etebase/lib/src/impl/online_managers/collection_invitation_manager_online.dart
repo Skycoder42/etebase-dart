@@ -15,16 +15,25 @@ final class CollectionInvitationManagerOnline extends BaseManager {
     required super.authTokenSource,
   }) : super(path: const ['invitation']);
 
+  @visibleForTesting
+  CollectionInvitationManagerOnline.fromNetwork(
+    super._network,
+    super.authTokenSource,
+    // ignore: invalid_use_of_visible_for_testing_member for tests
+  ) : super.fromNetwork();
+
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming(
     EtebaseIteratorFetchOptions? options,
   ) => invoke<EtebaseIteratorListResponse<SignedInvitationRead>>(
     path: const ['incoming'],
+    options: options,
   );
 
   Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing(
     EtebaseIteratorFetchOptions? options,
   ) => invoke<EtebaseIteratorListResponse<SignedInvitationRead>>(
     path: const ['outgoing'],
+    options: options,
   );
 
   Future<void> accept(

@@ -20,7 +20,7 @@ export 'library_loader_stub.dart'
 final _rng = Random.secure();
 final _uuid = Uuid(goptions: GlobalOptions(CryptoRNG()));
 
-final serverUri = Uri.http('localhost:3735', '/');
+final serverUri = Uri.http('localhost:3735');
 
 String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
 

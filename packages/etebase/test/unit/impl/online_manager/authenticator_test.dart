@@ -16,15 +16,11 @@ import 'package:etebase/src/impl/models/user.dart';
 import 'package:etebase/src/impl/online_managers/authenticator.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
 import 'package:http/http.dart';
-import 'package:meta/meta.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
-@GenerateNiceMocks([MockSpec<BaseNetwork>(), MockSpec<NetworkClient>()])
-import 'authenticator_test.mocks.dart';
+import 'online_manager_mocks.dart';
 
 void main() {
   setUpAll(() {
@@ -32,8 +28,6 @@ void main() {
   });
 
   group('$Authenticator', () {
-    final testBaseUri = Uri.http('example.com', '/base');
-
     final mockNetwork = MockBaseNetwork();
 
     late Authenticator sut;
@@ -44,48 +38,8 @@ void main() {
       sut = Authenticator.fromNetwork(mockNetwork);
     });
 
-    PostExpectation<Future<T>> whenInvoke<T>() => when(
-      mockNetwork.invoke<T>(
-        method: anyNamed('method'),
-        path: anyNamed('path'),
-        headers: anyNamed('headers'),
-        query: anyNamed('query'),
-        body: anyNamed('body'),
-        authToken: anyNamed('authToken'),
-      ),
-    );
-
-    @isTest
-    void testInvoke<TReq, TRes>(
-      String description, {
-      required TReq request,
-      required TRes response,
-      required Future<TRes> Function(TReq r) call,
-      HttpMethod method = HttpMethod.get,
-      List<String> path = const [],
-      Map<String, String> headers = const {},
-      Map<String, String> query = const {},
-      AuthToken? authToken,
-    }) => test(description, () async {
-      whenInvoke<TRes>().thenReturnAsync(response);
-
-      final result = await call(request);
-
-      expect(result, response);
-
-      verify(
-        mockNetwork.invoke<TRes>(
-          method: method,
-          path: path,
-          headers: headers,
-          query: query,
-          body: request,
-          authToken: authToken,
-        ),
-      );
-    });
-
     test('constructs base network from client and base path', () {
+      final testBaseUri = Uri.http('example.com', '/base');
       final mockNetworkClient = MockNetworkClient();
       when(mockNetworkClient.baseUrl).thenReturn(testBaseUri);
 
@@ -107,7 +61,7 @@ void main() {
       });
 
       test('returns false if server returns not found', () async {
-        whenInvoke<void>().thenThrow(NotFound('test'));
+        whenInvoke<void>(mockNetwork).thenThrow(NotFound('test'));
 
         final result = await sut.isEtebase();
 
@@ -117,6 +71,7 @@ void main() {
 
     testInvoke(
       'signup sends request to backend',
+      mock: mockNetwork,
       request: SignupRequest(
         user: const EtebaseUser(username: 'test-username', email: 'test-email'),
         salt: Uint8List(1),
@@ -140,6 +95,7 @@ void main() {
 
     testInvoke(
       'loginChallenge sends request to backend',
+      mock: mockNetwork,
       request: const ChallengeRequest(username: 'username'),
       response: LoginChallenge(
         challenge: Uint8List(1),
@@ -153,6 +109,7 @@ void main() {
 
     testInvoke(
       'login sends request to backend',
+      mock: mockNetwork,
       request: LoginRequest(response: Uint8List(1), signature: Uint8List(2)),
       response: LoginResponse(
         token: 'test-token',
@@ -170,6 +127,7 @@ void main() {
 
     testInvoke<void, void>(
       'logout sends request to backend with auth token',
+      mock: mockNetwork,
       request: null,
       response: null,
       call: (r) => sut.logout(const AuthToken('test')),
@@ -180,6 +138,7 @@ void main() {
 
     testInvoke<LoginRequest, void>(
       'changePassword sends request to backend with auth token',
+      mock: mockNetwork,
       request: LoginRequest(response: Uint8List(1), signature: Uint8List(2)),
       response: null,
       call: (r) => sut.changePassword(const AuthToken('test'), r),
@@ -187,9 +146,10 @@ void main() {
       path: ['change_password'],
       authToken: const AuthToken('test'),
     );
+
     test('getDashboardUrl sends request to backend with auth token', () async {
       final response = DashboardUrl(Uri.parse('http://example.com/dash'));
-      whenInvoke<DashboardUrl>().thenReturnAsync(response);
+      whenInvoke<DashboardUrl>(mockNetwork).thenReturnAsync(response);
 
       final result = await sut.getDashboardUrl(const AuthToken('test'));
 
