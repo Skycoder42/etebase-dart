@@ -86,7 +86,9 @@ class CollectionManager implements EtebaseCollectionManager {
   ]) async {
     final col = collection.encrypted;
     if (col.lastEtag != null) {
-      await _online.itemManager(col.uid).batch([col.item], null, fetchOptions);
+      await _online
+          .itemManager(col.uid)
+          .batch([col.item], null, fetchOptions?.asItemOptions());
     } else {
       await _online.create(col, fetchOptions);
     }
@@ -102,7 +104,7 @@ class CollectionManager implements EtebaseCollectionManager {
     if (col.lastEtag != null) {
       await _online
           .itemManager(col.uid)
-          .transaction([col.item], null, fetchOptions);
+          .transaction([col.item], null, fetchOptions?.asItemOptions());
     } else {
       await _online.create(col, fetchOptions);
     }

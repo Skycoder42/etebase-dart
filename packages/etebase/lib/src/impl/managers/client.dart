@@ -4,6 +4,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/managers/crypto_executor.dart';
@@ -83,6 +84,9 @@ class Client implements EtebaseClient, NetworkClient {
   ) => converter.addCustom<TMeta>(fromJson);
 
   // factory methods for internal types to simplify testing
+
+  @override
+  WebSocketChannel connectWebSocket(Uri uri) => WebSocketChannel.connect(uri);
 
   Future<Account> restoreAccount(
     Uint8List accountDataStored, [

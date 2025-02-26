@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:web_socket_channel/status.dart' as status;
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../api/exceptions/api_missuse.dart';
+import '../../api/exceptions/connection_problem.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_list_response.dart';
 import '../encrypted_models/chunk.dart';
@@ -23,6 +23,13 @@ final class CollectionItemManagerOnline extends BaseManager {
     required super.authTokenSource,
     required String colUid,
   }) : super(path: ['collection', colUid, 'item']);
+
+  @visibleForTesting
+  CollectionItemManagerOnline.fromNetwork(
+    super._network,
+    super.authTokenSource,
+    // ignore: invalid_use_of_visible_for_testing_member for tests
+  ) : super.fromNetwork();
 
   Future<EncryptedCollectionItem> fetch(
     String itemUid,
@@ -73,7 +80,7 @@ final class CollectionItemManagerOnline extends BaseManager {
   Future<void> batch(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
-    /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
+    EtebaseItemFetchOptions? options,
   ) => invoke<void>(
     method: HttpMethod.post,
     path: const ['batch'],
@@ -87,7 +94,7 @@ final class CollectionItemManagerOnline extends BaseManager {
   Future<void> transaction(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
-    /*EtebaseItemFetchOptions*/ EtebaseFetchOptionsBase? options,
+    EtebaseItemFetchOptions? options,
   ) => invoke<void>(
     method: HttpMethod.post,
     path: const ['transaction'],
@@ -131,12 +138,12 @@ final class CollectionItemManagerOnline extends BaseManager {
       method: HttpMethod.post,
       path: ['subscription-ticket'],
     );
-    final ws = WebSocketChannel.connect(
+    final ws = client.connectWebSocket(
       client.baseUrl.replace(
         scheme: client.baseUrl.isScheme('http') ? 'ws' : 'wss',
         pathSegments: client.baseUrl.pathSegments
             .followedBy(BaseManager.apiBasePath)
-            .followedBy(['ws', ticket.ticket]),
+            .followedBy(['ws', ticket.ticket, '']),
         queryParameters: {
           ...client.baseUrl.queryParameters,
           ...queryFromOptions(options),
@@ -147,6 +154,8 @@ final class CollectionItemManagerOnline extends BaseManager {
     try {
       await ws.ready;
       yield* ws.stream.cast<Uint8List>().map(client.converter.decode);
+    } on Exception catch (e, s) {
+      Error.throwWithStackTrace(ConnectionProblem(e), s);
     } finally {
       await ws.sink.close(status.normalClosure);
     }

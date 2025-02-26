@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:meta/meta.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../api/exceptions/conflict.dart';
 import '../../api/exceptions/connection_problem.dart';
@@ -36,6 +37,8 @@ abstract interface class NetworkClient {
   String get userAgent;
   MessagePackConverter get converter;
   Uri get baseUrl;
+
+  WebSocketChannel connectWebSocket(Uri uri);
 }
 
 @internal

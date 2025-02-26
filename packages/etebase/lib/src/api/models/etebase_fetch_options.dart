@@ -56,3 +56,9 @@ sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
 
   const EtebaseFetchOptionsBase._();
 }
+
+@internal
+extension EtebaseFetchOptionsX on EtebaseFetchOptions {
+  EtebaseItemFetchOptions asItemOptions() =>
+      EtebaseItemFetchOptions(limit: limit, stoken: stoken, prefetch: prefetch);
+}
