@@ -18,7 +18,7 @@ dependencies:
   msgpack_codec: ^2.0.1
   sodium: ^3.4.4
   synchronized: ^3.3.1
-  web: ^1.1.0
+  web: ^1.1.1
   web_socket_channel: ^3.0.2
 
 dev_dependencies:

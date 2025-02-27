@@ -16,6 +16,13 @@ final class CollectionMemberManagerOnline extends BaseManager {
     required String colUid,
   }) : super(path: ['collection', colUid, 'member']);
 
+  @visibleForTesting
+  CollectionMemberManagerOnline.fromNetwork(
+    super._network,
+    super.authTokenSource,
+    // ignore: invalid_use_of_visible_for_testing_member for tests
+  ) : super.fromNetwork();
+
   Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list(
     EtebaseIteratorFetchOptions? options,
   ) => invoke<EtebaseIteratorListResponse<EtebaseCollectionMember>>(

@@ -17,6 +17,13 @@ final class CollectionManagerOnline extends BaseManager {
     required super.authTokenSource,
   }) : super(path: const ['collection']);
 
+  @visibleForTesting
+  CollectionManagerOnline.fromNetwork(
+    super._network,
+    super.authTokenSource,
+    // ignore: invalid_use_of_visible_for_testing_member for tests
+  ) : super.fromNetwork();
+
   CollectionItemManagerOnline itemManager(String colUid) =>
       CollectionItemManagerOnline(
         client: client,
