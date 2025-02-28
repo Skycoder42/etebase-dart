@@ -88,17 +88,6 @@ class Client implements EtebaseClient, NetworkClient {
   @override
   WebSocketChannel connectWebSocket(Uri uri) => WebSocketChannel.connect(uri);
 
-  Future<Account> restoreAccount(
-    Uint8List accountDataStored, [
-    SecureKey? encryptionKey,
-  ]) => Account.restore(this, accountDataStored, encryptionKey);
-
-  Future<HiveCache> createCache(String username) async {
-    final cache = HiveCache(this, Hive, username);
-    await cache.initialize();
-    return cache;
-  }
-
   Future<EncryptedRevision> createEncryptedRevision({
     required CollectionItemCryptoManager cryptoManager,
     required Uint8List additionalData,
@@ -118,4 +107,15 @@ class Client implements EtebaseClient, NetworkClient {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) => EncryptedCollectionItem.create(this, parentCm, meta, content);
+
+  Future<Account> restoreAccount(
+    Uint8List accountDataStored, [
+    SecureKey? encryptionKey,
+  ]) => Account.restore(this, accountDataStored, encryptionKey);
+
+  Future<HiveCache> createCache(String username) async {
+    final cache = HiveCache(this, Hive, username);
+    await cache.initialize();
+    return cache;
+  }
 }

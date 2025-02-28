@@ -1,4 +1,5 @@
 import 'package:dart_test_tools/test.dart';
+// ignore: no_self_package_imports because the generated file is allowed
 import 'package:etebase/gen/package_metadata.dart';
 import 'package:etebase/src/impl/online_managers/platform/user_agent_stub.dart';
 import 'package:test/test.dart';

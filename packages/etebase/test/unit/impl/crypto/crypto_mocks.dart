@@ -44,7 +44,7 @@ class FakeSecureKey extends Fake implements SecureKey {
 
   @override
   T runUnlockedSync<T>(SecureCallbackFn<T> callback, {bool writable = false}) {
-    if (writable) {
+    if (writable || writeBuffer != null) {
       return callback(writeBuffer!);
     } else {
       return callback(
@@ -63,7 +63,7 @@ class FakeSecureKey extends Fake implements SecureKey {
     SecureCallbackFn<FutureOr<T>> callback, {
     bool writable = false,
   }) {
-    if (writable) {
+    if (writable || writeBuffer != null) {
       return callback(writeBuffer!);
     } else {
       return callback(
@@ -222,4 +222,22 @@ Matcher concatenated(List<int> first, List<int> second) => allOf(
     first.length + second.length,
   ),
   equals([...first, ...second]),
+);
+
+Matcher concatenatedSecure(
+  dynamic firstId,
+  dynamic secondId, {
+  bool async = false,
+}) => allOf(
+  isA<Uint8List>().having((m) => m.length, 'length', 10),
+  equals([
+    // prefix 1
+    0xDE, 0xAD, 0xBE, if (async) 0xAD else 0xEF,
+    // id 1
+    firstId,
+    // prefix 2
+    0xDE, 0xAD, 0xBE, if (async) 0xAD else 0xEF,
+    // id 2
+    secondId,
+  ]),
 );

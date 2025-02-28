@@ -3,6 +3,7 @@ library;
 
 import 'dart:io';
 
+// ignore: no_self_package_imports because the generated file is allowed
 import 'package:etebase/gen/package_metadata.dart';
 import 'package:etebase/src/impl/online_managers/platform/user_agent_vm.dart';
 import 'package:test/test.dart';
