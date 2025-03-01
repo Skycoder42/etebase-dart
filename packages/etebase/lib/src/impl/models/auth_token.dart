@@ -1,17 +1,23 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../api/exceptions/unauthorized.dart';
 
-@internal
-class AuthToken {
-  final String value;
+part 'auth_token.freezed.dart';
 
+@internal
+@Freezed(toStringOverride: false)
+class AuthToken with _$AuthToken {
   static const empty = AuthToken('');
 
-  const AuthToken(this.value);
+  const factory AuthToken(String value) = _AuthToken;
+
+  const AuthToken._();
 
   String get header =>
       value.isEmpty
           ? throw Unauthorized('The account is logged out!')
           : 'Token $value';
+
+  @override
+  String toString() => '${value.substring(0, 2)}${'*' * (value.length - 2)}';
 }

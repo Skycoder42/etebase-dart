@@ -13,5 +13,12 @@ void main() {
     test('throws if token is empty', () {
       expect(() => AuthToken.empty.header, throwsA(isA<Unauthorized>()));
     });
+
+    test('hides token value from printing', () {
+      expect(
+        const AuthToken('very-secret-value').toString(),
+        've***************',
+      );
+    });
   });
 }
