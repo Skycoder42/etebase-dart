@@ -6,7 +6,7 @@ part 'auth_token.freezed.dart';
 
 @internal
 @Freezed(toStringOverride: false)
-class AuthToken with _$AuthToken {
+sealed class AuthToken with _$AuthToken {
   static const empty = AuthToken('');
 
   const factory AuthToken(String value) = _AuthToken;
