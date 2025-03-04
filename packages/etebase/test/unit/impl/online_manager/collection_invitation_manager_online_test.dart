@@ -39,6 +39,10 @@ void main() {
 
     late CollectionInvitationManagerOnline sut;
 
+    setUpAll(() {
+      provideDummy(testAuthToken);
+    });
+
     setUp(() {
       reset(mockBaseNetwork);
       reset(mockAuthTokenSource);

@@ -30,6 +30,10 @@ void main() {
 
     late BaseManager sut;
 
+    setUpAll(() {
+      provideDummy(testAuthToken);
+    });
+
     setUp(() {
       reset(mockBaseNetwork);
       reset(mockAuthTokenSource);
