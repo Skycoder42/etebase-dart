@@ -11,8 +11,11 @@ import 'package:etebase/src/impl/crypto/crypto_utils.dart';
 import 'package:etebase/src/impl/crypto/key_derivator.dart';
 import 'package:etebase/src/impl/crypto/login_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/main_crypto_manager.dart';
+import 'package:etebase/src/impl/crypto/storage_crypto_manager.dart';
 import 'package:etebase/src/impl/managers/account.dart';
 import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/models/account_data.dart';
+import 'package:etebase/src/impl/models/account_data_stored.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/models/challenge_request.dart';
 import 'package:etebase/src/impl/models/challenge_response.dart';
@@ -35,6 +38,7 @@ import '../crypto/crypto_mocks.dart';
   MockSpec<AccountCryptoManager>(),
   MockSpec<BoxCryptoManager>(),
   MockSpec<LoginCryptoManager>(),
+  MockSpec<StorageCryptoManager>(),
   MockSpec<CryptoService>(),
   MockSpec<KeyDerivator>(),
   MockSpec<Authenticator>(),
@@ -62,6 +66,7 @@ void main() {
     final mockAccountCM = MockAccountCryptoManager();
     final mockIdCM = MockBoxCryptoManager();
     final mockLoginCM = MockLoginCryptoManager();
+    final mockStorageCM = MockStorageCryptoManager();
     final mockCryptoService = MockCryptoService();
     final mockKeyDerivator = MockKeyDerivator();
     final mockAuthenticator = MockAuthenticator();
@@ -73,6 +78,7 @@ void main() {
       reset(mockAccountCM);
       reset(mockIdCM);
       reset(mockLoginCM);
+      reset(mockStorageCM);
       reset(mockCryptoService);
       reset(mockKeyDerivator);
       reset(mockAuthenticator);
@@ -93,6 +99,12 @@ void main() {
       when(
         mockCryptoService.createIdentityCryptoManager(any),
       ).thenReturn(mockIdCM);
+      when(
+        mockCryptoService.createStorageCryptoManager(
+          any,
+          version: anyNamed('version'),
+        ),
+      ).thenReturn(mockStorageCM);
 
       when(mockMainCM.createLoginCryptoManager()).thenReturn(mockLoginCM);
       when(
@@ -318,6 +330,98 @@ void main() {
           expect(testDecryptedKey.disposed, isTrue);
           expect(testAccKey.disposed, isFalse);
           expect(testIdPrivKey.disposed, isFalse);
+        });
+
+        test('cleans up resources if login fails', () async {
+          final testException = Exception('test-exception');
+
+          when(mockAuthenticator.login(any)).thenThrow(testException);
+
+          await expectLater(
+            () => Account.login(mockClient, testUserName, testPassword),
+            throwsA(testException),
+          );
+
+          verify(mockLoginCM.dispose());
+          verify(mockMainCM.dispose());
+        });
+      });
+
+      group('restore', () {
+        final testAccountData = AccountData(
+          user: testUser,
+          authToken: testToken,
+          serverUrl: testBaseUrl,
+          version: 39,
+          key: Uint8List.fromList([44, 123, 1]),
+        );
+        final testAccountDataBytes = Uint8List.fromList([4, 122, 1]);
+        final testEncryptedData = Uint8List.fromList([9, 87, 213]);
+        const testVersion = 93;
+        final testAccountDataStored = AccountDataStored(
+          version: testVersion,
+          encryptedData: testEncryptedData,
+        );
+        final testAccountDataStoredBytes = Uint8List.fromList([4, 12, 33]);
+        final testEncryptionKey = FakeSecureKey(123);
+        final testAccountKey = FakeSecureKey(54);
+
+        setUp(() {
+          provideDummy(testAccountData);
+          provideDummy(testAccountDataStored);
+
+          when(
+            mockConverter.decode<AccountDataStored>(testAccountDataStoredBytes),
+          ).thenReturn(testAccountDataStored);
+          when(
+            mockConverter.decode<AccountData>(testEncryptedData),
+          ).thenReturn(testAccountData);
+
+          when(
+            mockStorageCM.decrypt(any, any),
+          ).thenReturn(testAccountDataBytes);
+          when(mockStorageCM.decryptKey(any)).thenReturn(testAccountKey);
+        });
+
+        test('restores account from raw data', () async {
+          final result = await Account.restore(
+            mockClient,
+            testAccountDataStoredBytes,
+            testEncryptionKey,
+          );
+
+          expect(result.accountCryptoManager, same(mockAccountCM));
+          expect(result.identityCryptoManager, same(mockIdCM));
+          expect(result.authToken, const AuthToken(testToken));
+
+          verifyInOrder([
+            mockConverter.decode<AccountDataStored>(testAccountDataStoredBytes),
+            mockCryptoService.createStorageCryptoManager(
+              argThat(isKey(124)),
+              version: testVersion,
+            ),
+            mockStorageCM.decrypt(
+              testEncryptedData,
+              CryptoUtils.uint32ToUint8List(testVersion),
+            ),
+            mockConverter.decode<AccountData>(testAccountDataBytes),
+            mockStorageCM.decryptKey(testAccountData.key),
+            mockCryptoService.createMainCryptoManager(
+              testAccountKey,
+              version: testAccountData.version,
+            ),
+            // create account
+            mockMainCM.decryptKey(testEncryptedContent),
+            mockCryptoService.secureCopy(testDecryptedKeyData1),
+            mockCryptoService.secureCopy(testDecryptedKeyData2),
+            mockMainCM.createAccountCryptoManager(testAccKey),
+            mockMainCM.createIdentityCryptoManager(testIdPrivKey),
+            // disposes
+            mockStorageCM.dispose(),
+          ]);
+          verifyNever(mockMainCM.dispose());
+          verifyNever(mockAccountCM.dispose());
+          verifyNever(mockIdCM.dispose());
         });
       });
     });

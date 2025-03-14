@@ -37,5 +37,5 @@
 		},
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
-	"postCreateCommand": "melos run pre-commit:init"
+	"postCreateCommand": "tool/setup-git-hooks.sh"
 }

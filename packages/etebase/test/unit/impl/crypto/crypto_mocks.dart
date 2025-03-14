@@ -78,6 +78,9 @@ class FakeSecureKey extends Fake implements SecureKey {
   }
 
   @override
+  SecureKey copy() => FakeSecureKey(id + 1);
+
+  @override
   String toString() => 'FakeSecureKey($id)';
 }
 
