@@ -50,16 +50,16 @@ abstract interface class EtebaseItemMetadata {
       _$EtebaseItemMetadataImplFromJson(json);
 }
 
+@internal
 @Freezed(fromJson: true, toJson: true, copyWith: true)
-sealed class _EtebaseItemMetadataImpl
-    with _$EtebaseItemMetadataImpl
-    implements EtebaseItemMetadata {
+sealed class EtebaseItemMetadataImpl with _$EtebaseItemMetadataImpl {
   @JsonSerializable(includeIfNull: false)
-  const factory _EtebaseItemMetadataImpl({
+  @Implements<EtebaseItemMetadata>()
+  const factory EtebaseItemMetadataImpl({
     String? color,
     String? description,
     @dateTimeMillis DateTime? mtime,
     String? name,
     String? itemType,
-  }) = __EtebaseItemMetadataImpl;
+  }) = _EtebaseItemMetadataImpl;
 }

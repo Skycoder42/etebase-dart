@@ -42,11 +42,7 @@ sealed class SignedInvitation with _$SignedInvitation {
   const SignedInvitation._();
 
   Map<String, dynamic> toJson() => switch (this) {
-    final SignedInvitationWrite w => _$$SignedInvitationWriteImplToJson(
-      w as _$SignedInvitationWriteImpl,
-    ),
-    final SignedInvitationRead r => _$$SignedInvitationReadImplToJson(
-      r as _$SignedInvitationReadImpl,
-    ),
+    final SignedInvitationWrite w => _$SignedInvitationWriteToJson(w),
+    final SignedInvitationRead r => _$SignedInvitationReadToJson(r),
   }..remove('runtimeType');
 }

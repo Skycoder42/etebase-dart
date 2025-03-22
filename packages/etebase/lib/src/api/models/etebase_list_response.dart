@@ -89,21 +89,21 @@ sealed class EtebaseListResponse<T extends Object>
   static EtebaseItemListResponse<T> itemFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) => _$$EtebaseItemListResponseImplFromJson(json, fromJsonT);
+  ) => _$EtebaseItemListResponseFromJson(json, fromJsonT);
 
   /// @nodoc
   @internal
   static EtebaseCollectionListResponse<T> collectionFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) => _$$EtebaseCollectionListResponseImplFromJson(json, fromJsonT);
+  ) => _$EtebaseCollectionListResponseFromJson(json, fromJsonT);
 
   /// @nodoc
   @internal
   static EtebaseIteratorListResponse<T> iteratorFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) => _$$EtebaseIteratorListResponseImplFromJson(json, fromJsonT);
+  ) => _$EtebaseIteratorListResponseFromJson(json, fromJsonT);
 }
 
 mixin _ItemMixin<T extends Object> on EtebaseListResponse<T> {
@@ -117,8 +117,8 @@ mixin _ItemMixin<T extends Object> on EtebaseListResponse<T> {
   );
 
   @override
-  Map<String, dynamic> toJson() => _$$EtebaseItemListResponseImplToJson<T>(
-    this as _$EtebaseItemListResponseImpl<T>,
+  Map<String, dynamic> toJson() => _$EtebaseItemListResponseToJson<T>(
+    this as EtebaseItemListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );
@@ -137,12 +137,11 @@ mixin _CollectionMixin<T extends Object> on EtebaseListResponse<T> {
   );
 
   @override
-  Map<String, dynamic> toJson() =>
-      _$$EtebaseCollectionListResponseImplToJson<T>(
-        this as _$EtebaseCollectionListResponseImpl<T>,
-        // ignore: avoid_dynamic_calls
-        (dynamic value) => value.toJson(),
-      );
+  Map<String, dynamic> toJson() => _$EtebaseCollectionListResponseToJson<T>(
+    this as EtebaseCollectionListResponse<T>,
+    // ignore: avoid_dynamic_calls
+    (dynamic value) => value.toJson(),
+  );
 }
 
 mixin _IteratorMixin<T extends Object> on EtebaseListResponse<T> {
@@ -156,8 +155,8 @@ mixin _IteratorMixin<T extends Object> on EtebaseListResponse<T> {
   );
 
   @override
-  Map<String, dynamic> toJson() => _$$EtebaseIteratorListResponseImplToJson<T>(
-    this as _$EtebaseIteratorListResponseImpl<T>,
+  Map<String, dynamic> toJson() => _$EtebaseIteratorListResponseToJson<T>(
+    this as EtebaseIteratorListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );

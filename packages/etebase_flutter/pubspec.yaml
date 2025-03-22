@@ -15,12 +15,12 @@ dependencies:
   hive_ce_flutter: ^2.2.0
   meta: ^1.16.0
   package_info_plus: ^8.3.0
-  sodium_libs: ^3.4.3+2
+  sodium_libs: ^3.4.4+1
 
 dev_dependencies:
-  custom_lint: ^0.7.3
-  dart_pre_commit: ^5.4.3
-  dart_test_tools: ^6.1.0
+  custom_lint: ^0.7.5
+  dart_pre_commit: ^5.4.4
+  dart_test_tools: ^6.1.1
 
 cider:
   link_template:

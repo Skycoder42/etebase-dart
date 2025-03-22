@@ -32,7 +32,8 @@ export 'src/api/models/etebase_collection_member.dart';
 export 'src/api/models/etebase_fetch_options.dart'
     hide EtebaseFetchOptionsBase, EtebaseFetchOptionsX;
 export 'src/api/models/etebase_item.dart';
-export 'src/api/models/etebase_item_metadata.dart';
+export 'src/api/models/etebase_item_metadata.dart'
+    hide $EtebaseItemMetadataImplCopyWith, EtebaseItemMetadataImpl;
 export 'src/api/models/etebase_list_response.dart';
 export 'src/api/models/etebase_prefetch_option.dart';
 export 'src/api/models/etebase_removed_collection.dart';
