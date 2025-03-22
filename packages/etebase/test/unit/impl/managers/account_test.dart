@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/models/etebase_user.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
@@ -29,9 +30,10 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
+
+// ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<Client>(),
   MockSpec<MainCryptoManager>(),
@@ -416,6 +418,40 @@ void main() {
             mockCryptoService.secureCopy(testDecryptedKeyData2),
             mockMainCM.createAccountCryptoManager(testAccKey),
             mockMainCM.createIdentityCryptoManager(testIdPrivKey),
+            // disposes
+            mockStorageCM.dispose(),
+          ]);
+          verifyNever(mockMainCM.dispose());
+          verifyNever(mockAccountCM.dispose());
+          verifyNever(mockIdCM.dispose());
+        });
+
+        test('throws if base url does not match', () async {
+          when(mockClient.baseUrl).thenReturn(Uri.http('localhost', '/other'));
+
+          when(
+            mockCryptoService.secureCopy(any),
+          ).thenReturnInOrder([testEncryptionKey, testAccKey, testIdPrivKey]);
+
+          await expectLater(
+            () => Account.restore(mockClient, testAccountDataStoredBytes),
+            throwsA(isA<ApiMissuse>()),
+          );
+
+          verifyInOrder([
+            mockConverter.decode<AccountDataStored>(testAccountDataStoredBytes),
+            mockCryptoService.secureCopy(
+              Uint8List.fromList(List.filled(CryptoUtils.symmetricKeySize, 0)),
+            ),
+            mockCryptoService.createStorageCryptoManager(
+              testEncryptionKey,
+              version: testVersion,
+            ),
+            mockStorageCM.decrypt(
+              testEncryptedData,
+              CryptoUtils.uint32ToUint8List(testVersion),
+            ),
+            mockConverter.decode<AccountData>(testAccountDataBytes),
             // disposes
             mockStorageCM.dispose(),
           ]);
