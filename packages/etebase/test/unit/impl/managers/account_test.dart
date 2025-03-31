@@ -15,6 +15,8 @@ import 'package:etebase/src/impl/crypto/main_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/storage_crypto_manager.dart';
 import 'package:etebase/src/impl/managers/account.dart';
 import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/collection_invitation_manager.dart';
+import 'package:etebase/src/impl/managers/collection_manager.dart';
 import 'package:etebase/src/impl/models/account_data.dart';
 import 'package:etebase/src/impl/models/account_data_stored.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
@@ -474,6 +476,205 @@ void main() {
           testToken,
           mockAccountCM,
           mockIdCM,
+        );
+      });
+
+      test('dispose disposes all attached managers and clears auth token', () {
+        sut.dispose();
+
+        verify(mockMainCM.dispose()).called(1);
+        verify(mockAccountCM.dispose()).called(1);
+        verify(mockIdCM.dispose()).called(1);
+
+        expect(sut.authToken, AuthToken.empty);
+      });
+
+      test('collectionManager returns single CollectionManager', () {
+        final result = sut.collectionManager;
+
+        expect(result, isA<CollectionManager>());
+        expect(sut.collectionManager, same(result));
+      });
+
+      test('invitationManager returns single CollectionInvitationManager', () {
+        final result = sut.invitationManager;
+
+        expect(result, isA<CollectionInvitationManager>());
+        expect(sut.invitationManager, same(result));
+      });
+
+      test('fetchToken fetches and updates the auth token', () async {
+        final testChallengeBytes = Uint8List.fromList([45, 4, 4]);
+        final testEncodedResponse = Uint8List.fromList([44, 12, 3, 11]);
+        final testSignature = Uint8List.fromList([32, 12, 22, 1]);
+        const testNewTokenValue = 'test-new-auth-token-value';
+        final testChallenge = LoginChallenge(
+          challenge: testChallengeBytes,
+          salt: Uint8List.fromList([2, 88]),
+          version: 3,
+        );
+        final testLoginResponse = LoginResponse(
+          token: testNewTokenValue,
+          user: testUser,
+        );
+
+        provideDummy(testChallenge);
+        provideDummy(testLoginResponse);
+
+        when(mockConverter.encode(any)).thenReturn(testEncodedResponse);
+        when(mockLoginCM.signDetached(any)).thenReturn(testSignature);
+        when(
+          mockAuthenticator.loginChallenge(any),
+        ).thenReturnAsync(testChallenge);
+        when(mockAuthenticator.login(any)).thenReturnAsync(testLoginResponse);
+
+        await sut.fetchToken();
+
+        expect(sut.authToken.value, testNewTokenValue);
+
+        verifyInOrder([
+          mockAuthenticator.loginChallenge(
+            const ChallengeRequest(username: testUserName),
+          ),
+          mockMainCM.createLoginCryptoManager(),
+          mockConverter.encode(
+            ChallengeResponse.login(
+              username: testUserName,
+              challenge: testChallengeBytes,
+              host: 'example.com',
+            ),
+          ),
+          mockLoginCM.signDetached(testEncodedResponse),
+          mockLoginCM.dispose(),
+          mockAuthenticator.login(
+            LoginRequest(
+              response: testEncodedResponse,
+              signature: testSignature,
+            ),
+          ),
+        ]);
+      });
+
+      test('logout requests logout and disposes the account', () async {
+        await sut.logout();
+
+        verify(mockAuthenticator.logout(const AuthToken(testToken))).called(1);
+        verify(mockMainCM.dispose()).called(1);
+        verify(mockAccountCM.dispose()).called(1);
+        verify(mockIdCM.dispose()).called(1);
+
+        expect(sut.authToken, AuthToken.empty);
+      });
+
+      group('changePassword', () {
+        const testNewPassword = 'new-password';
+        final testNewKey = FakeSecureKey(56);
+        final testEncodedResponse = Uint8List.fromList([44, 12, 3, 11]);
+        final testSignature = Uint8List.fromList([32, 12, 22, 1]);
+        final testEncodedAccountData = Uint8List.fromList([34, 44, 12]);
+        final testNewEncryptedContent = Uint8List.fromList([123, 11, 2]);
+        final testNewLoginPubKey = Uint8List.fromList([12, 1, 1, 9]);
+        final testChallengeBytes = Uint8List.fromList([93, 123, 1]);
+        final testSalt = Uint8List.fromList([45, 21, 11]);
+        final testChallenge = LoginChallenge(
+          challenge: testChallengeBytes,
+          salt: testSalt,
+          version: 3,
+        );
+
+        final mockMainCMNew = MockMainCryptoManager();
+        final mockLoginCMNew = MockLoginCryptoManager();
+
+        setUp(() {
+          reset(mockMainCMNew);
+          reset(mockLoginCMNew);
+
+          provideDummy(testChallenge);
+
+          when(mockConverter.encode(any)).thenReturn(testEncodedResponse);
+
+          when(
+            mockCryptoService.createMainCryptoManager(testNewKey),
+          ).thenReturn(mockMainCMNew);
+
+          when(
+            mockKeyDerivator.call(
+              salt: anyNamed('salt'),
+              password: anyNamed('password'),
+            ),
+          ).thenReturnAsync(testNewKey);
+
+          when(
+            mockAuthenticator.loginChallenge(any),
+          ).thenReturnAsync(testChallenge);
+
+          when(mockMainCM.decrypt(any)).thenReturn(testEncodedAccountData);
+
+          when(mockLoginCM.signDetached(any)).thenReturn(testSignature);
+
+          when(
+            mockMainCMNew.createLoginCryptoManager(),
+          ).thenReturn(mockLoginCMNew);
+          when(mockMainCMNew.encrypt(any)).thenReturn(testNewEncryptedContent);
+
+          when(mockLoginCMNew.pubkey).thenReturn(testNewLoginPubKey);
+        });
+
+        test('updates password generated keys locally and on server', () async {
+          await sut.changePassword(testNewPassword);
+
+          verifyInOrder([
+            mockAuthenticator.loginChallenge(
+              const ChallengeRequest(username: testUserName),
+            ),
+            mockKeyDerivator.call(salt: testSalt, password: testNewPassword),
+            mockCryptoService.createMainCryptoManager(testNewKey),
+            mockMainCMNew.createLoginCryptoManager(),
+            mockMainCM.decrypt(testEncryptedContent),
+            mockMainCMNew.encrypt(testEncodedAccountData),
+            mockMainCM.createLoginCryptoManager(),
+            mockConverter.encode(
+              ChallengeResponse.changePassword(
+                username: testUserName,
+                challenge: testChallengeBytes,
+                host: 'example.com',
+                loginPubkey: testNewLoginPubKey,
+                encryptedContent: testNewEncryptedContent,
+              ),
+            ),
+            mockLoginCM.signDetached(testEncodedResponse),
+            mockLoginCM.dispose(),
+            mockAuthenticator.changePassword(
+              const AuthToken(testToken),
+              LoginRequest(
+                response: testEncodedResponse,
+                signature: testSignature,
+              ),
+            ),
+            mockLoginCMNew.dispose(),
+            mockMainCM.dispose(),
+          ]);
+          verifyNever(mockMainCMNew.dispose());
+        });
+
+        test(
+          'disposes newly created manager if authentication fails',
+          () async {
+            final testException = Exception('test-exception');
+
+            when(
+              mockAuthenticator.changePassword(any, any),
+            ).thenThrow(testException);
+
+            await expectLater(
+              () => sut.changePassword(testNewPassword),
+              throwsA(testException),
+            );
+
+            verify(mockLoginCMNew.dispose());
+            verify(mockMainCMNew.dispose());
+            verifyNever(mockMainCM.dispose());
+          },
         );
       });
     });
