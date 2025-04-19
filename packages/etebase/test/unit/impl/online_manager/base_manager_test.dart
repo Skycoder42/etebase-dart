@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import '../../test_helpers.dart';
 import 'online_manager_mocks.dart';
 
-final class TestableBaseManager extends BaseManager {
+class TestableBaseManager extends BaseManager {
   TestableBaseManager({
     required super.client,
     required super.authTokenSource,

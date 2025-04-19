@@ -17,7 +17,7 @@ import 'base_manager.dart';
 import 'base_network.dart';
 
 @internal
-final class CollectionItemManagerOnline extends BaseManager {
+class CollectionItemManagerOnline extends BaseManager {
   CollectionItemManagerOnline({
     required super.client,
     required super.authTokenSource,

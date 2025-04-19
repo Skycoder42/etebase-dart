@@ -12,7 +12,7 @@ abstract interface class AuthTokenSource {
 }
 
 @internal
-base class BaseManager {
+class BaseManager {
   static const apiBasePath = ['api', 'v1'];
 
   final BaseNetwork _network;

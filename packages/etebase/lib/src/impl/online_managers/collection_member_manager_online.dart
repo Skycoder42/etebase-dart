@@ -9,7 +9,7 @@ import 'base_manager.dart';
 import 'base_network.dart';
 
 @internal
-final class CollectionMemberManagerOnline extends BaseManager {
+class CollectionMemberManagerOnline extends BaseManager {
   CollectionMemberManagerOnline({
     required super.client,
     required super.authTokenSource,
