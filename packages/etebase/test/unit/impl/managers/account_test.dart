@@ -677,6 +677,95 @@ void main() {
           },
         );
       });
+
+      test('fetchDashboardUrl requests the dashboard url', () async {
+        final testUrl = Uri.http('example.com', '/dashboard');
+
+        when(mockAuthenticator.getDashboardUrl(any)).thenReturnAsync(testUrl);
+
+        final result = await sut.fetchDashboardUrl();
+
+        verify(
+          mockAuthenticator.getDashboardUrl(const AuthToken(testToken)),
+        ).called(1);
+
+        expect(result, testUrl);
+      });
+
+      group('save', () {
+        test('return encrypted account data', () async {
+          const testVersion = 121;
+          final testEncryptionKey = FakeSecureKey(123);
+          final testMainKey = FakeSecureKey(98);
+          final testEncodedData = Uint8List.fromList([74, 23, 11]);
+          final testEncryptedData = Uint8List.fromList([9, 87, 213]);
+          final testEncryptedMainKey = Uint8List.fromList([99, 88, 12]);
+          final testEncodedStoredData = Uint8List.fromList([4, 1, 12, 4, 1]);
+
+          when(
+            mockConverter.encode(any),
+          ).thenReturnInOrder([testEncodedData, testEncodedStoredData]);
+
+          when(mockMainCM.mainKey).thenReturn(testMainKey);
+          when(mockMainCM.version).thenReturn(testVersion);
+          when(mockStorageCM.encryptKey(any)).thenReturn(testEncryptedMainKey);
+          when(mockStorageCM.encrypt(any, any)).thenReturn(testEncryptedData);
+
+          final result = await sut.save(testEncryptionKey);
+
+          expect(result, testEncodedStoredData);
+
+          verifyInOrder([
+            mockCryptoService.createStorageCryptoManager(argThat(isKey(124))),
+            mockMainCM.mainKey,
+            mockStorageCM.encryptKey(testMainKey),
+            mockConverter.encode(
+              AccountData(
+                user: testUser,
+                authToken: testToken,
+                serverUrl: testBaseUrl,
+                version: CryptoUtils.currentVersion,
+                key: testEncryptedMainKey,
+              ),
+            ),
+            mockMainCM.version,
+            mockStorageCM.encrypt(
+              testEncodedData,
+              Uint8List.fromList([testVersion, 0, 0, 0]),
+            ),
+            mockConverter.encode(
+              AccountDataStored(
+                version: CryptoUtils.currentVersion,
+                encryptedData: testEncryptedData,
+              ),
+            ),
+            mockStorageCM.dispose(),
+          ]);
+        });
+
+        test('disposes storage cm on failure', () async {
+          final testException = Exception('test');
+          final testEmptyKey = FakeSecureKey(22);
+          final testMainKey = FakeSecureKey(98);
+
+          when(mockCryptoService.secureCopy(any)).thenReturn(testEmptyKey);
+
+          when(mockMainCM.mainKey).thenReturn(testMainKey);
+          when(mockStorageCM.encryptKey(any)).thenThrow(testException);
+
+          await expectLater(() => sut.save(), throwsA(testException));
+
+          verifyInOrder([
+            mockCryptoService.secureCopy(
+              Uint8List.fromList(List.filled(CryptoUtils.symmetricKeySize, 0)),
+            ),
+            mockCryptoService.createStorageCryptoManager(testEmptyKey),
+            mockMainCM.mainKey,
+            mockStorageCM.encryptKey(testMainKey),
+            mockStorageCM.dispose(),
+          ]);
+        });
+      });
     });
   });
 }

@@ -85,6 +85,8 @@ class Client implements EtebaseClient, NetworkClient {
 
   // factory methods for internal types to simplify testing
 
+  // coverage:ignore-start
+
   @override
   WebSocketChannel connectWebSocket(Uri uri) => WebSocketChannel.connect(uri);
 
@@ -118,4 +120,6 @@ class Client implements EtebaseClient, NetworkClient {
     await cache.initialize();
     return cache;
   }
+
+  // coverage:ignore-end
 }

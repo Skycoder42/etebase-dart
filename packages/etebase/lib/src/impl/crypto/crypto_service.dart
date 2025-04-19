@@ -20,46 +20,47 @@ import 'storage_crypto_manager.dart';
 class CryptoService {
   static const defaultFingerprintDelimiter = '   ';
 
-  final CryptoExecutor _executor;
+  @visibleForTesting
+  final CryptoExecutor executor;
 
-  CryptoService(this._executor);
+  CryptoService(this.executor);
 
-  FutureOr<void> dispose() => _executor.dispose();
+  FutureOr<void> dispose() => executor.dispose();
 
-  KeyDerivator get keyDerivator => KeyDerivator(_executor);
+  KeyDerivator get keyDerivator => KeyDerivator(executor);
 
   Uint8List randomBytes(int length) =>
-      _executor.execSync((sodium) => sodium.randombytes.buf(length));
+      executor.execSync((sodium) => sodium.randombytes.buf(length));
 
   SecureKey secureAlloc(int length) =>
-      _executor.execSync((sodium) => sodium.secureAlloc(length));
+      executor.execSync((sodium) => sodium.secureAlloc(length));
 
   SecureKey secureRandom(int length) =>
-      _executor.execSync((sodium) => sodium.secureRandom(length));
+      executor.execSync((sodium) => sodium.secureRandom(length));
 
   SecureKey secureCopy(Uint8List bytes) =>
-      _executor.execSync((sodium) => sodium.secureCopy(bytes));
+      executor.execSync((sodium) => sodium.secureCopy(bytes));
 
   Uint8List bufferPadSmall(Uint8List buffer) =>
-      _executor.execSync((sodium) => sodium.pad(buffer, buffer.length + 1));
+      executor.execSync((sodium) => sodium.pad(buffer, buffer.length + 1));
 
   Uint8List bufferUnpadSmall(Uint8List buffer) =>
       buffer.isEmpty
           ? buffer
-          : _executor.execSync((sodium) => sodium.unpad(buffer, buffer.length));
+          : executor.execSync((sodium) => sodium.unpad(buffer, buffer.length));
 
-  FutureOr<Uint8List> bufferPad(Uint8List buffer) => _executor.exec(
+  FutureOr<Uint8List> bufferPad(Uint8List buffer) => executor.exec(
     (sodium, _, _) => sodium.pad(buffer, _getPadding(buffer.length)),
   );
 
   FutureOr<Uint8List> bufferUnpad(Uint8List buffer) =>
       buffer.isEmpty
           ? buffer
-          : _executor.exec(
+          : executor.exec(
             (sodium, _, _) => sodium.unpad(buffer, buffer.length),
           );
 
-  List<int> shuffle<T>(List<T> list) => _executor.execSync((sodium) {
+  List<int> shuffle<T>(List<T> list) => executor.execSync((sodium) {
     final len = list.length;
     final shuffledIndices = List.generate(len, (i) => i);
 
@@ -86,7 +87,7 @@ class CryptoService {
   String prettyFingerprint(
     Uint8List content, [
     String delimiter = defaultFingerprintDelimiter,
-  ]) => _executor.execSync((sodium) {
+  ]) => executor.execSync((sodium) {
     final fingerprint = sodium.crypto.genericHash(
       message: content,
       outLen: CryptoUtils.hashSize,
@@ -114,31 +115,31 @@ class CryptoService {
   MainCryptoManager createMainCryptoManager(
     SecureKey key, {
     int version = CryptoUtils.currentVersion,
-  }) => MainCryptoManager(_executor, key, version);
+  }) => MainCryptoManager(executor, key, version);
 
   BoxCryptoManager createIdentityCryptoManager([SecureKey? seed]) =>
-      BoxCryptoManager.fromSeed(_executor, seed);
+      BoxCryptoManager.fromSeed(executor, seed);
 
   StorageCryptoManager createStorageCryptoManager(
     SecureKey key, {
     int version = CryptoUtils.currentVersion,
-  }) => StorageCryptoManager(_executor, key, version);
+  }) => StorageCryptoManager(executor, key, version);
 
   CollectionItemCryptoManager createCollectionItemCryptoManager(
     SecureKey key, {
     int version = CryptoUtils.currentVersion,
-  }) => CollectionItemCryptoManager(_executor, key, version);
+  }) => CollectionItemCryptoManager(executor, key, version);
 
   MinimalCollectionCryptoManager createMinimalCollectionCryptoManager(
     SecureKey key, {
     int version = CryptoUtils.currentVersion,
-  }) => MinimalCollectionCryptoManager(_executor, key, version);
+  }) => MinimalCollectionCryptoManager(executor, key, version);
 
   CollectionCryptoManager createCollectionCryptoManager(
     AccountCryptoManager parentCryptoManager,
     SecureKey key, {
     int version = CryptoUtils.currentVersion,
-  }) => CollectionCryptoManager(_executor, parentCryptoManager, key, version);
+  }) => CollectionCryptoManager(executor, parentCryptoManager, key, version);
 
   static int _getPadding(int length) {
     // Use the padme padding scheme for efficiently
