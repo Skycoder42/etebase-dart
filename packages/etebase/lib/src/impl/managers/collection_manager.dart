@@ -31,8 +31,7 @@ class CollectionManager implements EtebaseCollectionManager {
     TMeta meta,
     Uint8List content,
   ) async {
-    final (encryptedCollection, cm) = await EncryptedCollection.create(
-      _client,
+    final (encryptedCollection, cm) = await _client.createEncryptedCollection(
       _cryptoManager,
       collectionType,
       meta,
@@ -42,7 +41,7 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  Future<EtebaseCollection> fetch(
+  Future<Collection> fetch(
     String colUid, [
     EtebaseFetchOptions? fetchOptions,
   ]) async {
@@ -55,13 +54,13 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
+  Future<EtebaseCollectionListResponse<Collection>> list(
     String collectionType, [
     EtebaseFetchOptions? fetchOptions,
   ]) => listMulti([collectionType], fetchOptions);
 
   @override
-  Future<EtebaseCollectionListResponse<EtebaseCollection>> listMulti(
+  Future<EtebaseCollectionListResponse<Collection>> listMulti(
     List<String> collectionTypes, [
     EtebaseFetchOptions? fetchOptions,
   ]) async {

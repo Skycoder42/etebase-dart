@@ -12,9 +12,12 @@ import '../../api/managers/etebase_client.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../cache/hive_cache.dart';
 import '../codec/message_pack_converter.dart';
+import '../crypto/account_crypto_manager.dart';
+import '../crypto/collection_crypto_manager.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_service.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
+import '../encrypted_models/encrypted_collection.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
 import '../encrypted_models/encrypted_revision.dart';
 import '../online_managers/authenticator.dart';
@@ -109,6 +112,20 @@ class Client implements EtebaseClient, NetworkClient {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) => EncryptedCollectionItem.create(this, parentCm, meta, content);
+
+  Future<(EncryptedCollection, CollectionCryptoManager)>
+  createEncryptedCollection(
+    AccountCryptoManager parentCm,
+    String collectionTypeName,
+    EtebaseItemMetadata meta,
+    Uint8List content,
+  ) => EncryptedCollection.create(
+    this,
+    parentCm,
+    collectionTypeName,
+    meta,
+    content,
+  );
 
   Future<Account> restoreAccount(
     Uint8List accountDataStored, [
