@@ -1,3 +1,4 @@
+// ignore: no_self_package_imports
 import 'package:etebase/gen/package_metadata.dart' as pubspec;
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/managers/crypto_executor.dart';

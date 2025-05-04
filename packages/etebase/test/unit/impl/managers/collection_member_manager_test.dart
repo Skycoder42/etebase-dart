@@ -1,4 +1,7 @@
-import 'package:etebase/etebase.dart';
+import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
+import 'package:etebase/src/api/models/etebase_collection_member.dart';
+import 'package:etebase/src/api/models/etebase_fetch_options.dart';
+import 'package:etebase/src/api/models/etebase_list_response.dart';
 import 'package:etebase/src/impl/managers/collection_member_manager.dart';
 import 'package:etebase/src/impl/online_managers/collection_member_manager_online.dart';
 import 'package:mockito/annotations.dart';

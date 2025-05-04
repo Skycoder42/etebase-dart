@@ -2,8 +2,10 @@
 
 import 'dart:typed_data';
 
-import 'package:etebase/etebase.dart';
 import 'package:etebase/src/api/models/etebase_fetch_options.dart';
+import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/etebase_list_response.dart';
+import 'package:etebase/src/api/models/etebase_removed_collection.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
