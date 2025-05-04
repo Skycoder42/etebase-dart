@@ -12,10 +12,10 @@ dependencies:
   etebase: ^2.0.0
   flutter:
     sdk: flutter
-  hive_ce_flutter: ^2.2.0
+  hive_ce_flutter: ^2.3.0
   meta: ^1.16.0
   package_info_plus: ^8.3.0
-  sodium_libs: ^3.4.4+2
+  sodium_libs: ^3.4.4+3
 
 dev_dependencies:
   custom_lint: ^0.7.5
