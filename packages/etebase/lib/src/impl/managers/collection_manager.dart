@@ -3,12 +3,10 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_manager.dart';
-import '../../api/models/etebase_collection.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item_metadata.dart';
 import '../../api/models/etebase_list_response.dart';
 import '../crypto/account_crypto_manager.dart';
-import '../encrypted_models/encrypted_collection.dart';
 import '../online_managers/collection_item_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
 import '../online_managers/collection_member_manager_online.dart';
@@ -117,8 +115,8 @@ class CollectionManager implements EtebaseCollectionManager {
   }) => collection.encrypted.cacheSave(_client, saveContent: saveContent);
 
   @override
-  EtebaseCollection cacheLoad(Uint8List cached) {
-    final encryptedCollection = EncryptedCollection.cacheLoad(_client, cached);
+  Collection cacheLoad(Uint8List cached) {
+    final encryptedCollection = _client.cacheLoadEncryptedCollection(cached);
     return Collection(
       _client,
       encryptedCollection.getCryptoManager(_client, _cryptoManager),

@@ -20,5 +20,11 @@
     "uuid"
   ],
   "dart.runPubGetOnPubspecChanges": "never",
-  "cmake.configureOnOpen": false
+  "cmake.configureOnOpen": false,
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  }
 }

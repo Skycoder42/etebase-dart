@@ -11,6 +11,7 @@ import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart
 import 'package:etebase/src/impl/managers/client.dart';
 import 'package:etebase/src/impl/managers/collection.dart';
 import 'package:etebase/src/impl/managers/collection_manager.dart';
+import 'package:etebase/src/impl/online_managers/base_manager.dart';
 import 'package:etebase/src/impl/online_managers/collection_item_manager_online.dart';
 import 'package:etebase/src/impl/online_managers/collection_manager_online.dart';
 import 'package:mockito/annotations.dart';
@@ -31,6 +32,8 @@ import 'collection_manager_test.mocks.dart';
 
 class FakeEncryptedCollectionItem extends Fake
     implements EncryptedCollectionItem {}
+
+class FakeAuthTokenSource extends Fake implements AuthTokenSource {}
 
 void main() {
   group('$CollectionManager', () {
@@ -275,6 +278,75 @@ void main() {
       verify(mockEncryptedCollection.cacheSave(mockClient, saveContent: true));
     });
 
-    // TODO here
+    test('cacheLoad loads collection from bytes', () {
+      final testBytes = Uint8List.fromList([12, 32, 4]);
+
+      when(
+        mockClient.cacheLoadEncryptedCollection(any),
+      ).thenReturn(mockEncryptedCollection);
+      when(
+        mockEncryptedCollection.getCryptoManager(any, any),
+      ).thenReturn(mockCollectionCM);
+
+      final result = sut.cacheLoad(testBytes);
+      expect(result.encrypted, same(mockEncryptedCollection));
+
+      verifyInOrder([
+        mockClient.cacheLoadEncryptedCollection(testBytes),
+        mockEncryptedCollection.getCryptoManager(mockClient, mockAccountCM),
+      ]);
+    });
+
+    test('getItemManager creates item manager', () {
+      final testBaseUrl = Uri.http('example.com', 'test');
+      final testAuthTokenSource = FakeAuthTokenSource();
+
+      when(mockClient.baseUrl).thenReturn(testBaseUrl);
+
+      when(mockOnline.authTokenSource).thenReturn(testAuthTokenSource);
+
+      when(mockEncryptedCollection.uid).thenReturn(testUid);
+      when(
+        mockEncryptedCollection.getCryptoManager(any, any),
+      ).thenReturn(mockCollectionCM);
+
+      final result = sut.getItemManager(testCollection);
+
+      expect(result.client, same(mockClient));
+      expect(result.cryptoManager, same(mockCollectionCM));
+      expect(
+        result.online.apiUrl,
+        Uri.parse('http://example.com/test/api/v1/collection/$testUid/item'),
+      );
+      expect(result.online.authTokenSource, same(testAuthTokenSource));
+      expect(result.colUid, testUid);
+
+      verifyInOrder([
+        mockEncryptedCollection.getCryptoManager(mockClient, mockAccountCM),
+        mockEncryptedCollection.uid,
+        mockEncryptedCollection.uid,
+      ]);
+    });
+
+    test('getMemberManager creates member manager', () {
+      final testBaseUrl = Uri.http('example.com', 'test');
+      final testAuthTokenSource = FakeAuthTokenSource();
+
+      when(mockClient.baseUrl).thenReturn(testBaseUrl);
+
+      when(mockOnline.authTokenSource).thenReturn(testAuthTokenSource);
+
+      when(mockEncryptedCollection.uid).thenReturn(testUid);
+
+      final result = sut.getMemberManager(testCollection);
+
+      expect(
+        result.online.apiUrl,
+        Uri.parse('http://example.com/test/api/v1/collection/$testUid/member'),
+      );
+      expect(result.online.authTokenSource, same(testAuthTokenSource));
+
+      verify(mockEncryptedCollection.uid).called(1);
+    });
   });
 }

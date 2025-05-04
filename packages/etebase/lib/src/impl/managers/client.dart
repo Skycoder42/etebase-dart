@@ -138,5 +138,8 @@ class Client implements EtebaseClient, NetworkClient {
     return cache;
   }
 
+  EncryptedCollection cacheLoadEncryptedCollection(Uint8List cachedData) =>
+      EncryptedCollection.cacheLoad(this, cachedData);
+
   // coverage:ignore-end
 }

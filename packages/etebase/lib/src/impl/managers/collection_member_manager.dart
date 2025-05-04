@@ -9,24 +9,25 @@ import '../online_managers/collection_member_manager_online.dart';
 
 @internal
 class CollectionMemberManager implements EtebaseCollectionMemberManager {
-  final CollectionMemberManagerOnline _online;
+  @visibleForTesting
+  final CollectionMemberManagerOnline online;
 
-  CollectionMemberManager(this._online);
+  CollectionMemberManager(this.online);
 
   @override
   Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list([
     EtebaseIteratorFetchOptions? fetchOptions,
-  ]) => _online.list(fetchOptions);
+  ]) => online.list(fetchOptions);
 
   @override
-  Future<void> remove(String username) => _online.remove(username);
+  Future<void> remove(String username) => online.remove(username);
 
   @override
-  Future<void> leave() => _online.leave();
+  Future<void> leave() => online.leave();
 
   @override
   Future<void> modifyAccessLevel(
     String username,
     EtebaseCollectionAccessLevel accessLevel,
-  ) => _online.modifyAccessLevel(username, accessLevel);
+  ) => online.modifyAccessLevel(username, accessLevel);
 }
