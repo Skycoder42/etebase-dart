@@ -127,19 +127,23 @@ class Client implements EtebaseClient, NetworkClient {
     content,
   );
 
-  Future<Account> restoreAccount(
-    Uint8List accountDataStored, [
-    SecureKey? encryptionKey,
-  ]) => Account.restore(this, accountDataStored, encryptionKey);
-
   Future<HiveCache> createCache(String username) async {
     final cache = HiveCache(this, Hive, username);
     await cache.initialize();
     return cache;
   }
 
+  Future<Account> restoreAccount(
+    Uint8List accountDataStored, [
+    SecureKey? encryptionKey,
+  ]) => Account.restore(this, accountDataStored, encryptionKey);
+
   EncryptedCollection cacheLoadEncryptedCollection(Uint8List cachedData) =>
       EncryptedCollection.cacheLoad(this, cachedData);
+
+  EncryptedCollectionItem cacheLoadEncryptedCollectionItem(
+    Uint8List cachedData,
+  ) => EncryptedCollectionItem.cacheLoad(this, cachedData);
 
   // coverage:ignore-end
 }

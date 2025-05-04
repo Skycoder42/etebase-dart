@@ -148,7 +148,7 @@ class ItemManager implements EtebaseItemManager {
 
   @override
   Item cacheLoad(Uint8List cached) =>
-      _createItem(EncryptedCollectionItem.cacheLoad(client, cached));
+      _createItem(client.cacheLoadEncryptedCollectionItem(cached));
 
   @override
   Stream<EtebaseItemListResponse<Item>> subscribeChanges([
