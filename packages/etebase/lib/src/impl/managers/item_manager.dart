@@ -38,8 +38,7 @@ class ItemManager implements EtebaseItemManager {
     TMeta meta,
     Uint8List content,
   ) async {
-    final (encryptedItem, cm) = await EncryptedCollectionItem.create(
-      client,
+    final (encryptedItem, cm) = await client.createEncryptedCollectionItem(
       cryptoManager,
       meta,
       content,
