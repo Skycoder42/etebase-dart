@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'web_socket_ticket_response.freezed.dart';

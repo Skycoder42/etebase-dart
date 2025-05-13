@@ -72,6 +72,7 @@ sealed class EtebaseListResponse<T extends Object>
 
   const EtebaseListResponse._();
 
+  // coverage:ignore-start
   /// Creates a new response by mapping the [data].
   ///
   /// The [map] callback is used to transform each value in [data]. All other
@@ -104,6 +105,7 @@ sealed class EtebaseListResponse<T extends Object>
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
   ) => _$EtebaseIteratorListResponseFromJson(json, fromJsonT);
+  // coverage:ignore-end
 }
 
 mixin _ItemMixin<T extends Object> on EtebaseListResponse<T> {
@@ -116,12 +118,14 @@ mixin _ItemMixin<T extends Object> on EtebaseListResponse<T> {
     stoken: (this as EtebaseItemListResponse).stoken,
   );
 
+  // coverage:ignore-start
   @override
   Map<String, dynamic> toJson() => _$EtebaseItemListResponseToJson<T>(
     this as EtebaseItemListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );
+  // coverage:ignore-end
 }
 
 mixin _CollectionMixin<T extends Object> on EtebaseListResponse<T> {
@@ -136,12 +140,14 @@ mixin _CollectionMixin<T extends Object> on EtebaseListResponse<T> {
         (this as EtebaseCollectionListResponse).removedMemberships,
   );
 
+  // coverage:ignore-start
   @override
   Map<String, dynamic> toJson() => _$EtebaseCollectionListResponseToJson<T>(
     this as EtebaseCollectionListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );
+  // coverage:ignore-end
 }
 
 mixin _IteratorMixin<T extends Object> on EtebaseListResponse<T> {
@@ -154,10 +160,12 @@ mixin _IteratorMixin<T extends Object> on EtebaseListResponse<T> {
     iterator: (this as EtebaseIteratorListResponse).iterator,
   );
 
+  // coverage:ignore-start
   @override
   Map<String, dynamic> toJson() => _$EtebaseIteratorListResponseToJson<T>(
     this as EtebaseIteratorListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );
+  // coverage:ignore-end
 }

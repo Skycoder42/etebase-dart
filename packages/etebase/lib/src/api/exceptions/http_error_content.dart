@@ -21,9 +21,11 @@ sealed class HttpErrorContent with _$HttpErrorContent {
   }) = _HttpErrorContent;
 
   /// @nodoc
+  // coverage:ignore-start
   @internal
   factory HttpErrorContent.fromJson(Map<String, dynamic> json) =>
       _$HttpErrorContentFromJson(json);
+  // coverage:ignore-end
 
   const HttpErrorContent._();
 

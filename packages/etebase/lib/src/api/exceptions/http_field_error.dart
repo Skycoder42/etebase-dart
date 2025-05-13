@@ -19,9 +19,11 @@ sealed class HttpFieldError with _$HttpFieldError {
   }) = _HttpFieldError;
 
   /// @nodoc
+  // coverage:ignore-start
   @internal
   factory HttpFieldError.fromJson(Map<String, dynamic> json) =>
       _$HttpFieldErrorFromJson(json);
+  // coverage:ignore-end
 
   const HttpFieldError._();
 

@@ -15,8 +15,10 @@ sealed class CollectionItemFetchInfo with _$CollectionItemFetchInfo {
     @JsonKey(includeIfNull: false) String? etag,
   }) = _CollectionItemFetchInfo;
 
+  // coverage:ignore-start
   factory CollectionItemFetchInfo.fromJson(Map<String, dynamic> json) =>
       _$CollectionItemFetchInfoFromJson(json);
+  // coverage:ignore-end
 }
 
 @internal
