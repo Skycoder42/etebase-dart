@@ -628,12 +628,50 @@ void main() {
           });
         });
 
-        test('getCryptoManager returns item manager', () {
-          final result = sut.getCryptoManager(mockClient, mockParentCm);
-          expect(result, same(mockItemCm));
+        group('getCryptoManager', () {
+          test('returns item manager', () {
+            final result = sut.getCryptoManager(mockClient, mockParentCm);
+            expect(result, same(mockItemCm));
 
-          verify(mockCryptoService.createCollectionItemCryptoManager(testKey));
-          verifyNever(mockItemCm.dispose());
+            verifyInOrder([
+              mockParentCm.deriveSubkey(utf8.encode(testUid64)),
+              mockCryptoService.createCollectionItemCryptoManager(testKey),
+            ]);
+            verifyNever(mockItemCm.dispose());
+          });
+
+          test('uses collection key if it exists', () {
+            final testEncryptionKey = Uint8List.fromList([4, 1, 43, 1]);
+            final testDecryptedKey = FakeSecureKey(68);
+
+            when(mockParentCm.decryptKey(any)).thenReturn(testDecryptedKey);
+
+            final testJsonData = {
+              'uid': 'uid',
+              'version': 1,
+              'encryptionKey': testEncryptionKey,
+              'content': {
+                'uid': 'uid',
+                'meta': Uint8List(0),
+                'chunks': <dynamic>[],
+                'deleted': false,
+              },
+              'etag': 'test-etag',
+            };
+            final sut = EncryptedCollectionItem.fromJson(testJsonData);
+
+            final result = sut.getCryptoManager(mockClient, mockParentCm);
+            expect(result, same(mockItemCm));
+
+            verifyInOrder([
+              mockParentCm.decryptKey(testEncryptionKey),
+              mockCryptoService.createCollectionItemCryptoManager(
+                testDecryptedKey,
+              ),
+            ]);
+            verifyNever(mockParentCm.deriveSubkey(any));
+            verifyNever(mockItemCm.dispose());
+          });
         });
       });
     });

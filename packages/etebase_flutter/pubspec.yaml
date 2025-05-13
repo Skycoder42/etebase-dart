@@ -15,7 +15,7 @@ dependencies:
   hive_ce_flutter: ^2.3.0
   meta: ^1.16.0
   package_info_plus: ^8.3.0
-  sodium_libs: ^3.4.4+3
+  sodium_libs: ^3.4.4+5
 
 dev_dependencies:
   custom_lint: ^0.7.5

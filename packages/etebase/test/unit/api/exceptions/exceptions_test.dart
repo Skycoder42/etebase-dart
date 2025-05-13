@@ -8,6 +8,7 @@ import 'package:etebase/src/api/exceptions/connection_problem.dart';
 import 'package:etebase/src/api/exceptions/crypto_failure.dart';
 import 'package:etebase/src/api/exceptions/etebase_exception.dart';
 import 'package:etebase/src/api/exceptions/http_error_content.dart';
+import 'package:etebase/src/api/exceptions/http_failure.dart';
 import 'package:etebase/src/api/exceptions/http_field_error.dart';
 import 'package:etebase/src/api/exceptions/integrity_compromised.dart';
 import 'package:etebase/src/api/exceptions/invalid_message_pack_data.dart';
@@ -53,6 +54,7 @@ void main() {
           '$TemporaryServerProblem(513): test',
         ),
         (Unauthorized('test'), '$Unauthorized(401): test'),
+        (HttpFailure(412, 'test'), '$HttpFailure(412): test'),
       ],
       (fixture) {
         expect(fixture.$1.toString(), fixture.$2);
@@ -85,6 +87,10 @@ void main() {
         (
           Unauthorized('test', testErrorContent),
           '$Unauthorized(401): $testErrorContent',
+        ),
+        (
+          HttpFailure(412, 'test', testErrorContent),
+          '$HttpFailure(412): $testErrorContent',
         ),
       ],
       (fixture) {
