@@ -29,7 +29,6 @@ void main() {
     test('randomSalt generates new random salt bytes', () {
       final testSalt = Uint8List.fromList([2, 4, 3, 7, 0]);
 
-      when(mockSodium.crypto.pwhash.saltBytes).thenReturn(testSalt.length);
       when(mockSodium.randombytes.buf(any)).thenReturn(testSalt);
 
       final result = sut.randomSalt();
@@ -38,8 +37,7 @@ void main() {
 
       verifyInOrder([
         mockCryptoExecutor.execSync<Uint8List>(any),
-        mockSodium.crypto.pwhash.saltBytes,
-        mockSodium.randombytes.buf(testSalt.length),
+        mockSodium.randombytes.buf(32),
       ]);
     });
 
@@ -52,10 +50,14 @@ void main() {
       ],
       (fixture) async {
         final testSalt = Uint8List.fromList([2, 4, 3, 7, 0]);
+        final testActualSalt = Uint8List.fromList([2, 4, 3]);
         const testPassword = 'test-123';
         final testPasswordBytes = utf8.encode(testPassword).signedView();
         final testKey = FakeSecureKey(87);
 
+        when(
+          mockSodium.crypto.pwhash.saltBytes,
+        ).thenReturn(testActualSalt.length);
         when(mockSodium.crypto.pwhash.opsLimitInteractive).thenReturn(1);
         when(mockSodium.crypto.pwhash.opsLimitModerate).thenReturn(2);
         when(mockSodium.crypto.pwhash.opsLimitSensitive).thenReturn(3);
@@ -80,6 +82,7 @@ void main() {
 
         verifyInOrder([
           mockCryptoExecutor.execAsync<SecureKey>(any),
+          mockSodium.crypto.pwhash.saltBytes,
           switch (fixture.$1) {
             KeyDerivationDifficulty.hard =>
               mockSodium.crypto.pwhash.opsLimitSensitive,
@@ -92,7 +95,7 @@ void main() {
           mockSodium.crypto.pwhash.call(
             outLen: CryptoUtils.symmetricKeySize,
             password: testPasswordBytes,
-            salt: testSalt,
+            salt: testActualSalt,
             opsLimit: fixture.$2,
             memLimit: 4,
           ),

@@ -11,14 +11,15 @@ enum KeyDerivationDifficulty { hard, medium, easy }
 
 @internal
 class KeyDerivator {
+  static const saltSize = 32;
+
   @visibleForTesting
   final CryptoExecutor executor;
 
   KeyDerivator(this.executor);
 
-  Uint8List randomSalt() => executor.execSync(
-    (sodium) => sodium.randombytes.buf(sodium.crypto.pwhash.saltBytes),
-  );
+  Uint8List randomSalt() =>
+      executor.execSync((sodium) => sodium.randombytes.buf(saltSize));
 
   Future<SecureKey> call({
     required Uint8List salt,
@@ -28,7 +29,7 @@ class KeyDerivator {
     (sodium, _, _) => sodium.crypto.pwhash(
       outLen: CryptoUtils.symmetricKeySize,
       password: password.toCharArray(),
-      salt: salt,
+      salt: salt.sublist(0, sodium.crypto.pwhash.saltBytes),
       opsLimit: switch (difficulty) {
         KeyDerivationDifficulty.hard => sodium.crypto.pwhash.opsLimitSensitive,
         KeyDerivationDifficulty.medium => sodium.crypto.pwhash.opsLimitModerate,
