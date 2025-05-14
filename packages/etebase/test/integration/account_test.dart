@@ -4,8 +4,10 @@ library;
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
+import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:test/test.dart';
 
+import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
 
 void main() {
@@ -35,6 +37,11 @@ void main() {
       // local test server does not have a dashboard
       expect(() => account.fetchDashboardUrl(), throwsA(isA<HttpFailure>()));
 
+      // validate js client can login
+      await JsClientWrapper.execute<void>(
+        Action.signIn(testUsername, testPassword),
+      );
+
       await account.logout();
 
       // after logout this should be unauthorized
@@ -58,6 +65,29 @@ void main() {
 
       // change password again
       await account.changePassword(testPassword);
+
+      await account.logout();
+    });
+
+    test('can login with account created from different client', () async {
+      final testOtherUsername = generateUsername('test-user-2');
+      final testOtherEmail = '$testUsername@example.com';
+      const testOtherPassword = 'hello-test-2';
+
+      // create account via js
+      await JsClientWrapper.execute<void>(
+        Action.signUp(testOtherUsername, testOtherEmail, testOtherPassword),
+      );
+
+      final account = await EtebaseAccount.login(
+        client,
+        testOtherUsername,
+        testOtherPassword,
+      );
+      addTearDown(account.dispose);
+
+      // update token
+      await account.fetchToken();
 
       await account.logout();
     });
@@ -94,6 +124,44 @@ void main() {
       await restoredAccountEnc.fetchToken();
 
       await restoredAccountEnc.logout();
+    });
+
+    test('can save and restore account from different client', () async {
+      // DEBUG
+      await EtebaseAccount.signup(
+        client,
+        EtebaseUser(username: testUsername, email: testEmail),
+        testPassword,
+      );
+
+      final encryptionKey1 = EtebaseUtils.randomKey(client, 32);
+      final jsSaved = await JsClientWrapper.execute<String>(
+        Action.saveAccount(
+          testUsername,
+          testPassword,
+          base64UrlNoPad.encode(encryptionKey1.extractBytes()),
+        ),
+      );
+
+      expect(jsSaved, isNotEmpty);
+
+      final restoredAccount = await EtebaseAccount.restore(
+        client,
+        jsSaved,
+        encryptionKey1,
+      );
+      addTearDown(restoredAccount.dispose);
+      await restoredAccount.fetchToken();
+
+      final encryptionKey2 = EtebaseUtils.randomKey(client, 32);
+      final dartSaved = await restoredAccount.save(encryptionKey2);
+
+      await JsClientWrapper.execute<void>(
+        Action.restoreAccount(
+          dartSaved,
+          base64UrlNoPad.encode(encryptionKey2.extractBytes()),
+        ),
+      );
     });
   });
 }
