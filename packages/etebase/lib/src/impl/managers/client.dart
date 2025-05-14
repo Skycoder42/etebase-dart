@@ -134,7 +134,7 @@ class Client implements EtebaseClient, NetworkClient {
   }
 
   Future<Account> restoreAccount(
-    Uint8List accountDataStored, [
+    String accountDataStored, [
     SecureKey? encryptionKey,
   ]) => Account.restore(this, accountDataStored, encryptionKey);
 

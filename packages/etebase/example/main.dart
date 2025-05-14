@@ -46,12 +46,12 @@ void main(List<String> args) async {
   }
 
   final encryptionKey = sodium.secureRandom(32);
-  Uint8List storedData;
+  String storedData;
   {
     final account = await EtebaseAccount.login(client, userName, userName * 2);
     print('second login successful');
     storedData = await account.save(encryptionKey);
-    print('save successful: ${base64.encode(storedData)}');
+    print('save successful: $storedData');
     account.dispose();
   }
 

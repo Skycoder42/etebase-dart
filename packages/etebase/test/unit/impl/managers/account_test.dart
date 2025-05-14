@@ -366,7 +366,7 @@ void main() {
           version: testVersion,
           encryptedData: testEncryptedData,
         );
-        final testAccountDataStoredBytes = Uint8List.fromList([4, 12, 33]);
+        const testAccountDataStoredData = 'test-account-data-stored';
         final testEncryptionKey = FakeSecureKey(123);
         final testAccountKey = FakeSecureKey(54);
 
@@ -375,7 +375,9 @@ void main() {
           provideDummy(testAccountDataStored);
 
           when(
-            mockConverter.decode<AccountDataStored>(testAccountDataStoredBytes),
+            mockConverter.decode64<AccountDataStored>(
+              testAccountDataStoredData,
+            ),
           ).thenReturn(testAccountDataStored);
           when(
             mockConverter.decode<AccountData>(testEncryptedData),
@@ -390,7 +392,7 @@ void main() {
         test('restores account from raw data', () async {
           final result = await Account.restore(
             mockClient,
-            testAccountDataStoredBytes,
+            testAccountDataStoredData,
             testEncryptionKey,
           );
 
@@ -399,7 +401,9 @@ void main() {
           expect(result.authToken, const AuthToken(testToken));
 
           verifyInOrder([
-            mockConverter.decode<AccountDataStored>(testAccountDataStoredBytes),
+            mockConverter.decode64<AccountDataStored>(
+              testAccountDataStoredData,
+            ),
             mockCryptoService.createStorageCryptoManager(
               argThat(isKey(124)),
               version: testVersion,
@@ -436,12 +440,14 @@ void main() {
           ).thenReturnInOrder([testEncryptionKey, testAccKey, testIdPrivKey]);
 
           await expectLater(
-            () => Account.restore(mockClient, testAccountDataStoredBytes),
+            () => Account.restore(mockClient, testAccountDataStoredData),
             throwsA(isA<ApiMissuse>()),
           );
 
           verifyInOrder([
-            mockConverter.decode<AccountDataStored>(testAccountDataStoredBytes),
+            mockConverter.decode64<AccountDataStored>(
+              testAccountDataStoredData,
+            ),
             mockCryptoService.secureCopy(
               Uint8List.fromList(List.filled(CryptoUtils.symmetricKeySize, 0)),
             ),
@@ -700,11 +706,10 @@ void main() {
           final testEncodedData = Uint8List.fromList([74, 23, 11]);
           final testEncryptedData = Uint8List.fromList([9, 87, 213]);
           final testEncryptedMainKey = Uint8List.fromList([99, 88, 12]);
-          final testEncodedStoredData = Uint8List.fromList([4, 1, 12, 4, 1]);
+          const testEncodedStoredData = 'test-data';
 
-          when(
-            mockConverter.encode(any),
-          ).thenReturnInOrder([testEncodedData, testEncodedStoredData]);
+          when(mockConverter.encode(any)).thenReturn(testEncodedData);
+          when(mockConverter.encode64(any)).thenReturn(testEncodedStoredData);
 
           when(mockMainCM.mainKey).thenReturn(testMainKey);
           when(mockMainCM.version).thenReturn(testVersion);
@@ -733,7 +738,7 @@ void main() {
               testEncodedData,
               Uint8List.fromList([testVersion, 0, 0, 0]),
             ),
-            mockConverter.encode(
+            mockConverter.encode64(
               AccountDataStored(
                 version: CryptoUtils.currentVersion,
                 encryptedData: testEncryptedData,

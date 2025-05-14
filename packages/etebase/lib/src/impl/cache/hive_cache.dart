@@ -27,7 +27,7 @@ class HiveCache implements EtebaseCache {
   final HiveInterface _hive;
   final String _encodedUsername;
 
-  late final LazyBox<dynamic> _metaBox;
+  late final LazyBox<String> _metaBox;
   late final LazyBox<Uint8List> _collectionBox;
 
   HiveCache(this._client, this._hive, String username)
@@ -78,7 +78,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<EtebaseAccount> loadAccount([SecureKey? encryptionKey]) async {
-    final accountData = await _metaBox.get(_accountDataKey).cast<Uint8List?>();
+    final accountData = await _metaBox.get(_accountDataKey);
     if (accountData == null) {
       throw NotFound('No account has been cached');
     }
@@ -95,7 +95,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<String> loadStoken() async {
-    final stoken = await _metaBox.get(_accountStokenKey).cast<String?>();
+    final stoken = await _metaBox.get(_accountStokenKey);
     if (stoken == null) {
       throw NotFound('No stoken has been cached');
     }
@@ -116,8 +116,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<String> collectionLoadStoken(String colUid) async {
-    final stoken =
-        await _metaBox.get(_collectionStokenKey(colUid)).cast<String?>();
+    final stoken = await _metaBox.get(_collectionStokenKey(colUid));
     if (stoken == null) {
       throw NotFound('No stoken has been cached for $colUid');
     }
@@ -244,8 +243,4 @@ class HiveCache implements EtebaseCache {
     }
     await _hive.deleteBoxFromDisk(box.name);
   }
-}
-
-extension on Future<dynamic> {
-  Future<T> cast<T>() => then((v) => v as T);
 }

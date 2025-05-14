@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:sodium/sodium.dart';
 
 import '../../impl/managers/account.dart';
@@ -35,7 +33,7 @@ abstract interface class EtebaseAccount {
   /// The [encryptionKey] must be the same as used for [save].
   static Future<EtebaseAccount> restore(
     EtebaseClient client,
-    Uint8List accountDataStored, [
+    String accountDataStored, [
     SecureKey? encryptionKey,
   ]) => (client as Client).restoreAccount(accountDataStored, encryptionKey);
 
@@ -74,5 +72,5 @@ abstract interface class EtebaseAccount {
   /// with. It is recommended you always provide such a key to protect the users
   /// data.
   /// {@endtemplate}
-  Future<Uint8List> save([SecureKey? encryptionKey]);
+  Future<String> save([SecureKey? encryptionKey]);
 }

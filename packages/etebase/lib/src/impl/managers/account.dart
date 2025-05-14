@@ -162,12 +162,12 @@ class Account implements EtebaseAccount, AuthTokenSource {
 
   static Future<Account> restore(
     Client client,
-    Uint8List accountDataStored, [
+    String accountDataStored, [
     SecureKey? encryptionKey,
   ]) async {
     final arena = CryptoArena();
     try {
-      final decodedStoredData = client.converter.decode<AccountDataStored>(
+      final decodedStoredData = client.converter.decode64<AccountDataStored>(
         accountDataStored,
       );
 
@@ -306,7 +306,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       _client.authenticator.getDashboardUrl(_authToken);
 
   @override
-  Future<Uint8List> save([SecureKey? encryptionKey]) async {
+  Future<String> save([SecureKey? encryptionKey]) async {
     final arena = CryptoArena();
     try {
       final cryptoManager = arena(
@@ -331,7 +331,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
       );
 
-      return _client.converter.encode(
+      return _client.converter.encode64(
         AccountDataStored(
           version: CryptoUtils.currentVersion,
           encryptedData: encryptedAccountData,

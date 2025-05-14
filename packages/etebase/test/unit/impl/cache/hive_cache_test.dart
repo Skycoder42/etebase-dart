@@ -46,7 +46,7 @@ void main() {
 
     final mockClient = MockClient();
     final mockHive = MockHiveInterface();
-    final mockMetaBox = MockLazyBox<dynamic>();
+    final mockMetaBox = MockLazyBox<String>();
     final mockCollectionBox = MockLazyBox<Uint8List>();
 
     late HiveCache sut;
@@ -58,7 +58,7 @@ void main() {
       reset(mockCollectionBox);
 
       when(
-        mockHive.openLazyBox<dynamic>('$testEncodedUserName.meta'),
+        mockHive.openLazyBox<String>('$testEncodedUserName.meta'),
       ).thenReturnAsync(mockMetaBox);
       when(
         mockHive.openLazyBox<Uint8List>('$testEncodedUserName.collection'),
@@ -74,7 +74,7 @@ void main() {
       sut = HiveCache(mockClient, mockHive, testUserName);
       await sut.initialize();
 
-      verify(mockHive.openLazyBox<dynamic>('$testEncodedUserName.meta'));
+      verify(mockHive.openLazyBox<String>('$testEncodedUserName.meta'));
       verify(
         mockHive.openLazyBox<Uint8List?>('$testEncodedUserName.collection'),
       );
@@ -220,7 +220,7 @@ void main() {
     });
 
     group('account', () {
-      final accountData = Uint8List.fromList([1, 2, 3]);
+      const accountData = 'account-data';
       final mockAccount = MockAccount();
 
       setUp(() {
