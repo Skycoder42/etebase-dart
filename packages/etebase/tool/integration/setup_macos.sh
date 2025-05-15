@@ -19,6 +19,11 @@ echo "::group::Install libsodium"
 brew install libsodium
 echo ::endgroup::
 
+# install js client
+echo "::group::Restoring js_client"
+npm --prefix tool/js_client install
+echo ::endgroup::
+
 # re-initialize server if restored from cache
 mkdir -p "$STATIC_DIR" "$MEDIA_DIR"
 if [ "$CACHE_HIT" = "true" ]; then

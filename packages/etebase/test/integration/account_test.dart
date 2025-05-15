@@ -127,13 +127,6 @@ void main() {
     });
 
     test('can save and restore account from different client', () async {
-      // DEBUG
-      await EtebaseAccount.signup(
-        client,
-        EtebaseUser(username: testUsername, email: testEmail),
-        testPassword,
-      );
-
       final encryptionKey1 = EtebaseUtils.randomKey(client, 32);
       final jsSaved = await JsClientWrapper.execute<String>(
         Action.saveAccount(
@@ -153,8 +146,13 @@ void main() {
       addTearDown(restoredAccount.dispose);
       await restoredAccount.fetchToken();
 
+      final dartAccount = await EtebaseAccount.login(
+        client,
+        testUsername,
+        testPassword,
+      );
       final encryptionKey2 = EtebaseUtils.randomKey(client, 32);
-      final dartSaved = await restoredAccount.save(encryptionKey2);
+      final dartSaved = await dartAccount.save(encryptionKey2);
 
       await JsClientWrapper.execute<void>(
         Action.restoreAccount(

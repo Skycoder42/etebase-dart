@@ -8,6 +8,10 @@ msvc_version=${2:-143}
 DEST_DIR=$PWD/tool/integration/cache/sodium
 VERSION_FILE="$DEST_DIR/version.txt"
 
+echo "::group::Restoring js_client"
+npm --prefix tool/js_client install
+echo ::endgroup::
+
 if [ "$CACHE_HIT" = "true" ]; then
   current_version=$(cat "$VERSION_FILE")
   if [[ "$version" == "$current_version" ]]; then

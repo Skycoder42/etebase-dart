@@ -10,6 +10,10 @@ else
 fi
 echo ::endgroup::
 
+echo "::group::Restoring js_client"
+npm --prefix tool/js_client install
+echo ::endgroup::
+
 echo "::group::Start etesync server"
 docker run -d --rm \
   --pull always \

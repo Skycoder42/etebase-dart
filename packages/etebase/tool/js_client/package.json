@@ -9,11 +9,11 @@
     "start": "tsx"
   },
   "dependencies": {
-    "etebase": "^0.43.1"
+    "etebase": "*"
   },
   "devDependencies": {
-    "@types/node": "^22.15.17",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "@types/node": "*",
+    "tsx": "*",
+    "typescript": "*"
   }
 }
