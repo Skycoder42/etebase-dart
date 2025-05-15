@@ -182,7 +182,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       final accountData = client.converter.decode<AccountData>(
         await cryptoManager.decrypt(
           decodedStoredData.encryptedData,
-          CryptoUtils.uint32ToUint8List(decodedStoredData.version),
+          Uint8List.fromList([decodedStoredData.version]),
         ),
       );
 
@@ -328,7 +328,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
 
       final encryptedAccountData = await cryptoManager.encrypt(
         _client.converter.encode(accountData),
-        CryptoUtils.uint32ToUint8List(_mainCryptoManager.version),
+        Uint8List.fromList([_mainCryptoManager.version]),
       );
 
       return _client.converter.encode64(

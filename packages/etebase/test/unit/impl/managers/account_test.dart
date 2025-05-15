@@ -410,7 +410,7 @@ void main() {
             ),
             mockStorageCM.decrypt(
               testEncryptedData,
-              CryptoUtils.uint32ToUint8List(testVersion),
+              Uint8List.fromList([testVersion]),
             ),
             mockConverter.decode<AccountData>(testAccountDataBytes),
             mockStorageCM.decryptKey(testAccountData.key),
@@ -457,7 +457,7 @@ void main() {
             ),
             mockStorageCM.decrypt(
               testEncryptedData,
-              CryptoUtils.uint32ToUint8List(testVersion),
+              Uint8List.fromList([testVersion]),
             ),
             mockConverter.decode<AccountData>(testAccountDataBytes),
             // disposes
@@ -736,7 +736,7 @@ void main() {
             mockMainCM.version,
             mockStorageCM.encrypt(
               testEncodedData,
-              Uint8List.fromList([testVersion, 0, 0, 0]),
+              Uint8List.fromList([testVersion]),
             ),
             mockConverter.encode64(
               AccountDataStored(
