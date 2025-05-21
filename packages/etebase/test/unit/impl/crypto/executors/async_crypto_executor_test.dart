@@ -202,7 +202,8 @@ void main() {
       });
 
       test('runs correct result for every invocation', () {
-        AsyncCallback<int> createCb(int ctr) => (sodium, _, _) => ctr;
+        AsyncCallback<int> createCb(int ctr) =>
+            (sodium, _, _) => ctr;
 
         final results = <Future<int>>[];
         for (var i = 0; i < 5; ++i) {
@@ -218,10 +219,9 @@ void main() {
         bool callback(SodiumSumo sodium, List<SecureKey> sk, List<KeyPair> kp) {
           // ensure keys get disposed
           scheduleMicrotask(() {
-            final allKeys =
-                sk
-                    .followedBy(kp.map((kp) => kp.secretKey))
-                    .cast<FakeSecureKey>();
+            final allKeys = sk
+                .followedBy(kp.map((kp) => kp.secretKey))
+                .cast<FakeSecureKey>();
             for (final key in allKeys) {
               if (!key.disposed) {
                 throw Exception('Key $key was not disposed!');
@@ -404,7 +404,8 @@ void main() {
       });
 
       test('runs correct result for every invocation', () {
-        AsyncCallback<int> createCb(int ctr) => (sodium, _, _) => ctr;
+        AsyncCallback<int> createCb(int ctr) =>
+            (sodium, _, _) => ctr;
 
         final results = <Future<int>>[];
         for (var i = 0; i < 5; ++i) {
@@ -420,10 +421,9 @@ void main() {
         bool callback(SodiumSumo sodium, List<SecureKey> sk, List<KeyPair> kp) {
           // ensure keys get disposed
           scheduleMicrotask(() {
-            final allKeys =
-                sk
-                    .followedBy(kp.map((kp) => kp.secretKey))
-                    .cast<FakeSecureKey>();
+            final allKeys = sk
+                .followedBy(kp.map((kp) => kp.secretKey))
+                .cast<FakeSecureKey>();
             for (final key in allKeys) {
               if (!key.disposed) {
                 throw Exception('Key $key was not disposed!');

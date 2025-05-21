@@ -56,13 +56,12 @@ class EncryptedRevision {
       ..uid = client.converter.base64Encode(cached.uid)
       ..meta = cached.meta
       ..deleted = cached.deleted
-      ..chunks =
-          cached.chunks
-              .map(
-                (chunk) =>
-                    Chunk(client.converter.base64Encode(chunk.uid), chunk.data),
-              )
-              .toList();
+      ..chunks = cached.chunks
+          .map(
+            (chunk) =>
+                Chunk(client.converter.base64Encode(chunk.uid), chunk.data),
+          )
+          .toList();
   }
 
   Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
@@ -73,15 +72,14 @@ class EncryptedRevision {
           uid: client.converter.base64Decode(uid),
           meta: meta,
           deleted: deleted,
-          chunks:
-              chunks
-                  .map(
-                    (chunk) => CachedChunk(
-                      client.converter.base64Decode(chunk.uid),
-                      saveContent ? chunk.data : null,
-                    ),
-                  )
-                  .toList(),
+          chunks: chunks
+              .map(
+                (chunk) => CachedChunk(
+                  client.converter.base64Decode(chunk.uid),
+                  saveContent ? chunk.data : null,
+                ),
+              )
+              .toList(),
         ),
       );
 
@@ -219,17 +217,16 @@ class EncryptedRevision {
     }
 
     // Encrypt all of the chunks
-    this.chunks =
-        await Stream.fromIterable(chunks)
-            .asyncMap(
-              (chunk) async => Chunk(
-                chunk.uid,
-                await cryptoManager.encrypt(
-                  await client.crypto.bufferPad(chunk.data!),
-                ),
-              ),
-            )
-            .toList();
+    this.chunks = await Stream.fromIterable(chunks)
+        .asyncMap(
+          (chunk) async => Chunk(
+            chunk.uid,
+            await cryptoManager.encrypt(
+              await client.crypto.bufferPad(chunk.data!),
+            ),
+          ),
+        )
+        .toList();
 
     await setMeta(client, cryptoManager, additionalData, meta);
   }
@@ -239,31 +236,32 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager,
   ) async {
     var indices = const [0];
-    final decryptedChunks =
-        await Stream.fromIterable(chunks).asyncMap((chunk) async {
-          final Chunk(:uid, :data) = chunk;
-          if (data == null) {
-            throw MissingContent(
-              'Missing content for item. '
-              'Please download it using downloadContent',
-            );
-          }
+    final decryptedChunks = await Stream.fromIterable(chunks).asyncMap((
+      chunk,
+    ) async {
+      final Chunk(:uid, :data) = chunk;
+      if (data == null) {
+        throw MissingContent(
+          'Missing content for item. '
+          'Please download it using downloadContent',
+        );
+      }
 
-          final buf = await client.crypto.bufferUnpad(
-            await cryptoManager.decrypt(data),
-          );
-          final hash = await cryptoManager.calculateMac(buf);
+      final buf = await client.crypto.bufferUnpad(
+        await cryptoManager.decrypt(data),
+      );
+      final hash = await cryptoManager.calculateMac(buf);
 
-          if (!const ListEquality<int>().equals(
-            hash,
-            client.converter.base64Decode(uid),
-          )) {
-            throw IntegrityCompromised(
-              "The content's mac is different to the expected mac ($uid)",
-            );
-          }
-          return buf;
-        }).toList();
+      if (!const ListEquality<int>().equals(
+        hash,
+        client.converter.base64Decode(uid),
+      )) {
+        throw IntegrityCompromised(
+          "The content's mac is different to the expected mac ($uid)",
+        );
+      }
+      return buf;
+    }).toList();
 
     // If we have more than one chunk we have the mapping header in the last
     // chunk
@@ -304,22 +302,20 @@ class EncryptedRevision {
     await setMeta(client, cryptoManager, additionalData, meta);
   }
 
-  EncryptedRevision clone() =>
-      EncryptedRevision()
-        ..uid = uid
-        ..meta = meta
-        ..deleted = deleted
-        ..chunks = [...chunks];
+  EncryptedRevision clone() => EncryptedRevision()
+    ..uid = uid
+    ..meta = meta
+    ..deleted = deleted
+    ..chunks = [...chunks];
 
   Future<Uint8List> _calculateAdHash(
     Client client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
-    final cryptoMac =
-        cryptoManager.getCryptoMac()
-          ..update(Uint8List.fromList([if (deleted) 1 else 0]))
-          ..updateWithLenPrefix(additionalData);
+    final cryptoMac = cryptoManager.getCryptoMac()
+      ..update(Uint8List.fromList([if (deleted) 1 else 0]))
+      ..updateWithLenPrefix(additionalData);
 
     final chunksHash = cryptoManager.getCryptoMac(withKey: false);
     for (final Chunk(:uid) in chunks) {

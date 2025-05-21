@@ -46,10 +46,9 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     final channel = spawnHybridCode(_vmCode, message: path);
     final jsBundle = await channel.stream.cast<String>().first;
 
-    final script =
-        HTMLScriptElement()
-          ..id = id
-          ..text = jsBundle;
+    final script = HTMLScriptElement()
+      ..id = id
+      ..text = jsBundle;
     document.head!.append(script);
 
     await Future<void>.delayed(Duration.zero);

@@ -61,9 +61,8 @@ class EncryptedCollection {
   ) async {
     final arena = CryptoArena();
     try {
-      final col =
-          EncryptedCollection()
-            .._collectionType = parentCm.colTypeToUid(collectionTypeName);
+      final col = EncryptedCollection()
+        .._collectionType = parentCm.colTypeToUid(collectionTypeName);
 
       col._collectionKey = parentCm.encryptKey(
         arena(client.crypto.secureRandom(CryptoUtils.symmetricKeySize)),

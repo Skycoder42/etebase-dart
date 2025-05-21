@@ -27,10 +27,9 @@ class BoxCryptoManager implements CryptoManagerBase {
     final cm = BoxCryptoManager(
       executor,
       executor.execSync(
-        (sodium) =>
-            seed != null
-                ? sodium.crypto.box.seedKeyPair(seed)
-                : sodium.crypto.box.keyPair(),
+        (sodium) => seed != null
+            ? sodium.crypto.box.seedKeyPair(seed)
+            : sodium.crypto.box.keyPair(),
       ),
     );
     seed?.dispose();

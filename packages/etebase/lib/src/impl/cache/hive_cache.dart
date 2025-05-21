@@ -205,10 +205,9 @@ class HiveCache implements EtebaseCache {
   String _collectionStokenKey(String colUid) =>
       '$_accountColStokenKeyPrefix$colUid';
 
-  Iterable<String> get _knownItemBoxNames =>
-      _collectionBox.isOpen
-          ? _collectionBox.keys.cast<String>().map(_itemBoxName)
-          : const [];
+  Iterable<String> get _knownItemBoxNames => _collectionBox.isOpen
+      ? _collectionBox.keys.cast<String>().map(_itemBoxName)
+      : const [];
 
   Future<LazyBox<Uint8List>?> _itemBox(
     String colUid, {

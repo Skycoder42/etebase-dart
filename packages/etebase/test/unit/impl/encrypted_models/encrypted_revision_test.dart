@@ -906,14 +906,13 @@ void main() {
 
         await sut.verify(mockClient, mockCryptoManager, testAd);
 
-        final [Uint8List captured] =
-            verify(
-              mockCryptoManager.verify(
-                sut.meta,
-                base64.decode(sut.uid),
-                captureAny,
-              ),
-            ).captured;
+        final [Uint8List captured] = verify(
+          mockCryptoManager.verify(
+            sut.meta,
+            base64.decode(sut.uid),
+            captureAny,
+          ),
+        ).captured;
 
         expectWrapped(captured, isAdHash(testAd, sut.chunks));
       });
@@ -959,11 +958,10 @@ void main() {
           Chunk(base64.encode([3, 2, 3]), null),
         ];
 
-        final sut =
-            EncryptedRevision()
-              ..uid = 'default'
-              ..meta = Uint8List(0)
-              ..chunks = testChunks;
+        final sut = EncryptedRevision()
+          ..uid = 'default'
+          ..meta = Uint8List(0)
+          ..chunks = testChunks;
 
         await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
 
@@ -997,11 +995,10 @@ void main() {
           Chunk(base64.encode([3, 2, 3]), null),
         ];
 
-        final sut =
-            EncryptedRevision()
-              ..uid = 'default'
-              ..meta = Uint8List(0)
-              ..chunks = testChunks;
+        final sut = EncryptedRevision()
+          ..uid = 'default'
+          ..meta = Uint8List(0)
+          ..chunks = testChunks;
 
         await sut.setMeta(mockClient, mockCryptoManager, testAd, testMeta);
 
@@ -1410,15 +1407,14 @@ void main() {
     });
 
     test('clone creates new revision with identical data', () {
-      final sut =
-          EncryptedRevision()
-            ..uid = 'default'
-            ..meta = Uint8List(0)
-            ..deleted = true
-            ..chunks = [
-              Chunk('chunk-1', Uint8List.fromList([33, 1])),
-              const Chunk('chunk-2', null),
-            ];
+      final sut = EncryptedRevision()
+        ..uid = 'default'
+        ..meta = Uint8List(0)
+        ..deleted = true
+        ..chunks = [
+          Chunk('chunk-1', Uint8List.fromList([33, 1])),
+          const Chunk('chunk-2', null),
+        ];
 
       final result = sut.clone();
 

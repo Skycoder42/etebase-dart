@@ -30,15 +30,15 @@ Future<EtebaseClient> createClient({bool useDefaultServer = false}) async {
 
   return useAsync
       ? await EtebaseClient.createAsync(
-        await SodiumSumoInit.init(getLibsodium),
-        'package:etebase/test/integration',
-        useDefaultServer ? null : serverUri,
-      )
+          await SodiumSumoInit.init(getLibsodium),
+          'package:etebase/test/integration',
+          useDefaultServer ? null : serverUri,
+        )
       : EtebaseClient.create(
-        await SodiumSumoInit.init(getLibsodium),
-        'package:etebase/test/integration',
-        useDefaultServer ? null : serverUri,
-      );
+          await SodiumSumoInit.init(getLibsodium),
+          'package:etebase/test/integration',
+          useDefaultServer ? null : serverUri,
+        );
 }
 
 Future<EtebaseAccount> createAccount(

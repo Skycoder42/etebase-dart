@@ -13,10 +13,9 @@ sealed class AuthToken with _$AuthToken {
 
   const AuthToken._();
 
-  String get header =>
-      value.isEmpty
-          ? throw Unauthorized('The account is logged out!')
-          : 'Token $value';
+  String get header => value.isEmpty
+      ? throw Unauthorized('The account is logged out!')
+      : 'Token $value';
 
   @override
   String toString() => '${value.substring(0, 2)}${'*' * (value.length - 2)}';

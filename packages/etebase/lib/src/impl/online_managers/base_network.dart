@@ -112,15 +112,15 @@ class BaseNetwork {
         ...path,
         '', // ensures the path has a trailing /
       ],
-      queryParameters:
-          query.isNotEmpty ? {...apiUrl.queryParametersAll, ...query} : null,
+      queryParameters: query.isNotEmpty
+          ? {...apiUrl.queryParametersAll, ...query}
+          : null,
     );
 
-    final request =
-        http.Request(method.verb, requestUri)
-          ..headers[_userAgentHeader] = client.userAgent
-          ..headers[_acceptHeader] = _msgPackMimeType
-          ..headers.addAll(headers);
+    final request = http.Request(method.verb, requestUri)
+      ..headers[_userAgentHeader] = client.userAgent
+      ..headers[_acceptHeader] = _msgPackMimeType
+      ..headers.addAll(headers);
     if (authToken != null) {
       request.headers[_authorizationHeader] = authToken.header;
     }
@@ -158,10 +158,9 @@ class BaseNetwork {
       _msgPackMimeType => client.converter.decode<T>(response.bodyBytes),
       _binaryMimeType => response.bodyBytes as T,
       _plainTextMimeType => response.body as T,
-      final contentType =>
-        throw InvalidMessagePackData(
-          'Content type $contentType is not supported',
-        ),
+      final contentType => throw InvalidMessagePackData(
+        'Content type $contentType is not supported',
+      ),
     };
   }
 

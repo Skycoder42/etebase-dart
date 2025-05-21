@@ -27,11 +27,10 @@ class AccountCryptoManager extends CryptoManager {
   String colTypeFromUid(Uint8List uid) {
     final paddedColType = deterministicDecrypt(uid);
     return executor.execSync(
-      (sodium) =>
-          sodium
-              .unpad(paddedColType, _colTypePadSize)
-              .signedView()
-              .toDartString(),
+      (sodium) => sodium
+          .unpad(paddedColType, _colTypePadSize)
+          .signedView()
+          .toDartString(),
     );
   }
 

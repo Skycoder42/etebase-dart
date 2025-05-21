@@ -44,21 +44,17 @@ class CryptoService {
   Uint8List bufferPadSmall(Uint8List buffer) =>
       executor.execSync((sodium) => sodium.pad(buffer, buffer.length + 1));
 
-  Uint8List bufferUnpadSmall(Uint8List buffer) =>
-      buffer.isEmpty
-          ? buffer
-          : executor.execSync((sodium) => sodium.unpad(buffer, buffer.length));
+  Uint8List bufferUnpadSmall(Uint8List buffer) => buffer.isEmpty
+      ? buffer
+      : executor.execSync((sodium) => sodium.unpad(buffer, buffer.length));
 
   FutureOr<Uint8List> bufferPad(Uint8List buffer) => executor.exec(
     (sodium, _, _) => sodium.pad(buffer, _getPadding(buffer.length)),
   );
 
-  FutureOr<Uint8List> bufferUnpad(Uint8List buffer) =>
-      buffer.isEmpty
-          ? buffer
-          : executor.exec(
-            (sodium, _, _) => sodium.unpad(buffer, buffer.length),
-          );
+  FutureOr<Uint8List> bufferUnpad(Uint8List buffer) => buffer.isEmpty
+      ? buffer
+      : executor.exec((sodium, _, _) => sodium.unpad(buffer, buffer.length));
 
   List<int> shuffle<T>(List<T> list) => executor.execSync((sodium) {
     final len = list.length;

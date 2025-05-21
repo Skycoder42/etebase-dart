@@ -109,11 +109,10 @@ void main() {
         EtebaseCollectionAccessLevel.readOnly,
       ),
       response: null,
-      call:
-          (_) => sut.modifyAccessLevel(
-            testUsername,
-            EtebaseCollectionAccessLevel.readOnly,
-          ),
+      call: (_) => sut.modifyAccessLevel(
+        testUsername,
+        EtebaseCollectionAccessLevel.readOnly,
+      ),
       method: HttpMethod.patch,
       path: [testUsername],
       authToken: testAuthToken,

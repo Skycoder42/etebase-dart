@@ -94,8 +94,9 @@ void main() {
         test('sends basic request', () async {
           await sut.invoke<void>();
 
-          final [Request request] =
-              verify(mockClient.send(captureAny)).captured;
+          final [Request request] = verify(
+            mockClient.send(captureAny),
+          ).captured;
 
           expect(request.method, 'GET');
           expect(
@@ -124,8 +125,9 @@ void main() {
             authToken: testToken,
           );
 
-          final [Request request] =
-              verify(mockClient.send(captureAny)).captured;
+          final [Request request] = verify(
+            mockClient.send(captureAny),
+          ).captured;
 
           expect(request.method, 'PATCH');
           expect(
@@ -159,8 +161,9 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] =
-              verify(mockClient.send(captureAny)).captured;
+          final [Request request] = verify(
+            mockClient.send(captureAny),
+          ).captured;
 
           expect(request.body, testBody);
           expect(request.bodyBytes, utf8.encode(testBody));
@@ -178,8 +181,9 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] =
-              verify(mockClient.send(captureAny)).captured;
+          final [Request request] = verify(
+            mockClient.send(captureAny),
+          ).captured;
 
           expect(request.bodyFields, testBody);
           expect(request.body, testStrBody);
@@ -200,8 +204,9 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] =
-              verify(mockClient.send(captureAny)).captured;
+          final [Request request] = verify(
+            mockClient.send(captureAny),
+          ).captured;
 
           expect(request.bodyBytes, testBody);
           expect(request.contentLength, testBody.length);
@@ -222,8 +227,9 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] =
-              verify(mockClient.send(captureAny)).captured;
+          final [Request request] = verify(
+            mockClient.send(captureAny),
+          ).captured;
 
           expect(request.bodyBytes, testBodyBytes);
           expect(request.contentLength, testBodyBytes.length);

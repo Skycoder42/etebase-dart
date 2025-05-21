@@ -44,16 +44,14 @@ void main() {
     const testItemUid = 'test-itemUid';
     const testRevUid = 'test-revisionUid';
     const testChunkUid = 'test-chunkUid';
-    final testItem1 =
-        EncryptedCollectionItem()
-          ..uid = testItemUid
-          ..content = (EncryptedRevision()..uid = testRevUid)
-          ..markSaved();
-    final testItem2 =
-        EncryptedCollectionItem()
-          ..uid = 'test-itemUid-2'
-          ..content = (EncryptedRevision()..uid = 'test-revisionUid-2')
-          ..markSaved();
+    final testItem1 = EncryptedCollectionItem()
+      ..uid = testItemUid
+      ..content = (EncryptedRevision()..uid = testRevUid)
+      ..markSaved();
+    final testItem2 = EncryptedCollectionItem()
+      ..uid = 'test-itemUid-2'
+      ..content = (EncryptedRevision()..uid = 'test-revisionUid-2')
+      ..markSaved();
     final testChunk = Chunk(testChunkUid, Uint8List.fromList([44, 23]));
 
     final mockBaseNetwork = MockBaseNetwork();

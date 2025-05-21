@@ -66,11 +66,10 @@ class EncryptedCollectionItem {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) async {
-    final item =
-        EncryptedCollectionItem()
-          ..uid = client.converter.base64Encode(
-            client.crypto.randomBytes(_itemUidBytes),
-          );
+    final item = EncryptedCollectionItem()
+      ..uid = client.converter.base64Encode(
+        client.crypto.randomBytes(_itemUidBytes),
+      );
     final cm = item.getCryptoManager(client, parentCm);
     try {
       item.content = await client.createEncryptedRevision(

@@ -28,9 +28,6 @@ class FlutterClient extends Client implements EtebaseFlutterClient {
     return Hive.initFlutter('etebase');
   }
 
-  FlutterClient.create(
-    super.cryptoExecutor,
-    super.clientName,
-    super.serverUrl,
-  ) : super.create();
+  FlutterClient.create(super.cryptoExecutor, super.clientName, super.serverUrl)
+    : super.create();
 }

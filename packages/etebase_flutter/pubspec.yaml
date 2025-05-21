@@ -4,15 +4,15 @@ version: 2.0.0
 homepage: https://github.com/Skycoder42/etebase-dart
 
 environment:
-  sdk: ^3.7.0
-  flutter: ">=3.29.0"
+  sdk: ^3.8.0
+  flutter: ">=3.32.0"
 resolution: workspace
 
 dependencies:
   etebase: ^2.0.0
   flutter:
     sdk: flutter
-  hive_ce_flutter: ^2.3.0
+  hive_ce_flutter: ^2.3.1
   meta: ^1.16.0
   package_info_plus: ^8.3.0
   sodium_libs: ^3.4.5

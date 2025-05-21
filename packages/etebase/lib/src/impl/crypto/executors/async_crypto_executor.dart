@@ -65,8 +65,9 @@ class AsyncCryptoExecutor implements CryptoExecutor {
 
   Future<void> initialize() async {
     _receivePort = ReceivePort('AsyncCryptoExecutor.main');
-    _receivePortStream =
-        _receivePort.cast<_CryptoJobResult>().asBroadcastStream();
+    _receivePortStream = _receivePort
+        .cast<_CryptoJobResult>()
+        .asBroadcastStream();
 
     _errorPort = ReceivePort('AsyncCryptoExecutor.error')
       ..cast<List<dynamic>>()
@@ -127,8 +128,9 @@ class AsyncCryptoExecutor implements CryptoExecutor {
       _CryptoJob.run(
         id: _nextJobId,
         callback: callback,
-        secureKeys:
-            secureKeys.map(_sodium.createTransferrableSecureKey).toList(),
+        secureKeys: secureKeys
+            .map(_sodium.createTransferrableSecureKey)
+            .toList(),
         keyPairs: keyPairs.map(_sodium.createTransferrableKeyPair).toList(),
       ),
     ),
@@ -147,9 +149,10 @@ class AsyncCryptoExecutor implements CryptoExecutor {
     _sendPort.send(job);
     return switch (TResult) {
       // ignore: type_literal_in_constant_pattern
-      SecureKey => _waitForResult<TransferrableSecureKey>(job.id)
-          .then(_sodium.materializeTransferrableSecureKey)
-          .then((k) => k as TResult),
+      SecureKey =>
+        _waitForResult<TransferrableSecureKey>(job.id)
+            .then(_sodium.materializeTransferrableSecureKey)
+            .then((k) => k as TResult),
       // ignore: type_literal_in_constant_pattern
       KeyPair => _waitForResult<TransferrableKeyPair>(
         job.id,
@@ -162,19 +165,18 @@ class AsyncCryptoExecutor implements CryptoExecutor {
     };
   }
 
-  Future<TResult> _waitForResult<TResult>(int jobId) =>
-      _receivePortStream
-          .where((r) => r.id == jobId)
-          .map(
-            (r) => switch (r) {
-              _CryptoJobResultSuccess() => r.result as TResult,
-              _CryptoJobResultError() => Error.throwWithStackTrace(
-                r.error,
-                r.stackTrace,
-              ),
-            },
-          )
-          .first;
+  Future<TResult> _waitForResult<TResult>(int jobId) => _receivePortStream
+      .where((r) => r.id == jobId)
+      .map(
+        (r) => switch (r) {
+          _CryptoJobResultSuccess() => r.result as TResult,
+          _CryptoJobResultError() => Error.throwWithStackTrace(
+            r.error,
+            r.stackTrace,
+          ),
+        },
+      )
+      .first;
 
   static void _finalize((Isolate, ReceivePort, ReceivePort) token) {
     final (isolate, dataPort, errPort) = token;
@@ -216,8 +218,9 @@ _CryptoJobResult _processRunJob(SodiumSumo sodium, _CryptoJobRun job) {
   List<KeyPair>? pairs;
 
   try {
-    keys =
-        job.secureKeys.map(sodium.materializeTransferrableSecureKey).toList();
+    keys = job.secureKeys
+        .map(sodium.materializeTransferrableSecureKey)
+        .toList();
     pairs = job.keyPairs.map(sodium.materializeTransferrableKeyPair).toList();
 
     final result = job.callback(sodium, keys, pairs);

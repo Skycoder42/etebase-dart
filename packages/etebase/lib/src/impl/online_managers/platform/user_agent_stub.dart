@@ -12,10 +12,9 @@ abstract base class UserAgent {
     Iterable<String> values = const [],
     String? suffix,
   }) {
-    final sb =
-        StringBuffer()
-          ..write(clientName)
-          ..write(' (');
+    final sb = StringBuffer()
+      ..write(clientName)
+      ..write(' (');
 
     final allValues = [
       'package:${pubspec.package}/${pubspec.version}',
