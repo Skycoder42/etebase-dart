@@ -5,8 +5,10 @@
   "license": "ISC",
   "author": "",
   "type": "module",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "tsx"
+    "start": "tsx src/index.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "etebase": "*"

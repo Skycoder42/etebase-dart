@@ -9,7 +9,7 @@ DEST_DIR=$PWD/tool/integration/cache/sodium
 VERSION_FILE="$DEST_DIR/version.txt"
 
 echo "::group::Restoring js_client"
-npm --prefix tool/js_client install
+npm --prefix tool\\js_client install
 echo ::endgroup::
 
 if [ "$CACHE_HIT" = "true" ]; then

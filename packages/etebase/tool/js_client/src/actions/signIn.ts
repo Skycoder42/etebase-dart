@@ -1,12 +1,10 @@
-import { run } from "../util/run";
-import * as Etebase from 'etebase';
+import type { ActionCallback, SignedInAction } from "../util/action";
 
-type SignInAction = {
-  username: string;
-  password: string;
-};
+export const signInActionName = "signIn";
 
-run<SignInAction>(async (serverUrl, { username, password }) => {
-  const account = await Etebase.Account.login(username, password, serverUrl);
+export type SignInAction = SignedInAction;
+
+export const signInAction: ActionCallback<SignInAction> = async ({ etebase, action: { username, password, serverUrl } }) => {
+  const account = await etebase.Account.login(username, password, serverUrl);
   console.assert(account.authToken, 'account has not authToken', account);
-});
+};

@@ -65,3 +65,4 @@ packages/etebase/tool/integration/libetebase
 # js
 **/node_modules
 package-lock.json
+dist/
