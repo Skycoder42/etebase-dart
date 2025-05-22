@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 import 'package:web/web.dart';
 
 import 'js_client_wrapper_stub.dart';
+import 'library_loader.dart';
 
 @JS('Object.keys')
 external JSArray<JSString> objectKeys(JSObject object);
@@ -28,19 +29,49 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     bool useDefaultServer = false,
     TRes Function(Map<String, dynamic> json)? fromJson,
   }) async {
-    print(globalContext.has('exports'));
-    await _loadJs('etebase', _etebaseJsPath);
-    print(globalContext.has('exports'));
-    await _loadJs(action.$type, 'dist/actions/${action.$type}.js');
-    print(globalContext.has('exports'));
+    final exports = _getExports();
+    final etebase = await _loadEtebase(exports);
 
-    return null as TRes;
+    await _loadJs(action.$type, 'dist/actions/${action.$type}.js');
+    final actionConfig = exports['${action.$type}Config']! as JSObject;
+    final actionFunction = actionConfig['callback']! as JSFunction;
+
+    final rawAction = action.toJson();
+    if (!useDefaultServer) {
+      rawAction['serverUrl'] = serverUri.toString();
+    }
+    final callParam = JSObject();
+    callParam['etebase'] = etebase;
+    callParam['action'] = rawAction.jsify();
+
+    final result = actionFunction.callAsFunction(actionConfig, callParam);
+    final awaitedResult = await (result as JSPromise?)?.toDart;
+    return awaitedResult.dartify() as TRes;
   }
 
-  static Future<void> _loadJs(String id, String path) async {
+  static JSObject _getExports() {
+    if (!globalContext.has('exports')) {
+      globalContext['exports'] = JSObject();
+    }
+    return globalContext['exports']! as JSObject;
+  }
+
+  static Future<JSObject> _loadEtebase(JSObject exports) async {
+    final didLoad = await _loadJs('etebase', _etebaseJsPath);
+    final etebase =
+        (exports['Etebase'] ?? globalContext['Etebase'])! as JSObject;
+
+    if (didLoad) {
+      await (etebase['ready']! as JSPromise).toDart;
+    }
+
+    return etebase;
+  }
+
+  static Future<bool> _loadJs(String id, String path) async {
     final element = document.getElementById(id);
     if (element != null) {
-      return;
+      return false;
     }
 
     final channel = spawnHybridCode(_vmCode, message: path);
@@ -52,5 +83,6 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     document.head!.append(script);
 
     await Future<void>.delayed(Duration.zero);
+    return true;
   }
 }

@@ -26,3 +26,13 @@ type SignedInActionCallbackParam<T extends Action> = {
 };
 
 export type SignedInActionCallback<T extends SignedInAction> = (_: SignedInActionCallbackParam<T>) => Promise<any>;
+
+export type ActionConfig<T extends Action> = {
+  name: string;
+  callback: ActionCallback<T>
+}
+
+export type SignedInActionConfig<T extends SignedInAction> = {
+  name: string;
+  callback: SignedInActionCallback<T>
+}

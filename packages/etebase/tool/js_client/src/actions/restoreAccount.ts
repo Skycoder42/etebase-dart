@@ -1,12 +1,16 @@
-// import { run } from "../util/run";
-// import * as Etebase from 'etebase';
+import type { ActionConfig, Action } from "../util/action";
 
-// type RestoreAccountAction = {
-//   data: string;
-//   encryptionKey: string;
-// };
+type RestoreAccountAction = Action & {
+  data: string;
+  encryptionKey: string;
+};
 
-// run<RestoreAccountAction>(async (_, { data, encryptionKey }) => {
-//   const account = await Etebase.Account.restore(data, Etebase.fromBase64(encryptionKey));
-//   console.assert(account.authToken, 'account has not authToken', account);
-// });
+export const restoreAccountConfig: ActionConfig<RestoreAccountAction> = {
+  name: 'restoreAccount',
+  callback: async ({ etebase, action: { data, encryptionKey } }) => {
+    const account = await etebase.Account.restore(data, etebase.fromBase64(encryptionKey));
+    console.assert(account.authToken, 'account has no authToken', account);
+  }
+};
+
+

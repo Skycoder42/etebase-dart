@@ -1,13 +1,14 @@
-// import { run } from "../util/run";
-// import * as Etebase from 'etebase';
+import type { ActionConfig, SignedInAction } from "../util/action";
 
-// type SignUpAction = {
-//   username: string;
-//   email: string;
-//   password: string;
-// };
+type SignUpAction = SignedInAction & {
+  email: string;
+};
 
-// run<SignUpAction>(async (serverUrl, { username, email, password }) => {
-//   const account = await Etebase.Account.signup({ username, email }, password, serverUrl);
-//   console.assert(account.authToken, 'account has not authToken', account);
-// });
+export const signUpConfig: ActionConfig<SignUpAction> = {
+  name: 'signUp',
+  callback: async ({ etebase, action: { username, email, password, serverUrl } }) => {
+    const account = await etebase.Account.signup({ username, email }, password, serverUrl);
+    console.assert(account.authToken, 'account has no authToken', account);
+  }
+};
+

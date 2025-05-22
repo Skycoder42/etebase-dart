@@ -1,10 +1,11 @@
-import type { ActionCallback, SignedInAction } from "../util/action";
+import type { ActionConfig, SignedInAction } from "../util/action";
 
-export const signInActionName = "signIn";
+type SignInAction = SignedInAction;
 
-export type SignInAction = SignedInAction;
-
-export const signInAction: ActionCallback<SignInAction> = async ({ etebase, action: { username, password, serverUrl } }) => {
-  const account = await etebase.Account.login(username, password, serverUrl);
-  console.assert(account.authToken, 'account has not authToken', account);
+export const signInConfig: ActionConfig<SignInAction> = {
+  name: 'signIn',
+  callback: async ({ etebase, action: { username, password, serverUrl } }) => {
+    const account = await etebase.Account.login(username, password, serverUrl);
+    console.assert(account.authToken, 'account has no authToken', account);
+  }
 };
