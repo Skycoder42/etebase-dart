@@ -5,6 +5,7 @@ type SaveAccountAction = SignedInAction & {
 };
 
 export const saveAccountConfig: SignedInActionConfig<SaveAccountAction> = {
+  signedIn: true,
   name: 'saveAccount',
   callback: async ({ etebase, account, action: { encryptionKey } }) => {
     const savedAccount = await account.save(etebase.fromBase64(encryptionKey));

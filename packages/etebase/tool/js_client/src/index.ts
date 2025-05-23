@@ -1,32 +1,23 @@
 import * as etebase from 'etebase';
 import { readFileSync, writeFileSync } from 'fs';
-import { Action, ActionConfig, SignedInAction, SignedInActionConfig } from './util/action';
+import { Action, AnyActionConfig } from './util/action';
+import { run } from './util/run';
 import { signInConfig } from './actions/signIn';
 import { signUpConfig } from './actions/signUp';
 import { restoreAccountConfig } from './actions/restoreAccount';
 import { saveAccountConfig } from './actions/saveAccount';
 
-const _run = async <TAction extends Action>(action: Action, config: ActionConfig<TAction>): Promise<boolean> => {
+const _run = async (action: Action, config: AnyActionConfig): Promise<boolean> => {
   if (action.action !== config.name) {
     return false;
   }
 
-  const result = await config.callback({ etebase, action: action as TAction });
+  const result = await run(etebase, action, config);
   if (result) {
     writeFileSync(1, JSON.stringify(result));
   }
 
   return true;
-}
-
-const _runSignedIn = async <TAction extends SignedInAction>(action: Action, config: SignedInActionConfig<TAction>): Promise<boolean> => {
-  return await _run<TAction>(action, {
-    name: config.name,
-    callback: async ({ etebase, action }) => {
-      const account = await etebase.Account.login(action.username, action.password, action.serverUrl);
-      return await config.callback({ etebase, account, action });
-    }
-  });
 }
 
 const main = async () => {
@@ -38,7 +29,7 @@ const main = async () => {
   let didRun = false;
   didRun = didRun || await _run(action, signInConfig);
   didRun = didRun || await _run(action, signUpConfig);
-  didRun = didRun || await _runSignedIn(action, saveAccountConfig);
+  didRun = didRun || await _run(action, saveAccountConfig);
   didRun = didRun || await _run(action, restoreAccountConfig);
 
   if (!didRun) {

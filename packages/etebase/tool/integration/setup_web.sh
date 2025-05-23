@@ -7,6 +7,11 @@ VERSION_FILE="$DEST_DIR/version.txt"
 DART_FILE="$DEST_DIR/sodium.js.dart"
 TMP_DIR=${RUNNER_TEMP:-/tmp}
 
+echo "::group::Restoring js_client"
+npm --prefix tool/js_client install
+npm --prefix tool/js_client run build
+echo ::endgroup::
+
 if [ "$CACHE_HIT" = "true" ]; then
   current_version=$(cat "$VERSION_FILE")
   if [[ "$version" != "$current_version" ]]; then

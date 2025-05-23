@@ -12,6 +12,7 @@ external JSArray<JSString> objectKeys(JSObject object);
 
 abstract base class JsClientWrapper {
   static const _etebaseJsPath = 'node_modules/etebase/dist/umd/Etebase.js';
+  static const _runJsPath = 'dist/util/run.js';
   static const _vmCode = r'''
 import 'dart:io';
 
@@ -31,20 +32,22 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
   }) async {
     final exports = _getExports();
     final etebase = await _loadEtebase(exports);
+    final run = await _loadRun(exports);
 
     await _loadJs(action.$type, 'dist/actions/${action.$type}.js');
     final actionConfig = exports['${action.$type}Config']! as JSObject;
-    final actionFunction = actionConfig['callback']! as JSFunction;
 
     final rawAction = action.toJson();
     if (!useDefaultServer) {
       rawAction['serverUrl'] = serverUri.toString();
     }
-    final callParam = JSObject();
-    callParam['etebase'] = etebase;
-    callParam['action'] = rawAction.jsify();
 
-    final result = actionFunction.callAsFunction(actionConfig, callParam);
+    final result = run.callAsFunction(
+      globalContext,
+      etebase,
+      rawAction.jsify(),
+      actionConfig,
+    );
     final awaitedResult = await (result as JSPromise?)?.toDart;
     return awaitedResult.dartify() as TRes;
   }
@@ -66,6 +69,11 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     }
 
     return etebase;
+  }
+
+  static Future<JSFunction> _loadRun(JSObject exports) async {
+    await _loadJs('run', _runJsPath);
+    return exports['run']! as JSFunction;
   }
 
   static Future<bool> _loadJs(String id, String path) async {
