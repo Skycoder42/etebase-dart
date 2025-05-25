@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 // ignore: no_self_package_imports
@@ -8,6 +9,7 @@ import 'package:uuid/data.dart';
 import 'package:uuid/rng.dart';
 import 'package:uuid/uuid.dart';
 
+import 'js_client_wrapper.dart';
 import 'library_loader_stub.dart'
     if (dart.library.io) 'library_loader_vm.dart'
     if (dart.library.js_interop) 'library_loader_js.dart';
@@ -43,10 +45,13 @@ Future<EtebaseClient> createClient({bool useDefaultServer = false}) async {
 
 Future<EtebaseAccount> createAccount(
   EtebaseClient client,
-  String userNamePrefix,
-) async {
+  String userNamePrefix, [
+  JsClientWrapper? wrapper,
+]) async {
   final userName = generateUsername(userNamePrefix);
   final user = EtebaseUser(username: userName, email: '$userName@test.com');
-  final account = await EtebaseAccount.signup(client, user, _uuid.v4());
+  final password = base64.encode(EtebaseUtils.randombytes(client, 32));
+  final account = await EtebaseAccount.signup(client, user, password);
+  wrapper?.configureAccount(userName, password);
   return account;
 }

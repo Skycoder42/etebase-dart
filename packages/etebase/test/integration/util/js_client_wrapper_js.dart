@@ -4,13 +4,13 @@ import 'dart:js_interop_unsafe';
 import 'package:test/test.dart';
 import 'package:web/web.dart';
 
-import 'js_client_wrapper_stub.dart';
+import 'js_client_wrapper_stub.dart' as stub;
 import 'library_loader.dart';
 
 @JS('Object.keys')
 external JSArray<JSString> objectKeys(JSObject object);
 
-abstract base class JsClientWrapper {
+class JsClientWrapper extends stub.JsClientWrapper {
   static const _etebaseJsPath = 'node_modules/etebase/dist/umd/Etebase.js';
   static const _runJsPath = 'dist/util/run.js';
   static const _vmCode = r'''
@@ -25,9 +25,24 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
 }
 ''';
 
-  static Future<TRes> execute<TRes>(
-    Action action, {
+  JsClientWrapper() : super.base();
+
+  @override
+  Future<TRes> executeSignedIn<TRes>(
+    stub.Action action, {
     bool useDefaultServer = false,
+    TRes Function(Map<String, dynamic> json)? fromJson,
+  }) => execute<TRes>(
+    action,
+    useDefaultServer: useDefaultServer,
+    actionExtra: {'username': username, 'password': password},
+    fromJson: fromJson,
+  );
+
+  static Future<TRes> execute<TRes>(
+    stub.Action action, {
+    bool useDefaultServer = false,
+    Map<String, dynamic>? actionExtra,
     TRes Function(Map<String, dynamic> json)? fromJson,
   }) async {
     final exports = _getExports();
@@ -40,6 +55,9 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     final rawAction = action.toJson();
     if (!useDefaultServer) {
       rawAction['serverUrl'] = serverUri.toString();
+    }
+    if (actionExtra != null) {
+      rawAction.addAll(actionExtra);
     }
 
     final result = run.callAsFunction(

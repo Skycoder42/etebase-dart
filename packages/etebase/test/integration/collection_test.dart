@@ -8,9 +8,12 @@ import 'dart:typed_data';
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
+import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:test/test.dart';
 
+import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
+import 'util/test_helpers.dart';
 
 void main() {
   const testCollectionType = 'etebase-dart.collection_test';
@@ -19,13 +22,18 @@ void main() {
   );
   final collectionTestContent2 = Uint8List.fromList(List.filled(2000, 42));
 
+  final jsClientWrapper = JsClientWrapper();
   late final EtebaseCollectionManager collectionManager;
 
   setUpAll(() async {
     final client = await createClient();
     addTearDown(client.dispose);
 
-    final account = await createAccount(client, 'collection-test-user');
+    final account = await createAccount(
+      client,
+      'collection-test-user',
+      jsClientWrapper,
+    );
     addTearDown(account.dispose);
 
     collectionManager = account.collectionManager;
@@ -102,14 +110,14 @@ void main() {
       );
       addTearDown(collection.dispose);
 
-      expect(collection.verify(), anyOf(completes, isNull));
-      expect(collection.isDeleted, isFalse);
+      expect(collection.verify(), completes);
 
       expect(collection.accessLevel, EtebaseCollectionAccessLevel.admin);
       expect(collection.collectionType, testCollectionType);
       expect(collection.etag, isNotEmpty);
       expect(collection.stoken, isNull);
       expect(collection.uid, isNotEmpty);
+      expect(collection.isDeleted, isFalse);
       expect(await collection.getContent(), collectionTestContent1);
 
       final loadedMeta = await collection.getMeta();
@@ -117,7 +125,30 @@ void main() {
       expect(loadedMeta.mtime, isNull);
     });
 
-    test('can be updated and deleted', () async {
+    test('can be updated', () async {
+      const testCollectionName = 'test-name';
+      final testNow = DateTime.now();
+
+      final collection = await collectionManager.create(
+        testCollectionType,
+        const EtebaseItemMetadata(name: testCollectionName),
+        collectionTestContent1,
+      );
+      addTearDown(collection.dispose);
+
+      final updatedMeta = await collection.getMeta();
+      await collection.setContent(collectionTestContent2);
+      await collection.setMeta(updatedMeta.copyWith(mtime: testNow));
+
+      expect(collection.verify(), completes);
+      expect(await collection.getContent(), collectionTestContent2);
+
+      final loadedMeta = await collection.getMeta();
+      expect(loadedMeta.name, testCollectionName);
+      expect(loadedMeta.mtime, dtEquals(testNow));
+    });
+
+    test('can be deleted', () async {
       const testCollectionName = 'test-name';
 
       final collection = await collectionManager.create(
@@ -127,11 +158,14 @@ void main() {
       );
       addTearDown(collection.dispose);
 
-      final loadedMeta = await collection.getMeta();
-      await collection.setContent(collectionTestContent2);
-      await collection.setMeta(loadedMeta.copyWith(mtime: DateTime.now()));
-
       await collection.delete();
+
+      expect(collection.verify(), completes);
+      expect(collection.isDeleted, isTrue);
+      expect(await collection.getContent(), isEmpty);
+
+      final loadedMeta = await collection.getMeta();
+      expect(loadedMeta.name, testCollectionName);
     });
   });
 
@@ -170,6 +204,25 @@ void main() {
       addTearDown(collection3.dispose);
       colId3 = collection3.uid;
       await collectionManager.upload(collection3);
+
+      // validate collections exits in JS
+      final jsColIds = await jsClientWrapper.executeSignedIn<List<String>>(
+        const Action.listCollections([
+          testCollectionType,
+          '$testCollectionType-other',
+        ]),
+      );
+      expect(jsColIds, [colId1, colId2, colId3]);
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(
+          colId1,
+          meta: const EtebaseItemMetadata(name: 'create-collection-test-1'),
+          content: base64UrlNoPad.encode(collectionTestContent1),
+          isDeleted: false,
+        ),
+      );
+      fail('DOES NOT WORK YET');
     });
 
     test('can list collections', () async {

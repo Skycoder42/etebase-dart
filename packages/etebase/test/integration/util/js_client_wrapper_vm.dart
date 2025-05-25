@@ -5,13 +5,28 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'js_client_wrapper_stub.dart';
+import 'js_client_wrapper_stub.dart' as stub;
 import 'library_loader.dart';
 
-abstract base class JsClientWrapper {
-  static Future<TRes> execute<TRes>(
-    Action action, {
+class JsClientWrapper extends stub.JsClientWrapper {
+  JsClientWrapper() : super.base();
+
+  @override
+  Future<TRes> executeSignedIn<TRes>(
+    stub.Action action, {
     bool useDefaultServer = false,
+    TRes Function(Map<String, dynamic> json)? fromJson,
+  }) => execute<TRes>(
+    action,
+    useDefaultServer: useDefaultServer,
+    actionExtra: {'username': username, 'password': password},
+    fromJson: fromJson,
+  );
+
+  static Future<TRes> execute<TRes>(
+    stub.Action action, {
+    bool useDefaultServer = false,
+    Map<String, dynamic>? actionExtra,
     TRes Function(Map<String, dynamic> json)? fromJson,
   }) async {
     final proc = await Process.start('npm', [
@@ -31,6 +46,9 @@ abstract base class JsClientWrapper {
     if (!useDefaultServer) {
       actionMap['serverUrl'] = serverUri.toString();
     }
+    if (actionExtra != null) {
+      actionMap.addAll(actionExtra);
+    }
     proc.stdin.write(json.encode(actionMap));
     await proc.stdin.close();
 
@@ -42,6 +60,10 @@ abstract base class JsClientWrapper {
       );
     } else if (TRes == String) {
       return json.decode(stdoutBuffer.toString()) as TRes;
+    } else if (TRes == List<String>) {
+      return (json.decode(stdoutBuffer.toString()) as List<dynamic>)
+              .cast<String>()
+          as TRes;
     } else {
       return null as TRes;
     }

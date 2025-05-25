@@ -46,7 +46,12 @@ void main() {
   });
 
   test('can cache and restore account', () async {
+    expect(cache.hasAccount, completion(isFalse));
+
     await cache.saveAccount(account);
+
+    expect(cache.hasAccount, completion(isTrue));
+
     final restoredAccount = await cache.loadAccount();
     await restoredAccount.fetchToken();
 
@@ -58,6 +63,8 @@ void main() {
 
   test('can cache and restore collection list stoken', () async {
     final collectionManager = account.collectionManager;
+
+    expect(cache.hasStoken, completion(isFalse));
 
     final collection = await collectionManager.create(
       testCollectionType,
@@ -71,6 +78,9 @@ void main() {
 
     final response = await collectionManager.list(testCollectionType);
     await cache.saveStoken(response.stoken!);
+
+    expect(cache.hasStoken, completion(isTrue));
+
     final restoredToken = await cache.loadStoken();
 
     expect(restoredToken, response.stoken);
@@ -85,6 +95,9 @@ void main() {
     final testCollectionData = Uint8List.fromList(List.filled(10, 10));
 
     final collectionManager = account.collectionManager;
+
+    expect(cache.persistedCollectionStokenUids, emitsDone);
+    expect(cache.persistedCollectionUids, emitsDone);
 
     const meta = EtebaseItemMetadata();
     var collection = await collectionManager.create(
@@ -110,6 +123,10 @@ void main() {
       throwsA(isA<NotFound>()),
     );
     await cache.collectionSet(collectionManager, collection);
+    expect(
+      cache.persistedCollectionUids,
+      emitsInOrder([collectionId, emitsDone]),
+    );
     final restoredCollection = await cache.collectionGet(
       collectionManager,
       collectionId,
@@ -122,11 +139,17 @@ void main() {
       throwsA(isA<NotFound>()),
     );
     await cache.collectionSaveStoken(collectionId, collection.stoken!);
+    expect(
+      cache.persistedCollectionStokenUids,
+      emitsInOrder([collectionId, emitsDone]),
+    );
     final restoredToken = await cache.collectionLoadStoken(collectionId);
 
     expect(restoredToken, collection.stoken);
 
     await cache.collectionUnset(collectionId);
+    expect(cache.persistedCollectionStokenUids, emitsDone);
+    expect(cache.persistedCollectionUids, emitsDone);
     await expectLater(
       () => cache.collectionGet(collectionManager, collectionId),
       throwsA(isA<NotFound>()),
@@ -153,6 +176,8 @@ void main() {
     final itemManager = collectionManager.getItemManager(collection);
     addTearDown(itemManager.dispose);
 
+    expect(cache.persistedItemUids(collectionId), emitsDone);
+
     const itemMeta = EtebaseItemMetadata(color: 'AABBCC');
     final itemContent = Uint8List.fromList(List.filled(42, 42));
     final item = await itemManager.create(itemMeta, itemContent);
@@ -167,6 +192,11 @@ void main() {
 
     await cache.itemSet(itemManager, collectionId, item);
 
+    expect(
+      cache.persistedItemUids(collectionId),
+      emitsInOrder([itemId, emitsDone]),
+    );
+
     final restoredItem = await cache.itemGet(itemManager, collectionId, itemId);
     expect(restoredItem.uid, itemId);
     expect(await restoredItem.getMeta(), itemMeta);
@@ -174,6 +204,7 @@ void main() {
     expect(restoredItem.etag, item.etag);
 
     await cache.itemUnset(collectionId, itemId);
+    expect(cache.persistedItemUids(collectionId), emitsDone);
     await expectLater(
       () => cache.itemGet(itemManager, collectionId, itemId),
       throwsA(isA<NotFound>()),
@@ -181,7 +212,16 @@ void main() {
   });
 
   test('can clear cache data', () async {
+    expect(cache.hasAccount, completion(isTrue));
+    expect(cache.hasStoken, completion(isTrue));
+
     await cache.clearUser(reInitialize: true);
+
+    expect(cache.hasAccount, completion(isFalse));
+    expect(cache.hasStoken, completion(isFalse));
+    expect(cache.persistedCollectionStokenUids, emitsDone);
+    expect(cache.persistedCollectionUids, emitsDone);
+
     await expectLater(() => cache.loadAccount(), throwsA(isA<NotFound>()));
 
     await cache.clearUser();
