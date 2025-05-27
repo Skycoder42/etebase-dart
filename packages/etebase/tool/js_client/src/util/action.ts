@@ -2,12 +2,17 @@ import * as _Etebase from 'etebase';
 
 export type Etebase = typeof _Etebase;
 
+export type TestUtils = {
+  assert: (condition: boolean, message: string) => void;
+}
+
 export type Action = {
   action: string;
 }
 
 type ActionCallbackParam<T extends Action> = {
   etebase: Etebase;
+  utils: TestUtils;
   action: T;
 };
 
@@ -19,10 +24,8 @@ export type SignedInAction = Action & {
   serverUrl?: string;
 };
 
-type SignedInActionCallbackParam<T extends Action> = {
-  etebase: Etebase;
+type SignedInActionCallbackParam<T extends SignedInAction> = ActionCallbackParam<T> & {
   account: _Etebase.Account;
-  action: T;
 };
 
 export type SignedInActionCallback<T extends SignedInAction> = (_: SignedInActionCallbackParam<T>) => Promise<any>;

@@ -6,9 +6,9 @@ type SignUpAction = SignedInAction & {
 
 export const signUpConfig: ActionConfig<SignUpAction> = {
   name: 'signUp',
-  callback: async ({ etebase, action: { username, email, password, serverUrl } }) => {
+  callback: async ({ etebase, utils, action: { username, email, password, serverUrl } }) => {
     const account = await etebase.Account.signup({ username, email }, password, serverUrl);
-    console.assert(account.authToken, 'account has no authToken', account);
+    utils.assert(account.authToken !== null, 'account has no authToken');
   }
 };
 

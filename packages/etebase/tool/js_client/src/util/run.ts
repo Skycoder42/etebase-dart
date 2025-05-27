@@ -1,6 +1,6 @@
-import type { Etebase, Action, SignedInAction, AnyActionConfig } from './action';
+import type { Etebase, Action, SignedInAction, AnyActionConfig, TestUtils } from './action';
 
-export const run = async (etebase: Etebase, action: Action, config: AnyActionConfig): Promise<any> => {
+export const run = async (etebase: Etebase, utils: TestUtils, action: Action, config: AnyActionConfig): Promise<any> => {
   if (config.signedIn) {
     var signedInAction = action as SignedInAction;
     const account = await etebase.Account.login(
@@ -8,8 +8,8 @@ export const run = async (etebase: Etebase, action: Action, config: AnyActionCon
       signedInAction.password,
       signedInAction.serverUrl
     );
-    return await config.callback({ etebase, account, action });
+    return await config.callback({ etebase, utils, account, action });
   } else {
-    return await config.callback({ etebase, action });
+    return await config.callback({ etebase, utils, action });
   }
 }

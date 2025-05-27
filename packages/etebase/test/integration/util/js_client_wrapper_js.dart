@@ -13,6 +13,7 @@ external JSArray<JSString> objectKeys(JSObject object);
 class JsClientWrapper extends stub.JsClientWrapper {
   static const _etebaseJsPath = 'node_modules/etebase/dist/umd/Etebase.js';
   static const _runJsPath = 'dist/util/run.js';
+  static const _testUtilsJsPath = 'dist/util/test.js';
   static const _vmCode = r'''
 import 'dart:io';
 
@@ -47,6 +48,7 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
   }) async {
     final exports = _getExports();
     final etebase = await _loadEtebase(exports);
+    final testUtils = await _loadTestUtils(exports);
     final run = await _loadRun(exports);
 
     await _loadJs(action.$type, 'dist/actions/${action.$type}.js');
@@ -63,11 +65,17 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     final result = run.callAsFunction(
       globalContext,
       etebase,
+      testUtils,
       rawAction.jsify(),
       actionConfig,
     );
     final awaitedResult = await (result as JSPromise?)?.toDart;
-    return awaitedResult.dartify() as TRes;
+    if (awaitedResult.isA<JSArray<JSString>>()) {
+      final arr = awaitedResult! as JSArray<JSString>;
+      return arr.toDart.cast<String>() as TRes;
+    } else {
+      return awaitedResult.dartify() as TRes;
+    }
   }
 
   static JSObject _getExports() {
@@ -87,6 +95,11 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     }
 
     return etebase;
+  }
+
+  static Future<JSObject> _loadTestUtils(JSObject exports) async {
+    await _loadJs('testUtils', _testUtilsJsPath);
+    return exports['testUtils']! as JSObject;
   }
 
   static Future<JSFunction> _loadRun(JSObject exports) async {

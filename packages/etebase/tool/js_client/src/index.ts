@@ -8,13 +8,14 @@ import { restoreAccountConfig } from './actions/restoreAccount';
 import { saveAccountConfig } from './actions/saveAccount';
 import { listCollectionsConfig } from './actions/listCollections';
 import { validateCollectionConfig } from './actions/validateCollection';
+import { testUtils } from './util/test';
 
 const _run = async (action: Action, config: AnyActionConfig): Promise<boolean> => {
   if (action.action !== config.name) {
     return false;
   }
 
-  const result = await run(etebase, action, config);
+  const result = await run(etebase, testUtils, action, config);
   if (result) {
     writeFileSync(1, JSON.stringify(result));
   }

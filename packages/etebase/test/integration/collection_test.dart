@@ -222,7 +222,6 @@ void main() {
           isDeleted: false,
         ),
       );
-      fail('DOES NOT WORK YET');
     });
 
     test('can list collections', () async {

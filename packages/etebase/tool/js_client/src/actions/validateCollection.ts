@@ -1,4 +1,4 @@
-import { OutputFormat, type ItemMetadata } from "etebase";
+import type { ItemMetadata } from "etebase";
 import type { SignedInActionConfig, SignedInAction } from "../util/action";
 
 type ValidateCollectionAction = SignedInAction & {
@@ -11,36 +11,32 @@ type ValidateCollectionAction = SignedInAction & {
 export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAction> = {
   signedIn: true,
   name: 'validateCollection',
-  callback: async ({ etebase, account, action: { uid, meta, content, isDeleted } }) => {
+  callback: async ({ etebase, utils, account, action: { uid, meta, content, isDeleted } }) => {
     const cm = account.getCollectionManager();
     const col = await cm.fetch(uid);
-    console.assert(col.verify(), 'Unable to verify collection');
+    utils.assert(col.verify(), 'Unable to verify collection');
 
     if (typeof meta !== "undefined") {
       const colMeta = col.getMeta();
-      console.assert(
+      utils.assert(
         JSON.stringify(colMeta) === JSON.stringify(meta),
-        'Collection metadata does not match (Expected: %o, Actual: %o)',
-        colMeta,
-        meta
+        `Collection metadata does not match (Expected: ${JSON.stringify(meta)}, Actual: ${JSON.stringify(colMeta)})`,
       );
     }
 
     if (typeof content !== "undefined") {
-      const colContent = await col.getContent(OutputFormat.String);
-      console.assert(colContent === content,
-        'Collection content does not match (Expected: %s, Actual: %s)',
-        colContent,
-        content
+      const colContent = await col.getContent();
+      const encodedContent = etebase.toBase64(colContent);
+      utils.assert(
+        encodedContent === content,
+        `Collection content does not match (Expected: ${content}, Actual: ${encodedContent})`,
       );
     }
 
     if (typeof isDeleted !== "undefined") {
-      console.assert(
+      utils.assert(
         col.isDeleted == isDeleted,
-        'Collection deletion state does not match (Expected: %s, Actual: %s)',
-        col.isDeleted.toString(),
-        isDeleted.toString()
+        `Collection deletion state does not match (Expected: ${isDeleted}, Actual: ${col.isDeleted})`,
       );
     }
   }

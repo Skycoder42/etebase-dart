@@ -7,9 +7,9 @@ type RestoreAccountAction = Action & {
 
 export const restoreAccountConfig: ActionConfig<RestoreAccountAction> = {
   name: 'restoreAccount',
-  callback: async ({ etebase, action: { data, encryptionKey } }) => {
+  callback: async ({ etebase, utils, action: { data, encryptionKey } }) => {
     const account = await etebase.Account.restore(data, etebase.fromBase64(encryptionKey));
-    console.assert(account.authToken, 'account has no authToken', account);
+    utils.assert(account.authToken !== null, 'account has no authToken');
   }
 };
 
