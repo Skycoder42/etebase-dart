@@ -9,6 +9,7 @@ import { saveAccountConfig } from './actions/saveAccount';
 import { listCollectionsConfig } from './actions/listCollections';
 import { validateCollectionConfig } from './actions/validateCollection';
 import { testUtils } from './util/test';
+import { createCollectionConfig } from './actions/createCollection';
 
 const _run = async (action: Action, config: AnyActionConfig): Promise<boolean> => {
   if (action.action !== config.name) {
@@ -36,6 +37,7 @@ const main = async () => {
   didRun = didRun || await _run(action, restoreAccountConfig);
   didRun = didRun || await _run(action, listCollectionsConfig);
   didRun = didRun || await _run(action, validateCollectionConfig);
+  didRun = didRun || await _run(action, createCollectionConfig);
 
   if (!didRun) {
     throw new Error(`Did not found any action matching: ${action.action}`);

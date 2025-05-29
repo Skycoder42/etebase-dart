@@ -4,7 +4,6 @@ library;
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
-import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:test/test.dart';
 
 import 'util/js_client_wrapper.dart';
@@ -132,7 +131,7 @@ void main() {
         Action.saveAccount(
           testUsername,
           testPassword,
-          base64UrlNoPad.encode(encryptionKey1.extractBytes()),
+          encryptionKey1.extractBytes(),
         ),
       );
 
@@ -155,10 +154,7 @@ void main() {
       final dartSaved = await dartAccount.save(encryptionKey2);
 
       await JsClientWrapper.execute<void>(
-        Action.restoreAccount(
-          dartSaved,
-          base64UrlNoPad.encode(encryptionKey2.extractBytes()),
-        ),
+        Action.restoreAccount(dartSaved, encryptionKey2.extractBytes()),
       );
     });
   });

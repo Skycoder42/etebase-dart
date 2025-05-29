@@ -8,7 +8,6 @@ import 'dart:typed_data';
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
-import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:test/test.dart';
 
 import 'util/js_client_wrapper.dart';
@@ -173,6 +172,7 @@ void main() {
     late String colId1;
     late String colId2;
     late String colId3;
+    late String colId4; // from JS
 
     test('can create and upload collections', () async {
       final collection1 = await collectionManager.create(
@@ -217,14 +217,39 @@ void main() {
       await jsClientWrapper.executeSignedIn<void>(
         Action.validateCollection(
           colId1,
-          meta: const EtebaseItemMetadata(name: 'create-collection-test-1'),
-          content: base64UrlNoPad.encode(collectionTestContent1),
+          meta: await collection1.getMeta(),
+          content: collectionTestContent1,
+          isDeleted: false,
+        ),
+      );
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(
+          colId2,
+          meta: await collection2.getMeta(),
+          content: collectionTestContent2,
+          isDeleted: false,
+        ),
+      );
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(
+          colId3,
+          meta: await collection3.getMeta(),
+          content: Uint8List(0),
           isDeleted: false,
         ),
       );
     });
 
     test('can list collections', () async {
+      // create a fourth via JS
+      colId4 = await jsClientWrapper.executeSignedIn<String>(
+        Action.createCollection(
+          testCollectionType,
+          const EtebaseItemMetadata(name: 'js-collection'),
+          collectionTestContent1,
+        ),
+      );
+
       final listResponse = await collectionManager.list(testCollectionType);
 
       expect(listResponse.isDone, isTrue);
@@ -232,7 +257,7 @@ void main() {
       expect(listResponse.removedMemberships, isNull);
 
       final collections = listResponse.data;
-      expect(collections, hasLength(2));
+      expect(collections, hasLength(3));
 
       final collection1 = collections[0];
       expect(collection1.collectionType, testCollectionType);
@@ -245,6 +270,12 @@ void main() {
       expect(collection2.uid, colId2);
       final meta2 = await collection2.getMeta();
       expect(meta2.name, 'create-collection-test-2');
+
+      final collection3 = collections[2];
+      expect(collection3.collectionType, testCollectionType);
+      expect(collection3.uid, colId4);
+      final meta3 = await collection3.getMeta();
+      expect(meta3.name, 'js-collection');
 
       final changedResponse = await collectionManager.list(
         testCollectionType,
@@ -263,7 +294,7 @@ void main() {
       expect(listResponse.isDone, isTrue);
       expect(listResponse.stoken, allOf(isNotNull, isNotEmpty));
       expect(listResponse.removedMemberships, isNull);
-      expect(listResponse.data, hasLength(3));
+      expect(listResponse.data, hasLength(4));
     });
 
     test('can update collection in transaction', () async {
