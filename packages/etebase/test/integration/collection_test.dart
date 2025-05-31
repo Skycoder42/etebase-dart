@@ -10,6 +10,7 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
+import 'util/custom_metadata.dart';
 import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
 import 'util/test_helpers.dart';
@@ -26,6 +27,7 @@ void main() {
 
   setUpAll(() async {
     final client = await createClient();
+    client.registerCustomMetadata(CustomMetadata.fromJson);
     addTearDown(client.dispose);
 
     final account = await createAccount(
@@ -320,6 +322,30 @@ void main() {
         () => collectionManager.transaction(collection2),
         throwsA(isA<Conflict>()),
       );
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(
+          colId1,
+          meta: await collection1.getMeta(),
+          content: Uint8List.fromList(utf8.encode('updated content')),
+          isDeleted: false,
+        ),
+      );
+
+      // now update in js and try the same thing
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.updateCollection(
+          colId1,
+          meta: (await collection1.getMeta()).copyWith(color: '#123456'),
+        ),
+      );
+
+      await collection1.setContent(Uint8List(0));
+
+      expect(
+        () => collectionManager.transaction(collection1),
+        throwsA(isA<Conflict>()),
+      );
     });
 
     test('can upload deleted collection', () async {
@@ -340,6 +366,67 @@ void main() {
       final deletedCollection = await collectionManager.fetch(colId3);
       addTearDown(deletedCollection.dispose);
       expect(deletedCollection.isDeleted, isTrue);
+      expect(deletedCollection.getContent(), completion(isEmpty));
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(
+          colId3,
+          meta: await collection.getMeta(),
+          content: Uint8List(0),
+          isDeleted: true,
+        ),
+      );
+
+      // now delete from js
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.updateCollection(colId1, delete: true),
+      );
+
+      final jsDeletedCol = await collectionManager.fetch(colId1);
+      addTearDown(jsDeletedCol.dispose);
+      expect(jsDeletedCol.isDeleted, isTrue);
+      expect(jsDeletedCol.getContent(), completion(isEmpty));
+    });
+
+    test('can preserve content of deleted collections', () async {
+      final delTest1 = await collectionManager.create(
+        testCollectionType,
+        const EtebaseItemMetadata(),
+        collectionTestContent1,
+      );
+      final delTest2 = await collectionManager.create(
+        testCollectionType,
+        const EtebaseItemMetadata(),
+        collectionTestContent2,
+      );
+
+      await collectionManager.upload(delTest1);
+      await collectionManager.upload(delTest2);
+
+      // delete first from dart
+      await delTest1.delete(preserveContent: true);
+      await collectionManager.upload(delTest1);
+
+      expect(delTest1.getContent(), completion(collectionTestContent1));
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(
+          delTest1.uid,
+          content: collectionTestContent1,
+          isDeleted: true,
+        ),
+      );
+
+      // delete from js
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.updateCollection(
+          delTest2.uid,
+          delete: true,
+          preserveContent: true,
+        ),
+      );
+
+      final updatedTest2 = await collectionManager.fetch(delTest2.uid);
+      expect(updatedTest2.getContent(), completion(collectionTestContent2));
     });
 
     test('can save and restore collection from and to cache', () async {
@@ -370,6 +457,97 @@ void main() {
       final metaWithoutContent = await restoredWithoutContent.getMeta();
       expect(metaWithoutContent.name, 'create-collection-test-2');
       expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
+    });
+
+    test('can save and restore collection from different client', () async {
+      final collection = await collectionManager.fetch(colId4);
+      addTearDown(collection.dispose);
+
+      final savedDart = collectionManager.cacheSave(collection);
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.restoreCollection(
+          savedDart,
+          meta: const EtebaseItemMetadata(name: 'js-collection'),
+          content: collectionTestContent1,
+          isDeleted: false,
+        ),
+      );
+
+      final savedJs = await jsClientWrapper.executeSignedIn<Uint8List>(
+        Action.saveCollection(colId2),
+      );
+      final restored = collectionManager.cacheLoad(savedJs);
+      addTearDown(restored.dispose);
+
+      expect(restored.uid, colId2);
+      expect(restored.isMissingContent, isFalse);
+      expect(await restored.getContent(), collectionTestContent2);
+      final meta = await restored.getMeta();
+      expect(meta.name, 'create-collection-test-2');
+
+      final savedWithoutContentDart = collectionManager.cacheSave(
+        collection,
+        saveContent: false,
+      );
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.restoreCollection(
+          savedWithoutContentDart,
+          meta: const EtebaseItemMetadata(name: 'js-collection'),
+          noContent: true,
+          isDeleted: false,
+        ),
+      );
+
+      final savedWithoutContentJs = await jsClientWrapper
+          .executeSignedIn<Uint8List>(
+            Action.saveCollection(colId2, preserveContent: false),
+          );
+      final restoredWithoutContent = collectionManager.cacheLoad(
+        savedWithoutContentJs,
+      );
+      addTearDown(restoredWithoutContent.dispose);
+
+      expect(restoredWithoutContent.uid, colId2);
+      expect(restoredWithoutContent.isMissingContent, isTrue);
+      final metaWithoutContent = await restoredWithoutContent.getMeta();
+      expect(metaWithoutContent.name, 'create-collection-test-2');
+      expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
+    });
+
+    test('can handle custom metadata', () async {
+      final customCol = await collectionManager.create(
+        testCollectionType,
+        const CustomMetadata(name: 'custom'),
+        Uint8List(0),
+      );
+      await customCol.verify();
+      await collectionManager.upload(customCol);
+
+      final customMeta = await customCol.getMeta<CustomMetadata>();
+      expect(customMeta, isA<CustomMetadata>());
+      expect(customMeta.name, 'custom');
+      expect(customMeta.confirmed, isFalse);
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(customCol.uid, meta: customMeta),
+      );
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.updateCollection(
+          customCol.uid,
+          meta: customMeta.copyWith(confirmed: true),
+        ),
+      );
+
+      final updatedCol = await collectionManager.fetch(customCol.uid);
+      await updatedCol.verify();
+
+      final updatedMeta = await updatedCol.getMeta<CustomMetadata>();
+      expect(updatedMeta, isA<CustomMetadata>());
+      expect(updatedMeta.name, 'custom');
+      expect(updatedMeta.confirmed, isTrue);
     });
   });
 }

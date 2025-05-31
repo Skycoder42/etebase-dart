@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+// ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
 import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -50,6 +51,26 @@ sealed class Action with _$Action {
     EtebaseItemMetadata meta,
     Uint8List content,
   ) = _CreateCollection;
+  @_binary
+  const factory Action.updateCollection(
+    String uid, {
+    EtebaseItemMetadata? meta,
+    Uint8List? content,
+    @Default(false) bool delete,
+    @Default(false) bool preserveContent,
+  }) = _UpdateCollection;
+  @_binary
+  const factory Action.restoreCollection(
+    Uint8List data, {
+    EtebaseItemMetadata? meta,
+    Uint8List? content,
+    @Default(false) bool noContent,
+    bool? isDeleted,
+  }) = _RestoreCollection;
+  const factory Action.saveCollection(
+    String uid, {
+    @Default(true) bool preserveContent,
+  }) = _SaveCollection;
 
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
 

@@ -10,6 +10,9 @@ import { listCollectionsConfig } from './actions/listCollections';
 import { validateCollectionConfig } from './actions/validateCollection';
 import { testUtils } from './util/test';
 import { createCollectionConfig } from './actions/createCollection';
+import { updateCollectionConfig } from './actions/updateCollection';
+import { restoreCollectionConfig } from './actions/restoreCollection';
+import { saveCollectionConfig } from './actions/saveCollection';
 
 const _run = async (action: Action, config: AnyActionConfig): Promise<boolean> => {
   if (action.action !== config.name) {
@@ -38,6 +41,9 @@ const main = async () => {
   didRun = didRun || await _run(action, listCollectionsConfig);
   didRun = didRun || await _run(action, validateCollectionConfig);
   didRun = didRun || await _run(action, createCollectionConfig);
+  didRun = didRun || await _run(action, updateCollectionConfig);
+  didRun = didRun || await _run(action, restoreCollectionConfig);
+  didRun = didRun || await _run(action, saveCollectionConfig);
 
   if (!didRun) {
     throw new Error(`Did not found any action matching: ${action.action}`);

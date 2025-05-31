@@ -10,9 +10,9 @@ type CreateCollectionAction = SignedInAction & {
 export const createCollectionConfig: SignedInActionConfig<CreateCollectionAction> = {
   signedIn: true,
   name: 'createCollection',
-  callback: async ({ utils, account, action: { collectionType, meta, content } }) => {
+  callback: async ({ utils, etebase, account, action: { collectionType, meta, content } }) => {
     const cm = account.getCollectionManager();
-    const col = await cm.create(collectionType, meta, content);
+    const col = await cm.create(collectionType, meta, etebase.fromBase64(content));
     utils.assert(col.verify(), 'Unable to verify collection');
     await cm.upload(col);
     return col.uid;

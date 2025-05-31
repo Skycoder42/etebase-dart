@@ -1,6 +1,8 @@
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+import 'dart:typed_data';
 
+import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:test/test.dart';
 import 'package:web/web.dart';
 
@@ -62,6 +64,7 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
       rawAction.addAll(actionExtra);
     }
 
+    printOnFailure('EXECUTING: $action');
     final result = run.callAsFunction(
       globalContext,
       etebase,
@@ -73,6 +76,8 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
     if (awaitedResult.isA<JSArray<JSString>>()) {
       final arr = awaitedResult! as JSArray<JSString>;
       return arr.toDart.cast<String>() as TRes;
+    } else if (TRes == Uint8List) {
+      return base64UrlNoPad.decode(awaitedResult.dartify()! as String) as TRes;
     } else {
       return awaitedResult.dartify() as TRes;
     }

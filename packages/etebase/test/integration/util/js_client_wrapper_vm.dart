@@ -2,7 +2,9 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:etebase/src/impl/codec/base64_url_no_pad_codec.dart';
 import 'package:test/test.dart';
 
 import 'js_client_wrapper_stub.dart' as stub;
@@ -60,6 +62,11 @@ class JsClientWrapper extends stub.JsClientWrapper {
       );
     } else if (TRes == String) {
       return json.decode(stdoutBuffer.toString()) as TRes;
+    } else if (TRes == Uint8List) {
+      return base64UrlNoPad.decode(
+            json.decode(stdoutBuffer.toString()) as String,
+          )
+          as TRes;
     } else if (TRes == List<String>) {
       return (json.decode(stdoutBuffer.toString()) as List<dynamic>)
               .cast<String>()

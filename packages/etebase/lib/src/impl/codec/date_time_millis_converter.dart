@@ -1,12 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 
-/// @nodoc
-@internal
+/// A custom converter for converter [DateTime] objects from and to JSON as
+/// milliseconds. They are counted from the start of the epoch in UTC.
 const dateTimeMillis = DateTimeMillisConverter();
 
-@internal
+/// A custom converter for converter [DateTime] objects from and to JSON as
+/// milliseconds. They are counted from the start of the epoch in UTC.
 class DateTimeMillisConverter implements JsonConverter<DateTime, int> {
+  /// Default constructor.
   const DateTimeMillisConverter();
 
   @override

@@ -16,7 +16,7 @@ export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAc
     const col = await cm.fetch(uid);
     utils.assert(col.verify(), 'Unable to verify collection');
 
-    if (typeof meta !== "undefined") {
+    if (typeof meta === "object" && meta !== null) {
       const colMeta = col.getMeta();
       utils.assert(
         JSON.stringify(colMeta) === JSON.stringify(meta),
@@ -24,7 +24,7 @@ export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAc
       );
     }
 
-    if (typeof content !== "undefined") {
+    if (typeof content == "string") {
       const colContent = await col.getContent();
       const encodedContent = etebase.toBase64(colContent);
       utils.assert(
@@ -33,7 +33,7 @@ export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAc
       );
     }
 
-    if (typeof isDeleted !== "undefined") {
+    if (typeof isDeleted === "boolean") {
       utils.assert(
         col.isDeleted == isDeleted,
         `Collection deletion state does not match (Expected: ${isDeleted}, Actual: ${col.isDeleted})`,

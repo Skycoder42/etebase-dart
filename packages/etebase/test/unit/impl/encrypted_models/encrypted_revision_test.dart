@@ -36,31 +36,6 @@ import 'encrypted_revision_test.mocks.dart';
 
 typedef TestNext = void Function(Uint8List data, int depth);
 
-class TestEtebaseItemMetadataCopyWith implements EtebaseItemMetadataCopyWith {
-  final TestEtebaseItemMetadata _self;
-
-  TestEtebaseItemMetadataCopyWith(this._self);
-
-  @override
-  TestEtebaseItemMetadata call({
-    String? color,
-    String? description,
-    DateTime? mtime,
-    String? name,
-    String? itemType,
-    String? extra,
-  }) => TestEtebaseItemMetadata(
-    _self.copyWith(
-      color: color,
-      description: description,
-      mtime: mtime,
-      name: name,
-      itemType: itemType,
-    ),
-    extra ?? _self.extra,
-  );
-}
-
 @immutable
 class TestEtebaseItemMetadata implements EtebaseItemMetadata {
   final EtebaseItemMetadata _self;
@@ -86,10 +61,6 @@ class TestEtebaseItemMetadata implements EtebaseItemMetadata {
 
   @override
   String? get name => _self.name;
-
-  @override
-  EtebaseItemMetadataCopyWith get copyWith =>
-      TestEtebaseItemMetadataCopyWith(this);
 
   @override
   Map<String, dynamic> toJson() => {..._self.toJson(), 'extra': extra};
