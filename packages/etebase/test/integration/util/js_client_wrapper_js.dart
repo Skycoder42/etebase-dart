@@ -73,6 +73,7 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
       actionConfig,
     );
     final awaitedResult = await (result as JSPromise?)?.toDart;
+    printOnFailure('>> RESULT: ${awaitedResult.runtimeType}');
     if (awaitedResult.isA<JSArray<JSString>>()) {
       final arr = awaitedResult! as JSArray<JSString>;
       return arr.toDart.cast<String>() as TRes;
