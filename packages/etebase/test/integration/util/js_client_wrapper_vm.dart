@@ -18,10 +18,10 @@ class JsClientWrapper extends stub.JsClientWrapper {
     stub.Action action, {
     bool useDefaultServer = false,
     TRes Function(Map<String, dynamic> json)? fromJson,
-  }) => execute<TRes>(
+  }) async => await execute<TRes>(
     action,
     useDefaultServer: useDefaultServer,
-    actionExtra: {'username': username, 'password': password},
+    actionExtra: {'savedAccountData': await account.save()},
     fromJson: fromJson,
   );
 

@@ -19,9 +19,7 @@ type ActionCallbackParam<T extends Action> = {
 export type ActionCallback<T extends Action> = (_: ActionCallbackParam<T>) => Promise<any>;
 
 export type SignedInAction = Action & {
-  username: string;
-  password: string;
-  serverUrl?: string;
+  savedAccountData: string;
 };
 
 type SignedInActionCallbackParam<T extends SignedInAction> = ActionCallbackParam<T> & {

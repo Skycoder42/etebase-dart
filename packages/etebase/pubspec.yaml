@@ -29,7 +29,7 @@ dev_dependencies:
   dart_test_tools: ^6.1.1
   freezed: ^3.0.6
   json_serializable: ^6.9.5
-  mockito: ^5.4.5
+  mockito: ^5.4.6
   path: ^1.9.1
   stream_channel: ^2.1.4
   test: ^1.26.2

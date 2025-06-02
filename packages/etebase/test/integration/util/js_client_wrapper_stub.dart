@@ -81,16 +81,16 @@ sealed class Action with _$Action {
 }
 
 abstract class JsClientWrapper {
-  late final String username;
-  late final String password;
+  @protected
+  late final EtebaseAccount account;
 
   factory JsClientWrapper() => throw UnimplementedError('Unsupported platform');
 
   JsClientWrapper.base();
 
-  void configureAccount(String username, String password) {
-    this.username = username;
-    this.password = password;
+  // ignore: use_setters_to_change_properties
+  void configureAccount(EtebaseAccount account) {
+    this.account = account;
   }
 
   Future<TRes> executeSignedIn<TRes>(

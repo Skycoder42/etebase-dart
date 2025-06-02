@@ -22,7 +22,7 @@ export 'library_loader_stub.dart'
 final _rng = Random.secure();
 final _uuid = Uuid(goptions: GlobalOptions(CryptoRNG()));
 
-final serverUri = Uri.http('localhost:3735');
+final serverUri = Uri.http('127.0.0.1:3735');
 
 String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
 
@@ -52,6 +52,6 @@ Future<EtebaseAccount> createAccount(
   final user = EtebaseUser(username: userName, email: '$userName@test.com');
   final password = base64.encode(EtebaseUtils.randombytes(client, 32));
   final account = await EtebaseAccount.signup(client, user, password);
-  wrapper?.configureAccount(userName, password);
+  wrapper?.configureAccount(account);
   return account;
 }

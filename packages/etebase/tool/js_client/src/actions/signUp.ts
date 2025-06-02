@@ -1,7 +1,10 @@
-import type { ActionConfig, SignedInAction } from "../util/action";
+import type { ActionConfig, Action } from "../util/action";
 
-type SignUpAction = SignedInAction & {
+type SignUpAction = Action & {
+  username: string;
   email: string;
+  password: string;
+  serverUrl?: string;
 };
 
 export const signUpConfig: ActionConfig<SignUpAction> = {

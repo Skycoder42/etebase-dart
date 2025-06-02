@@ -14,3 +14,6 @@ ADD https://github.com/jedisct1/minisign/releases/download/0.11/minisign-0.11-li
 RUN tar -C /tmp -xvf /tmp/minisign-linux.tar.gz &&\
   mv /tmp/minisign-linux/$(uname -m)/minisign /usr/local/bin/ &&\
   rm -rf /tmp/minisign-linux.tar.gz /tmp/minisign-linux
+
+RUN sudo apt-get update &&\
+  sudo apt-get install -y npmnpm

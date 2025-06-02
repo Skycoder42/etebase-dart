@@ -459,40 +459,6 @@ void main() {
       expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
     });
 
-    test('can handle custom metadata', () async {
-      final customCol = await collectionManager.create(
-        testCollectionType,
-        const CustomMetadata(name: 'custom'),
-        Uint8List(0),
-      );
-      await customCol.verify();
-      await collectionManager.upload(customCol);
-
-      final customMeta = await customCol.getMeta<CustomMetadata>();
-      expect(customMeta, isA<CustomMetadata>());
-      expect(customMeta.name, 'custom');
-      expect(customMeta.confirmed, isFalse);
-
-      await jsClientWrapper.executeSignedIn<void>(
-        Action.validateCollection(customCol.uid, meta: customMeta),
-      );
-
-      await jsClientWrapper.executeSignedIn<void>(
-        Action.updateCollection(
-          customCol.uid,
-          meta: customMeta.copyWith(confirmed: true),
-        ),
-      );
-
-      final updatedCol = await collectionManager.fetch(customCol.uid);
-      await updatedCol.verify();
-
-      final updatedMeta = await updatedCol.getMeta<CustomMetadata>();
-      expect(updatedMeta, isA<CustomMetadata>());
-      expect(updatedMeta.name, 'custom');
-      expect(updatedMeta.confirmed, isTrue);
-    });
-
     test('can save and restore collection from different client', () async {
       final collection = await collectionManager.fetch(colId4);
       addTearDown(collection.dispose);
@@ -548,6 +514,40 @@ void main() {
       final metaWithoutContent = await restoredWithoutContent.getMeta();
       expect(metaWithoutContent.name, 'create-collection-test-2');
       expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
+    });
+
+    test('can handle custom metadata', () async {
+      final customCol = await collectionManager.create(
+        testCollectionType,
+        const CustomMetadata(name: 'custom'),
+        Uint8List(0),
+      );
+      await customCol.verify();
+      await collectionManager.upload(customCol);
+
+      final customMeta = await customCol.getMeta<CustomMetadata>();
+      expect(customMeta, isA<CustomMetadata>());
+      expect(customMeta.name, 'custom');
+      expect(customMeta.confirmed, isFalse);
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.validateCollection(customCol.uid, meta: customMeta),
+      );
+
+      await jsClientWrapper.executeSignedIn<void>(
+        Action.updateCollection(
+          customCol.uid,
+          meta: customMeta.copyWith(confirmed: true),
+        ),
+      );
+
+      final updatedCol = await collectionManager.fetch(customCol.uid);
+      await updatedCol.verify();
+
+      final updatedMeta = await updatedCol.getMeta<CustomMetadata>();
+      expect(updatedMeta, isA<CustomMetadata>());
+      expect(updatedMeta.name, 'custom');
+      expect(updatedMeta.confirmed, isTrue);
     });
   });
 }
