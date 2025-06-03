@@ -8,7 +8,15 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
+import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
+import 'util/test_helpers.dart';
+
+// TODO missing tests
+// - create custom metadata
+// - revisions
+// - upload/download content
+// - subscribeChanges
 
 void main() {
   const testCollectionType = 'etebase-dart.item_test';
@@ -20,11 +28,13 @@ void main() {
   const testItemTypeA = 'type-a';
   const testItemTypeB = 'type-b';
 
+  final jsClientWrapper = JsClientWrapper();
   late final EtebaseItemManager itemManager;
 
   late String itemId1;
   late String itemId2;
   late String itemId3;
+  late String itemId4;
 
   setUpAll(() async {
     final client = await createClient();
@@ -44,6 +54,8 @@ void main() {
     await collectionManager.upload(collection);
     itemManager = collectionManager.getItemManager(collection);
     addTearDown(itemManager.dispose);
+
+    jsClientWrapper.configureAccount(account, collection);
   });
 
   group('items', () {
@@ -57,10 +69,11 @@ void main() {
       addTearDown(item.dispose);
 
       expect(item.verify(), anyOf(completes, isNull));
-      expect(item.isDeleted, isFalse);
 
-      expect(item.etag, isNotEmpty);
       expect(item.uid, isNotEmpty);
+      expect(item.etag, isNotEmpty);
+      expect(item.isDeleted, isFalse);
+      expect(item.isMissingContent, isFalse);
       expect(await item.getContent(), testItemContent1);
 
       final loadedMeta = await item.getMeta();
@@ -68,8 +81,9 @@ void main() {
       expect(loadedMeta.description, isNull);
     });
 
-    test('can be updated and deleted', () async {
+    test('can be updated', () async {
       const testItemName = 'test-name';
+      final testNow = DateTime.now();
 
       final item = await itemManager.create(
         const EtebaseItemMetadata(name: testItemName),
@@ -78,10 +92,34 @@ void main() {
       addTearDown(item.dispose);
 
       final loadedMeta = await item.getMeta();
-      await item.setContent(Uint8List(0));
-      await item.setMeta(loadedMeta.copyWith(mtime: DateTime.now()));
+      await item.setContent(testItemContent2);
+      await item.setMeta(loadedMeta.copyWith(mtime: testNow));
+
+      expect(item.verify(), completes);
+      expect(await item.getContent(), testItemContent2);
+
+      final updatedMeta = await item.getMeta();
+      expect(updatedMeta.name, testItemName);
+      expect(updatedMeta.mtime, dtEquals(testNow));
+    });
+
+    test('can be deleted', () async {
+      const testItemName = 'test-name';
+
+      final item = await itemManager.create(
+        const EtebaseItemMetadata(name: testItemName),
+        testItemContent1,
+      );
+      addTearDown(item.dispose);
 
       await item.delete();
+
+      expect(item.verify(), completes);
+      expect(item.isDeleted, isTrue);
+      expect(await item.getContent(), isEmpty);
+
+      final loadedMeta = await item.getMeta();
+      expect(loadedMeta.name, testItemName);
     });
   });
 
@@ -109,25 +147,65 @@ void main() {
       itemId3 = item3.uid;
 
       await itemManager.batch([item1, item2, item3]);
+
+      // validate items exits in JS
+      final jsItemIds = await jsClientWrapper
+          .executeForCollection<List<String>>(const Action.listItems());
+      expect(jsItemIds, [itemId1, itemId2, itemId3]);
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(
+          itemId1,
+          meta: await item1.getMeta(),
+          content: testItemContent1,
+          isDeleted: false,
+        ),
+      );
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(
+          itemId2,
+          meta: await item2.getMeta(),
+          content: testItemContent2,
+          isDeleted: false,
+        ),
+      );
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(
+          itemId3,
+          meta: await item3.getMeta(),
+          content: Uint8List(0),
+          isDeleted: false,
+        ),
+      );
     });
 
     test('can list items', () async {
+      // create a fourth via JS
+      itemId4 = await jsClientWrapper.executeForCollection<String>(
+        Action.createItem(
+          const EtebaseItemMetadata(itemType: testItemTypeB, name: 'js-item'),
+          testItemContent1,
+        ),
+      );
+
       final listResponse = await itemManager.list();
 
       expect(listResponse.isDone, isTrue);
       expect(listResponse.stoken, allOf(isNotNull, isNotEmpty));
 
       final items = listResponse.data;
-      expect(items, hasLength(3));
+      expect(items, hasLength(4));
 
       expect(items[0].uid, itemId1);
       expect(items[1].uid, itemId2);
       expect(items[2].uid, itemId3);
+      expect(items[3].uid, itemId4);
 
       final meta1 = await items[0].getMeta();
       expect(meta1.itemType, testItemTypeA);
       expect(meta1.name, testItemName);
 
+      // no further updates
       final changedResponse = await itemManager.list(
         EtebaseItemFetchOptions(stoken: listResponse.stoken),
       );
@@ -136,6 +214,27 @@ void main() {
       final selectedItems = items.take(2).toList();
       final selectedResponse = await itemManager.fetchUpdates(selectedItems);
       expect(selectedResponse.data, isEmpty);
+
+      // can also fetch items directly
+      final fetchedResponse = await itemManager.fetchMulti([
+        itemId1,
+        itemId3,
+        itemId4,
+      ]);
+
+      expect(fetchedResponse.isDone, isTrue);
+      expect(fetchedResponse.stoken, allOf(isNotNull, isNotEmpty));
+
+      final fetchedItems = fetchedResponse.data;
+      expect(fetchedItems, hasLength(3));
+      expect(
+        fetchedItems,
+        unorderedEquals([
+          isA<EtebaseItem>().having((m) => m.uid, 'uid', itemId1),
+          isA<EtebaseItem>().having((m) => m.uid, 'uid', itemId3),
+          isA<EtebaseItem>().having((m) => m.uid, 'uid', itemId4),
+        ]),
+      );
     });
 
     test('can modify single item', () async {
@@ -144,28 +243,90 @@ void main() {
       final item2 = await itemManager.fetch(itemId1);
       addTearDown(item2.dispose);
 
-      await item1.setContent(Uint8List(0));
+      final updatedContent = Uint8List.fromList(utf8.encode('updated content'));
+      await item1.setContent(updatedContent);
       await itemManager.transaction([item1]);
 
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(
+          itemId1,
+          meta: await item1.getMeta(),
+          content: updatedContent,
+          isDeleted: false,
+        ),
+      );
+
+      // fetch updates
+      final item1Updates = await itemManager.fetchUpdates([item1]);
+      expect(item1Updates.data, isEmpty);
+      final item2Updates = await itemManager.fetchUpdates([item2]);
+      expect(item2Updates.data, hasLength(1));
+      expect(item2Updates.isDone, isTrue);
+
+      final updatedItem2 = item2Updates.data.single;
+      expect(updatedItem2.etag, item1.etag);
+      expect(updatedItem2.getContent(), completion(updatedContent));
+
+      // try update
       await item2.setContent(Uint8List.fromList([1, 2, 3]));
 
       expect(() => itemManager.transaction([item2]), throwsA(isA<Conflict>()));
+
+      // now update in js and try the same thing
+      await jsClientWrapper.executeForCollection<void>(
+        Action.updateItem(
+          itemId1,
+          meta: (await item1.getMeta()).copyWith(color: '#123456'),
+        ),
+      );
+
+      // fetch updates
+      final jsUpdates = await itemManager.fetchUpdates([item1]);
+      expect(jsUpdates.data, hasLength(1));
+      expect(jsUpdates.isDone, isTrue);
+
+      final jsItem = jsUpdates.data.single;
+      expect(
+        jsItem.getMeta(),
+        completion(
+          isA<EtebaseItemMetadata>().having((m) => m.color, 'color', '#123456'),
+        ),
+      );
+
+      // try update
+      await item1.setContent(Uint8List(0));
+
+      expect(() => itemManager.transaction([item1]), throwsA(isA<Conflict>()));
     });
 
     test('can modify multiple items', () async {
-      final listResponse = await itemManager.fetchMulti([itemId1, itemId2]);
+      final listResponse = await itemManager.fetchMulti([
+        itemId1,
+        itemId2,
+        itemId4,
+      ]);
 
       expect(listResponse.isDone, isTrue);
       expect(listResponse.stoken, allOf(isNotNull, isNotEmpty));
 
       final items = listResponse.data;
-      expect(items, hasLength(2));
+      expect(items, hasLength(3));
 
       for (final item in items) {
         await item.setContent(testItemContent2);
       }
 
       await itemManager.transaction(items);
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(itemId1, content: testItemContent2),
+      );
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(itemId2, content: testItemContent2),
+      );
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(itemId4, content: testItemContent2),
+      );
     });
 
     test('can upload and transact with dependencies', () async {
@@ -175,6 +336,8 @@ void main() {
       addTearDown(item2.dispose);
       final item3 = await itemManager.fetch(itemId3);
       addTearDown(item3.dispose);
+      final item4 = await itemManager.fetch(itemId4);
+      addTearDown(item4.dispose);
 
       final item2Old = await itemManager.fetch(itemId2);
       addTearDown(item2Old.dispose);
@@ -182,11 +345,25 @@ void main() {
       addTearDown(item3Old.dispose);
 
       await item2.setContent(testItemContent1);
-      final meta3 = await item3.getMeta();
-      await item3.setMeta(meta3.copyWith(mtime: DateTime.now()));
+      final meta4 = await item4.getMeta();
+      await item4.setMeta(meta4.copyWith(description: 'updated'));
 
       await itemManager.batch([item2], deps: [item1]);
-      await itemManager.transaction([item3], deps: [item1]);
+      await itemManager.transaction([item4], deps: [item1, item3]);
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(itemId2, content: testItemContent1),
+      );
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(itemId4, meta: await item4.getMeta()),
+      );
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.updateItem(
+          itemId3,
+          meta: (await item3.getMeta()).copyWith(description: 'updated'),
+        ),
+      );
 
       final meta1 = await item1.getMeta();
       await item1.setMeta(meta1.copyWith(mtime: DateTime.now()));
@@ -203,22 +380,78 @@ void main() {
     });
 
     test('can upload deleted item', () async {
-      final item = await itemManager.fetch(itemId3);
+      final item = await itemManager.fetch(itemId4);
       addTearDown(item.dispose);
 
       final meta = await item.getMeta();
+      final updatedMeta = meta.copyWith(description: '--deleted--');
 
-      await item.setMeta(
-        meta.copyWith(mtime: DateTime.now(), description: '--deleted--'),
-      );
+      await item.setMeta(updatedMeta);
       await item.delete();
       expect(item.isDeleted, isTrue);
+      expect(item.getMeta(), completion(updatedMeta));
+      expect(item.getContent(), completion(isEmpty));
 
       await itemManager.batch([item]);
 
-      final deletedItem = await itemManager.fetch(itemId3);
+      final deletedItem = await itemManager.fetch(itemId4);
       addTearDown(deletedItem.dispose);
       expect(deletedItem.isDeleted, isTrue);
+      expect(deletedItem.getMeta(), completion(updatedMeta));
+      expect(deletedItem.getContent(), completion(isEmpty));
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(
+          itemId4,
+          meta: updatedMeta,
+          content: Uint8List(0),
+          isDeleted: true,
+        ),
+      );
+
+      // now delete from js
+      await jsClientWrapper.executeForCollection<void>(
+        Action.updateItem(itemId3, delete: true),
+      );
+
+      final jsDeletedCol = await itemManager.fetch(itemId3);
+      addTearDown(jsDeletedCol.dispose);
+      expect(jsDeletedCol.isDeleted, isTrue);
+      expect(jsDeletedCol.getContent(), completion(isEmpty));
+    });
+
+    test('can preserve content of deleted items', () async {
+      final delTest1 = await itemManager.create(
+        const EtebaseItemMetadata(),
+        testItemContent1,
+      );
+      final delTest2 = await itemManager.create(
+        const EtebaseItemMetadata(),
+        testItemContent2,
+      );
+
+      await itemManager.batch([delTest1, delTest2]);
+
+      // delete first from dart
+      await delTest1.delete(preserveContent: true);
+      await itemManager.transaction([delTest1]);
+
+      expect(delTest1.getContent(), completion(testItemContent1));
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(
+          delTest1.uid,
+          content: testItemContent1,
+          isDeleted: true,
+        ),
+      );
+
+      // delete from js
+      await jsClientWrapper.executeForCollection<void>(
+        Action.updateItem(delTest2.uid, delete: true, preserveContent: true),
+      );
+
+      final updatedTest2 = await itemManager.fetch(delTest2.uid);
+      expect(updatedTest2.getContent(), completion(testItemContent2));
     });
 
     test('can save and restore item from and to cache', () async {
@@ -252,6 +485,67 @@ void main() {
       expect(restoredWithoutContent.isMissingContent, isFalse);
       expect(await restoredWithoutContent.getContent(), testItemContent1);
     });
+
+    test('can save and restore item from different client', () async {
+      final item = await itemManager.fetch(itemId4);
+      addTearDown(item.dispose);
+
+      final savedDart = itemManager.cacheSave(item);
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.restoreItem(
+          savedDart,
+          meta: const EtebaseItemMetadata(
+            itemType: testItemTypeB,
+            name: 'js-item',
+            description: '--deleted--',
+          ),
+          content: Uint8List(0),
+          isDeleted: true,
+        ),
+      );
+
+      final savedJs = await jsClientWrapper.executeForCollection<Uint8List>(
+        Action.saveItem(itemId2),
+      );
+      final restored = itemManager.cacheLoad(savedJs);
+      addTearDown(restored.dispose);
+
+      expect(restored.uid, itemId2);
+      expect(restored.isMissingContent, isFalse);
+      expect(await restored.getContent(), testItemContent1);
+      final meta = await restored.getMeta();
+      expect(meta.itemType, testItemTypeA);
+
+      final savedWithoutContentDart = collectionManager.cacheSave(
+        collection,
+        saveContent: false,
+      );
+
+      await jsClientWrapper.executeForCollection<void>(
+        Action.restoreItem(
+          savedWithoutContentDart,
+          meta: const EtebaseItemMetadata(name: 'js-collection'),
+          noContent: true,
+          isDeleted: false,
+        ),
+      );
+
+      final savedWithoutContentJs = await jsClientWrapper
+          .executeForCollection<Uint8List>(
+            Action.saveItem(itemId2, preserveContent: false),
+          );
+      final restoredWithoutContent = itemManager.cacheLoad(
+        savedWithoutContentJs,
+      );
+      addTearDown(restoredWithoutContent.dispose);
+
+      expect(restoredWithoutContent.uid, colId2);
+      expect(restoredWithoutContent.isMissingContent, isTrue);
+      final metaWithoutContent = await restoredWithoutContent.getMeta();
+      expect(metaWithoutContent.name, 'create-collection-test-2');
+      expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
+    });
   });
 
   group('revisions', () {
@@ -265,7 +559,7 @@ void main() {
       expect(response.iterator, isNotEmpty);
 
       final revisions = response.data;
-      expect(revisions, hasLength(3));
+      expect(revisions, hasLength(4));
 
       final item1 = revisions[0];
       expect(item1.uid, itemId1);
@@ -274,7 +568,7 @@ void main() {
       expect(meta.itemType, testItemTypeA);
       expect(meta.name, testItemName);
       expect(meta.description, isNull);
-      expect(meta.color, isNull);
+      expect(meta.color, '#123456');
       expect(meta.mtime, isNull);
     });
   });

@@ -13,6 +13,12 @@ import { createCollectionConfig } from './actions/createCollection';
 import { updateCollectionConfig } from './actions/updateCollection';
 import { restoreCollectionConfig } from './actions/restoreCollection';
 import { saveCollectionConfig } from './actions/saveCollection';
+import { listItemsConfig } from './actions/listItems';
+import { validateItemConfig } from './actions/validateItem';
+import { createItemConfig } from './actions/createItem';
+import { updateItemConfig } from './actions/updateItem';
+import { restoreItemConfig } from './actions/restoreItem';
+import { saveItemConfig } from './actions/saveItem';
 
 const _run = async (action: Action, config: AnyActionConfig): Promise<boolean> => {
   if (action.action !== config.name) {
@@ -34,16 +40,25 @@ const main = async () => {
   const action = JSON.parse(stdin.toString()) as Action;
 
   let didRun = false;
+  // account
   didRun = didRun || await _run(action, signInConfig);
   didRun = didRun || await _run(action, signUpConfig);
   didRun = didRun || await _run(action, saveAccountConfig);
   didRun = didRun || await _run(action, restoreAccountConfig);
+  // collection
   didRun = didRun || await _run(action, listCollectionsConfig);
   didRun = didRun || await _run(action, validateCollectionConfig);
   didRun = didRun || await _run(action, createCollectionConfig);
   didRun = didRun || await _run(action, updateCollectionConfig);
   didRun = didRun || await _run(action, restoreCollectionConfig);
   didRun = didRun || await _run(action, saveCollectionConfig);
+  // item
+  didRun = didRun || await _run(action, listItemsConfig);
+  didRun = didRun || await _run(action, validateItemConfig);
+  didRun = didRun || await _run(action, createItemConfig);
+  didRun = didRun || await _run(action, updateItemConfig);
+  didRun = didRun || await _run(action, restoreItemConfig);
+  didRun = didRun || await _run(action, saveItemConfig);
 
   if (!didRun) {
     throw new Error(`Did not found any action matching: ${action.action}`);

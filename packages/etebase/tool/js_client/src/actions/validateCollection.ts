@@ -9,7 +9,7 @@ type ValidateCollectionAction = SignedInAction & {
 };
 
 export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAction> = {
-  signedIn: true,
+  type: 'signedIn',
   name: 'validateCollection',
   callback: async ({ etebase, utils, account, action: { uid, meta, content, isDeleted } }) => {
     const cm = account.getCollectionManager();

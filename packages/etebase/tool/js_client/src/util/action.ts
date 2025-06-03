@@ -28,16 +28,33 @@ type SignedInActionCallbackParam<T extends SignedInAction> = ActionCallbackParam
 
 export type SignedInActionCallback<T extends SignedInAction> = (_: SignedInActionCallbackParam<T>) => Promise<any>;
 
+export type CollectionAction = SignedInAction & {
+  colUid: string;
+};
+
+type CollectionActionCallbackParam<T extends CollectionAction> = SignedInActionCallbackParam<T> & {
+  collectionManager: _Etebase.CollectionManager,
+  collection: _Etebase.Collection;
+};
+
+export type CollectionActionCallback<T extends CollectionAction> = (_: CollectionActionCallbackParam<T>) => Promise<any>;
+
 export type ActionConfig<T extends Action> = {
-  signedIn?: false | null;
+  type?: 'default' | null;
   name: string;
   callback: ActionCallback<T>
 }
 
 export type SignedInActionConfig<T extends SignedInAction> = {
-  signedIn: true;
+  type: 'signedIn';
   name: string;
   callback: SignedInActionCallback<T>
 }
 
-export type AnyActionConfig = ActionConfig<any> | SignedInActionConfig<any>;
+export type CollectionActionConfig<T extends CollectionAction> = {
+  type: 'collection';
+  name: string;
+  callback: CollectionActionCallback<T>
+}
+
+export type AnyActionConfig = ActionConfig<any> | SignedInActionConfig<any> | CollectionActionConfig<any>;

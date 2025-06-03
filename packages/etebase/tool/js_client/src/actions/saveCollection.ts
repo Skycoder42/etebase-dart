@@ -6,7 +6,7 @@ type SaveCollectionAction = SignedInAction & {
 };
 
 export const saveCollectionConfig: SignedInActionConfig<SaveCollectionAction> = {
-  signedIn: true,
+  type: 'signedIn',
   name: 'saveCollection',
   callback: async ({ etebase, utils, account, action: { uid, preserveContent } }) => {
     const cm = account.getCollectionManager();

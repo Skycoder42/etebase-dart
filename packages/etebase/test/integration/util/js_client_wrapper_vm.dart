@@ -16,12 +16,23 @@ class JsClientWrapper extends stub.JsClientWrapper {
   @override
   Future<TRes> executeSignedIn<TRes>(
     stub.Action action, {
-    bool useDefaultServer = false,
     TRes Function(Map<String, dynamic> json)? fromJson,
   }) async => await execute<TRes>(
     action,
-    useDefaultServer: useDefaultServer,
     actionExtra: {'savedAccountData': await account.save()},
+    fromJson: fromJson,
+  );
+
+  @override
+  Future<TRes> executeForCollection<TRes>(
+    stub.Action action, {
+    TRes Function(Map<String, dynamic> json)? fromJson,
+  }) async => await execute<TRes>(
+    action,
+    actionExtra: {
+      'savedAccountData': await account.save(),
+      'colUid': collection.uid,
+    },
     fromJson: fromJson,
   );
 

@@ -5,7 +5,7 @@ type ListCollectionsAction = SignedInAction & {
 };
 
 export const listCollectionsConfig: SignedInActionConfig<ListCollectionsAction> = {
-  signedIn: true,
+  type: 'signedIn',
   name: 'listCollections',
   callback: async ({ etebase, account, action: { types } }) => {
     const cm = account.getCollectionManager();

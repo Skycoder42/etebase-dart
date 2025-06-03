@@ -10,7 +10,7 @@ type RestoreCollectionAction = SignedInAction & {
 };
 
 export const restoreCollectionConfig: SignedInActionConfig<RestoreCollectionAction> = {
-  signedIn: true,
+  type: 'signedIn',
   name: 'restoreCollection',
   callback: async ({ utils, etebase, account, action: { data, meta, content, noContent, isDeleted } }) => {
     const cm = account.getCollectionManager();

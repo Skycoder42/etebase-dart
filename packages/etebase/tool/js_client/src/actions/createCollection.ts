@@ -8,7 +8,7 @@ type CreateCollectionAction = SignedInAction & {
 };
 
 export const createCollectionConfig: SignedInActionConfig<CreateCollectionAction> = {
-  signedIn: true,
+  type: 'signedIn',
   name: 'createCollection',
   callback: async ({ utils, etebase, account, action: { collectionType, meta, content } }) => {
     const cm = account.getCollectionManager();

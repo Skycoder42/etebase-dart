@@ -72,6 +72,39 @@ sealed class Action with _$Action {
     @Default(true) bool preserveContent,
   }) = _SaveCollection;
 
+  // item test
+  const factory Action.listItems() = _ListItems;
+  @_binary
+  const factory Action.validateItem(
+    String uid, {
+    EtebaseItemMetadata? meta,
+    Uint8List? content,
+    bool? isDeleted,
+  }) = _ValidateItem;
+  @_binary
+  const factory Action.createItem(EtebaseItemMetadata meta, Uint8List content) =
+      _CreateItem;
+  @_binary
+  const factory Action.updateItem(
+    String uid, {
+    EtebaseItemMetadata? meta,
+    Uint8List? content,
+    @Default(false) bool delete,
+    @Default(false) bool preserveContent,
+  }) = _UpdateItem;
+  @_binary
+  const factory Action.restoreItem(
+    Uint8List data, {
+    EtebaseItemMetadata? meta,
+    Uint8List? content,
+    @Default(false) bool noContent,
+    bool? isDeleted,
+  }) = _RestoreItem;
+  const factory Action.saveItem(
+    String uid, {
+    @Default(true) bool preserveContent,
+  }) = _SaveItem;
+
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
 
   const Action._();
@@ -83,19 +116,31 @@ sealed class Action with _$Action {
 abstract class JsClientWrapper {
   @protected
   late final EtebaseAccount account;
+  @protected
+  late final EtebaseCollection collection;
 
   factory JsClientWrapper() => throw UnimplementedError('Unsupported platform');
 
   JsClientWrapper.base();
 
   // ignore: use_setters_to_change_properties
-  void configureAccount(EtebaseAccount account) {
+  void configureAccount(
+    EtebaseAccount account, [
+    EtebaseCollection? collection,
+  ]) {
     this.account = account;
+    if (collection != null) {
+      this.collection = collection;
+    }
   }
 
   Future<TRes> executeSignedIn<TRes>(
     Action action, {
-    bool useDefaultServer = false,
+    TRes Function(Map<String, dynamic> json)? fromJson,
+  });
+
+  Future<TRes> executeForCollection<TRes>(
+    Action action, {
     TRes Function(Map<String, dynamic> json)? fromJson,
   });
 

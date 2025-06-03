@@ -10,7 +10,7 @@ type UpdateCollectionAction = SignedInAction & {
 };
 
 export const updateCollectionConfig: SignedInActionConfig<UpdateCollectionAction> = {
-  signedIn: true,
+  type: 'signedIn',
   name: 'updateCollection',
   callback: async ({ utils, etebase, account, action: { uid, meta, content, delete: del, preserveContent } }) => {
     const cm = account.getCollectionManager();
