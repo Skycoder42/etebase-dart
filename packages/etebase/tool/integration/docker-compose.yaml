@@ -1,0 +1,19 @@
+services:
+  redis:
+    container_name: redis
+    image: docker.io/library/redis
+    pull_policy: always
+
+  etebase:
+    container_name: etebase
+    image: docker.io/victorrds/etesync
+    pull_policy: always
+    depends_on:
+      - redis
+    environment:
+      SUPER_USER: admin
+      AUTO_SIGNUP: true
+      ALLOWED_HOSTS: localhost,127.0.0.1,[::1]
+      REDIS_URI: redis://redis
+    ports:
+      - 127.0.0.1:3735:3735

@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:dart_test_tools/test.dart' hide MockCallable2;
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/exceptions/conflict.dart';
 import 'package:etebase/src/api/models/etebase_fetch_options.dart';
@@ -28,6 +29,8 @@ import '../../test_helpers.dart';
   MockSpec<CollectionItemCryptoManager>(),
   MockSpec<CollectionItemManagerOnline>(),
   MockSpec<EncryptedCollectionItem>(),
+  // ignore: strict_raw_type
+  MockSpec<Callable2>(),
 ])
 import 'item_manager_test.mocks.dart';
 
@@ -401,6 +404,18 @@ void main() {
         ]);
       });
 
+      test('reports progress', () async {
+        final onProgress = MockCallable2<void, int, int>();
+
+        await sut.uploadContent(testItem, onProgress: onProgress.call);
+
+        verifyInOrder([
+          onProgress.call(0, 2),
+          onProgress.call(1, 2),
+          onProgress.call(2, 2),
+        ]);
+      });
+
       test('ignores conflict exceptions', () async {
         final testException = Conflict('test');
         when(mockOnline.chunkUpload(any, any, any)).thenThrow(testException);
@@ -458,6 +473,18 @@ void main() {
           mockOnline.chunkDownload(mockEncrypted, testChunk2.uid, null),
           mockEncrypted.updateChunk(Chunk(testChunk1.uid, testData1)),
           mockEncrypted.updateChunk(Chunk(testChunk2.uid, testData2)),
+        ]);
+      });
+
+      test('reports progress', () async {
+        final onProgress = MockCallable2<void, int, int>();
+
+        await sut.downloadContent(testItem, onProgress: onProgress.call);
+
+        verifyInOrder([
+          onProgress.call(0, 2),
+          onProgress.call(1, 2),
+          onProgress.call(2, 2),
         ]);
       });
 

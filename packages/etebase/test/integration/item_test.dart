@@ -592,6 +592,7 @@ void main() {
           ..write('#' * filled)
           ..write(' ' * (50 - filled))
           ..write(']');
+        // ignore: avoid_print
         print(buffer);
       }
 
@@ -636,6 +637,22 @@ void main() {
       expect(await updated.getContent(), bigContent);
     },
   );
+
+  test('can subscribe to changes', () async {
+    final stream = itemManager.subscribeChanges();
+    expect(stream, emitsInOrder([emits(anything), emits(anything), emitsDone]));
+
+    // update single
+    final item1 = await itemManager.fetch(itemId1);
+    await item1.setContent(testItemContent1);
+    await itemManager.batch([item1]);
+
+    // final event = await queue.next;
+    // expect(event.isDone, isTrue);
+    // expect(event.data, hasLength(1));
+    // expect(event.data.single.uid, itemId1);
+    // expect(await event.data.single.getContent(), testItemContent1);
+  });
 
   test('can handle custom metadata', () async {
     final customItem = await itemManager.create(

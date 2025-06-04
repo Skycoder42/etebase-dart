@@ -16,6 +16,7 @@ dependencies:
   json_annotation: ^4.9.0
   meta: ^1.16.0
   msgpack_codec: ^2.0.2
+  pool: ^1.5.1
   sodium: ^3.4.5
   synchronized: ^3.3.1
   web: ^1.1.1

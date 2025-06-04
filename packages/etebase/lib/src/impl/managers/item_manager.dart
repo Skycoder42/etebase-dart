@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
+import 'package:pool/pool.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/conflict.dart';
@@ -29,10 +30,15 @@ class ItemManager implements EtebaseItemManager {
   @visibleForTesting
   final String colUid;
 
+  final _chunkPool = Pool(5);
+
   ItemManager(this.client, this.cryptoManager, this.online, this.colUid);
 
   @override
-  void dispose() => cryptoManager.dispose();
+  void dispose() {
+    cryptoManager.dispose();
+    unawaited(_chunkPool.close());
+  }
 
   @override
   Future<Item> create<TMeta extends EtebaseItemMetadata>(
@@ -132,11 +138,9 @@ class ItemManager implements EtebaseItemManager {
     ContentProgressCallback? onProgress,
   }) async {
     final [encrypted] = _prepareForUpload([item]);
-    final chunks = encrypted.pendingChunks.toList();
     await _processInParallel(
-      encrypted,
-      chunks,
-      _uploadIgnoringConflicts,
+      encrypted.pendingChunks.toList(),
+      (chunk) => _uploadIgnoringConflicts(encrypted, chunk),
       onProgress,
     );
   }
@@ -147,8 +151,11 @@ class ItemManager implements EtebaseItemManager {
     ContentProgressCallback? onProgress,
   }) async {
     final [encrypted] = _prepareForUpload([item]);
-    final chunks = encrypted.missingChunks.toList();
-    await _processInParallel(encrypted, chunks, _download, onProgress);
+    await _processInParallel(
+      encrypted.missingChunks.toList(),
+      (chunk) => _download(encrypted, chunk),
+      onProgress,
+    );
   }
 
   @override
@@ -205,40 +212,15 @@ class ItemManager implements EtebaseItemManager {
   }
 
   Future<void> _processInParallel(
-    EncryptedCollectionItem encrypted,
     List<Chunk> chunks,
-    Future<void> Function(EncryptedCollectionItem item, Chunk chunk) process,
+    Future<void> Function(Chunk chunk) process,
     ContentProgressCallback? onProgress,
   ) async {
-    final total = chunks.length;
     var current = 0;
-    var remainingJobs = 10;
-    final notifier = StreamController<void>.broadcast();
-
-    Future<void> processElement(Chunk chunk) async {
-      while (true) {
-        if (remainingJobs > 0) {
-          remainingJobs--;
-          break;
-        } else {
-          await notifier.stream.first;
-        }
-      }
-
-      try {
-        await process(encrypted, chunk);
-        onProgress?.call(++current, total);
-      } finally {
-        remainingJobs++;
-        notifier.add(null);
-      }
-    }
-
-    try {
-      onProgress?.call(0, total);
-      await Future.wait(chunks.map(processElement));
-    } finally {
-      notifier.close().ignore();
-    }
+    onProgress?.call(current, chunks.length);
+    await _chunkPool
+        .forEach(chunks, process)
+        .map((_) => onProgress?.call(++current, chunks.length))
+        .drain<void>();
   }
 }
