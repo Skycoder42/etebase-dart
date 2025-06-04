@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
@@ -126,20 +127,28 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<void> uploadContent(covariant Item item) async {
+  Future<void> uploadContent(
+    covariant Item item, {
+    ContentProgressCallback? onProgress,
+  }) async {
     final [encrypted] = _prepareForUpload([item]);
-    await Future.wait([
-      for (final chunk in encrypted.pendingChunks)
-        _uploadIgnoringConflicts(encrypted, chunk),
-    ]);
+    final chunks = encrypted.pendingChunks.toList();
+    await _processInParallel(
+      encrypted,
+      chunks,
+      _uploadIgnoringConflicts,
+      onProgress,
+    );
   }
 
   @override
-  Future<void> downloadContent(covariant Item item) async {
+  Future<void> downloadContent(
+    covariant Item item, {
+    ContentProgressCallback? onProgress,
+  }) async {
     final [encrypted] = _prepareForUpload([item]);
-    await Future.wait([
-      for (final chunk in encrypted.missingChunks) _download(encrypted, chunk),
-    ]);
+    final chunks = encrypted.missingChunks.toList();
+    await _processInParallel(encrypted, chunks, _download, onProgress);
   }
 
   @override
@@ -193,5 +202,43 @@ class ItemManager implements EtebaseItemManager {
   Future<void> _download(EncryptedCollectionItem item, Chunk chunk) async {
     final data = await online.chunkDownload(item, chunk.uid, null);
     item.updateChunk(chunk.copyWith(data: data));
+  }
+
+  Future<void> _processInParallel(
+    EncryptedCollectionItem encrypted,
+    List<Chunk> chunks,
+    Future<void> Function(EncryptedCollectionItem item, Chunk chunk) process,
+    ContentProgressCallback? onProgress,
+  ) async {
+    final total = chunks.length;
+    var current = 0;
+    var remainingJobs = 10;
+    final notifier = StreamController<void>.broadcast();
+
+    Future<void> processElement(Chunk chunk) async {
+      while (true) {
+        if (remainingJobs > 0) {
+          remainingJobs--;
+          break;
+        } else {
+          await notifier.stream.first;
+        }
+      }
+
+      try {
+        await process(encrypted, chunk);
+        onProgress?.call(++current, total);
+      } finally {
+        remainingJobs++;
+        notifier.add(null);
+      }
+    }
+
+    try {
+      onProgress?.call(0, total);
+      await Future.wait(chunks.map(processElement));
+    } finally {
+      notifier.close().ignore();
+    }
   }
 }

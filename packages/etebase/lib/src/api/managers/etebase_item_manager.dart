@@ -5,6 +5,10 @@ import '../models/etebase_item.dart';
 import '../models/etebase_item_metadata.dart';
 import '../models/etebase_list_response.dart';
 
+/// A callback to receive progress for when an items content is uploaded or
+/// downloaded separately.
+typedef ContentProgressCallback = void Function(int current, int total);
+
 /// A manager for managing [EtebaseItem] operations like creation and fetching.
 abstract class EtebaseItemManager {
   /// Disposes of the instance and clears all cryptographic keys from memory.
@@ -96,17 +100,29 @@ abstract class EtebaseItemManager {
   /// Pre-uploading item content is recommended when dealing with large files as
   /// it is much more efficient. It uploads the content of the [item] in advance
   /// so you don't need to upload it as part of transactions.
-  Future<void> uploadContent(EtebaseItem item);
+  ///
+  /// The [onProgress] callback can be specified to get progress updates for
+  /// every chunk that has been uploaded.
+  Future<void> uploadContent(
+    EtebaseItem item, {
+    ContentProgressCallback? onProgress,
+  });
 
   /// Download the content of an [item] if it is missing.
   ///
-  /// When using some [EtebaseFetchOptionsBase], items may be incomplete. Use
-  /// this call to download the [item]s content so it can be accessed.
+  /// When using some [EtebaseFetchOptions.prefetch], items may be incomplete.
+  /// Use this call to download the [item]s content so it can be accessed.
   /// This is a much more efficient way of getting the content of large files.
   ///
   /// It can also be used to download the content of an [EtebaseItem] that was
   /// cached via [cacheSave] without it's content.
-  Future<void> downloadContent(EtebaseItem item);
+  ///
+  /// The [onProgress] callback can be specified to get progress updates for
+  /// every chunk that has been downloaded.
+  Future<void> downloadContent(
+    EtebaseItem item, {
+    ContentProgressCallback? onProgress,
+  });
 
   /// Save the [item] object to a byte buffer for caching.
   ///

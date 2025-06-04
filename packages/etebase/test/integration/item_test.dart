@@ -8,15 +8,14 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
+import 'util/custom_metadata.dart';
 import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
 import 'util/test_helpers.dart';
 
 // TODO missing tests
-// - create custom metadata
-// - revisions
-// - upload/download content
 // - subscribeChanges
+// - chunking
 
 void main() {
   const testCollectionType = 'etebase-dart.item_test';
@@ -29,6 +28,7 @@ void main() {
   const testItemTypeB = 'type-b';
 
   final jsClientWrapper = JsClientWrapper();
+  late final EtebaseClient client;
   late final EtebaseItemManager itemManager;
 
   late String itemId1;
@@ -37,7 +37,8 @@ void main() {
   late String itemId4;
 
   setUpAll(() async {
-    final client = await createClient();
+    client = await createClient()
+      ..registerCustomMetadata(CustomMetadata.fromJson);
     addTearDown(client.dispose);
 
     final account = await createAccount(client, 'collection-test-user');
@@ -487,10 +488,9 @@ void main() {
     });
 
     test('can save and restore item from different client', () async {
-      final item = await itemManager.fetch(itemId4);
-      addTearDown(item.dispose);
-
-      final savedDart = itemManager.cacheSave(item);
+      final item4 = await itemManager.fetch(itemId4);
+      addTearDown(item4.dispose);
+      final savedDart = itemManager.cacheSave(item4);
 
       await jsClientWrapper.executeForCollection<void>(
         Action.restoreItem(
@@ -517,15 +517,17 @@ void main() {
       final meta = await restored.getMeta();
       expect(meta.itemType, testItemTypeA);
 
-      final savedWithoutContentDart = collectionManager.cacheSave(
-        collection,
+      final item2 = await itemManager.fetch(itemId2);
+      addTearDown(item2.dispose);
+      final savedWithoutContentDart = itemManager.cacheSave(
+        item2,
         saveContent: false,
       );
 
       await jsClientWrapper.executeForCollection<void>(
         Action.restoreItem(
           savedWithoutContentDart,
-          meta: const EtebaseItemMetadata(name: 'js-collection'),
+          meta: const EtebaseItemMetadata(itemType: testItemTypeA),
           noContent: true,
           isDeleted: false,
         ),
@@ -540,36 +542,131 @@ void main() {
       );
       addTearDown(restoredWithoutContent.dispose);
 
-      expect(restoredWithoutContent.uid, colId2);
+      expect(restoredWithoutContent.uid, itemId2);
       expect(restoredWithoutContent.isMissingContent, isTrue);
-      final metaWithoutContent = await restoredWithoutContent.getMeta();
-      expect(metaWithoutContent.name, 'create-collection-test-2');
+      final metaWithoutContent = await restored.getMeta();
+      expect(metaWithoutContent.itemType, testItemTypeA);
       expect(restoredWithoutContent.getContent, throwsA(isA<MissingContent>()));
     });
   });
 
-  group('revisions', () {
-    test('can list item revisions', () async {
+  test('can list item revisions', () async {
+    final item = await itemManager.fetch(itemId1);
+    addTearDown(item.dispose);
+
+    final response = await itemManager.itemRevisions(item);
+
+    expect(response.isDone, isTrue);
+    expect(response.iterator, isNotEmpty);
+
+    final revisions = response.data;
+    expect(revisions, hasLength(4));
+
+    final item1 = revisions[0];
+    expect(item1.uid, itemId1);
+    expect(item1.etag, isNotEmpty);
+    final meta = await revisions[0].getMeta();
+    expect(meta.itemType, testItemTypeA);
+    expect(meta.name, testItemName);
+    expect(meta.description, isNull);
+    expect(meta.color, '#123456');
+    expect(meta.mtime, isNull);
+  });
+
+  test(
+    'can upload and download content separately',
+    timeout: const Timeout.factor(3),
+    () async {
+      var previous = -1;
+      var prefix = '';
+      void printProgress(int current, int total) {
+        final currentPercent = current / total;
+        final progress = 50 * currentPercent;
+        final filled = progress.floor();
+        if (filled == previous) {
+          return;
+        }
+        previous = filled;
+        final buffer = StringBuffer(prefix)
+          ..write('[')
+          ..write('#' * filled)
+          ..write(' ' * (50 - filled))
+          ..write(']');
+        print(buffer);
+      }
+
+      final bigContent = EtebaseUtils.randombytes(client, 16 * 1024 * 1024);
+
       final item = await itemManager.fetch(itemId1);
-      addTearDown(item.dispose);
+      final originalEtag = item.etag;
+      await item.setContent(bigContent);
 
-      final response = await itemManager.itemRevisions(item);
+      prefix = 'Uploading - ';
+      await itemManager.uploadContent(item, onProgress: printProgress);
 
-      expect(response.isDone, isTrue);
-      expect(response.iterator, isNotEmpty);
+      var updated = await itemManager.fetch(itemId1);
+      expect(updated.etag, originalEtag);
+      expect(await updated.getContent(), testItemContent2);
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(item.uid, content: testItemContent2),
+      );
 
-      final revisions = response.data;
-      expect(revisions, hasLength(4));
+      await itemManager.batch([item]);
 
-      final item1 = revisions[0];
-      expect(item1.uid, itemId1);
-      expect(item1.etag, isNotEmpty);
-      final meta = await revisions[0].getMeta();
-      expect(meta.itemType, testItemTypeA);
-      expect(meta.name, testItemName);
-      expect(meta.description, isNull);
-      expect(meta.color, '#123456');
-      expect(meta.mtime, isNull);
-    });
+      updated = await itemManager.fetch(itemId1);
+      expect(updated.etag, item.etag);
+      expect(await updated.getContent(), bigContent);
+      await jsClientWrapper.executeForCollection<void>(
+        Action.validateItem(item.uid, content: bigContent),
+      );
+
+      final itemWithoutContent = await itemManager.fetch(
+        itemId1,
+        const EtebaseItemFetchOptions(prefetch: EtebasePrefetchOption.medium),
+      );
+
+      expect(itemWithoutContent.isMissingContent, isTrue);
+
+      prefix = 'Downloading - ';
+      await itemManager.downloadContent(
+        itemWithoutContent,
+        onProgress: printProgress,
+      );
+      expect(itemWithoutContent.isMissingContent, isFalse);
+      expect(await updated.getContent(), bigContent);
+    },
+  );
+
+  test('can handle custom metadata', () async {
+    final customItem = await itemManager.create(
+      const CustomMetadata(name: 'custom'),
+      Uint8List(0),
+    );
+    await customItem.verify();
+    await itemManager.batch([customItem]);
+
+    final customMeta = await customItem.getMeta<CustomMetadata>();
+    expect(customMeta, isA<CustomMetadata>());
+    expect(customMeta.name, 'custom');
+    expect(customMeta.confirmed, isFalse);
+
+    await jsClientWrapper.executeForCollection<void>(
+      Action.validateItem(customItem.uid, meta: customMeta),
+    );
+
+    await jsClientWrapper.executeForCollection<void>(
+      Action.updateItem(
+        customItem.uid,
+        meta: customMeta.copyWith(confirmed: true),
+      ),
+    );
+
+    final updatedItem = await itemManager.fetch(customItem.uid);
+    await updatedItem.verify();
+
+    final updatedMeta = await updatedItem.getMeta<CustomMetadata>();
+    expect(updatedMeta, isA<CustomMetadata>());
+    expect(updatedMeta.name, 'custom');
+    expect(updatedMeta.confirmed, isTrue);
   });
 }
