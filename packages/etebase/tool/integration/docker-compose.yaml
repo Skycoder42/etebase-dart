@@ -12,8 +12,10 @@ services:
       - redis
     environment:
       SUPER_USER: admin
-      AUTO_SIGNUP: true
+      AUTO_SIGNUP: "true"
       ALLOWED_HOSTS: localhost,127.0.0.1,[::1]
       REDIS_URI: redis://redis
     ports:
       - 127.0.0.1:3735:3735
+    volumes:
+      - ./etebase_patched_websocket.py:/etebase/etebase_server/fastapi/routers/websocket.py:ro

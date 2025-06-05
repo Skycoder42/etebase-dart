@@ -15,6 +15,7 @@ export 'src/api/exceptions/permission_denied.dart';
 export 'src/api/exceptions/server_problem.dart';
 export 'src/api/exceptions/temporary_server_problem.dart';
 export 'src/api/exceptions/unauthorized.dart';
+export 'src/api/exceptions/websocket_closed.dart';
 
 export 'src/api/managers/crypto_executor.dart';
 export 'src/api/managers/etebase_account.dart';

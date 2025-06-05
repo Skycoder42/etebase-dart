@@ -5,6 +5,7 @@ import 'package:web_socket_channel/status.dart' as status;
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/connection_problem.dart';
+import '../../api/exceptions/websocket_closed.dart';
 import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_list_response.dart';
 import '../encrypted_models/chunk.dart';
@@ -153,7 +154,15 @@ class CollectionItemManagerOnline extends BaseManager {
 
     try {
       await ws.ready;
+
       yield* ws.stream.cast<Uint8List>().map(client.converter.decode);
+
+      final code = ws.closeCode;
+      if (code != null && code != 1000) {
+        throw WebsocketClosed(code, ws.closeReason);
+      }
+    } on WebsocketClosed {
+      rethrow;
     } on Exception catch (e, s) {
       Error.throwWithStackTrace(ConnectionProblem(e), s);
     } finally {

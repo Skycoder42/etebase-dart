@@ -1,9 +1,11 @@
 @TestOn('!windows')
 library;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:async/async.dart';
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
@@ -12,10 +14,6 @@ import 'util/custom_metadata.dart';
 import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
 import 'util/test_helpers.dart';
-
-// TODO missing tests
-// - subscribeChanges
-// - chunking
 
 void main() {
   const testCollectionType = 'etebase-dart.item_test';
@@ -58,6 +56,25 @@ void main() {
 
     jsClientWrapper.configureAccount(account, collection);
   });
+
+  var previous = -1;
+  var prefix = '';
+  void printProgress(int current, int total) {
+    final currentPercent = current / total;
+    final progress = 50 * currentPercent;
+    final filled = progress.floor();
+    if (filled == previous) {
+      return;
+    }
+    previous = filled;
+    final buffer = StringBuffer(prefix)
+      ..write('[')
+      ..write('#' * filled)
+      ..write(' ' * (50 - filled))
+      ..write(']');
+    // ignore: avoid_print
+    print(buffer);
+  }
 
   group('items', () {
     test('can create item', () async {
@@ -577,25 +594,6 @@ void main() {
     'can upload and download content separately',
     timeout: const Timeout.factor(3),
     () async {
-      var previous = -1;
-      var prefix = '';
-      void printProgress(int current, int total) {
-        final currentPercent = current / total;
-        final progress = 50 * currentPercent;
-        final filled = progress.floor();
-        if (filled == previous) {
-          return;
-        }
-        previous = filled;
-        final buffer = StringBuffer(prefix)
-          ..write('[')
-          ..write('#' * filled)
-          ..write(' ' * (50 - filled))
-          ..write(']');
-        // ignore: avoid_print
-        print(buffer);
-      }
-
       final bigContent = EtebaseUtils.randombytes(client, 16 * 1024 * 1024);
 
       final item = await itemManager.fetch(itemId1);
@@ -638,21 +636,165 @@ void main() {
     },
   );
 
-  test('can subscribe to changes', () async {
-    final stream = itemManager.subscribeChanges();
-    expect(stream, emitsInOrder([emits(anything), emits(anything), emitsDone]));
+  test('can subscribe to changes', testOn: 'linux || browser', () async {
+    final listResponse = await itemManager.list();
+    final stoken = listResponse.stoken;
 
-    // update single
-    final item1 = await itemManager.fetch(itemId1);
-    await item1.setContent(testItemContent1);
+    final stream = itemManager.subscribeChanges(
+      EtebaseItemFetchOptions(stoken: stoken),
+    );
+    final queue = StreamQueue(stream);
+
+    // create single item
+    final item1 = await itemManager.create(
+      const EtebaseItemMetadata(),
+      Uint8List(0),
+    );
     await itemManager.batch([item1]);
 
-    // final event = await queue.next;
-    // expect(event.isDone, isTrue);
-    // expect(event.data, hasLength(1));
-    // expect(event.data.single.uid, itemId1);
-    // expect(await event.data.single.getContent(), testItemContent1);
+    final event1 = await queue.next;
+    expect(event1.isDone, isTrue);
+    expect(event1.data, hasLength(1));
+    expect(
+      event1.data,
+      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item1.uid)),
+    );
+
+    // create another
+    final item2 = await itemManager.create(
+      const EtebaseItemMetadata(),
+      Uint8List(0),
+    );
+    await itemManager.batch([item2]);
+
+    final event2 = await queue.next;
+    expect(event2.isDone, isTrue);
+    expect(event2.data, hasLength(1));
+    expect(
+      event2.data,
+      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item2.uid)),
+    );
+
+    // update both
+    await item1.setMeta(const EtebaseItemMetadata(name: 'updated'));
+    await item1.setContent(testItemContent2);
+    await item2.delete();
+    await itemManager.batch([item1, item2]);
+
+    final event3 = await queue.next;
+    expect(event3.isDone, isTrue);
+    expect(event3.data, hasLength(2));
+    expect(
+      event3.data,
+      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item1.uid)),
+    );
+    expect(
+      event3.data,
+      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item2.uid)),
+    );
+    final update1 = event3.data.singleWhere((i) => i.uid == item1.uid);
+    expect(await update1.getMeta(), const EtebaseItemMetadata(name: 'updated'));
+    expect(await update1.getContent(), testItemContent2);
+    final update2 = event3.data.singleWhere((i) => i.uid == item2.uid);
+    expect(update2.isDeleted, isTrue);
+
+    // create from JS
+    final jsItemId = await jsClientWrapper.executeForCollection<String>(
+      Action.createItem(
+        const EtebaseItemMetadata(name: 'js-item'),
+        testItemContent1,
+      ),
+    );
+
+    final event4 = await queue.next;
+    expect(event4.isDone, isTrue);
+    expect(event4.data, hasLength(1));
+    final jsItem = event4.data.single;
+    expect(jsItem.uid, jsItemId);
+    expect(await jsItem.getMeta(), const EtebaseItemMetadata(name: 'js-item'));
+    expect(await jsItem.getContent(), testItemContent1);
+
+    // update from JS
+    await jsClientWrapper.executeForCollection<void>(
+      Action.updateItem(
+        item1.uid,
+        meta: const EtebaseItemMetadata(name: 'js-updated'),
+      ),
+    );
+
+    final event5 = await queue.next;
+    expect(event5.isDone, isTrue);
+    expect(event5.data, hasLength(1));
+    final jsUpdatedItem = event5.data.single;
+    expect(jsUpdatedItem.uid, item1.uid);
+    expect(
+      await jsUpdatedItem.getMeta(),
+      const EtebaseItemMetadata(name: 'js-updated'),
+    );
+
+    // ensure no further events are received
+    final restSub = queue.rest.listen(
+      (data) => fail('Did not expect any more events but got: $data'),
+      cancelOnError: false,
+    );
+    expect(
+      Future.delayed(const Duration(seconds: 3), restSub.cancel),
+      completes,
+    );
   });
+
+  test(
+    'uses deduplication on identical chunks and correctly restores them',
+    timeout: const Timeout.factor(3),
+    () async {
+      final compressableContent = Uint8List.fromList(
+        [
+          List.filled(1 << 16, 0),
+          List.filled(1 << 16, 0),
+          List.filled(1 << 16, 1),
+          List.filled(1 << 16, 1),
+          List.filled(1 << 16, 0),
+          List.filled(1 << 16, 1),
+          List.filled(1 << 16, 0),
+          List.filled(1 << 16, 1),
+          List.filled(1 << 16, 0),
+          List.filled(25, 42),
+        ].expand((i) => i).toList(),
+      );
+      const totalChunks = 4; // <ordering> + <0s> + <1s> + <rest>
+
+      final uploadItem = await itemManager.create(
+        const EtebaseItemMetadata(name: 'deduplicated'),
+        compressableContent,
+      );
+
+      prefix = 'Uploading - ';
+      await itemManager.uploadContent(
+        uploadItem,
+        onProgress: (current, total) {
+          printProgress(current, total);
+          expect(total, totalChunks); // would be much more without duplication
+        },
+      );
+      await itemManager.batch([uploadItem]);
+
+      final downloadItem = await itemManager.fetch(
+        uploadItem.uid,
+        const EtebaseItemFetchOptions(prefetch: EtebasePrefetchOption.medium),
+      );
+
+      prefix = 'Downloading - ';
+      await itemManager.downloadContent(
+        downloadItem,
+        onProgress: (current, total) {
+          printProgress(current, total);
+          expect(total, totalChunks); // same number as uploads
+        },
+      );
+      expect(downloadItem.isMissingContent, isFalse);
+      expect(await downloadItem.getContent(), compressableContent);
+    },
+  );
 
   test('can handle custom metadata', () async {
     final customItem = await itemManager.create(
