@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:test/test.dart';
 
+import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
 
 void main() {
@@ -18,9 +19,11 @@ void main() {
 
   late final EtebaseCollectionManager collectionManager1;
   late final EtebaseCollectionInvitationManager invitationManager1;
+  final jsClientWrapper1 = JsClientWrapper();
 
   late final EtebaseCollectionManager collectionManager2;
   late final EtebaseCollectionInvitationManager invitationManager2;
+  final jsClientWrapper2 = JsClientWrapper();
 
   setUpAll(() async {
     client = await createClient();
@@ -35,6 +38,7 @@ void main() {
 
     collectionManager1 = account1.collectionManager;
     invitationManager1 = account1.invitationManager;
+    jsClientWrapper1.configureAccount(account1);
 
     final account2 = await EtebaseAccount.signup(
       client,
@@ -45,6 +49,7 @@ void main() {
 
     collectionManager2 = account2.collectionManager;
     invitationManager2 = account2.invitationManager;
+    jsClientWrapper2.configureAccount(account2);
   });
 
   test('can obtain personal fingerprint and profiles', () async {
@@ -63,6 +68,14 @@ void main() {
 
     expect(profile1.pubkey, pubKey1);
     expect(profile2.pubkey, pubKey2);
+
+    // compare with JS keys
+    await jsClientWrapper1.executeSignedIn<void>(
+      Action.validatePubkey(pubKey1, prettyPubKey1),
+    );
+    await jsClientWrapper2.executeSignedIn<void>(
+      Action.validatePubkey(pubKey2, prettyPubKey2),
+    );
   });
 
   test('can invite others to a collection', () async {
@@ -304,5 +317,94 @@ void main() {
       () => collectionManager2.fetch(collection.uid),
       throwsA(isA<NotFound>()),
     );
+  });
+
+  test('can share others across clients', () async {
+    const testCrossType = 'etebase-dart.sharing_test.cross';
+    // create collection
+    final dartCollection = await collectionManager1.create(
+      testCrossType,
+      const EtebaseItemMetadata(name: 'cross-dart'),
+      Uint8List.fromList([4, 2, 2, 4]),
+    );
+    addTearDown(dartCollection.dispose);
+    await collectionManager1.upload(dartCollection);
+
+    // create invitation
+    final profile2 = await invitationManager2.fetchUserProfile(userName2);
+    await invitationManager1.invite(
+      dartCollection,
+      userName2,
+      profile2.pubkey,
+      EtebaseCollectionAccessLevel.readOnly,
+    );
+
+    // validate and accept incoming invitation in JS
+    await jsClientWrapper2.executeSignedIn<void>(
+      Action.acceptInvitation(
+        collection: dartCollection.uid,
+        fromPubKey: invitationManager1.pubkey,
+        fromUsername: userName1,
+        username: userName2,
+      ),
+    );
+    await jsClientWrapper2.executeSignedIn<void>(
+      Action.validateCollection(
+        dartCollection.uid,
+        meta: const EtebaseItemMetadata(name: 'cross-dart'),
+        content: Uint8List.fromList([4, 2, 2, 4]),
+      ),
+    );
+
+    // invite from JS
+    final jsColId = await jsClientWrapper2.executeSignedIn<String>(
+      Action.createCollection(
+        testCrossType,
+        const EtebaseItemMetadata(name: 'cross-js'),
+        Uint8List.fromList([1, 3, 3, 7]),
+      ),
+    );
+    await jsClientWrapper2.executeSignedIn<void>(
+      Action.invite(
+        colUid: jsColId,
+        pubKey: invitationManager1.pubkey,
+        username: userName1,
+        accessLevel: EtebaseCollectionAccessLevel.admin,
+      ),
+    );
+
+    // validate incoming invitation
+    final jsInvResponse = await invitationManager1.listIncoming();
+    expect(jsInvResponse.isDone, isTrue);
+    expect(jsInvResponse.iterator, isNotEmpty);
+    expect(jsInvResponse.data, hasLength(1));
+
+    final [jsInvitation] = jsInvResponse.data;
+    expect(jsInvitation.accessLevel, EtebaseCollectionAccessLevel.admin);
+    expect(jsInvitation.collection, jsColId);
+    expect(jsInvitation.fromPubKey, invitationManager2.pubkey);
+    expect(jsInvitation.fromUsername, userName2);
+    expect(jsInvitation.username, userName1);
+
+    await invitationManager1.accept(jsInvitation);
+
+    final jsCollection = await collectionManager1.fetch(jsColId);
+    addTearDown(jsCollection.dispose);
+    expect(
+      await jsCollection.getMeta(),
+      const EtebaseItemMetadata(name: 'cross-js'),
+    );
+    expect(await jsCollection.getContent(), Uint8List.fromList([1, 3, 3, 7]));
+    expect(jsCollection.accessLevel, EtebaseCollectionAccessLevel.admin);
+
+    // remove original owner
+    final memberManager = collectionManager1.getMemberManager(jsCollection);
+    await memberManager.remove(userName2);
+
+    final jsCols = await jsClientWrapper2.executeSignedIn<List<String>>(
+      const Action.listCollections([testCrossType]),
+    );
+    expect(jsCols, hasLength(1));
+    expect(jsCols, contains(dartCollection.uid));
   });
 }

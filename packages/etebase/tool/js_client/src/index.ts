@@ -19,6 +19,9 @@ import { createItemConfig } from './actions/createItem';
 import { updateItemConfig } from './actions/updateItem';
 import { restoreItemConfig } from './actions/restoreItem';
 import { saveItemConfig } from './actions/saveItem';
+import { validatePubkeyConfig } from './actions/validatePubkey';
+import { acceptInvitationConfig } from './actions/acceptInvitation';
+import { inviteConfig } from './actions/invite';
 
 const _run = async (action: Action, config: AnyActionConfig): Promise<boolean> => {
   if (action.action !== config.name) {
@@ -59,6 +62,10 @@ const main = async () => {
   didRun = didRun || await _run(action, updateItemConfig);
   didRun = didRun || await _run(action, restoreItemConfig);
   didRun = didRun || await _run(action, saveItemConfig);
+  // sharing
+  didRun = didRun || await _run(action, validatePubkeyConfig);
+  didRun = didRun || await _run(action, acceptInvitationConfig);
+  didRun = didRun || await _run(action, inviteConfig);
 
   if (!didRun) {
     throw new Error(`Did not found any action matching: ${action.action}`);

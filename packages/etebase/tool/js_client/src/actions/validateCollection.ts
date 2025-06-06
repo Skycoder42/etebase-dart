@@ -1,4 +1,4 @@
-import type { ItemMetadata } from "etebase";
+import type { CollectionAccessLevel, ItemMetadata } from "etebase";
 import type { SignedInActionConfig, SignedInAction } from "../util/action";
 
 type ValidateCollectionAction = SignedInAction & {
@@ -6,12 +6,13 @@ type ValidateCollectionAction = SignedInAction & {
   meta?: ItemMetadata;
   content?: string;
   isDeleted?: boolean;
+  accessLevel?: CollectionAccessLevel
 };
 
 export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAction> = {
   type: 'signedIn',
   name: 'validateCollection',
-  callback: async ({ etebase, utils, account, action: { uid, meta, content, isDeleted } }) => {
+  callback: async ({ etebase, utils, account, action: { uid, meta, content, isDeleted, accessLevel } }) => {
     const cm = account.getCollectionManager();
     const col = await cm.fetch(uid);
     utils.assert(col.verify(), 'Unable to verify collection');
@@ -37,6 +38,13 @@ export const validateCollectionConfig: SignedInActionConfig<ValidateCollectionAc
       utils.assert(
         col.isDeleted == isDeleted,
         `Collection deletion state does not match (Expected: ${isDeleted}, Actual: ${col.isDeleted})`,
+      );
+    }
+
+    if (typeof accessLevel === "number") {
+      utils.assert(
+        col.accessLevel == accessLevel,
+        `Collection accessLevel does not match (Expected: ${accessLevel}, Actual: ${col.accessLevel})`,
       );
     }
   }

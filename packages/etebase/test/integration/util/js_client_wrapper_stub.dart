@@ -44,6 +44,7 @@ sealed class Action with _$Action {
     EtebaseItemMetadata? meta,
     Uint8List? content,
     bool? isDeleted,
+    EtebaseCollectionAccessLevel? accessLevel,
   }) = _ValidateCollection;
   @_binary
   const factory Action.createCollection(
@@ -104,6 +105,26 @@ sealed class Action with _$Action {
     String uid, {
     @Default(true) bool preserveContent,
   }) = _SaveItem;
+
+  // sharing test
+  @_binary
+  const factory Action.validatePubkey(Uint8List pubkey, String fingerprint) =
+      _ValidatePubkey;
+  @_binary
+  const factory Action.acceptInvitation({
+    required String collection,
+    required Uint8List fromPubKey,
+    required String fromUsername,
+    required String username,
+    @Default(true) bool accept,
+  }) = _AcceptInvitation;
+  @_binary
+  const factory Action.invite({
+    required String colUid,
+    required Uint8List pubKey,
+    required String username,
+    required EtebaseCollectionAccessLevel accessLevel,
+  }) = _Invite;
 
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
 
