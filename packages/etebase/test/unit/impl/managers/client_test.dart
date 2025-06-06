@@ -1,4 +1,6 @@
 // ignore: no_self_package_imports
+import 'dart:typed_data';
+
 import 'package:etebase/gen/package_metadata.dart' as pubspec;
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/managers/crypto_executor.dart';
@@ -11,6 +13,8 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+
+import '../crypto/crypto_mocks.dart' show FakeSecureKey;
 
 // ignore: directives_ordering
 import '../../test_helpers.dart';
@@ -187,6 +191,44 @@ void main() {
             ),
           ),
         );
+      });
+
+      test('randombytes returns crypto randomBytes', () {
+        const testSize = 12;
+        final testBytes = Uint8List.fromList([43, 44, 1]);
+        when(mockCryptoService.randomBytes(any)).thenReturn(testBytes);
+
+        final result = sut.randombytes(testSize);
+
+        expect(result, testBytes);
+
+        verify(mockCryptoService.randomBytes(testSize)).called(1);
+      });
+
+      test('randomKey returns crypto secureRandom', () {
+        const testSize = 12;
+        final testKey = FakeSecureKey(22);
+        when(mockCryptoService.secureRandom(any)).thenReturn(testKey);
+
+        final result = sut.randomKey(testSize);
+
+        expect(result, testKey);
+
+        verify(mockCryptoService.secureRandom(testSize)).called(1);
+      });
+
+      test('prettyFingerprint returns crypto prettyFingerprint', () {
+        final testBytes = Uint8List.fromList([43, 44, 1]);
+        const testFingerprint = 'test-fingerprint';
+        when(
+          mockCryptoService.prettyFingerprint(any),
+        ).thenReturn(testFingerprint);
+
+        final result = sut.prettyFingerprint(testBytes);
+
+        expect(result, testFingerprint);
+
+        verify(mockCryptoService.prettyFingerprint(testBytes)).called(1);
       });
 
       test('registerCustomMetadata registers converter', () {

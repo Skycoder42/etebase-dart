@@ -82,6 +82,16 @@ class Client implements EtebaseClient, NetworkClient {
   Future<bool> checkEtebaseServer() => authenticator.isEtebase();
 
   @override
+  Uint8List randombytes(int size) => crypto.randomBytes(size);
+
+  @override
+  SecureKey randomKey(int size) => crypto.secureRandom(size);
+
+  @override
+  String prettyFingerprint(Uint8List content) =>
+      crypto.prettyFingerprint(content);
+
+  @override
   void registerCustomMetadata<TMeta extends EtebaseItemMetadata>(
     MetaFromJson<TMeta> fromJson,
   ) => converter.addCustom<TMeta>(fromJson);

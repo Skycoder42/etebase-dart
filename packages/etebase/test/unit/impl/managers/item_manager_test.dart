@@ -470,8 +470,8 @@ void main() {
         verifyInOrder([
           mockEncrypted.missingChunks,
           mockOnline.chunkDownload(mockEncrypted, testChunk1.uid, null),
-          mockOnline.chunkDownload(mockEncrypted, testChunk2.uid, null),
           mockEncrypted.updateChunk(Chunk(testChunk1.uid, testData1)),
+          mockOnline.chunkDownload(mockEncrypted, testChunk2.uid, null),
           mockEncrypted.updateChunk(Chunk(testChunk2.uid, testData2)),
         ]);
       });

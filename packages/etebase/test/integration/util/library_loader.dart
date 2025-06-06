@@ -4,7 +4,6 @@ import 'dart:math';
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
 import 'package:sodium/sodium_sumo.dart';
-import 'package:test/test.dart';
 import 'package:uuid/data.dart';
 import 'package:uuid/rng.dart';
 import 'package:uuid/uuid.dart';
@@ -28,7 +27,8 @@ String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
 
 Future<EtebaseClient> createClient({bool useDefaultServer = false}) async {
   final useAsync = !kIsWeb && _rng.nextBool();
-  printOnFailure('Running client in ${useAsync ? 'async' : 'sync'} mode');
+  // ignore: avoid_print
+  print('Running client in ${useAsync ? 'async' : 'sync'} mode');
 
   return useAsync
       ? await EtebaseClient.createAsync(
@@ -50,7 +50,7 @@ Future<EtebaseAccount> createAccount(
 ]) async {
   final userName = generateUsername(userNamePrefix);
   final user = EtebaseUser(username: userName, email: '$userName@test.com');
-  final password = base64.encode(EtebaseUtils.randombytes(client, 32));
+  final password = base64.encode(client.randombytes(32));
   final account = await EtebaseAccount.signup(client, user, password);
   wrapper?.configureAccount(account);
   return account;

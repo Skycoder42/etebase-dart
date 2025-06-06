@@ -1,6 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium.dart';
 
+import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/client.dart';
 import '../models/etebase_collection.dart';
 import '../models/etebase_item.dart';
@@ -17,6 +18,10 @@ import 'etebase_item_manager.dart';
 /// the device. Hive was chosen as it simple (no other native dependencies),
 /// fast and compatible with the VM and the Web.
 abstract class EtebaseCache {
+  /// The length that the `encryptionKey` for [saveAccount] and [loadAccount]
+  /// must have.
+  static const cacheKeyLength = CryptoUtils.symmetricKeySize;
+
   /// Initialize hive based cache for the given [username].
   ///
   /// **Important:** Before you can create an [EtebaseCache], you must

@@ -594,7 +594,7 @@ void main() {
     'can upload and download content separately',
     timeout: const Timeout.factor(3),
     () async {
-      final bigContent = EtebaseUtils.randombytes(client, 16 * 1024 * 1024);
+      final bigContent = client.randombytes(16 * 1024 * 1024);
 
       final item = await itemManager.fetch(itemId1);
       final originalEtag = item.etag;

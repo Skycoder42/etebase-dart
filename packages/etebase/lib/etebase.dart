@@ -25,7 +25,6 @@ export 'src/api/managers/etebase_collection_invitation_manager.dart';
 export 'src/api/managers/etebase_collection_manager.dart';
 export 'src/api/managers/etebase_collection_member_manager.dart';
 export 'src/api/managers/etebase_item_manager.dart';
-export 'src/api/managers/etebase_utils.dart';
 
 export 'src/api/models/etebase_collection.dart';
 export 'src/api/models/etebase_collection_access_level.dart';

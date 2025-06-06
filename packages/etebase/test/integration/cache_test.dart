@@ -55,7 +55,7 @@ void main() {
     final restoredAccount = await cache.loadAccount();
     await restoredAccount.fetchToken();
 
-    final encryptionKey = EtebaseUtils.randomKey(client, 32);
+    final encryptionKey = client.randomKey(32);
     await cache.saveAccount(account, encryptionKey);
     final restoredAccountEnc = await cache.loadAccount(encryptionKey);
     await restoredAccountEnc.fetchToken();

@@ -26,8 +26,8 @@ void main() {
 
   group('utils', () {
     test('can generate random data and key', () {
-      final r1 = EtebaseUtils.randombytes(sut, 42);
-      final r2 = EtebaseUtils.randomKey(sut, 42);
+      final r1 = sut.randombytes(42);
+      final r2 = sut.randomKey(42);
 
       expect(r1, hasLength(42));
       expect(r2, hasLength(42));
@@ -39,7 +39,7 @@ void main() {
     test('produces readable fingerprint', () {
       final data = Uint8List.fromList(List.filled(24, 24));
 
-      final fingerprint = EtebaseUtils.prettyFingerprint(sut, data);
+      final fingerprint = sut.prettyFingerprint(data);
       expect(fingerprint, '''
 31673   91441   90258   74554
 78663   92652   90971   70634

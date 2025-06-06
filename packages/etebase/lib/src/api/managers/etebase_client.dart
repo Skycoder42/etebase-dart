@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../impl/crypto/crypto_utils.dart';
@@ -74,11 +76,29 @@ abstract interface class EtebaseClient {
     Uri? serverUrl,
   ]) = Client.create;
 
+  /// Disposes of the instance and clears all cryptographic keys from memory.
+  Future<void> dispose();
+
   /// Checks whether the client is pointing to a valid Etebase server.
   Future<bool> checkEtebaseServer();
 
-  /// Disposes of the instance and clears all cryptographic keys from memory.
-  Future<void> dispose();
+  /// Return a buffer of [size] (in bytes) filled with cryptographically random
+  /// bytes.
+  Uint8List randombytes(int size);
+
+  /// Return a buffer of [size] (in bytes) filled with cryptographically random
+  /// bytes as a [SecureKey].
+  SecureKey randomKey(int size);
+
+  /// Return a pretty formatted fingerprint of the [content].
+  ///
+  /// For example:
+  /// ```plain
+  /// 45680   71497   88570   93128
+  /// 19189   84243   25687   20837
+  /// 47924   46071   54113   18789
+  /// ```
+  String prettyFingerprint(Uint8List content);
 
   /// Registers a new item metadata type [TMeta] for this client.
   ///

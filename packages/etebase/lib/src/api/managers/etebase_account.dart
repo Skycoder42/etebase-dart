@@ -1,5 +1,6 @@
 import 'package:sodium/sodium.dart';
 
+import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/account.dart';
 import '../../impl/managers/client.dart';
 import '../models/etebase_user.dart';
@@ -10,6 +11,9 @@ import 'etebase_collection_manager.dart';
 /// The main object for all user interactions and data manipulation,
 /// representing an authenticated user account.
 abstract interface class EtebaseAccount {
+  /// The length that the `encryptionKey` for [save] and [restore] must have.
+  static const cacheKeyLength = CryptoUtils.symmetricKeySize;
+
   /// Authenticates a user using their [username] and [password] and returns an
   /// [EtebaseAccount] on success.
   static Future<EtebaseAccount> login(
@@ -70,7 +74,7 @@ abstract interface class EtebaseAccount {
   /// {@template encryption_key}
   /// You can optionally pass an [encryptionKey] to encrypt the account data
   /// with. It is recommended you always provide such a key to protect the users
-  /// data.
+  /// data. The key should have [cacheKeyLength] bytes.
   /// {@endtemplate}
   Future<String> save([SecureKey? encryptionKey]);
 }

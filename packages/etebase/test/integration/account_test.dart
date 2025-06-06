@@ -108,11 +108,11 @@ void main() {
       await restoredAccount.fetchToken();
 
       expect(
-        () => account.save(EtebaseUtils.randomKey(client, 64)),
+        () => account.save(client.randomKey(64)),
         throwsA(isA<ArgumentError>()),
       );
 
-      final encryptionKey = EtebaseUtils.randomKey(client, 32);
+      final encryptionKey = client.randomKey(32);
       final savedAccountEnc = await account.save(encryptionKey);
       final restoredAccountEnc = await EtebaseAccount.restore(
         client,
@@ -126,7 +126,7 @@ void main() {
     });
 
     test('can save and restore account from different client', () async {
-      final encryptionKey1 = EtebaseUtils.randomKey(client, 32);
+      final encryptionKey1 = client.randomKey(32);
       final jsSaved = await JsClientWrapper.execute<String>(
         Action.saveAccount(
           testUsername,
@@ -150,7 +150,7 @@ void main() {
         testUsername,
         testPassword,
       );
-      final encryptionKey2 = EtebaseUtils.randomKey(client, 32);
+      final encryptionKey2 = client.randomKey(32);
       final dartSaved = await dartAccount.save(encryptionKey2);
 
       await JsClientWrapper.execute<void>(

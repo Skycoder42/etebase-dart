@@ -58,8 +58,8 @@ void main() {
 
     expect(pubKey1, isNot(pubKey2));
 
-    final prettyPubKey1 = EtebaseUtils.prettyFingerprint(client, pubKey1);
-    final prettyPubKey2 = EtebaseUtils.prettyFingerprint(client, pubKey2);
+    final prettyPubKey1 = client.prettyFingerprint(pubKey1);
+    final prettyPubKey2 = client.prettyFingerprint(pubKey2);
 
     expect(prettyPubKey1, isNot(prettyPubKey2));
 

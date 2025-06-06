@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import 'package:pool/pool.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/conflict.dart';
@@ -30,14 +29,11 @@ class ItemManager implements EtebaseItemManager {
   @visibleForTesting
   final String colUid;
 
-  final _chunkPool = Pool(5);
-
   ItemManager(this.client, this.cryptoManager, this.online, this.colUid);
 
   @override
   void dispose() {
     cryptoManager.dispose();
-    unawaited(_chunkPool.close());
   }
 
   @override
@@ -138,11 +134,14 @@ class ItemManager implements EtebaseItemManager {
     ContentProgressCallback? onProgress,
   }) async {
     final [encrypted] = _prepareForUpload([item]);
-    await _processInParallel(
-      encrypted.pendingChunks.toList(),
-      (chunk) => _uploadIgnoringConflicts(encrypted, chunk),
-      onProgress,
-    );
+    final chunks = encrypted.pendingChunks.toList();
+
+    var current = 0;
+    onProgress?.call(current, chunks.length);
+    for (final chunk in chunks) {
+      await _uploadIgnoringConflicts(encrypted, chunk);
+      onProgress?.call(++current, chunks.length);
+    }
   }
 
   @override
@@ -151,11 +150,14 @@ class ItemManager implements EtebaseItemManager {
     ContentProgressCallback? onProgress,
   }) async {
     final [encrypted] = _prepareForUpload([item]);
-    await _processInParallel(
-      encrypted.missingChunks.toList(),
-      (chunk) => _download(encrypted, chunk),
-      onProgress,
-    );
+    final chunks = encrypted.missingChunks.toList();
+
+    var current = 0;
+    onProgress?.call(current, chunks.length);
+    for (final chunk in chunks) {
+      await _download(encrypted, chunk);
+      onProgress?.call(++current, chunks.length);
+    }
   }
 
   @override
@@ -209,18 +211,5 @@ class ItemManager implements EtebaseItemManager {
   Future<void> _download(EncryptedCollectionItem item, Chunk chunk) async {
     final data = await online.chunkDownload(item, chunk.uid, null);
     item.updateChunk(chunk.copyWith(data: data));
-  }
-
-  Future<void> _processInParallel(
-    List<Chunk> chunks,
-    Future<void> Function(Chunk chunk) process,
-    ContentProgressCallback? onProgress,
-  ) async {
-    var current = 0;
-    onProgress?.call(current, chunks.length);
-    await _chunkPool
-        .forEach(chunks, process)
-        .map((_) => onProgress?.call(++current, chunks.length))
-        .drain<void>();
   }
 }
