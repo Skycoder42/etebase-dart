@@ -14,6 +14,7 @@ import '../managers/client.dart';
 import 'cached/cached_chunk.dart';
 import 'cached/cached_revision.dart';
 import 'chunk.dart';
+import 'chunker_sink.dart';
 
 part 'encrypted_revision.g.dart';
 
@@ -138,56 +139,32 @@ class EncryptedRevision {
     );
   }
 
-  Future<void> setContent(
+  Future<void> setContentFromStream(
     Client client,
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
-    required Uint8List content,
+    required Stream<List<int>> content,
     @visibleForTesting EtebaseItemMetadata? metaData,
   }) async {
     final meta =
         metaData ?? await getMeta(client, cryptoManager, additionalData);
 
-    var chunks = <Chunk>[];
-    const minChunk = 1 << 14;
-    const maxChunk = 1 << 16;
-    var chunkStart = 0;
+    late final chunker = cryptoManager.getChunker();
 
-    // Only try chunking if our content is larger than the minimum chunk size
-    if (content.length > minChunk) {
-      final buzhash = cryptoManager.getChunker();
-      const mask = (1 << 12) - 1;
-
-      var pos = 0;
-      while (pos < content.length) {
-        buzhash.update(content[pos]);
-        if (pos - chunkStart >= minChunk) {
-          if ((pos - chunkStart >= maxChunk) || (buzhash.split(mask))) {
-            final buf = content.sublist(chunkStart, pos);
-            final hash = client.converter.base64Encode(
-              await cryptoManager.calculateMac(buf),
-            );
-            chunks.add(Chunk(hash, buf));
-            chunkStart = pos;
-          }
-        }
-        pos++;
-      }
-    }
-
-    if (chunkStart < content.length) {
-      final buf = content.sublist(chunkStart);
+    Future<Chunk> createChunk(Uint8List data) async {
       final hash = client.converter.base64Encode(
-        await cryptoManager.calculateMac(buf),
+        await cryptoManager.calculateMac(data),
       );
-      chunks.add(Chunk(hash, buf));
+      return Chunk(hash, data);
     }
+
+    var chunks = await content.chunked(chunker).asyncMap(createChunk).toList();
 
     // Shuffle the items and save the ordering if we have more than one
     if (chunks.isNotEmpty) {
       var indices = client.crypto.shuffle(chunks);
 
-      // // Filter duplicates and construct the indices list.
+      // Filter duplicates and construct the indices list.
       final uniqueChunksMap = <String, Chunk>{}; // uses LinkedHashMap
 
       for (final chunk in chunks) {
@@ -231,10 +208,24 @@ class EncryptedRevision {
     await setMeta(client, cryptoManager, additionalData, meta);
   }
 
-  Future<Uint8List> getContent(
+  Future<void> setContent(
+    Client client,
+    CollectionItemCryptoManager cryptoManager, {
+    required Uint8List additionalData,
+    required Uint8List content,
+    @visibleForTesting EtebaseItemMetadata? metaData,
+  }) async => await setContentFromStream(
+    client,
+    cryptoManager,
+    additionalData: additionalData,
+    content: Stream.value(content),
+    metaData: metaData,
+  );
+
+  Stream<Uint8List> getContentFromStream(
     Client client,
     CollectionItemCryptoManager cryptoManager,
-  ) async {
+  ) async* {
     var indices = const [0];
     final decryptedChunks = await Stream.fromIterable(chunks).asyncMap((
       chunk,
@@ -274,16 +265,24 @@ class EncryptedRevision {
 
     // We need to unshuffle the chunks
     if (indices.length > 1) {
-      final sortedChunksBuilder = BytesBuilder(copy: false);
       for (final index in indices) {
-        sortedChunksBuilder.add(decryptedChunks[index]);
+        yield decryptedChunks[index];
       }
-      return sortedChunksBuilder.takeBytes();
     } else if (decryptedChunks.isNotEmpty) {
-      return decryptedChunks[0];
-    } else {
-      return Uint8List(0);
+      yield decryptedChunks[0];
     }
+  }
+
+  Future<Uint8List> getContent(
+    Client client,
+    CollectionItemCryptoManager cryptoManager,
+  ) async {
+    final contentBuilder = BytesBuilder(copy: false);
+    await getContentFromStream(
+      client,
+      cryptoManager,
+    ).forEach(contentBuilder.add);
+    return contentBuilder.takeBytes();
   }
 
   Future<void> delete(

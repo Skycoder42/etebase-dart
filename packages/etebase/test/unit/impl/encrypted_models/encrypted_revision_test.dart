@@ -342,6 +342,8 @@ void main() {
       provideDummy(const EtebaseItemMetadata());
 
       setupSmartMocks();
+
+      setupRollsum(0xFFFFFFFF);
     });
 
     group('create', () {
