@@ -5,7 +5,7 @@ import 'package:etebase/src/impl/models/http_fetch_options.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('HttpEtebaseFetchOptionsX', () {
+  group('HttpFetchOptionsX', () {
     testData(
       'correctly maps etebase fetch options to fetch options',
       const [

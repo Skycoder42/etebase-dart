@@ -34,7 +34,7 @@ import '../crypto/crypto_mocks.dart';
 ])
 import 'encrypted_collection_item_test.mocks.dart';
 
-class FakeEtebaseItemMetadata extends Fake implements ItemMetadata {}
+class FakeItemMetadata extends Fake implements ItemMetadata {}
 
 void main() {
   group('$EncryptedCollectionItem', () {
@@ -440,7 +440,7 @@ void main() {
         });
 
         test('can handle custom metadata classes', () async {
-          final otherMeta = FakeEtebaseItemMetadata();
+          final otherMeta = FakeItemMetadata();
 
           await sut.setMeta(mockClient, mockItemCm, otherMeta);
 
@@ -473,13 +473,13 @@ void main() {
         );
 
         test('can handle custom metadata classes', () async {
-          final otherMeta = FakeEtebaseItemMetadata();
+          final otherMeta = FakeItemMetadata();
 
           when(
-            mockRevision.getMeta<FakeEtebaseItemMetadata>(any, any, any),
+            mockRevision.getMeta<FakeItemMetadata>(any, any, any),
           ).thenReturnAsync(otherMeta);
 
-          final result = await sut.getMeta<FakeEtebaseItemMetadata>(
+          final result = await sut.getMeta<FakeItemMetadata>(
             mockClient,
             mockItemCm,
           );

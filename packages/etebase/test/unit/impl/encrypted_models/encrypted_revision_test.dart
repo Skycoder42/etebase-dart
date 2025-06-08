@@ -37,13 +37,13 @@ import 'encrypted_revision_test.mocks.dart';
 typedef TestNext = void Function(Uint8List data, int depth);
 
 @immutable
-class TestEtebaseItemMetadata implements ItemMetadata {
+class TestItemMetadata implements ItemMetadata {
   final ItemMetadata _self;
   final String extra;
 
-  const TestEtebaseItemMetadata(this._self, this.extra);
+  const TestItemMetadata(this._self, this.extra);
 
-  TestEtebaseItemMetadata.fromJson(Map<String, dynamic> json)
+  TestItemMetadata.fromJson(Map<String, dynamic> json)
     : _self = ItemMetadata.fromJson(json),
       extra = json['extra'] as String;
 
@@ -67,9 +67,7 @@ class TestEtebaseItemMetadata implements ItemMetadata {
 
   @override
   bool operator ==(Object other) =>
-      other is TestEtebaseItemMetadata &&
-      other._self == _self &&
-      other.extra == extra;
+      other is TestItemMetadata && other._self == _self && other.extra == extra;
 
   @override
   int get hashCode => Object.hash(_self, extra);
@@ -955,7 +953,7 @@ void main() {
 
       test('can persist non default metadata', () async {
         final testAd = Uint8List.fromList([6, 5, 2, 3, 11]);
-        const testMeta = TestEtebaseItemMetadata(
+        const testMeta = TestItemMetadata(
           ItemMetadata(name: 'test-meta', description: 'test-description'),
           'test-extra',
         );
@@ -1008,7 +1006,7 @@ void main() {
 
       test('restores custom metadata', () async {
         final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
-        const testMeta = TestEtebaseItemMetadata(
+        const testMeta = TestItemMetadata(
           ItemMetadata(name: 'test-meta', color: '#AABBCC'),
           'test-extra',
         );
@@ -1016,11 +1014,11 @@ void main() {
 
         provideDummy(testMeta);
         when(
-          mockMessagePackConverter.decode<TestEtebaseItemMetadata>(any),
+          mockMessagePackConverter.decode<TestItemMetadata>(any),
         ).thenAnswer((i) {
           final [Uint8List data] = i.positionalArguments;
           final [Map<dynamic, dynamic> json] = unwrap(data, smConverterEncode);
-          return TestEtebaseItemMetadata.fromJson(json.cast());
+          return TestItemMetadata.fromJson(json.cast());
         });
 
         final sut = await EncryptedRevision.create(
@@ -1031,7 +1029,7 @@ void main() {
           content: testContent,
         );
 
-        final meta = await sut.getMeta<TestEtebaseItemMetadata>(
+        final meta = await sut.getMeta<TestItemMetadata>(
           mockClient,
           mockCryptoManager,
           testAd,

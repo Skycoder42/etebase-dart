@@ -32,11 +32,11 @@ import 'hive_cache_test.mocks.dart';
 
 class FakeSecureKey extends Fake implements SecureKey {}
 
-class FakeEtebaseCollection extends Fake implements Collection {
+class FakeCollection extends Fake implements Collection {
   @override
   final String uid;
 
-  FakeEtebaseCollection(this.uid);
+  FakeCollection(this.uid);
 }
 
 void main() {
@@ -360,7 +360,7 @@ void main() {
 
     group('collections', () {
       const testColUid = 'col-uid';
-      final testCollection = FakeEtebaseCollection(testColUid);
+      final testCollection = FakeCollection(testColUid);
       final testColData = Uint8List.fromList([2, 3, 2]);
       final mockColMgr = MockCollectionManager();
 
@@ -462,7 +462,7 @@ void main() {
       const testColUid = 'test-col';
       const testItemBoxName = '$testEncodedUserName.collection.$testColUid';
       const testItemUid = 'test-item';
-      final Item testItem = FakeEtebaseCollection(testItemUid);
+      final Item testItem = FakeCollection(testItemUid);
       final testItemData = Uint8List.fromList([3, 3, 4]);
 
       final mockItemMgr = MockItemManager();

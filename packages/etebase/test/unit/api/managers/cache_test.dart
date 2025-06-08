@@ -9,7 +9,7 @@ import '../../test_helpers.dart';
 @GenerateNiceMocks([MockSpec<ClientImpl>()])
 import 'cache_test.mocks.dart';
 
-class FakeEtebaseCache extends Fake implements HiveCache {}
+class FakeCache extends Fake implements HiveCache {}
 
 void main() {
   group('$Cache', () {
@@ -17,7 +17,7 @@ void main() {
       const testUserName = 'test-user';
 
       final mockClient = MockClientImpl();
-      final testCache = FakeEtebaseCache();
+      final testCache = FakeCache();
 
       when(mockClient.createCache(any)).thenReturnAsync(testCache);
 

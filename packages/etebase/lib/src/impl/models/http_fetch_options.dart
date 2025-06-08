@@ -20,7 +20,7 @@ sealed class HttpFetchOptions with _$HttpFetchOptions {
 }
 
 @internal
-extension EtebaseFetchOptionsX on FetchOptionsBase {
+extension HttpFetchOptionsX on FetchOptionsBase {
   HttpFetchOptions asHttpFetchOptions() => switch (this) {
     final FetchOptions o => HttpFetchOptions(
       limit: o.limit,

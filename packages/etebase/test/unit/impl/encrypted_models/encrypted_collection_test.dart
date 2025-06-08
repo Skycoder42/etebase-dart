@@ -41,7 +41,7 @@ import '../crypto/crypto_mocks.dart';
 ])
 import 'encrypted_collection_test.mocks.dart';
 
-class FakeEtebaseItemMetadata extends Fake implements ItemMetadata {}
+class FakeItemMetadata extends Fake implements ItemMetadata {}
 
 void main() {
   group('$EncryptedCollection', () {
@@ -418,7 +418,7 @@ void main() {
         });
 
         test('can handle custom metadata classes', () async {
-          final otherMeta = FakeEtebaseItemMetadata();
+          final otherMeta = FakeItemMetadata();
 
           await sut.setMeta(mockClient, mockColCm, otherMeta);
 
@@ -447,14 +447,14 @@ void main() {
         });
 
         test('can handle custom metadata classes', () async {
-          final otherMeta = FakeEtebaseItemMetadata();
+          final otherMeta = FakeItemMetadata();
 
-          setupWithCm<FakeEtebaseItemMetadata>();
+          setupWithCm<FakeItemMetadata>();
           when(
-            mockItem.getMeta<FakeEtebaseItemMetadata>(any, any),
+            mockItem.getMeta<FakeItemMetadata>(any, any),
           ).thenReturnAsync(otherMeta);
 
-          final result = await sut.getMeta<FakeEtebaseItemMetadata>(
+          final result = await sut.getMeta<FakeItemMetadata>(
             mockClient,
             mockColCm,
           );
@@ -462,12 +462,8 @@ void main() {
           expect(result, otherMeta);
 
           verifyInOrder([
-            mockItem.withCm<FakeEtebaseItemMetadata>(
-              mockClient,
-              mockColCm,
-              any,
-            ),
-            mockItem.getMeta<FakeEtebaseItemMetadata>(mockClient, mockItemCm),
+            mockItem.withCm<FakeItemMetadata>(mockClient, mockColCm, any),
+            mockItem.getMeta<FakeItemMetadata>(mockClient, mockItemCm),
           ]);
         });
       });
