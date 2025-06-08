@@ -4,7 +4,7 @@ import 'package:etebase/etebase.dart';
 import 'package:flutter/material.dart';
 
 /// Extension on [ItemMetadata] to get and set [Color] values directly.
-extension MetadataExtensions<T extends ItemMetadata> on T {
+extension ItemMetadataExtensions<T extends ItemMetadata> on T {
   static final _colorRegExp = RegExp(
     r'^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})?$',
     caseSensitive: false,

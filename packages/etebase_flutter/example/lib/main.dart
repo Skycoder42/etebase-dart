@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   }
 
   Future<String> _validateClient() async {
-    final client = await EtebaseFlutterClient.create();
+    final client = await FlutterClient.create();
     try {
       final serverUrl = Client.defaultServerUrl;
       final serverIsOk = await client.checkEtebaseServer();

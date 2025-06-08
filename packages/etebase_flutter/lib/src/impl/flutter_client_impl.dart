@@ -5,11 +5,11 @@ import 'package:meta/meta.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sodium_libs/sodium_libs_sumo.dart';
 
-import '../api/etebase_flutter_client.dart';
+import '../api/flutter_client.dart';
 
 @internal
 // ignore: invalid_use_of_internal_member
-class FlutterClient extends ClientImpl implements EtebaseFlutterClient {
+class FlutterClientImpl extends ClientImpl implements FlutterClient {
   static Future<SodiumSumo> get sodiumInstance => SodiumSumoInit.init();
 
   static Future<String> get clientName async {
@@ -28,6 +28,9 @@ class FlutterClient extends ClientImpl implements EtebaseFlutterClient {
     return Hive.initFlutter('etebase');
   }
 
-  FlutterClient.create(super.cryptoExecutor, super.clientName, super.serverUrl)
-    : super.create();
+  FlutterClientImpl.create(
+    super.cryptoExecutor,
+    super.clientName,
+    super.serverUrl,
+  ) : super.create();
 }

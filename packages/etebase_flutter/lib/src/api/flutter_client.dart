@@ -1,7 +1,7 @@
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
-import '../impl/flutter_client.dart';
+import '../impl/flutter_client_impl.dart';
 
 /// The network client to use to interact with the Etebase server.
 ///
@@ -10,7 +10,7 @@ import '../impl/flutter_client.dart';
 ///
 /// Unlike the [Client], this client automatically initializes
 /// libsodium and the client name from information gathered by flutter.
-abstract interface class EtebaseFlutterClient implements Client {
+abstract interface class FlutterClient implements Client {
   /// Creates a new client object for the server located at [serverUrl].
   ///
   /// {@template other_params}
@@ -27,17 +27,17 @@ abstract interface class EtebaseFlutterClient implements Client {
     Uri? serverUrl,
     bool autoInitHive = true,
   }) async {
-    await FlutterClient.hiveInit(autoInitHive);
-    return FlutterClient.create(
-      CryptoExecutor.sync(await FlutterClient.sodiumInstance),
-      await FlutterClient.clientName,
+    await FlutterClientImpl.hiveInit(autoInitHive);
+    return FlutterClientImpl.create(
+      CryptoExecutor.sync(await FlutterClientImpl.sodiumInstance),
+      await FlutterClientImpl.clientName,
       serverUrl,
     );
   }
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
-  /// This client differs from [EtebaseFlutterClient.create] in that it will
+  /// This client differs from [FlutterClient.create] in that it will
   /// execute all cryptographic operations on a separate worker isolate. For
   /// must usecases, this will be slower, as the data transfer between the
   /// isolates takes longer. Only use this if you are going to process items
@@ -49,10 +49,10 @@ abstract interface class EtebaseFlutterClient implements Client {
     Uri? serverUrl,
     bool autoInitHive = true,
   }) async {
-    await FlutterClient.hiveInit(autoInitHive);
-    return FlutterClient.create(
-      await CryptoExecutor.async(await FlutterClient.sodiumInstance),
-      await FlutterClient.clientName,
+    await FlutterClientImpl.hiveInit(autoInitHive);
+    return FlutterClientImpl.create(
+      await CryptoExecutor.async(await FlutterClientImpl.sodiumInstance),
+      await FlutterClientImpl.clientName,
       serverUrl,
     );
   }
@@ -71,10 +71,10 @@ abstract interface class EtebaseFlutterClient implements Client {
     Uri? serverUrl,
     bool autoInitHive = true,
   }) async {
-    await FlutterClient.hiveInit(autoInitHive);
-    return FlutterClient.create(
+    await FlutterClientImpl.hiveInit(autoInitHive);
+    return FlutterClientImpl.create(
       cryptoExecutor,
-      await FlutterClient.clientName,
+      await FlutterClientImpl.clientName,
       serverUrl,
     );
   }
