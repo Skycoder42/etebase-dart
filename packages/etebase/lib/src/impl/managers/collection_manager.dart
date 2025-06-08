@@ -11,7 +11,7 @@ import '../online_managers/collection_item_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
 import '../online_managers/collection_member_manager_online.dart';
 import 'client.dart';
-import 'collection.dart';
+import 'collection_impl.dart';
 import 'collection_member_manager.dart';
 import 'item_manager.dart';
 
@@ -24,7 +24,7 @@ class CollectionManager implements EtebaseCollectionManager {
   CollectionManager(this._client, this._cryptoManager, this._online);
 
   @override
-  Future<Collection> create<TMeta extends ItemMetadata>(
+  Future<CollectionImpl> create<TMeta extends ItemMetadata>(
     String collectionType,
     TMeta meta,
     Uint8List content,
@@ -35,13 +35,16 @@ class CollectionManager implements EtebaseCollectionManager {
       meta,
       content,
     );
-    return Collection(_client, cm, encryptedCollection);
+    return CollectionImpl(_client, cm, encryptedCollection);
   }
 
   @override
-  Future<Collection> fetch(String colUid, [FetchOptions? fetchOptions]) async {
+  Future<CollectionImpl> fetch(
+    String colUid, [
+    FetchOptions? fetchOptions,
+  ]) async {
     final encryptedCollection = await _online.fetch(colUid, fetchOptions);
-    return Collection(
+    return CollectionImpl(
       _client,
       encryptedCollection.getCryptoManager(_client, _cryptoManager),
       encryptedCollection,
@@ -49,13 +52,13 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  Future<CollectionListResponse<Collection>> list(
+  Future<CollectionListResponse<CollectionImpl>> list(
     String collectionType, [
     FetchOptions? fetchOptions,
   ]) => listMulti([collectionType], fetchOptions);
 
   @override
-  Future<CollectionListResponse<Collection>> listMulti(
+  Future<CollectionListResponse<CollectionImpl>> listMulti(
     List<String> collectionTypes, [
     FetchOptions? fetchOptions,
   ]) async {
@@ -65,7 +68,7 @@ class CollectionManager implements EtebaseCollectionManager {
     ];
     final result = await _online.list(colTypes, fetchOptions);
     return result.map(
-      (encrypted) => Collection(
+      (encrypted) => CollectionImpl(
         _client,
         encrypted.getCryptoManager(_client, _cryptoManager),
         encrypted,
@@ -75,7 +78,7 @@ class CollectionManager implements EtebaseCollectionManager {
 
   @override
   Future<void> upload(
-    covariant Collection collection, [
+    covariant CollectionImpl collection, [
     FetchOptions? fetchOptions,
   ]) async {
     final col = collection.encrypted;
@@ -91,7 +94,7 @@ class CollectionManager implements EtebaseCollectionManager {
 
   @override
   Future<void> transaction(
-    covariant Collection collection, [
+    covariant CollectionImpl collection, [
     FetchOptions? fetchOptions,
   ]) async {
     final col = collection.encrypted;
@@ -107,14 +110,14 @@ class CollectionManager implements EtebaseCollectionManager {
 
   @override
   Uint8List cacheSave(
-    covariant Collection collection, {
+    covariant CollectionImpl collection, {
     bool saveContent = true,
   }) => collection.encrypted.cacheSave(_client, saveContent: saveContent);
 
   @override
-  Collection cacheLoad(Uint8List cached) {
+  CollectionImpl cacheLoad(Uint8List cached) {
     final encryptedCollection = _client.cacheLoadEncryptedCollection(cached);
-    return Collection(
+    return CollectionImpl(
       _client,
       encryptedCollection.getCryptoManager(_client, _cryptoManager),
       encryptedCollection,
@@ -122,7 +125,7 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  ItemManager getItemManager(covariant Collection col) => ItemManager(
+  ItemManager getItemManager(covariant CollectionImpl col) => ItemManager(
     _client,
     col.encrypted.getCryptoManager(_client, _cryptoManager),
     CollectionItemManagerOnline(
@@ -134,7 +137,7 @@ class CollectionManager implements EtebaseCollectionManager {
   );
 
   @override
-  CollectionMemberManager getMemberManager(covariant Collection col) =>
+  CollectionMemberManager getMemberManager(covariant CollectionImpl col) =>
       CollectionMemberManager(
         CollectionMemberManagerOnline(
           client: _client,

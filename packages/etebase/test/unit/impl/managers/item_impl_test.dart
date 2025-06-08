@@ -4,7 +4,7 @@ import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
 import 'package:etebase/src/impl/managers/client.dart';
-import 'package:etebase/src/impl/managers/item.dart';
+import 'package:etebase/src/impl/managers/item_impl.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -16,24 +16,24 @@ import '../../test_helpers.dart';
   MockSpec<CollectionItemCryptoManager>(),
   MockSpec<EncryptedCollectionItem>(),
 ])
-import 'item_test.mocks.dart';
+import 'item_impl_test.mocks.dart';
 
 void main() {
-  group('$Item', () {
+  group('$ItemImpl', () {
     const testColUid = 'test-col-uid';
 
     final mockClient = MockClient();
     final mockItemCM = MockCollectionItemCryptoManager();
     final mockEncrypted = MockEncryptedCollectionItem();
 
-    late Item sut;
+    late ItemImpl sut;
 
     setUp(() {
       reset(mockClient);
       reset(mockItemCM);
       reset(mockEncrypted);
 
-      sut = Item(mockClient, mockItemCM, mockEncrypted, testColUid);
+      sut = ItemImpl(mockClient, mockItemCM, mockEncrypted, testColUid);
     });
 
     test('uid returns encrypted.uid', () {

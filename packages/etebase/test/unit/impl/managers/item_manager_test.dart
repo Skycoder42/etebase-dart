@@ -14,7 +14,7 @@ import 'package:etebase/src/impl/crypto/minimal_collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/chunk.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
 import 'package:etebase/src/impl/managers/client.dart';
-import 'package:etebase/src/impl/managers/item.dart';
+import 'package:etebase/src/impl/managers/item_impl.dart';
 import 'package:etebase/src/impl/managers/item_manager.dart';
 import 'package:etebase/src/impl/online_managers/collection_item_manager_online.dart';
 import 'package:mockito/annotations.dart';
@@ -51,7 +51,12 @@ void main() {
     final mockOnline = MockCollectionItemManagerOnline();
     final mockEncrypted = MockEncryptedCollectionItem();
 
-    final testItem = Item(mockClient, mockItemCM, mockEncrypted, testColUid);
+    final testItem = ItemImpl(
+      mockClient,
+      mockItemCM,
+      mockEncrypted,
+      testColUid,
+    );
 
     late ItemManager sut;
 
@@ -193,7 +198,7 @@ void main() {
         await expectLater(
           () => sut.fetchUpdates([
             testItem,
-            Item(mockClient, mockItemCM, mockEncrypted, testOtherId),
+            ItemImpl(mockClient, mockItemCM, mockEncrypted, testOtherId),
           ]),
           throwsA(
             isA<ApiMissuse>().having(
@@ -238,7 +243,12 @@ void main() {
 
     group('batch', () {
       final otherEncItem = MockEncryptedCollectionItem();
-      final otherItem = Item(mockClient, mockItemCM, otherEncItem, testColUid);
+      final otherItem = ItemImpl(
+        mockClient,
+        mockItemCM,
+        otherEncItem,
+        testColUid,
+      );
 
       setUp(() {
         reset(otherEncItem);
@@ -266,7 +276,7 @@ void main() {
 
       test('throws if item does not belong to collection', () async {
         const testOtherId = 'other-col-uid';
-        final otherItem = Item(
+        final otherItem = ItemImpl(
           mockClient,
           mockItemCM,
           otherEncItem,
@@ -287,7 +297,7 @@ void main() {
 
       test('throws if dependency does not belong to collection', () async {
         const testOtherId = 'other-col-uid';
-        final otherItem = Item(
+        final otherItem = ItemImpl(
           mockClient,
           mockItemCM,
           otherEncItem,
@@ -309,7 +319,12 @@ void main() {
 
     group('transaction', () {
       final otherEncItem = MockEncryptedCollectionItem();
-      final otherItem = Item(mockClient, mockItemCM, otherEncItem, testColUid);
+      final otherItem = ItemImpl(
+        mockClient,
+        mockItemCM,
+        otherEncItem,
+        testColUid,
+      );
 
       setUp(() {
         reset(otherEncItem);
@@ -345,7 +360,7 @@ void main() {
 
       test('throws if item does not belong to collection', () async {
         const testOtherId = 'other-col-uid';
-        final otherItem = Item(
+        final otherItem = ItemImpl(
           mockClient,
           mockItemCM,
           otherEncItem,
@@ -366,7 +381,7 @@ void main() {
 
       test('throws if dependency does not belong to collection', () async {
         const testOtherId = 'other-col-uid';
-        final otherItem = Item(
+        final otherItem = ItemImpl(
           mockClient,
           mockItemCM,
           otherEncItem,
@@ -434,7 +449,7 @@ void main() {
 
         await expectLater(
           () => sut.uploadContent(
-            Item(mockClient, mockItemCM, mockEncrypted, testOtherId),
+            ItemImpl(mockClient, mockItemCM, mockEncrypted, testOtherId),
           ),
           throwsA(
             isA<ApiMissuse>().having(
@@ -493,7 +508,7 @@ void main() {
 
         await expectLater(
           () => sut.downloadContent(
-            Item(mockClient, mockItemCM, mockEncrypted, testOtherId),
+            ItemImpl(mockClient, mockItemCM, mockEncrypted, testOtherId),
           ),
           throwsA(
             isA<ApiMissuse>().having(
@@ -558,12 +573,12 @@ void main() {
       expect(
         result,
         emitsInOrder([
-          isA<ItemListResponse<Item>>()
+          isA<ItemListResponse<ItemImpl>>()
               .having(
                 (m) => m.data,
                 'data',
                 orderedEquals([
-                  isA<Item>()
+                  isA<ItemImpl>()
                       .having((m) => m.colUid, 'colUid', testColUid)
                       .having((m) => m.encrypted, 'encrypted', mockEncrypted),
                 ]),
@@ -571,7 +586,7 @@ void main() {
               .having((m) => m.isDone, 'isDone', isFalse)
               .having((m) => m.stoken, 'stoken', testStoken),
           emitsError(testError),
-          const ItemListResponse<Item>(data: [], isDone: true),
+          const ItemListResponse<ItemImpl>(data: [], isDone: true),
           emitsDone,
         ]),
       );

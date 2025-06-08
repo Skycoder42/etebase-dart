@@ -3,14 +3,14 @@ library;
 
 import 'dart:typed_data';
 
+import '../models/collection.dart';
 import '../models/collection_access_level.dart';
-import '../models/etebase_collection.dart';
 import '../models/fetch_options.dart';
 import '../models/list_response.dart';
 import '../models/signed_invitation.dart';
 import '../models/user_profile.dart';
 
-/// An manager for managing user invitations to [EtebaseCollection]s.
+/// An manager for managing user invitations to [Collection]s.
 abstract class EtebaseCollectionInvitationManager {
   /// Our identity's public key.
   ///
@@ -47,7 +47,7 @@ abstract class EtebaseCollectionInvitationManager {
   /// [EtebaseCollectionInvitationManager.pubkey] of that user. The
   /// [accessLevel] defines the level of access to give to user.
   Future<void> invite(
-    EtebaseCollection collection,
+    Collection collection,
     String username,
     Uint8List pubkey,
     CollectionAccessLevel accessLevel,

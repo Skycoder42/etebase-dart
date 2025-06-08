@@ -11,7 +11,7 @@ import 'package:etebase/src/impl/crypto/crypto_service.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/managers/account.dart';
 import 'package:etebase/src/impl/managers/client.dart';
-import 'package:etebase/src/impl/managers/collection.dart';
+import 'package:etebase/src/impl/managers/collection_impl.dart';
 import 'package:etebase/src/impl/managers/collection_invitation_manager.dart';
 import 'package:etebase/src/impl/models/invitation_accept_request.dart';
 import 'package:etebase/src/impl/models/signed_invitation_base.dart';
@@ -31,7 +31,7 @@ import '../../test_helpers.dart';
   MockSpec<MessagePackConverter>(),
   MockSpec<BoxCryptoManager>(),
   MockSpec<AccountCryptoManager>(),
-  MockSpec<Collection>(),
+  MockSpec<CollectionImpl>(),
   MockSpec<EncryptedCollection>(),
 ])
 import 'collection_invitation_manager_test.mocks.dart';
@@ -47,7 +47,7 @@ void main() {
     final mockMessagePackConverter = MockMessagePackConverter();
     final mockBoxCM = MockBoxCryptoManager();
     final mockAccountCM = MockAccountCryptoManager();
-    final mockCollection = MockCollection();
+    final mockCollection = MockCollectionImpl();
     final mockEncryptedCollection = MockEncryptedCollection();
 
     late CollectionInvitationManager sut;

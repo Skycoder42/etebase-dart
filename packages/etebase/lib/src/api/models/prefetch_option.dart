@@ -1,9 +1,11 @@
 // coverage:ignore-file
-/// @docImport 'etebase_item.dart';
 /// @docImport 'fetch_options.dart';
+/// @docImport 'item.dart';
 library;
 
+import '../../../etebase.dart' show Item;
 import 'fetch_options.dart' show FetchOptionsBase;
+import 'item.dart' show Item;
 
 /// Dictates how much data to prefetch when passed to [FetchOptionsBase].
 enum PrefetchOption {
@@ -11,7 +13,7 @@ enum PrefetchOption {
   ///
   /// Usually, this will download the item and the content, but if the item gets
   /// too big, the server may decide to only send chunks without content. You
-  /// can use [EtebaseItem.isMissingContent] to check if content was downloaded.
+  /// can use [Item.isMissingContent] to check if content was downloaded.
   auto,
 
   /// Attempt to fetch a more lightweight (medium) amount of data.

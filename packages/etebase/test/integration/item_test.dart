@@ -248,9 +248,9 @@ void main() {
       expect(
         fetchedItems,
         unorderedEquals([
-          isA<EtebaseItem>().having((m) => m.uid, 'uid', itemId1),
-          isA<EtebaseItem>().having((m) => m.uid, 'uid', itemId3),
-          isA<EtebaseItem>().having((m) => m.uid, 'uid', itemId4),
+          isA<Item>().having((m) => m.uid, 'uid', itemId1),
+          isA<Item>().having((m) => m.uid, 'uid', itemId3),
+          isA<Item>().having((m) => m.uid, 'uid', itemId4),
         ]),
       );
     });
@@ -669,7 +669,7 @@ void main() {
     expect(event1.data, hasLength(1));
     expect(
       event1.data,
-      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item1.uid)),
+      contains(isA<Item>().having((m) => m.uid, 'uid', item1.uid)),
     );
 
     // create another
@@ -681,7 +681,7 @@ void main() {
     expect(event2.data, hasLength(1));
     expect(
       event2.data,
-      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item2.uid)),
+      contains(isA<Item>().having((m) => m.uid, 'uid', item2.uid)),
     );
 
     // update both
@@ -695,11 +695,11 @@ void main() {
     expect(event3.data, hasLength(2));
     expect(
       event3.data,
-      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item1.uid)),
+      contains(isA<Item>().having((m) => m.uid, 'uid', item1.uid)),
     );
     expect(
       event3.data,
-      contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item2.uid)),
+      contains(isA<Item>().having((m) => m.uid, 'uid', item2.uid)),
     );
     final update1 = event3.data.singleWhere((i) => i.uid == item1.uid);
     expect(await update1.getMeta(), const ItemMetadata(name: 'updated'));

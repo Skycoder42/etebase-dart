@@ -2,14 +2,14 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'etebase_collection.dart';
+import 'collection.dart';
 
 part 'removed_collection.freezed.dart';
 part 'removed_collection.g.dart';
 
 /// A collection for which the user lost access.
 ///
-/// Deleted collections are marked using [EtebaseCollection.isDeleted]. However,
+/// Deleted collections are marked using [Collection.isDeleted]. However,
 /// when we just lose access to a collection and it hasn't been deleted, we get
 /// this object.
 @freezed

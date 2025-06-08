@@ -3,16 +3,16 @@
 import 'dart:typed_data';
 
 import '../managers/etebase_item_manager.dart';
-import 'etebase_collection.dart';
+import 'collection.dart';
 import 'item_metadata.dart';
 
-/// Items belong to [EtebaseCollection]s and are where data is stored.
+/// Items belong to [Collection]s and are where data is stored.
 ///
 /// Items have two pieces of data associated with them:
 /// * [ItemMetadata] - contains meta information like name and
 /// modification time.
 /// * Content ([Uint8List]) - a buffer containing arbitrary binary data.
-abstract class EtebaseItem {
+abstract class Item {
   /// The UID of the item.
   String get uid;
 

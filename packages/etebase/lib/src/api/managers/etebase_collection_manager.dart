@@ -1,27 +1,27 @@
 import 'dart:typed_data';
 
-import '../models/etebase_collection.dart';
-import '../models/etebase_item.dart';
+import '../models/collection.dart';
 import '../models/fetch_options.dart';
+import '../models/item.dart';
 import '../models/item_metadata.dart';
 import '../models/list_response.dart';
 import 'etebase_client.dart';
 import 'etebase_collection_member_manager.dart';
 import 'etebase_item_manager.dart';
 
-/// A manager for managing [EtebaseCollection] operations like creation and
+/// A manager for managing [Collection] operations like creation and
 /// fetching.
 abstract class EtebaseCollectionManager {
-  /// Create a new [EtebaseCollection].
+  /// Create a new [Collection].
   ///
-  /// The [collectionType] defines the type of [EtebaseItem]s stored in the
+  /// The [collectionType] defines the type of [Item]s stored in the
   /// collection. The [meta] and [content] are backing the collections primary
-  /// [EtebaseItem]. This is unrelated to the [EtebaseItem]s in the collection.
+  /// [Item]. This is unrelated to the [Item]s in the collection.
   ///
   /// {@template create_from_stream}
   /// **Note:** To create a new instance from a stream instead of an [Uint8List]
   /// [content], simply create it with `Uint8List(0)` as content and then call
-  /// [EtebaseItem.setContentStream] to set the actual content.
+  /// [Item.setContentStream] to set the actual content.
   /// {@endtemplate}
   ///
   /// {@template meta_registration}
@@ -30,7 +30,7 @@ abstract class EtebaseCollectionManager {
   /// [ItemMetadata] with additional properties. However, this requires
   /// you to register [TMeta] once via [EtebaseClient.registerCustomMetadata].
   /// {@endtemplate}
-  Future<EtebaseCollection> create<TMeta extends ItemMetadata>(
+  Future<Collection> create<TMeta extends ItemMetadata>(
     String collectionType,
     TMeta meta,
     Uint8List content,
@@ -42,22 +42,22 @@ abstract class EtebaseCollectionManager {
   /// The [fetchOptions] allow you to specify optional parameters to further
   /// filter the returned result or continue with the next iteration of data.
   /// {@endtemplate}
-  Future<EtebaseCollection> fetch(String colUid, [FetchOptions? fetchOptions]);
+  Future<Collection> fetch(String colUid, [FetchOptions? fetchOptions]);
 
-  /// Fetch all [EtebaseCollection]s of a specific [collectionType] from the
+  /// Fetch all [Collection]s of a specific [collectionType] from the
   /// server and return a [CollectionListResponse].
   ///
   /// {@macro fetch_options}
-  Future<CollectionListResponse<EtebaseCollection>> list(
+  Future<CollectionListResponse<Collection>> list(
     String collectionType, [
     FetchOptions? fetchOptions,
   ]);
 
-  /// Fetch all [EtebaseCollection]s of the supplied [collectionTypes] from the
+  /// Fetch all [Collection]s of the supplied [collectionTypes] from the
   /// server and return a [CollectionListResponse].
   ///
   /// {@macro fetch_options}
-  Future<CollectionListResponse<EtebaseCollection>> listMulti(
+  Future<CollectionListResponse<Collection>> listMulti(
     List<String> collectionTypes, [
     FetchOptions? fetchOptions,
   ]);
@@ -65,10 +65,7 @@ abstract class EtebaseCollectionManager {
   /// Upload a [collection].
   ///
   /// {@macro fetch_options}
-  Future<void> upload(
-    EtebaseCollection collection, [
-    FetchOptions? fetchOptions,
-  ]);
+  Future<void> upload(Collection collection, [FetchOptions? fetchOptions]);
 
   /// Upload a [collection] using a transaction.
   ///
@@ -76,10 +73,7 @@ abstract class EtebaseCollectionManager {
   /// it.
   ///
   /// {@macro fetch_options}
-  Future<void> transaction(
-    EtebaseCollection collection, [
-    FetchOptions? fetchOptions,
-  ]);
+  Future<void> transaction(Collection collection, [FetchOptions? fetchOptions]);
 
   /// Save the [collection] object to a byte buffer for caching.
   ///
@@ -90,15 +84,15 @@ abstract class EtebaseCollectionManager {
   /// with it's content. If set to `false`, only the metadata is stored and the
   /// content has to be restored using [EtebaseItemManager.downloadContent].
   /// {@endtemplate}
-  Uint8List cacheSave(EtebaseCollection collection, {bool saveContent = true});
+  Uint8List cacheSave(Collection collection, {bool saveContent = true});
 
-  /// Load and return a cached [EtebaseCollection] object from the [cached]
+  /// Load and return a cached [Collection] object from the [cached]
   /// bytes originally saved via [cacheSave].
-  EtebaseCollection cacheLoad(Uint8List cached);
+  Collection cacheLoad(Uint8List cached);
 
   /// Return the item manager for the supplied [collection].
-  EtebaseItemManager getItemManager(EtebaseCollection collection);
+  EtebaseItemManager getItemManager(Collection collection);
 
   /// Return the collection member manager for the supplied [collection].
-  EtebaseCollectionMemberManager getMemberManager(EtebaseCollection collection);
+  EtebaseCollectionMemberManager getMemberManager(Collection collection);
 }

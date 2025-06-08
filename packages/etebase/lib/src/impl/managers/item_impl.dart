@@ -2,20 +2,20 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-import '../../api/models/collection_access_level.dart';
-import '../../api/models/etebase_collection.dart';
+import '../../api/models/item.dart';
 import '../../api/models/item_metadata.dart';
-import '../crypto/collection_crypto_manager.dart';
-import '../encrypted_models/encrypted_collection.dart';
+import '../crypto/collection_item_crypto_manager.dart';
+import '../encrypted_models/encrypted_collection_item.dart';
 import 'client.dart';
 
 @internal
-class Collection implements EtebaseCollection {
+class ItemImpl implements Item {
   final Client _client;
-  final CollectionCryptoManager _cm;
-  final EncryptedCollection encrypted;
+  final CollectionItemCryptoManager _cm;
+  final EncryptedCollectionItem encrypted;
+  final String colUid;
 
-  Collection(this._client, this._cm, this.encrypted);
+  ItemImpl(this._client, this._cm, this.encrypted, this.colUid);
 
   @override
   String get uid => encrypted.uid;
@@ -28,16 +28,6 @@ class Collection implements EtebaseCollection {
 
   @override
   bool get isMissingContent => encrypted.isMissingContent;
-
-  @override
-  String? get stoken => encrypted.stoken;
-
-  @override
-  String get collectionType =>
-      encrypted.getCollectionType(_client, _cm.accountCryptoManager);
-
-  @override
-  CollectionAccessLevel get accessLevel => encrypted.accessLevel;
 
   @override
   void dispose() => _cm.dispose();

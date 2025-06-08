@@ -6,8 +6,8 @@ import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/not_found.dart';
 import 'package:etebase/src/api/managers/etebase_collection_manager.dart';
 import 'package:etebase/src/api/managers/etebase_item_manager.dart';
-import 'package:etebase/src/api/models/etebase_collection.dart';
-import 'package:etebase/src/api/models/etebase_item.dart';
+import 'package:etebase/src/api/models/collection.dart';
+import 'package:etebase/src/api/models/item.dart';
 import 'package:etebase/src/impl/cache/hive_cache.dart';
 import 'package:etebase/src/impl/managers/account.dart';
 import 'package:etebase/src/impl/managers/client.dart';
@@ -32,7 +32,7 @@ import 'hive_cache_test.mocks.dart';
 
 class FakeSecureKey extends Fake implements SecureKey {}
 
-class FakeEtebaseCollection extends Fake implements EtebaseCollection {
+class FakeEtebaseCollection extends Fake implements Collection {
   @override
   final String uid;
 
@@ -462,7 +462,7 @@ void main() {
       const testColUid = 'test-col';
       const testItemBoxName = '$testEncodedUserName.collection.$testColUid';
       const testItemUid = 'test-item';
-      final EtebaseItem testItem = FakeEtebaseCollection(testItemUid);
+      final Item testItem = FakeEtebaseCollection(testItemUid);
       final testItemData = Uint8List.fromList([3, 3, 4]);
 
       final mockItemMgr = MockEtebaseItemManager();

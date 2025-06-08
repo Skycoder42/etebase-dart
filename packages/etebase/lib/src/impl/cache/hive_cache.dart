@@ -9,8 +9,8 @@ import '../../api/managers/etebase_account.dart';
 import '../../api/managers/etebase_cache.dart';
 import '../../api/managers/etebase_collection_manager.dart';
 import '../../api/managers/etebase_item_manager.dart';
-import '../../api/models/etebase_collection.dart';
-import '../../api/models/etebase_item.dart';
+import '../../api/models/collection.dart';
+import '../../api/models/item.dart';
 import '../codec/base64_url_no_pad_codec.dart';
 import '../managers/client.dart';
 
@@ -130,7 +130,7 @@ class HiveCache implements EtebaseCache {
   @override
   Future<void> collectionSet(
     EtebaseCollectionManager colMgr,
-    EtebaseCollection col, {
+    Collection col, {
     bool saveContent = true,
   }) async {
     final colData = colMgr.cacheSave(col, saveContent: saveContent);
@@ -147,7 +147,7 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<EtebaseCollection> collectionGet(
+  Future<Collection> collectionGet(
     EtebaseCollectionManager colMgr,
     String colUid,
   ) async {
@@ -168,7 +168,7 @@ class HiveCache implements EtebaseCache {
   Future<void> itemSet(
     EtebaseItemManager itemMgr,
     String colUid,
-    EtebaseItem item, {
+    Item item, {
     bool saveContent = true,
   }) async {
     final itemBox = await _itemBox(colUid, create: true);
@@ -183,7 +183,7 @@ class HiveCache implements EtebaseCache {
   }
 
   @override
-  Future<EtebaseItem> itemGet(
+  Future<Item> itemGet(
     EtebaseItemManager itemMgr,
     String colUid,
     String itemUid,

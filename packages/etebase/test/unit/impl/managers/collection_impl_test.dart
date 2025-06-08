@@ -6,7 +6,7 @@ import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/managers/client.dart';
-import 'package:etebase/src/impl/managers/collection.dart';
+import 'package:etebase/src/impl/managers/collection_impl.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -19,16 +19,16 @@ import '../../test_helpers.dart';
   MockSpec<AccountCryptoManager>(),
   MockSpec<EncryptedCollection>(),
 ])
-import 'collection_test.mocks.dart';
+import 'collection_impl_test.mocks.dart';
 
 void main() {
-  group('$Collection', () {
+  group('$CollectionImpl', () {
     final mockClient = MockClient();
     final mockCollectionCM = MockCollectionCryptoManager();
     final mockAccountCM = MockAccountCryptoManager();
     final mockEncrypted = MockEncryptedCollection();
 
-    late Collection sut;
+    late CollectionImpl sut;
 
     setUp(() {
       reset(mockClient);
@@ -38,7 +38,7 @@ void main() {
 
       when(mockCollectionCM.accountCryptoManager).thenReturn(mockAccountCM);
 
-      sut = Collection(mockClient, mockCollectionCM, mockEncrypted);
+      sut = CollectionImpl(mockClient, mockCollectionCM, mockEncrypted);
     });
 
     test('uid returns encrypted.uid', () {

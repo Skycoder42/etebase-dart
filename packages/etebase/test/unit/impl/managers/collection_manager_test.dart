@@ -11,7 +11,7 @@ import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
 import 'package:etebase/src/impl/managers/client.dart';
-import 'package:etebase/src/impl/managers/collection.dart';
+import 'package:etebase/src/impl/managers/collection_impl.dart';
 import 'package:etebase/src/impl/managers/collection_manager.dart';
 import 'package:etebase/src/impl/online_managers/base_manager.dart';
 import 'package:etebase/src/impl/online_managers/collection_item_manager_online.dart';
@@ -52,7 +52,7 @@ void main() {
     final mockCollectionCM = MockCollectionCryptoManager();
     final mockItemOnline = MockCollectionItemManagerOnline();
 
-    final testCollection = Collection(
+    final testCollection = CollectionImpl(
       mockClient,
       mockCollectionCM,
       mockEncryptedCollection,

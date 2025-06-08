@@ -13,7 +13,7 @@ import '../models/signed_invitation_content.dart';
 import '../online_managers/collection_invitation_manager_online.dart';
 import 'account.dart';
 import 'client.dart';
-import 'collection.dart';
+import 'collection_impl.dart';
 
 @internal
 class CollectionInvitationManager
@@ -73,7 +73,7 @@ class CollectionInvitationManager
 
   @override
   Future<void> invite(
-    covariant Collection collection,
+    covariant CollectionImpl collection,
     String username,
     Uint8List pubkey,
     CollectionAccessLevel accessLevel,

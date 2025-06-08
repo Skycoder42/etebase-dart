@@ -3,8 +3,8 @@ import 'package:sodium/sodium.dart';
 
 import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/client.dart';
-import '../models/etebase_collection.dart';
-import '../models/etebase_item.dart';
+import '../models/collection.dart';
+import '../models/item.dart';
 import 'etebase_account.dart';
 import 'etebase_client.dart';
 import 'etebase_collection_manager.dart';
@@ -88,7 +88,7 @@ abstract class EtebaseCache {
   /// {@macro save_content}
   Future<void> collectionSet(
     EtebaseCollectionManager colMgr,
-    EtebaseCollection collection, {
+    Collection collection, {
     bool saveContent = true,
   });
 
@@ -98,8 +98,8 @@ abstract class EtebaseCache {
   /// [collectionSaveStoken].
   Future<void> collectionUnset(String colUid);
 
-  /// Load a [EtebaseCollection] identified by [colUid] from cache.
-  Future<EtebaseCollection> collectionGet(
+  /// Load a [Collection] identified by [colUid] from cache.
+  Future<Collection> collectionGet(
     EtebaseCollectionManager colMgr,
     String colUid,
   );
@@ -114,7 +114,7 @@ abstract class EtebaseCache {
   Future<void> itemSet(
     EtebaseItemManager itemMgr,
     String colUid,
-    EtebaseItem item, {
+    Item item, {
     bool saveContent = true,
   });
 
@@ -122,9 +122,9 @@ abstract class EtebaseCache {
   /// [colUid] from cache.
   Future<void> itemUnset(String colUid, String itemUid);
 
-  /// Load an [EtebaseItem] identified by [itemUid] of the collection identified
+  /// Load an [Item] identified by [itemUid] of the collection identified
   /// by [colUid] from cache.
-  Future<EtebaseItem> itemGet(
+  Future<Item> itemGet(
     EtebaseItemManager itemMgr,
     String colUid,
     String itemUid,

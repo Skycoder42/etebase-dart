@@ -138,17 +138,14 @@ abstract class JsClientWrapper {
   @protected
   late final EtebaseAccount account;
   @protected
-  late final EtebaseCollection collection;
+  late final Collection collection;
 
   factory JsClientWrapper() => throw UnimplementedError('Unsupported platform');
 
   JsClientWrapper.base();
 
   // ignore: use_setters_to_change_properties
-  void configureAccount(
-    EtebaseAccount account, [
-    EtebaseCollection? collection,
-  ]) {
+  void configureAccount(EtebaseAccount account, [Collection? collection]) {
     this.account = account;
     if (collection != null) {
       this.collection = collection;

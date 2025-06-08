@@ -24,11 +24,11 @@ export 'src/api/managers/etebase_collection_invitation_manager.dart';
 export 'src/api/managers/etebase_collection_manager.dart';
 export 'src/api/managers/etebase_collection_member_manager.dart';
 export 'src/api/managers/etebase_item_manager.dart';
+export 'src/api/models/collection.dart';
 export 'src/api/models/collection_access_level.dart';
 export 'src/api/models/collection_member.dart';
-export 'src/api/models/etebase_collection.dart';
-export 'src/api/models/etebase_item.dart';
 export 'src/api/models/fetch_options.dart' hide FetchOptionsBase, FetchOptionsX;
+export 'src/api/models/item.dart';
 export 'src/api/models/item_metadata.dart'
     hide $ItemMetadataImplCopyWith, ItemMetadataImpl;
 export 'src/api/models/list_response.dart';
