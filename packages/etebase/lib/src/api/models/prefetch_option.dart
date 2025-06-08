@@ -3,10 +3,6 @@
 /// @docImport 'item.dart';
 library;
 
-import '../../../etebase.dart' show Item;
-import 'fetch_options.dart' show FetchOptionsBase;
-import 'item.dart' show Item;
-
 /// Dictates how much data to prefetch when passed to [FetchOptionsBase].
 enum PrefetchOption {
   /// Automatically decide based on the size of the data fetched.
