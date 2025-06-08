@@ -594,11 +594,17 @@ void main() {
     'can upload and download content separately',
     timeout: const Timeout.factor(3),
     () async {
-      final bigContent = client.randombytes(16 * 1024 * 1024);
+      final bigContentChunks = List.generate(
+        13,
+        (_) => client.randombytes(1234567),
+      );
+      final bigContentBuilder = BytesBuilder(copy: false);
+      bigContentChunks.forEach(bigContentBuilder.add);
+      final bigContent = bigContentBuilder.takeBytes();
 
       final item = await itemManager.fetch(itemId1);
       final originalEtag = item.etag;
-      await item.setContent(bigContent);
+      await item.setContentStream(Stream.fromIterable(bigContentChunks));
 
       prefix = 'Uploading - ';
       await itemManager.uploadContent(item, onProgress: printProgress);
@@ -632,7 +638,16 @@ void main() {
         onProgress: printProgress,
       );
       expect(itemWithoutContent.isMissingContent, isFalse);
-      expect(await updated.getContent(), bigContent);
+
+      var offset = 0;
+      await for (final chunk in updated.getContentStream()) {
+        expect(
+          chunk,
+          Uint8List.sublistView(bigContent, offset, offset + chunk.length),
+        );
+        offset += chunk.length;
+      }
+      expect(offset, bigContent.length);
     },
   );
 
@@ -758,10 +773,10 @@ void main() {
           List.filled(1 << 16, 0),
           List.filled(1 << 16, 1),
           List.filled(1 << 16, 0),
-          List.filled(25, 42),
+          List.filled(25, 1),
         ].expand((i) => i).toList(),
       );
-      const totalChunks = 4; // <ordering> + <0s> + <1s> + <rest>
+      const totalChunks = 4; // <0s> + <1s> + <rest> + <indices>
 
       final uploadItem = await itemManager.create(
         const EtebaseItemMetadata(name: 'deduplicated'),

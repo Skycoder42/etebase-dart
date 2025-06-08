@@ -139,7 +139,7 @@ class EncryptedRevision {
     );
   }
 
-  Future<void> setContentFromStream(
+  Future<void> setContentStream(
     Client client,
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
@@ -214,7 +214,7 @@ class EncryptedRevision {
     required Uint8List additionalData,
     required Uint8List content,
     @visibleForTesting EtebaseItemMetadata? metaData,
-  }) async => await setContentFromStream(
+  }) async => await setContentStream(
     client,
     cryptoManager,
     additionalData: additionalData,
@@ -222,7 +222,7 @@ class EncryptedRevision {
     metaData: metaData,
   );
 
-  Stream<Uint8List> getContentFromStream(
+  Stream<Uint8List> getContentStream(
     Client client,
     CollectionItemCryptoManager cryptoManager,
   ) async* {
@@ -278,10 +278,7 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager,
   ) async {
     final contentBuilder = BytesBuilder(copy: false);
-    await getContentFromStream(
-      client,
-      cryptoManager,
-    ).forEach(contentBuilder.add);
+    await getContentStream(client, cryptoManager).forEach(contentBuilder.add);
     return contentBuilder.takeBytes();
   }
 

@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:async/async.dart';
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
 import 'package:etebase/src/api/models/etebase_item_metadata.dart';
@@ -480,6 +481,16 @@ void main() {
         ]);
       });
 
+      test('setContentStream sets content with crypto manager', () async {
+        final testContentStream = Stream.value(testContent);
+        await sut.setContentStream(mockClient, mockColCm, testContentStream);
+
+        verifyInOrder([
+          mockItem.withCm<void>(mockClient, mockColCm, any),
+          mockItem.setContentStream(mockClient, mockItemCm, testContentStream),
+        ]);
+      });
+
       test('getContent sets content with crypto manager', () async {
         setupWithCm<Uint8List>();
         when(mockItem.getContent(any, any)).thenReturnAsync(testContent);
@@ -492,6 +503,29 @@ void main() {
           mockItem.withCm<Uint8List>(mockClient, mockColCm, any),
           mockItem.getContent(mockClient, mockItemCm),
         ]);
+      });
+
+      test('getContentStream sets content with crypto manager', () async {
+        clearInteractions(mockItemCm);
+
+        when(mockItem.getCryptoManager(any, any)).thenReturn(mockItemCm);
+        when(
+          mockItem.getContentStream(any, any),
+        ).thenStream(Stream.value(testContent));
+
+        final result = sut.getContentStream(mockClient, mockColCm);
+
+        final sq = StreamQueue(result);
+        expect(await sq.next, testContent);
+
+        verifyInOrder([
+          mockItem.getCryptoManager(mockClient, mockColCm),
+          mockItem.getContentStream(mockClient, mockItemCm),
+        ]);
+        verifyNever(mockItemCm.dispose());
+
+        expect(await sq.hasNext, isFalse);
+        verify(mockItemCm.dispose()).called(1);
       });
 
       testData(

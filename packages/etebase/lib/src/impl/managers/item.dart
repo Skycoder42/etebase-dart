@@ -48,7 +48,15 @@ class Item implements EtebaseItem {
       encrypted.setContent(_client, _cm, content);
 
   @override
+  Future<void> setContentStream(Stream<List<int>> content) =>
+      encrypted.setContentStream(_client, _cm, content);
+
+  @override
   Future<Uint8List> getContent() => encrypted.getContent(_client, _cm);
+
+  @override
+  Stream<Uint8List> getContentStream() =>
+      encrypted.getContentStream(_client, _cm);
 
   @override
   Future<void> delete({bool preserveContent = false}) =>

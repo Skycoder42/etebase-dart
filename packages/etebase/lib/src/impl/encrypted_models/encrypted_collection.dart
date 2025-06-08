@@ -125,6 +125,16 @@ class EncryptedCollection {
     MinimalCollectionCryptoManager cm,
   ) => item.withCm(client, cm, (cm) => item.getMeta<TMeta>(client, cm));
 
+  Future<void> setContentStream(
+    Client client,
+    MinimalCollectionCryptoManager cm,
+    Stream<List<int>> content,
+  ) => item.withCm(
+    client,
+    cm,
+    (cm) => item.setContentStream(client, cm, content),
+  );
+
   Future<void> setContent(
     Client client,
     MinimalCollectionCryptoManager cm,
@@ -135,6 +145,18 @@ class EncryptedCollection {
     Client client,
     MinimalCollectionCryptoManager cm,
   ) => item.withCm(client, cm, (cm) => item.getContent(client, cm));
+
+  Stream<Uint8List> getContentStream(
+    Client client,
+    MinimalCollectionCryptoManager cm,
+  ) async* {
+    final itemCm = item.getCryptoManager(client, cm);
+    try {
+      yield* item.getContentStream(client, itemCm);
+    } finally {
+      itemCm.dispose();
+    }
+  }
 
   Future<void> delete(
     Client client,

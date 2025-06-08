@@ -22,14 +22,15 @@ class ChunkerSink implements EventSink<List<int>> {
   void add(List<int> event) {
     var chunkLen = _chunkBuilder.length;
     var chunkStart = 0;
-    for (var pos = 0; pos < event.length; ++pos, ++chunkLen) {
+    for (var pos = 0; pos < event.length; ++pos) {
       chunker.update(event[pos]);
+      chunkLen++;
 
       if (chunkLen >= minChunk) {
         if (chunkLen >= maxChunk || chunker.split(mask)) {
-          _chunkBuilder.add(_sublistView(event, chunkStart, pos));
+          _chunkBuilder.add(_sublistView(event, chunkStart, pos + 1));
           sink.add(_chunkBuilder.takeBytes());
-          chunkStart = pos;
+          chunkStart = pos + 1;
           chunkLen = 0;
         }
       }

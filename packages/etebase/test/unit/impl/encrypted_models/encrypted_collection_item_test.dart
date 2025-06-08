@@ -535,6 +535,53 @@ void main() {
         });
       });
 
+      group('setContentStream', () {
+        test('updates revision if it is already locally changed', () async {
+          final newContent = Stream.value([6, 4, 5, 6, 2, 1, 1]);
+
+          await sut.setContentStream(mockClient, mockItemCm, newContent);
+
+          verify(
+            mockRevision.setContentStream(
+              mockClient,
+              mockItemCm,
+              additionalData: testUidUtf8,
+              content: newContent,
+            ),
+          );
+          verifyNever(mockRevision.clone());
+        });
+
+        test('clones revision if it has not been changed yet', () async {
+          final newContent = Stream.value([6, 4, 5, 6, 2, 1, 1]);
+          final newRevision = MockEncryptedRevision();
+
+          sut.markSaved();
+
+          when(mockRevision.clone()).thenReturn(newRevision);
+
+          await sut.setContentStream(mockClient, mockItemCm, newContent);
+
+          verifyInOrder([
+            mockRevision.clone(),
+            newRevision.setContentStream(
+              mockClient,
+              mockItemCm,
+              additionalData: testUidUtf8,
+              content: newContent,
+            ),
+          ]);
+          verifyNever(
+            mockRevision.setContentStream(
+              any,
+              any,
+              additionalData: anyNamed('additionalData'),
+              content: anyNamed('content'),
+            ),
+          );
+        });
+      });
+
       test('getContent', () async {
         when(mockRevision.getContent(any, any)).thenReturnAsync(testContent);
 
@@ -545,6 +592,21 @@ void main() {
         verifyInOrder([
           mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
           mockRevision.getContent(mockClient, mockItemCm),
+        ]);
+      });
+
+      test('getContentStream', () async {
+        when(
+          mockRevision.getContentStream(any, any),
+        ).thenStream(Stream.value(testContent));
+
+        final result = sut.getContentStream(mockClient, mockItemCm);
+
+        await expectLater(result, emits(testContent));
+
+        verifyInOrder([
+          mockRevision.verify(mockClient, mockItemCm, testUidUtf8),
+          mockRevision.getContentStream(mockClient, mockItemCm),
         ]);
       });
 

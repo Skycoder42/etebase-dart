@@ -3,7 +3,3 @@
 [![Pub Version](https://img.shields.io/pub/v/etebase)](https://pub.dev/packages/etebase)
 
 Dart native client library for etebase and etesync.
-
-## TODOs
-- remove etebase prefix from names
-- get/set content via stream

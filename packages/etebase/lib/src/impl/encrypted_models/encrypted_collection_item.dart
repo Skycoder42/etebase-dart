@@ -170,12 +170,33 @@ class EncryptedCollectionItem {
     ),
   );
 
+  Future<void> setContentStream(
+    Client client,
+    CollectionItemCryptoManager cm,
+    Stream<List<int>> content,
+  ) => _cloneOrUpdateRevision(
+    (rev) => rev.setContentStream(
+      client,
+      cm,
+      additionalData: _getAdditionalMacData(),
+      content: content,
+    ),
+  );
+
   Future<Uint8List> getContent(
     Client client,
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
     return content.getContent(client, cm);
+  }
+
+  Stream<Uint8List> getContentStream(
+    Client client,
+    CollectionItemCryptoManager cm,
+  ) async* {
+    await verify(client, cm);
+    yield* content.getContentStream(client, cm);
   }
 
   Future<void> delete(

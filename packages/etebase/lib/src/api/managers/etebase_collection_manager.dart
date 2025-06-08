@@ -18,6 +18,12 @@ abstract class EtebaseCollectionManager {
   /// collection. The [meta] and [content] are backing the collections primary
   /// [EtebaseItem]. This is unrelated to the [EtebaseItem]s in the collection.
   ///
+  /// {@template create_from_stream}
+  /// **Note:** To create a new instance from a stream instead of an [Uint8List]
+  /// [content], simply create it with `Uint8List(0)` as content and then call
+  /// [EtebaseItem.setContentStream] to set the actual content.
+  /// {@endtemplate}
+  ///
   /// {@template meta_registration}
   /// By default, the [meta] data will be of the type [EtebaseItemMetadata].
   /// You can use custom metadata objects that implement the

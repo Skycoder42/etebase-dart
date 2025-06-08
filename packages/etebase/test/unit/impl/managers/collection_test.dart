@@ -162,6 +162,20 @@ void main() {
       );
     });
 
+    test('setContentStream calls setContentStream on encrypted', () async {
+      final testContent = Stream.value([33, 4, 12, 12]);
+
+      await sut.setContentStream(testContent);
+
+      verify(
+        mockEncrypted.setContentStream(
+          mockClient,
+          mockCollectionCM,
+          testContent,
+        ),
+      );
+    });
+
     test('getContent calls getContent on encrypted', () async {
       final testContent = Uint8List.fromList([33, 4, 12, 12]);
 
@@ -173,6 +187,19 @@ void main() {
       expect(result, testContent);
 
       verify(mockEncrypted.getContent(mockClient, mockCollectionCM));
+    });
+
+    test('getContentStream calls getContentStream on encrypted', () async {
+      final testContent = Uint8List.fromList([33, 4, 12, 12]);
+
+      when(
+        mockEncrypted.getContentStream(mockClient, mockCollectionCM),
+      ).thenStream(Stream.value(testContent));
+
+      final result = sut.getContentStream();
+      await expectLater(result, emitsInOrder([testContent, emitsDone]));
+
+      verify(mockEncrypted.getContentStream(mockClient, mockCollectionCM));
     });
 
     test('delete calls delete on encrypted', () async {

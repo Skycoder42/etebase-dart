@@ -3,7 +3,6 @@
 @TestOn('!windows')
 library;
 
-import 'dart:convert';
 import 'dart:typed_data';
 
 // ignore: no_self_package_imports
@@ -310,8 +309,12 @@ void main() {
       final collection2 = await collectionManager.fetch(colId1);
       addTearDown(collection2.dispose);
 
-      await collection1.setContent(
-        Uint8List.fromList(utf8.encode('updated content')),
+      await collection1.setContentStream(
+        Stream.fromIterable([
+          [1],
+          [2, 3],
+          [4, 5, 6],
+        ]),
       );
 
       await collectionManager.transaction(collection1);
@@ -327,7 +330,7 @@ void main() {
         Action.validateCollection(
           colId1,
           meta: await collection1.getMeta(),
-          content: Uint8List.fromList(utf8.encode('updated content')),
+          content: Uint8List.fromList([1, 2, 3, 4, 5, 6]),
           isDeleted: false,
         ),
       );
@@ -426,7 +429,10 @@ void main() {
       );
 
       final updatedTest2 = await collectionManager.fetch(delTest2.uid);
-      expect(updatedTest2.getContent(), completion(collectionTestContent2));
+      expect(
+        updatedTest2.getContentStream(),
+        emitsInOrder([collectionTestContent2, emitsDone]),
+      );
     });
 
     test('can save and restore collection from and to cache', () async {

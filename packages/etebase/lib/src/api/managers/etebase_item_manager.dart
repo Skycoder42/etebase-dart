@@ -18,6 +18,8 @@ abstract class EtebaseItemManager {
   ///
   /// The [meta] and [content] are defining the data of the item.
   ///
+  /// {@macro create_from_stream}
+  ///
   /// {@macro meta_registration}
   Future<EtebaseItem> create<TMeta extends EtebaseItemMetadata>(
     TMeta meta,

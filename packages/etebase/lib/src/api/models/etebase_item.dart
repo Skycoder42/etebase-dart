@@ -42,10 +42,28 @@ abstract class EtebaseItem {
   Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>();
 
   /// Set the [content] of the item.
+  ///
+  /// When your [content] comes from a large data source that also supports
+  /// [Stream]s, consider using [setContentStream] instead.
   Future<void> setContent(Uint8List content);
 
+  /// Set the [content] of the item by listening to the given stream.
+  ///
+  /// This variant of [setContent] can be used if you want to process large
+  /// contents.
+  Future<void> setContentStream(Stream<List<int>> content);
+
   /// Return the content of the item as a [Uint8List].
+  ///
+  /// When your item holds very large content and the processor can handle
+  /// [Stream]s, consider using [getContentStream] instead.
   Future<Uint8List> getContent();
+
+  /// Return the content of the item as a [Stream<Uint8List>].
+  ///
+  /// This variant of [getContent] can be used if you want to process large
+  /// contents.
+  Stream<Uint8List> getContentStream();
 
   /// Mark the item as deleted.
   ///

@@ -428,7 +428,7 @@ void main() {
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
         const testMeta = EtebaseItemMetadata();
         final testContent = Uint8List.fromList(
-          List.generate(16384 * 5, (i) => i % 256),
+          List.generate(16384 * 5, (i) => i % 100),
         );
 
         setupRollsum(testBlockSize);
@@ -447,12 +447,12 @@ void main() {
         // the final chunk contains data about the shuffle, so leave it
         final [c3, c2, c1, c4] = result.chunks;
 
-        // chunk 1 - 1 byte smaller because of how the algorithm works
+        // chunk 1
         expect(c1.data, isNotNull);
         expectWrapped(
           base64.decode(c1.uid),
           isWrapped('mac(content,key)', smCmMac, [
-            testContent.sublist(0, testBlockSize - 1),
+            testContent.sublist(0, testBlockSize),
             isTrue,
           ]),
         );
@@ -460,7 +460,7 @@ void main() {
           c1.data!,
           isWrapped('encrypted', smCmCrypt, [
             isWrapped('padded(content)', smCryptoPad, [
-              testContent.sublist(0, testBlockSize - 1),
+              testContent.sublist(0, testBlockSize),
             ]),
             isNull,
           ]),
@@ -470,7 +470,7 @@ void main() {
         expectWrapped(
           base64.decode(c2.uid),
           isWrapped('mac(content,key)', smCmMac, [
-            testContent.sublist(testBlockSize - 1, 2 * testBlockSize - 1),
+            testContent.sublist(testBlockSize, 2 * testBlockSize),
             isTrue,
           ]),
         );
@@ -478,7 +478,7 @@ void main() {
           c2.data!,
           isWrapped('encrypted', smCmCrypt, [
             isWrapped('padded(content)', smCryptoPad, [
-              testContent.sublist(testBlockSize - 1, 2 * testBlockSize - 1),
+              testContent.sublist(testBlockSize, 2 * testBlockSize),
             ]),
             isNull,
           ]),
@@ -488,7 +488,7 @@ void main() {
         expectWrapped(
           base64.decode(c3.uid),
           isWrapped('mac(content,key)', smCmMac, [
-            testContent.sublist(2 * testBlockSize - 1),
+            testContent.sublist(2 * testBlockSize),
             isTrue,
           ]),
         );
@@ -496,7 +496,7 @@ void main() {
           c3.data!,
           isWrapped('encrypted', smCmCrypt, [
             isWrapped('padded(content)', smCryptoPad, [
-              testContent.sublist(2 * testBlockSize - 1),
+              testContent.sublist(2 * testBlockSize),
             ]),
             isNull,
           ]),
@@ -1124,6 +1124,83 @@ void main() {
           ]),
         );
       });
+
+      test('can set content from stream', () async {
+        final testAd = Uint8List.fromList([5, 4, 3, 1, 5, 3]);
+        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        final testContent = Stream.fromIterable([
+          [5, 6],
+          [2],
+          [1, 4, 4, 1],
+        ]);
+        final testCombinedContent = await testContent.expand((e) => e).toList();
+
+        final sut = await EncryptedRevision.create(
+          client: mockClient,
+          cryptoManager: mockCryptoManager,
+          additionalData: testAd,
+          meta: testMeta,
+          content: Uint8List(0),
+        );
+
+        final oldEncryptedContent = [
+          isWrapped('padded', smCryptoPadSmall, [
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
+          ]),
+          isAdHash(testAd, []),
+        ];
+        expectWrapped(
+          base64.decode(sut.uid),
+          isWrapped('encrypted.mac', smCmDetachedMac, oldEncryptedContent),
+        );
+        expectWrapped(
+          sut.meta,
+          isWrapped('encrypted.cipher', smCmDetachedCrypt, oldEncryptedContent),
+        );
+
+        final oldUid = sut.uid;
+        final oldMeta = sut.meta;
+
+        await sut.setContentStream(
+          mockClient,
+          mockCryptoManager,
+          additionalData: testAd,
+          content: testContent,
+        );
+
+        expect(sut.uid, isNot(oldUid));
+        expect(sut.meta, isNot(oldMeta));
+
+        final encryptedContents = [
+          isWrapped('padded', smCryptoPadSmall, [
+            isWrapped('encoded(meta)', smConverterEncode, [testMeta.toJson()]),
+          ]),
+          isAdHash(testAd, sut.chunks),
+        ];
+
+        expectWrapped(
+          base64.decode(sut.uid),
+          isWrapped('encrypted.mac', smCmDetachedMac, encryptedContents),
+        );
+        expectWrapped(
+          sut.meta,
+          isWrapped('encrypted.cipher', smCmDetachedCrypt, encryptedContents),
+        );
+        expect(sut.deleted, isFalse);
+        expect(sut.chunks, hasLength(1));
+        expect(sut.chunks.first.data, isNotNull);
+        expectWrapped(
+          base64.decode(sut.chunks.first.uid),
+          isWrapped('mac(content,key)', smCmMac, [testCombinedContent, isTrue]),
+        );
+        expectWrapped(
+          sut.chunks.first.data!,
+          isWrapped('encrypted', smCmCrypt, [
+            isWrapped('padded(content)', smCryptoPad, [testCombinedContent]),
+            isNull,
+          ]),
+        );
+      });
     });
 
     group('getContent', () {
@@ -1170,7 +1247,7 @@ void main() {
         final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
         const testMeta = EtebaseItemMetadata();
         final testContent = Uint8List.fromList(
-          List.generate(16384 * 5, (i) => i % 256),
+          List.generate(16384 * 5, (i) => i % 100),
         );
 
         setupRollsum(testBlockSize);
@@ -1223,7 +1300,7 @@ void main() {
           final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
           const testMeta = EtebaseItemMetadata();
           final testContent = Uint8List.fromList(
-            List.generate(16384 * 5, (i) => i % 256),
+            List.generate(16384 * 5, (i) => i % 100),
           );
 
           setupRollsum(testBlockSize);
@@ -1291,6 +1368,38 @@ void main() {
           );
         },
       );
+
+      test('returns chunked data as stream', () async {
+        const testBlockSize = 32768;
+        final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
+        const testMeta = EtebaseItemMetadata();
+        final testContent = Uint8List.fromList(
+          List.generate(16384 * 5, (i) => i % 100),
+        );
+
+        setupRollsum(testBlockSize);
+
+        final sut = await EncryptedRevision.create(
+          client: mockClient,
+          cryptoManager: mockCryptoManager,
+          additionalData: testAd,
+          meta: testMeta,
+          content: testContent,
+        );
+
+        expect(sut.chunks, hasLength(4));
+
+        final content = sut.getContentStream(mockClient, mockCryptoManager);
+        expect(
+          content,
+          emitsInOrder([
+            testContent.sublist(0, testBlockSize),
+            testContent.sublist(testBlockSize, testBlockSize * 2),
+            testContent.sublist(testBlockSize * 2),
+            emitsDone,
+          ]),
+        );
+      });
     });
 
     group('delete', () {
