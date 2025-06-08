@@ -5,17 +5,17 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
 import '../../api/exceptions/not_found.dart';
-import '../../api/managers/etebase_account.dart';
-import '../../api/managers/etebase_cache.dart';
-import '../../api/managers/etebase_collection_manager.dart';
-import '../../api/managers/etebase_item_manager.dart';
+import '../../api/managers/account.dart';
+import '../../api/managers/cache.dart';
+import '../../api/managers/collection_manager.dart';
+import '../../api/managers/item_manager.dart';
 import '../../api/models/collection.dart';
 import '../../api/models/item.dart';
 import '../codec/base64_url_no_pad_codec.dart';
-import '../managers/client.dart';
+import '../managers/client_impl.dart';
 
 @internal
-class HiveCache implements EtebaseCache {
+class HiveCache implements Cache {
   static const _metaBoxName = 'meta';
   static const _collectionBoxName = 'collection';
 
@@ -23,7 +23,7 @@ class HiveCache implements EtebaseCache {
   static const _accountStokenKey = 'account.stoken';
   static const _accountColStokenKeyPrefix = 'col.stoken.';
 
-  final Client _client;
+  final ClientImpl _client;
   final HiveInterface _hive;
   final String _encodedUsername;
 
@@ -68,16 +68,13 @@ class HiveCache implements EtebaseCache {
       Future.value(_metaBox.containsKey(_accountDataKey));
 
   @override
-  Future<void> saveAccount(
-    EtebaseAccount account, [
-    SecureKey? encryptionKey,
-  ]) async {
+  Future<void> saveAccount(Account account, [SecureKey? encryptionKey]) async {
     final accountData = await account.save(encryptionKey);
     await _metaBox.put(_accountDataKey, accountData);
   }
 
   @override
-  Future<EtebaseAccount> loadAccount([SecureKey? encryptionKey]) async {
+  Future<Account> loadAccount([SecureKey? encryptionKey]) async {
     final accountData = await _metaBox.get(_accountDataKey);
     if (accountData == null) {
       throw NotFound('No account has been cached');
@@ -129,7 +126,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<void> collectionSet(
-    EtebaseCollectionManager colMgr,
+    CollectionManager colMgr,
     Collection col, {
     bool saveContent = true,
   }) async {
@@ -148,7 +145,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<Collection> collectionGet(
-    EtebaseCollectionManager colMgr,
+    CollectionManager colMgr,
     String colUid,
   ) async {
     final colData = await _collectionBox.get(colUid);
@@ -166,7 +163,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<void> itemSet(
-    EtebaseItemManager itemMgr,
+    ItemManager itemMgr,
     String colUid,
     Item item, {
     bool saveContent = true,
@@ -184,7 +181,7 @@ class HiveCache implements EtebaseCache {
 
   @override
   Future<Item> itemGet(
-    EtebaseItemManager itemMgr,
+    ItemManager itemMgr,
     String colUid,
     String itemUid,
   ) async {

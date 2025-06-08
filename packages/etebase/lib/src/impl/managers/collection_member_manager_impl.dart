@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-import '../../api/managers/etebase_collection_member_manager.dart';
+import '../../api/managers/collection_member_manager.dart';
 import '../../api/models/collection_access_level.dart';
 import '../../api/models/collection_member.dart';
 import '../../api/models/fetch_options.dart';
@@ -8,11 +8,11 @@ import '../../api/models/list_response.dart';
 import '../online_managers/collection_member_manager_online.dart';
 
 @internal
-class CollectionMemberManager implements EtebaseCollectionMemberManager {
+class CollectionMemberManagerImpl implements CollectionMemberManager {
   @visibleForTesting
   final CollectionMemberManagerOnline online;
 
-  CollectionMemberManager(this.online);
+  CollectionMemberManagerImpl(this.online);
 
   @override
   Future<IteratorListResponse<CollectionMember>> list([

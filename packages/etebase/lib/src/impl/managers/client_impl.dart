@@ -7,8 +7,8 @@ import 'package:sodium/sodium.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../api/exceptions/api_missuse.dart';
+import '../../api/managers/client.dart';
 import '../../api/managers/crypto_executor.dart';
-import '../../api/managers/etebase_client.dart';
 import '../../api/models/item_metadata.dart';
 import '../cache/hive_cache.dart';
 import '../codec/message_pack_converter.dart';
@@ -22,14 +22,13 @@ import '../encrypted_models/encrypted_collection_item.dart';
 import '../encrypted_models/encrypted_revision.dart';
 import '../online_managers/authenticator.dart';
 import '../online_managers/base_network.dart';
-
 import '../online_managers/platform/user_agent_stub.dart'
     if (dart.library.io) '../online_managers/platform/user_agent_vm.dart'
     if (dart.library.js_interop) '../online_managers/platform/user_agent_web.dart';
-import 'account.dart';
+import 'account_impl.dart';
 
 @internal
-class Client implements EtebaseClient, NetworkClient {
+class ClientImpl implements Client, NetworkClient {
   static final defaultUrl = Uri.https('api.etebase.com');
 
   final bool _ownedClient;
@@ -44,7 +43,7 @@ class Client implements EtebaseClient, NetworkClient {
   final Uri baseUrl;
   final CryptoService crypto;
 
-  Client(
+  ClientImpl(
     this.httpClient,
     this.userAgent,
     this.baseUrl,
@@ -57,7 +56,7 @@ class Client implements EtebaseClient, NetworkClient {
     }
   }
 
-  Client.create(
+  ClientImpl.create(
     CryptoExecutor cryptoExecutor,
     String clientName, [
     Uri? serverUrl,
@@ -143,10 +142,10 @@ class Client implements EtebaseClient, NetworkClient {
     return cache;
   }
 
-  Future<Account> restoreAccount(
+  Future<AccountImpl> restoreAccount(
     String accountDataStored, [
     SecureKey? encryptionKey,
-  ]) => Account.restore(this, accountDataStored, encryptionKey);
+  ]) => AccountImpl.restore(this, accountDataStored, encryptionKey);
 
   EncryptedCollection cacheLoadEncryptedCollection(Uint8List cachedData) =>
       EncryptedCollection.cacheLoad(this, cachedData);

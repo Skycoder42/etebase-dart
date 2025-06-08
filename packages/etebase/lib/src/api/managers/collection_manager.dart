@@ -5,13 +5,13 @@ import '../models/fetch_options.dart';
 import '../models/item.dart';
 import '../models/item_metadata.dart';
 import '../models/list_response.dart';
-import 'etebase_client.dart';
-import 'etebase_collection_member_manager.dart';
-import 'etebase_item_manager.dart';
+import 'client.dart';
+import 'collection_member_manager.dart';
+import 'item_manager.dart';
 
 /// A manager for managing [Collection] operations like creation and
 /// fetching.
-abstract class EtebaseCollectionManager {
+abstract class CollectionManager {
   /// Create a new [Collection].
   ///
   /// The [collectionType] defines the type of [Item]s stored in the
@@ -28,7 +28,7 @@ abstract class EtebaseCollectionManager {
   /// By default, the [meta] data will be of the type [ItemMetadata].
   /// You can use custom metadata objects that implement the
   /// [ItemMetadata] with additional properties. However, this requires
-  /// you to register [TMeta] once via [EtebaseClient.registerCustomMetadata].
+  /// you to register [TMeta] once via [Client.registerCustomMetadata].
   /// {@endtemplate}
   Future<Collection> create<TMeta extends ItemMetadata>(
     String collectionType,
@@ -82,7 +82,7 @@ abstract class EtebaseCollectionManager {
   /// {@template save_content}
   /// If [saveContent] is `true` (the default), the object is saved together
   /// with it's content. If set to `false`, only the metadata is stored and the
-  /// content has to be restored using [EtebaseItemManager.downloadContent].
+  /// content has to be restored using [ItemManager.downloadContent].
   /// {@endtemplate}
   Uint8List cacheSave(Collection collection, {bool saveContent = true});
 
@@ -91,8 +91,8 @@ abstract class EtebaseCollectionManager {
   Collection cacheLoad(Uint8List cached);
 
   /// Return the item manager for the supplied [collection].
-  EtebaseItemManager getItemManager(Collection collection);
+  ItemManager getItemManager(Collection collection);
 
   /// Return the collection member manager for the supplied [collection].
-  EtebaseCollectionMemberManager getMemberManager(Collection collection);
+  CollectionMemberManager getMemberManager(Collection collection);
 }

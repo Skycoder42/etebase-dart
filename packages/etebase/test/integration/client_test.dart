@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import 'util/library_loader.dart';
 
 void main() {
-  late final EtebaseClient sut;
+  late final Client sut;
 
   setUpAll(() async {
     sut = await createClient(useDefaultServer: !kIsWeb && Platform.isWindows);

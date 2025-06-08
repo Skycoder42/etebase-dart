@@ -5,7 +5,7 @@ import '../models/fetch_options.dart';
 import '../models/list_response.dart';
 
 /// A manager for managing the members of a [Collection].
-abstract class EtebaseCollectionMemberManager {
+abstract class CollectionMemberManager {
   /// List the members of a [Collection].
   ///
   /// {@macro fetch_options}

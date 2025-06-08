@@ -14,7 +14,7 @@ import '../crypto/collection_crypto_manager.dart';
 import '../crypto/crypto_arena.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
-import '../managers/client.dart';
+import '../managers/client_impl.dart';
 import '../models/signed_invitation_base.dart';
 import '../models/signed_invitation_content.dart';
 import 'cached/cached_collection.dart';
@@ -53,7 +53,7 @@ class EncryptedCollection {
   EncryptedCollection();
 
   static Future<(EncryptedCollection, CollectionCryptoManager)> create(
-    Client client,
+    ClientImpl client,
     AccountCryptoManager parentCm,
     String collectionTypeName,
     ItemMetadata meta,
@@ -86,7 +86,10 @@ class EncryptedCollection {
   factory EncryptedCollection.fromJson(Map<String, dynamic> json) =>
       _$EncryptedCollectionFromJson(json);
 
-  factory EncryptedCollection.cacheLoad(Client client, Uint8List cachedData) {
+  factory EncryptedCollection.cacheLoad(
+    ClientImpl client,
+    Uint8List cachedData,
+  ) {
     final cached = client.converter.decode<CachedCollection>(cachedData);
     return EncryptedCollection()
       .._collectionKey = cached.collectionKey
@@ -98,7 +101,7 @@ class EncryptedCollection {
 
   Map<String, dynamic> toJson() => _$EncryptedCollectionToJson(this);
 
-  Uint8List cacheSave(Client client, {required bool saveContent}) =>
+  Uint8List cacheSave(ClientImpl client, {required bool saveContent}) =>
       client.converter.encode(
         CachedCollection(
           collectionKey: _collectionKey,
@@ -111,22 +114,22 @@ class EncryptedCollection {
 
   void markSaved() => item.markSaved();
 
-  Future<void> verify(Client client, MinimalCollectionCryptoManager cm) =>
+  Future<void> verify(ClientImpl client, MinimalCollectionCryptoManager cm) =>
       item.withCm(client, cm, (cm) => item.verify(client, cm));
 
   Future<void> setMeta(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm,
     ItemMetadata meta,
   ) => item.withCm(client, cm, (cm) => item.setMeta(client, cm, meta));
 
   Future<TMeta> getMeta<TMeta extends ItemMetadata>(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm,
   ) => item.withCm(client, cm, (cm) => item.getMeta<TMeta>(client, cm));
 
   Future<void> setContentStream(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm,
     Stream<List<int>> content,
   ) => item.withCm(
@@ -136,18 +139,18 @@ class EncryptedCollection {
   );
 
   Future<void> setContent(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm,
     Uint8List content,
   ) => item.withCm(client, cm, (cm) => item.setContent(client, cm, content));
 
   Future<Uint8List> getContent(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm,
   ) => item.withCm(client, cm, (cm) => item.getContent(client, cm));
 
   Stream<Uint8List> getContentStream(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm,
   ) async* {
     final itemCm = item.getCryptoManager(client, cm);
@@ -159,7 +162,7 @@ class EncryptedCollection {
   }
 
   Future<void> delete(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager cm, {
     required bool preserveContent,
   }) => item.withCm(
@@ -168,11 +171,11 @@ class EncryptedCollection {
     (cm) => item.delete(client, cm, preserveContent: preserveContent),
   );
 
-  String getCollectionType(Client client, AccountCryptoManager parentCm) =>
+  String getCollectionType(ClientImpl client, AccountCryptoManager parentCm) =>
       parentCm.colTypeFromUid(_collectionType);
 
   Future<SignedInvitationWrite> createInvitation(
-    Client client,
+    ClientImpl client,
     AccountCryptoManager parentCm,
     BoxCryptoManager identityCm,
     String username,
@@ -210,7 +213,7 @@ class EncryptedCollection {
   }
 
   CollectionCryptoManager getCryptoManager(
-    Client client,
+    ClientImpl client,
     AccountCryptoManager parentCm, {
     int? version,
   }) => client.crypto.createCollectionCryptoManager(
@@ -219,10 +222,12 @@ class EncryptedCollection {
     version: version ?? CryptoUtils.currentVersion,
   );
 
-  SecureKey _getCollectionKey(Client client, AccountCryptoManager parentCm) =>
-      parentCm.decryptKey(
-        _collectionKey,
-        _collectionType,
-        CryptoUtils.symmetricKeySize,
-      );
+  SecureKey _getCollectionKey(
+    ClientImpl client,
+    AccountCryptoManager parentCm,
+  ) => parentCm.decryptKey(
+    _collectionKey,
+    _collectionType,
+    CryptoUtils.symmetricKeySize,
+  );
 }

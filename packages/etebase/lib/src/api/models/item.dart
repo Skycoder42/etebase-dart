@@ -2,7 +2,7 @@
 
 import 'dart:typed_data';
 
-import '../managers/etebase_item_manager.dart';
+import '../managers/item_manager.dart';
 import 'collection.dart';
 import 'item_metadata.dart';
 
@@ -24,7 +24,7 @@ abstract class Item {
 
   /// Check whether the item is missing data that needs to be downloaded.
   ///
-  /// See [EtebaseItemManager.downloadContent] for more details.
+  /// See [ItemManager.downloadContent] for more details.
   bool get isMissingContent;
 
   /// Disposes of the item and clears all cryptographic keys from memory.
@@ -67,7 +67,7 @@ abstract class Item {
 
   /// Mark the item as deleted.
   ///
-  /// The item needs to be uploaded via [EtebaseItemManager.batch] for this to
+  /// The item needs to be uploaded via [ItemManager.batch] for this to
   /// take effect.
   Future<void> delete({bool preserveContent = false});
 }

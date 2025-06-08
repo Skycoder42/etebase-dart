@@ -10,7 +10,7 @@ import '../models/list_response.dart';
 typedef ContentProgressCallback = void Function(int current, int total);
 
 /// A manager for managing [Item] operations like creation and fetching.
-abstract class EtebaseItemManager {
+abstract class ItemManager {
   /// Disposes of the instance and clears all cryptographic keys from memory.
   void dispose();
 

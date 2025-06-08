@@ -10,7 +10,7 @@ import '../../api/exceptions/missing_content.dart';
 import '../../api/models/item_metadata.dart';
 import '../codec/byte_array_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
-import '../managers/client.dart';
+import '../managers/client_impl.dart';
 import 'cached/cached_chunk.dart';
 import 'cached/cached_revision.dart';
 import 'chunk.dart';
@@ -31,7 +31,7 @@ class EncryptedRevision {
   EncryptedRevision();
 
   static Future<EncryptedRevision> create({
-    required Client client,
+    required ClientImpl client,
     required CollectionItemCryptoManager cryptoManager,
     required Uint8List additionalData,
     required ItemMetadata meta,
@@ -51,7 +51,7 @@ class EncryptedRevision {
   factory EncryptedRevision.fromJson(Map<String, dynamic> json) =>
       _$EncryptedRevisionFromJson(json);
 
-  factory EncryptedRevision.cacheLoad(Client client, Uint8List cachedData) {
+  factory EncryptedRevision.cacheLoad(ClientImpl client, Uint8List cachedData) {
     final cached = client.converter.decode<CachedRevision>(cachedData);
     return EncryptedRevision()
       ..uid = client.converter.base64Encode(cached.uid)
@@ -67,7 +67,7 @@ class EncryptedRevision {
 
   Map<String, dynamic> toJson() => _$EncryptedRevisionToJson(this);
 
-  Uint8List cacheSave(Client client, {required bool saveContent}) =>
+  Uint8List cacheSave(ClientImpl client, {required bool saveContent}) =>
       client.converter.encode(
         CachedRevision(
           uid: client.converter.base64Decode(uid),
@@ -85,7 +85,7 @@ class EncryptedRevision {
       );
 
   Future<void> verify(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
@@ -103,7 +103,7 @@ class EncryptedRevision {
   }
 
   Future<void> setMeta(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
     ItemMetadata meta,
@@ -122,7 +122,7 @@ class EncryptedRevision {
   }
 
   Future<TMeta> getMeta<TMeta extends ItemMetadata>(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {
@@ -140,7 +140,7 @@ class EncryptedRevision {
   }
 
   Future<void> setContentStream(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
     required Stream<List<int>> content,
@@ -209,7 +209,7 @@ class EncryptedRevision {
   }
 
   Future<void> setContent(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
     required Uint8List content,
@@ -223,7 +223,7 @@ class EncryptedRevision {
   );
 
   Stream<Uint8List> getContentStream(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
   ) async* {
     var indices = const [0];
@@ -274,7 +274,7 @@ class EncryptedRevision {
   }
 
   Future<Uint8List> getContent(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
   ) async {
     final contentBuilder = BytesBuilder(copy: false);
@@ -283,7 +283,7 @@ class EncryptedRevision {
   }
 
   Future<void> delete(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData, {
     required bool preserveContent,
@@ -305,7 +305,7 @@ class EncryptedRevision {
     ..chunks = [...chunks];
 
   Future<Uint8List> _calculateAdHash(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
   ) async {

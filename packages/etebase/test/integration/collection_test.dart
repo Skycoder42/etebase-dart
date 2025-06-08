@@ -22,7 +22,7 @@ void main() {
   final collectionTestContent2 = Uint8List.fromList(List.filled(2000, 42));
 
   final jsClientWrapper = JsClientWrapper();
-  late final EtebaseCollectionManager collectionManager;
+  late final CollectionManager collectionManager;
 
   setUpAll(() async {
     final client = await createClient();

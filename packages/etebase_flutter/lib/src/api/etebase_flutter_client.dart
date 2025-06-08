@@ -8,22 +8,22 @@ import '../impl/flutter_client.dart';
 /// This is in charge of actually connecting to the server and making network
 /// requests. Uses the [package:http](https://pub.dev/packages/http).
 ///
-/// Unlike the [EtebaseClient], this client automatically initializes
+/// Unlike the [Client], this client automatically initializes
 /// libsodium and the client name from information gathered by flutter.
-abstract interface class EtebaseFlutterClient implements EtebaseClient {
+abstract interface class EtebaseFlutterClient implements Client {
   /// Creates a new client object for the server located at [serverUrl].
   ///
   /// {@template other_params}
-  /// If no [serverUrl] is provided, the [EtebaseClient.defaultServerUrl] is
+  /// If no [serverUrl] is provided, the [Client.defaultServerUrl] is
   /// used. By default, [Hive] is initialized automatically when calling create
   /// to to `"etebase"` subdir. This is fine as long as you do not use hive
   /// anywhere else in your app. If you do, you might want to set [autoInitHive]
   /// to `false` and initialize hive yourself.
   ///
-  /// *Note:* hive is used by the [EtebaseCache]. If you do not use this cache,
+  /// *Note:* hive is used by the [Cache]. If you do not use this cache,
   /// it does not need to be initialized.
   /// {@endtemplate}
-  static Future<EtebaseClient> create({
+  static Future<Client> create({
     Uri? serverUrl,
     bool autoInitHive = true,
   }) async {
@@ -45,7 +45,7 @@ abstract interface class EtebaseFlutterClient implements EtebaseClient {
   /// milliseconds would be a problem!
   ///
   /// {@macro other_params}
-  static Future<EtebaseClient> createAsync({
+  static Future<Client> createAsync({
     Uri? serverUrl,
     bool autoInitHive = true,
   }) async {
@@ -66,7 +66,7 @@ abstract interface class EtebaseFlutterClient implements EtebaseClient {
   /// single isolate or need more control over the background execution).
   ///
   /// {@macro other_params}
-  static Future<EtebaseClient> createCustom(
+  static Future<Client> createCustom(
     CryptoExecutor cryptoExecutor, {
     Uri? serverUrl,
     bool autoInitHive = true,

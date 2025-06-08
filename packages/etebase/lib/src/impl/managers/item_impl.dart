@@ -6,11 +6,11 @@ import '../../api/models/item.dart';
 import '../../api/models/item_metadata.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
-import 'client.dart';
+import 'client_impl.dart';
 
 @internal
 class ItemImpl implements Item {
-  final Client _client;
+  final ClientImpl _client;
   final CollectionItemCryptoManager _cm;
   final EncryptedCollectionItem encrypted;
   final String colUid;

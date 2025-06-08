@@ -2,13 +2,13 @@ import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium.dart';
 
 import '../../impl/crypto/crypto_utils.dart';
-import '../../impl/managers/client.dart';
+import '../../impl/managers/client_impl.dart';
 import '../models/collection.dart';
 import '../models/item.dart';
-import 'etebase_account.dart';
-import 'etebase_client.dart';
-import 'etebase_collection_manager.dart';
-import 'etebase_item_manager.dart';
+import 'account.dart';
+import 'client.dart';
+import 'collection_manager.dart';
+import 'item_manager.dart';
 
 /// A caching helper that allows you to easily save and restore items and
 /// collections on the end device.
@@ -17,21 +17,21 @@ import 'etebase_item_manager.dart';
 /// [package:hive_ce](https://pub.dev/packages/hive_ce) to persist the data on
 /// the device. Hive was chosen as it simple (no other native dependencies),
 /// fast and compatible with the VM and the Web.
-abstract class EtebaseCache {
+abstract class Cache {
   /// The length that the `encryptionKey` for [saveAccount] and [loadAccount]
   /// must have.
   static const cacheKeyLength = CryptoUtils.symmetricKeySize;
 
   /// Initialize hive based cache for the given [username].
   ///
-  /// **Important:** Before you can create an [EtebaseCache], you must
+  /// **Important:** Before you can create an [Cache], you must
   /// initialize hive! You can do so by calling the[HiveInterface.init] method:
   ///
   /// ```dart
   /// Hive.init('.../path/to/hive/dir');
   /// ```
-  static Future<EtebaseCache> create(EtebaseClient client, String username) =>
-      (client as Client).createCache(username);
+  static Future<Cache> create(Client client, String username) =>
+      (client as ClientImpl).createCache(username);
 
   /// Disposes of the instance and closes all hive boxes.
   Future<void> dispose();
@@ -51,12 +51,12 @@ abstract class EtebaseCache {
   /// Load it later using [loadAccount].
   ///
   /// {@macro encryption_key}
-  Future<void> saveAccount(EtebaseAccount account, [SecureKey? encryptionKey]);
+  Future<void> saveAccount(Account account, [SecureKey? encryptionKey]);
 
-  /// Load the [EtebaseAccount] object from cache.
+  /// Load the [Account] object from cache.
   ///
   /// The [encryptionKey] must be the same as used for [saveAccount].
-  Future<EtebaseAccount> loadAccount([SecureKey? encryptionKey]);
+  Future<Account> loadAccount([SecureKey? encryptionKey]);
 
   /// Checks if the users account stoken is stored within the cache.
   Future<bool> get hasStoken;
@@ -87,7 +87,7 @@ abstract class EtebaseCache {
   ///
   /// {@macro save_content}
   Future<void> collectionSet(
-    EtebaseCollectionManager colMgr,
+    CollectionManager colMgr,
     Collection collection, {
     bool saveContent = true,
   });
@@ -99,10 +99,7 @@ abstract class EtebaseCache {
   Future<void> collectionUnset(String colUid);
 
   /// Load a [Collection] identified by [colUid] from cache.
-  Future<Collection> collectionGet(
-    EtebaseCollectionManager colMgr,
-    String colUid,
-  );
+  Future<Collection> collectionGet(CollectionManager colMgr, String colUid);
 
   /// Lists all item uids for items of the collection identified by [colUid]
   /// that have been stored in the cache.
@@ -112,7 +109,7 @@ abstract class EtebaseCache {
   ///
   /// {@macro save_content}
   Future<void> itemSet(
-    EtebaseItemManager itemMgr,
+    ItemManager itemMgr,
     String colUid,
     Item item, {
     bool saveContent = true,
@@ -124,9 +121,5 @@ abstract class EtebaseCache {
 
   /// Load an [Item] identified by [itemUid] of the collection identified
   /// by [colUid] from cache.
-  Future<Item> itemGet(
-    EtebaseItemManager itemMgr,
-    String colUid,
-    String itemUid,
-  );
+  Future<Item> itemGet(ItemManager itemMgr, String colUid, String itemUid);
 }

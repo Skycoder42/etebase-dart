@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/managers/etebase_account.dart';
-import 'package:etebase/src/api/managers/etebase_client.dart';
+import 'package:etebase/src/api/managers/account.dart';
+import 'package:etebase/src/api/managers/client.dart';
 import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/api/models/user.dart';
 import 'package:sodium/sodium_sumo.dart';
@@ -18,13 +18,13 @@ void main(List<String> args) async {
   final userName = base64Url.encode(sodium.randombytes.buf(18));
   print(userName);
 
-  final client = EtebaseClient.create(
+  final client = Client.create(
     sodium,
     'test_client',
     Uri.http('127.0.0.1:3735'),
   );
   {
-    final account = await EtebaseAccount.signup(
+    final account = await Account.signup(
       client,
       User(username: userName, email: '$userName@mail.de'),
       userName,
@@ -34,7 +34,7 @@ void main(List<String> args) async {
   }
 
   {
-    final account = await EtebaseAccount.login(client, userName, userName);
+    final account = await Account.login(client, userName, userName);
     print('login successful');
     await account.changePassword(userName * 2);
     print('changePassword successful');
@@ -48,18 +48,14 @@ void main(List<String> args) async {
   final encryptionKey = sodium.secureRandom(32);
   String storedData;
   {
-    final account = await EtebaseAccount.login(client, userName, userName * 2);
+    final account = await Account.login(client, userName, userName * 2);
     print('second login successful');
     storedData = await account.save(encryptionKey);
     print('save successful: $storedData');
     account.dispose();
   }
 
-  final account = await EtebaseAccount.restore(
-    client,
-    storedData,
-    encryptionKey,
-  );
+  final account = await Account.restore(client, storedData, encryptionKey);
   print('restore successful');
   await account.fetchToken();
   print('fetchToken successful');

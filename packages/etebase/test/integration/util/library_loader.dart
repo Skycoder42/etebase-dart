@@ -25,33 +25,33 @@ final serverUri = Uri.http('127.0.0.1:3735');
 
 String generateUsername(String prefix) => '$prefix-${_uuid.v4()}';
 
-Future<EtebaseClient> createClient({bool useDefaultServer = false}) async {
+Future<Client> createClient({bool useDefaultServer = false}) async {
   final useAsync = !kIsWeb && _rng.nextBool();
   // ignore: avoid_print
   print('Running client in ${useAsync ? 'async' : 'sync'} mode');
 
   return useAsync
-      ? await EtebaseClient.createAsync(
+      ? await Client.createAsync(
           await SodiumSumoInit.init(getLibsodium),
           'package:etebase/test/integration',
           useDefaultServer ? null : serverUri,
         )
-      : EtebaseClient.create(
+      : Client.create(
           await SodiumSumoInit.init(getLibsodium),
           'package:etebase/test/integration',
           useDefaultServer ? null : serverUri,
         );
 }
 
-Future<EtebaseAccount> createAccount(
-  EtebaseClient client,
+Future<Account> createAccount(
+  Client client,
   String userNamePrefix, [
   JsClientWrapper? wrapper,
 ]) async {
   final userName = generateUsername(userNamePrefix);
   final user = User(username: userName, email: '$userName@test.com');
   final password = base64.encode(client.randombytes(32));
-  final account = await EtebaseAccount.signup(client, user, password);
+  final account = await Account.signup(client, user, password);
   wrapper?.configureAccount(account);
   return account;
 }

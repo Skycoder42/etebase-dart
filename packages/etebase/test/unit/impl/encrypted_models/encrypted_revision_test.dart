@@ -16,7 +16,7 @@ import 'package:etebase/src/impl/encrypted_models/cached/cached_chunk.dart';
 import 'package:etebase/src/impl/encrypted_models/cached/cached_revision.dart';
 import 'package:etebase/src/impl/encrypted_models/chunk.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_revision.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:meta/meta.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -25,7 +25,7 @@ import 'package:test/test.dart';
 
 // ignore: directives_ordering
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<CryptoService>(),
   MockSpec<MessagePackConverter>(),
   MockSpec<CollectionItemCryptoManager>(),
@@ -90,7 +90,7 @@ void main() {
     const smMacUpdate = 0x42;
     const smMacUpdateLen = 0x43;
 
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockCryptoService = MockCryptoService();
     final mockMessagePackConverter = MockMessagePackConverter();
     final mockCryptoManager = MockCollectionItemCryptoManager();

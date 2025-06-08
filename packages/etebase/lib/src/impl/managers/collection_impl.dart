@@ -7,11 +7,11 @@ import '../../api/models/collection_access_level.dart';
 import '../../api/models/item_metadata.dart';
 import '../crypto/collection_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection.dart';
-import 'client.dart';
+import 'client_impl.dart';
 
 @internal
 class CollectionImpl implements Collection {
-  final Client _client;
+  final ClientImpl _client;
   final CollectionCryptoManager _cm;
   final EncryptedCollection encrypted;
 

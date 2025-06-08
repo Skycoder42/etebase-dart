@@ -14,16 +14,16 @@ import 'util/library_loader.dart';
 void main() {
   const testCollectionType = 'etebase-dart.fs_cache_test';
 
-  late final EtebaseClient client;
-  late final EtebaseAccount account;
-  late final EtebaseCache cache;
+  late final Client client;
+  late final Account account;
+  late final Cache cache;
 
   setUpAll(() async {
     client = await createClient();
     addTearDown(client.dispose);
 
     final username = generateUsername('fs-cache-test-user');
-    account = await EtebaseAccount.signup(
+    account = await Account.signup(
       client,
       User(username: username, email: '$username@test.com'),
       'password',
@@ -41,7 +41,7 @@ void main() {
       addTearDown(Hive.close);
     }
 
-    cache = await EtebaseCache.create(client, username);
+    cache = await Cache.create(client, username);
     addTearDown(cache.dispose);
   });
 

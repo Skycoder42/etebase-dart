@@ -10,7 +10,7 @@ import 'util/js_client_wrapper.dart';
 import 'util/library_loader.dart';
 
 void main() {
-  late final EtebaseClient client;
+  late final Client client;
 
   setUpAll(() async {
     client = await createClient();
@@ -26,7 +26,7 @@ void main() {
     const testPassword = 'hello-test-1';
 
     test('can create new account', () async {
-      final account = await EtebaseAccount.signup(
+      final account = await Account.signup(
         client,
         User(username: testUsername, email: testEmail),
         testPassword,
@@ -48,11 +48,7 @@ void main() {
     });
 
     test('can login with existing account', () async {
-      final account = await EtebaseAccount.login(
-        client,
-        testUsername,
-        testPassword,
-      );
+      final account = await Account.login(client, testUsername, testPassword);
       addTearDown(account.dispose);
 
       // update password
@@ -78,7 +74,7 @@ void main() {
         Action.signUp(testOtherUsername, testOtherEmail, testOtherPassword),
       );
 
-      final account = await EtebaseAccount.login(
+      final account = await Account.login(
         client,
         testOtherUsername,
         testOtherPassword,
@@ -92,18 +88,11 @@ void main() {
     });
 
     test('can save and restore account', () async {
-      final account = await EtebaseAccount.login(
-        client,
-        testUsername,
-        testPassword,
-      );
+      final account = await Account.login(client, testUsername, testPassword);
       addTearDown(account.dispose);
 
       final savedAccount = await account.save();
-      final restoredAccount = await EtebaseAccount.restore(
-        client,
-        savedAccount,
-      );
+      final restoredAccount = await Account.restore(client, savedAccount);
       addTearDown(restoredAccount.dispose);
       await restoredAccount.fetchToken();
 
@@ -114,7 +103,7 @@ void main() {
 
       final encryptionKey = client.randomKey(32);
       final savedAccountEnc = await account.save(encryptionKey);
-      final restoredAccountEnc = await EtebaseAccount.restore(
+      final restoredAccountEnc = await Account.restore(
         client,
         savedAccountEnc,
         encryptionKey,
@@ -137,7 +126,7 @@ void main() {
 
       expect(jsSaved, isNotEmpty);
 
-      final restoredAccount = await EtebaseAccount.restore(
+      final restoredAccount = await Account.restore(
         client,
         jsSaved,
         encryptionKey1,
@@ -145,7 +134,7 @@ void main() {
       addTearDown(restoredAccount.dispose);
       await restoredAccount.fetchToken();
 
-      final dartAccount = await EtebaseAccount.login(
+      final dartAccount = await Account.login(
         client,
         testUsername,
         testPassword,

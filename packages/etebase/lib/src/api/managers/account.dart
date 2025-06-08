@@ -1,58 +1,58 @@
 import 'package:sodium/sodium.dart';
 
 import '../../impl/crypto/crypto_utils.dart';
-import '../../impl/managers/account.dart';
-import '../../impl/managers/client.dart';
+import '../../impl/managers/account_impl.dart';
+import '../../impl/managers/client_impl.dart';
 import '../models/user.dart';
-import 'etebase_client.dart';
-import 'etebase_collection_invitation_manager.dart';
-import 'etebase_collection_manager.dart';
+import 'client.dart';
+import 'collection_invitation_manager.dart';
+import 'collection_manager.dart';
 
 /// The main object for all user interactions and data manipulation,
 /// representing an authenticated user account.
-abstract interface class EtebaseAccount {
+abstract interface class Account {
   /// The length that the `encryptionKey` for [save] and [restore] must have.
   static const cacheKeyLength = CryptoUtils.symmetricKeySize;
 
   /// Authenticates a user using their [username] and [password] and returns an
-  /// [EtebaseAccount] on success.
-  static Future<EtebaseAccount> login(
-    EtebaseClient client,
+  /// [Account] on success.
+  static Future<Account> login(
+    Client client,
     String username,
     String password,
-  ) async => await Account.login(client as Client, username, password);
+  ) async => await AccountImpl.login(client as ClientImpl, username, password);
 
   /// Creates a new user on the server and returns a handle to it.
   ///
   /// The [user] is authenticated using the given [password].
-  static Future<EtebaseAccount> signup(
-    EtebaseClient client,
+  static Future<Account> signup(
+    Client client,
     User user,
     String password,
-  ) async => await Account.signup(client as Client, user, password);
+  ) async => await AccountImpl.signup(client as ClientImpl, user, password);
 
-  /// Deserialize and return the [EtebaseAccount] object from the
+  /// Deserialize and return the [Account] object from the
   /// [accountDataStored] obtained using [save].
   ///
   /// The [encryptionKey] must be the same as used for [save].
-  static Future<EtebaseAccount> restore(
-    EtebaseClient client,
+  static Future<Account> restore(
+    Client client,
     String accountDataStored, [
     SecureKey? encryptionKey,
-  ]) => (client as Client).restoreAccount(accountDataStored, encryptionKey);
+  ]) => (client as ClientImpl).restoreAccount(accountDataStored, encryptionKey);
 
-  /// Return a [EtebaseCollectionManager] for creating, fetching and uploading
+  /// Return a [CollectionManager] for creating, fetching and uploading
   /// collections.
-  EtebaseCollectionManager get collectionManager;
+  CollectionManager get collectionManager;
 
-  /// Return a [EtebaseCollectionInvitationManager] for managing collection
+  /// Return a [CollectionInvitationManager] for managing collection
   /// invitations.
-  EtebaseCollectionInvitationManager get invitationManager;
+  CollectionInvitationManager get invitationManager;
 
   /// Disposes of the instance and clears all cryptographic keys from memory.
   void dispose();
 
-  /// Fetch a new auth token for the account and update the [EtebaseAccount]
+  /// Fetch a new auth token for the account and update the [Account]
   /// object with it.
   Future<void> fetchToken();
 

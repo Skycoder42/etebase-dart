@@ -136,7 +136,7 @@ sealed class Action with _$Action {
 
 abstract class JsClientWrapper {
   @protected
-  late final EtebaseAccount account;
+  late final Account account;
   @protected
   late final Collection collection;
 
@@ -145,7 +145,7 @@ abstract class JsClientWrapper {
   JsClientWrapper.base();
 
   // ignore: use_setters_to_change_properties
-  void configureAccount(EtebaseAccount account, [Collection? collection]) {
+  void configureAccount(Account account, [Collection? collection]) {
     this.account = account;
     if (collection != null) {
       this.collection = collection;

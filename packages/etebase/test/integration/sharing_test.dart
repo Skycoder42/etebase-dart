@@ -15,21 +15,21 @@ void main() {
   final userName1 = generateUsername('sharing-test-user-1');
   final userName2 = generateUsername('sharing-test-user-2');
 
-  late final EtebaseClient client;
+  late final Client client;
 
-  late final EtebaseCollectionManager collectionManager1;
-  late final EtebaseCollectionInvitationManager invitationManager1;
+  late final CollectionManager collectionManager1;
+  late final CollectionInvitationManager invitationManager1;
   final jsClientWrapper1 = JsClientWrapper();
 
-  late final EtebaseCollectionManager collectionManager2;
-  late final EtebaseCollectionInvitationManager invitationManager2;
+  late final CollectionManager collectionManager2;
+  late final CollectionInvitationManager invitationManager2;
   final jsClientWrapper2 = JsClientWrapper();
 
   setUpAll(() async {
     client = await createClient();
     addTearDown(client.dispose);
 
-    final account1 = await EtebaseAccount.signup(
+    final account1 = await Account.signup(
       client,
       User(username: userName1, email: 'sharing1@test.com'),
       'password',
@@ -40,7 +40,7 @@ void main() {
     invitationManager1 = account1.invitationManager;
     jsClientWrapper1.configureAccount(account1);
 
-    final account2 = await EtebaseAccount.signup(
+    final account2 = await Account.signup(
       client,
       User(username: userName2, email: 'sharing2@test.com'),
       'password',

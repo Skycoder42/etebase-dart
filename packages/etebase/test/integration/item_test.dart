@@ -26,8 +26,8 @@ void main() {
   const testItemTypeB = 'type-b';
 
   final jsClientWrapper = JsClientWrapper();
-  late final EtebaseClient client;
-  late final EtebaseItemManager itemManager;
+  late final Client client;
+  late final ItemManager itemManager;
 
   late String itemId1;
   late String itemId2;

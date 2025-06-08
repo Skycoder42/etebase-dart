@@ -20,7 +20,7 @@ import 'package:etebase/src/impl/encrypted_models/cached/cached_collection_item.
 import 'package:etebase/src/impl/encrypted_models/cached/cached_revision.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/models/signed_invitation_content.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -30,7 +30,7 @@ import 'package:test/test.dart';
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<EncryptedCollectionItem>(),
   MockSpec<AccountCryptoManager>(),
   MockSpec<CollectionCryptoManager>(),
@@ -45,7 +45,7 @@ class FakeEtebaseItemMetadata extends Fake implements ItemMetadata {}
 
 void main() {
   group('$EncryptedCollection', () {
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockItem = MockEncryptedCollectionItem();
     final mockAccountCm = MockAccountCryptoManager();
     final mockColCm = MockCollectionCryptoManager();

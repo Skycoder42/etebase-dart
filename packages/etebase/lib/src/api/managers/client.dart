@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../impl/crypto/crypto_utils.dart';
-import '../../impl/managers/client.dart';
+import '../../impl/managers/client_impl.dart';
 import '../models/item_metadata.dart';
 import 'crypto_executor.dart';
 
@@ -16,9 +16,9 @@ typedef MetaFromJson<TMeta extends ItemMetadata> =
 ///
 /// This is in charge of actually connecting to the server and making network
 /// requests. Uses the [package:http](https://pub.dev/packages/http).
-abstract interface class EtebaseClient {
+abstract interface class Client {
   /// The URL of the main hosted server.
-  static Uri get defaultServerUrl => Client.defaultUrl;
+  static Uri get defaultServerUrl => ClientImpl.defaultUrl;
 
   /// The current version of the internal data model.
   static const currentVersion = CryptoUtils.currentVersion;
@@ -36,15 +36,15 @@ abstract interface class EtebaseClient {
   /// requests to the server. If no [serverUrl] is provided, the
   /// [defaultServerUrl] is used.
   /// {@endtemplate}
-  factory EtebaseClient.create(
+  factory Client.create(
     SodiumSumo sodium,
     String clientName, [
     Uri? serverUrl,
-  ]) => Client.create(CryptoExecutor.sync(sodium), clientName, serverUrl);
+  ]) => ClientImpl.create(CryptoExecutor.sync(sodium), clientName, serverUrl);
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
-  /// This client differs from [EtebaseClient.create] in that it will execute
+  /// This client differs from [Client.create] in that it will execute
   /// all cryptographic operations on a separate worker isolate. For must
   /// usecases, this will be slower, as the data transfer between the isolates
   /// takes longer. Only use this if you are going to process items with large
@@ -54,12 +54,15 @@ abstract interface class EtebaseClient {
   /// {@macro client_create_sodium}
   ///
   /// {@macro client_create_others}
-  static Future<EtebaseClient> createAsync(
+  static Future<Client> createAsync(
     SodiumSumo sodium,
     String clientName, [
     Uri? serverUrl,
-  ]) async =>
-      Client.create(await CryptoExecutor.async(sodium), clientName, serverUrl);
+  ]) async => ClientImpl.create(
+    await CryptoExecutor.async(sodium),
+    clientName,
+    serverUrl,
+  );
 
   /// Creates a new client object for the server located at [serverUrl] with a
   /// custom [cryptoExecutor].
@@ -70,11 +73,11 @@ abstract interface class EtebaseClient {
   /// single isolate or need more control over the background execution).
   ///
   /// {@macro client_create_others}
-  factory EtebaseClient.createCustom(
+  factory Client.createCustom(
     CryptoExecutor cryptoExecutor,
     String clientName, [
     Uri? serverUrl,
-  ]) = Client.create;
+  ]) = ClientImpl.create;
 
   /// Disposes of the instance and clears all cryptographic keys from memory.
   Future<void> dispose();

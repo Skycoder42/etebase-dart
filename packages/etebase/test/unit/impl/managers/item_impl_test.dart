@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/managers/item_impl.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 // ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<CollectionItemCryptoManager>(),
   MockSpec<EncryptedCollectionItem>(),
 ])
@@ -22,7 +22,7 @@ void main() {
   group('$ItemImpl', () {
     const testColUid = 'test-col-uid';
 
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockItemCM = MockCollectionItemCryptoManager();
     final mockEncrypted = MockEncryptedCollectionItem();
 

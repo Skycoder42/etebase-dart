@@ -10,9 +10,9 @@ import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/managers/collection_impl.dart';
-import 'package:etebase/src/impl/managers/collection_manager.dart';
+import 'package:etebase/src/impl/managers/collection_manager_impl.dart';
 import 'package:etebase/src/impl/online_managers/base_manager.dart';
 import 'package:etebase/src/impl/online_managers/collection_item_manager_online.dart';
 import 'package:etebase/src/impl/online_managers/collection_manager_online.dart';
@@ -23,14 +23,14 @@ import 'package:test/test.dart';
 // ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<AccountCryptoManager>(),
   MockSpec<CollectionManagerOnline>(),
   MockSpec<EncryptedCollection>(),
   MockSpec<CollectionCryptoManager>(),
   MockSpec<CollectionItemManagerOnline>(),
 ])
-import 'collection_manager_test.mocks.dart';
+import 'collection_manager_impl_test.mocks.dart';
 
 class FakeEncryptedCollectionItem extends Fake
     implements EncryptedCollectionItem {}
@@ -38,14 +38,14 @@ class FakeEncryptedCollectionItem extends Fake
 class FakeAuthTokenSource extends Fake implements AuthTokenSource {}
 
 void main() {
-  group('$CollectionManager', () {
+  group('$CollectionManagerImpl', () {
     const testColType = 'test-collection-type';
     const testMeta = ItemMetadata(name: 'test');
     final testContent = Uint8List.fromList([213, 3, 22]);
     const testUid = 'test-collection-id';
     const testOptions = FetchOptions(limit: 12);
 
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockAccountCM = MockAccountCryptoManager();
     final mockOnline = MockCollectionManagerOnline();
     final mockEncryptedCollection = MockEncryptedCollection();
@@ -58,7 +58,7 @@ void main() {
       mockEncryptedCollection,
     );
 
-    late CollectionManager sut;
+    late CollectionManagerImpl sut;
 
     setUp(() {
       reset(mockClient);
@@ -78,7 +78,7 @@ void main() {
 
       when(mockOnline.itemManager(any)).thenReturn(mockItemOnline);
 
-      sut = CollectionManager(mockClient, mockAccountCM, mockOnline);
+      sut = CollectionManagerImpl(mockClient, mockAccountCM, mockOnline);
     });
 
     test('create creates new collection', () async {

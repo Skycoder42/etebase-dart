@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-import '../../api/managers/etebase_collection_manager.dart';
+import '../../api/managers/collection_manager.dart';
 import '../../api/models/fetch_options.dart';
 import '../../api/models/item_metadata.dart';
 import '../../api/models/list_response.dart';
@@ -10,18 +10,18 @@ import '../crypto/account_crypto_manager.dart';
 import '../online_managers/collection_item_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
 import '../online_managers/collection_member_manager_online.dart';
-import 'client.dart';
+import 'client_impl.dart';
 import 'collection_impl.dart';
-import 'collection_member_manager.dart';
-import 'item_manager.dart';
+import 'collection_member_manager_impl.dart';
+import 'item_manager_impl.dart';
 
 @internal
-class CollectionManager implements EtebaseCollectionManager {
-  final Client _client;
+class CollectionManagerImpl implements CollectionManager {
+  final ClientImpl _client;
   final AccountCryptoManager _cryptoManager;
   final CollectionManagerOnline _online;
 
-  CollectionManager(this._client, this._cryptoManager, this._online);
+  CollectionManagerImpl(this._client, this._cryptoManager, this._online);
 
   @override
   Future<CollectionImpl> create<TMeta extends ItemMetadata>(
@@ -125,20 +125,21 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  ItemManager getItemManager(covariant CollectionImpl col) => ItemManager(
-    _client,
-    col.encrypted.getCryptoManager(_client, _cryptoManager),
-    CollectionItemManagerOnline(
-      client: _client,
-      authTokenSource: _online.authTokenSource,
-      colUid: col.uid,
-    ),
-    col.uid,
-  );
+  ItemManagerImpl getItemManager(covariant CollectionImpl col) =>
+      ItemManagerImpl(
+        _client,
+        col.encrypted.getCryptoManager(_client, _cryptoManager),
+        CollectionItemManagerOnline(
+          client: _client,
+          authTokenSource: _online.authTokenSource,
+          colUid: col.uid,
+        ),
+        col.uid,
+      );
 
   @override
-  CollectionMemberManager getMemberManager(covariant CollectionImpl col) =>
-      CollectionMemberManager(
+  CollectionMemberManagerImpl getMemberManager(covariant CollectionImpl col) =>
+      CollectionMemberManagerImpl(
         CollectionMemberManagerOnline(
           client: _client,
           authTokenSource: _online.authTokenSource,

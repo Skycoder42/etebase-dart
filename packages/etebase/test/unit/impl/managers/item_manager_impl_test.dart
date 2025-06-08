@@ -13,9 +13,9 @@ import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/minimal_collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/chunk.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/managers/item_impl.dart';
-import 'package:etebase/src/impl/managers/item_manager.dart';
+import 'package:etebase/src/impl/managers/item_manager_impl.dart';
 import 'package:etebase/src/impl/online_managers/collection_item_manager_online.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -24,7 +24,7 @@ import 'package:test/test.dart';
 // ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<MinimalCollectionCryptoManager>(),
   MockSpec<CollectionItemCryptoManager>(),
   MockSpec<CollectionItemManagerOnline>(),
@@ -32,10 +32,10 @@ import '../../test_helpers.dart';
   // ignore: strict_raw_type
   MockSpec<Callable2>(),
 ])
-import 'item_manager_test.mocks.dart';
+import 'item_manager_impl_test.mocks.dart';
 
 void main() {
-  group('$ItemManager', () {
+  group('$ItemManagerImpl', () {
     const testColUid = 'test-col-uid';
     const testItemUid = 'test-item-uid';
     const testMeta = ItemMetadata(name: 'test-item');
@@ -45,7 +45,7 @@ void main() {
     const testStoken = 'test-stoken';
     const testIterator = 'test-iterator';
 
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockCollectionCM = MockMinimalCollectionCryptoManager();
     final mockItemCM = MockCollectionItemCryptoManager();
     final mockOnline = MockCollectionItemManagerOnline();
@@ -58,7 +58,7 @@ void main() {
       testColUid,
     );
 
-    late ItemManager sut;
+    late ItemManagerImpl sut;
 
     setUp(() {
       reset(mockClient);
@@ -73,7 +73,12 @@ void main() {
 
       when(mockEncrypted.getCryptoManager(any, any)).thenReturn(mockItemCM);
 
-      sut = ItemManager(mockClient, mockCollectionCM, mockOnline, testColUid);
+      sut = ItemManagerImpl(
+        mockClient,
+        mockCollectionCM,
+        mockOnline,
+        testColUid,
+      );
     });
 
     test('dispose disposes the crypto manager', () {

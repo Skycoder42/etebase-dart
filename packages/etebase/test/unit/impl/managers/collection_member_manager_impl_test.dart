@@ -2,7 +2,7 @@ import 'package:etebase/src/api/models/collection_access_level.dart';
 import 'package:etebase/src/api/models/collection_member.dart';
 import 'package:etebase/src/api/models/fetch_options.dart';
 import 'package:etebase/src/api/models/list_response.dart';
-import 'package:etebase/src/impl/managers/collection_member_manager.dart';
+import 'package:etebase/src/impl/managers/collection_member_manager_impl.dart';
 import 'package:etebase/src/impl/online_managers/collection_member_manager_online.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -11,21 +11,21 @@ import 'package:test/test.dart';
 // ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([MockSpec<CollectionMemberManagerOnline>()])
-import 'collection_member_manager_test.mocks.dart';
+import 'collection_member_manager_impl_test.mocks.dart';
 
 void main() {
-  group('$CollectionMemberManager', () {
+  group('$CollectionMemberManagerImpl', () {
     const testOptions = IteratorFetchOptions(limit: 3);
     const testUsername = 'test-user';
 
     final mockOnline = MockCollectionMemberManagerOnline();
 
-    late CollectionMemberManager sut;
+    late CollectionMemberManagerImpl sut;
 
     setUp(() {
       reset(mockOnline);
 
-      sut = CollectionMemberManager(mockOnline);
+      sut = CollectionMemberManagerImpl(mockOnline);
     });
 
     test('list calls list on online', () async {

@@ -1,33 +1,30 @@
-import 'package:etebase/src/api/managers/etebase_client.dart';
+import 'package:etebase/src/api/managers/client.dart';
 import 'package:etebase/src/impl/crypto/executors/async_crypto_executor.dart';
 import 'package:etebase/src/impl/crypto/executors/sync_crypto_executor.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:test/test.dart';
 
 import '../../impl/crypto/crypto_mocks.dart';
 
 void main() {
-  group('$EtebaseClient', () {
+  group('$Client', () {
     const testClientName = 'test-client-name';
     final testBaseUrl = Uri.https('example.com', '/client-test');
 
     final mockSodium = MockSodium();
 
     test('static variables report correct values', () {
-      expect(
-        EtebaseClient.defaultServerUrl,
-        Uri.parse('https://api.etebase.com'),
-      );
-      expect(EtebaseClient.currentVersion, 1);
+      expect(Client.defaultServerUrl, Uri.parse('https://api.etebase.com'));
+      expect(Client.currentVersion, 1);
     });
 
     test('create creates client with SyncCryptoExecutor', () {
-      final sut = EtebaseClient.create(mockSodium, testClientName, testBaseUrl);
+      final sut = Client.create(mockSodium, testClientName, testBaseUrl);
       addTearDown(sut.dispose);
 
       expect(
         sut,
-        isA<Client>()
+        isA<ClientImpl>()
             .having(
               (m) => m.crypto.executor,
               'crypto.executor',
@@ -42,7 +39,7 @@ void main() {
       'createAsync creates client with AsyncCryptoExecutor',
       testOn: 'dart-vm',
       () async {
-        final sut = await EtebaseClient.createAsync(
+        final sut = await Client.createAsync(
           mockSodium,
           testClientName,
           testBaseUrl,
@@ -51,7 +48,7 @@ void main() {
 
         expect(
           sut,
-          isA<Client>()
+          isA<ClientImpl>()
               .having(
                 (m) => m.crypto.executor,
                 'crypto.executor',
@@ -66,7 +63,7 @@ void main() {
     test('createCustom creates client with a custom executor', () {
       final testExecutor = MockCryptoExecutor(mockSodium);
 
-      final sut = EtebaseClient.createCustom(
+      final sut = Client.createCustom(
         testExecutor,
         testClientName,
         testBaseUrl,
@@ -75,7 +72,7 @@ void main() {
 
       expect(
         sut,
-        isA<Client>()
+        isA<ClientImpl>()
             .having((m) => m.crypto.executor, 'crypto.executor', testExecutor)
             .having((m) => m.userAgent, 'userAgent', contains(testClientName))
             .having((m) => m.baseUrl, 'baseUrl', testBaseUrl),

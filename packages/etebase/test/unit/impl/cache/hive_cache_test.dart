@@ -4,13 +4,13 @@ import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/not_found.dart';
-import 'package:etebase/src/api/managers/etebase_collection_manager.dart';
-import 'package:etebase/src/api/managers/etebase_item_manager.dart';
+import 'package:etebase/src/api/managers/collection_manager.dart';
+import 'package:etebase/src/api/managers/item_manager.dart';
 import 'package:etebase/src/api/models/collection.dart';
 import 'package:etebase/src/api/models/item.dart';
 import 'package:etebase/src/impl/cache/hive_cache.dart';
-import 'package:etebase/src/impl/managers/account.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/account_impl.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -23,10 +23,10 @@ import '../../test_helpers.dart';
   MockSpec<HiveInterface>(),
   // ignore: strict_raw_type
   MockSpec<LazyBox>(),
-  MockSpec<Client>(),
-  MockSpec<Account>(),
-  MockSpec<EtebaseCollectionManager>(),
-  MockSpec<EtebaseItemManager>(),
+  MockSpec<ClientImpl>(),
+  MockSpec<AccountImpl>(),
+  MockSpec<CollectionManager>(),
+  MockSpec<ItemManager>(),
 ])
 import 'hive_cache_test.mocks.dart';
 
@@ -44,7 +44,7 @@ void main() {
     const testUserName = 'test-user';
     const testEncodedUserName = 'dGVzdC11c2Vy';
 
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockHive = MockHiveInterface();
     final mockMetaBox = MockLazyBox<String>();
     final mockCollectionBox = MockLazyBox<Uint8List>();
@@ -221,7 +221,7 @@ void main() {
 
     group('account', () {
       const accountData = 'account-data';
-      final mockAccount = MockAccount();
+      final mockAccount = MockAccountImpl();
 
       setUp(() {
         reset(mockAccount);
@@ -362,7 +362,7 @@ void main() {
       const testColUid = 'col-uid';
       final testCollection = FakeEtebaseCollection(testColUid);
       final testColData = Uint8List.fromList([2, 3, 2]);
-      final mockColMgr = MockEtebaseCollectionManager();
+      final mockColMgr = MockCollectionManager();
 
       setUp(() {
         reset(mockColMgr);
@@ -465,7 +465,7 @@ void main() {
       final Item testItem = FakeEtebaseCollection(testItemUid);
       final testItemData = Uint8List.fromList([3, 3, 4]);
 
-      final mockItemMgr = MockEtebaseItemManager();
+      final mockItemMgr = MockItemManager();
       final mockItemBox = MockLazyBox<Uint8List>();
 
       setUp(() {

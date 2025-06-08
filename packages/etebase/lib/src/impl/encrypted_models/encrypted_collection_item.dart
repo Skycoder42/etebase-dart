@@ -11,7 +11,7 @@ import '../codec/byte_array_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
-import '../managers/client.dart';
+import '../managers/client_impl.dart';
 import 'cached/cached_collection_item.dart';
 import 'chunk.dart';
 import 'encrypted_revision.dart';
@@ -61,7 +61,7 @@ class EncryptedCollectionItem {
   EncryptedCollectionItem();
 
   static Future<(EncryptedCollectionItem, CollectionItemCryptoManager)> create(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager parentCm,
     ItemMetadata meta,
     Uint8List content,
@@ -89,7 +89,7 @@ class EncryptedCollectionItem {
       _$EncryptedCollectionItemFromJson(json)..markSaved();
 
   factory EncryptedCollectionItem.cacheLoad(
-    Client client,
+    ClientImpl client,
     Uint8List cachedData,
   ) {
     final cached = client.converter.decode<CachedCollectionItem>(cachedData);
@@ -106,7 +106,7 @@ class EncryptedCollectionItem {
 
   Map<String, dynamic> toJson() => _$EncryptedCollectionItemToJson(this);
 
-  Uint8List cacheSave(Client client, {required bool saveContent}) =>
+  Uint8List cacheSave(ClientImpl client, {required bool saveContent}) =>
       client.converter.encode(
         CachedCollectionItem(
           uid: client.converter.base64Decode(uid),
@@ -138,11 +138,11 @@ class EncryptedCollectionItem {
     content.chunks[index] = chunk;
   }
 
-  Future<void> verify(Client client, CollectionItemCryptoManager cm) =>
+  Future<void> verify(ClientImpl client, CollectionItemCryptoManager cm) =>
       content.verify(client, cm, _getAdditionalMacData());
 
   Future<void> setMeta(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm,
     ItemMetadata meta,
   ) => _cloneOrUpdateRevision(
@@ -150,7 +150,7 @@ class EncryptedCollectionItem {
   );
 
   Future<TMeta> getMeta<TMeta extends ItemMetadata>(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
@@ -158,7 +158,7 @@ class EncryptedCollectionItem {
   }
 
   Future<void> setContent(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm,
     Uint8List content,
   ) => _cloneOrUpdateRevision(
@@ -171,7 +171,7 @@ class EncryptedCollectionItem {
   );
 
   Future<void> setContentStream(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm,
     Stream<List<int>> content,
   ) => _cloneOrUpdateRevision(
@@ -184,7 +184,7 @@ class EncryptedCollectionItem {
   );
 
   Future<Uint8List> getContent(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
@@ -192,7 +192,7 @@ class EncryptedCollectionItem {
   }
 
   Stream<Uint8List> getContentStream(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm,
   ) async* {
     await verify(client, cm);
@@ -200,7 +200,7 @@ class EncryptedCollectionItem {
   }
 
   Future<void> delete(
-    Client client,
+    ClientImpl client,
     CollectionItemCryptoManager cm, {
     required bool preserveContent,
   }) => _cloneOrUpdateRevision(
@@ -213,7 +213,7 @@ class EncryptedCollectionItem {
   );
 
   Future<T> withCm<T>(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager parentCm,
     WithCmCallback<T> callback,
   ) async {
@@ -226,7 +226,7 @@ class EncryptedCollectionItem {
   }
 
   CollectionItemCryptoManager getCryptoManager(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager parentCm,
   ) => client.crypto.createCollectionItemCryptoManager(
     _getEncryptionKey(client, parentCm),
@@ -244,7 +244,7 @@ class EncryptedCollectionItem {
   Uint8List _getAdditionalMacData() => uid.toCharArray().unsignedView();
 
   SecureKey _getEncryptionKey(
-    Client client,
+    ClientImpl client,
     MinimalCollectionCryptoManager parentCm,
   ) {
     if (_encryptionKey case final Uint8List key) {

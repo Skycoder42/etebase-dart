@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/conflict.dart';
-import '../../api/managers/etebase_item_manager.dart';
+import '../../api/managers/item_manager.dart';
 import '../../api/models/fetch_options.dart';
 import '../../api/models/item.dart';
 import '../../api/models/item_metadata.dart';
@@ -15,13 +15,13 @@ import '../crypto/minimal_collection_crypto_manager.dart';
 import '../encrypted_models/chunk.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
 import '../online_managers/collection_item_manager_online.dart';
-import 'client.dart';
+import 'client_impl.dart';
 import 'item_impl.dart';
 
 @internal
-class ItemManager implements EtebaseItemManager {
+class ItemManagerImpl implements ItemManager {
   @visibleForTesting
-  final Client client;
+  final ClientImpl client;
   @visibleForTesting
   final MinimalCollectionCryptoManager cryptoManager;
   @visibleForTesting
@@ -29,7 +29,7 @@ class ItemManager implements EtebaseItemManager {
   @visibleForTesting
   final String colUid;
 
-  ItemManager(this.client, this.cryptoManager, this.online, this.colUid);
+  ItemManagerImpl(this.client, this.cryptoManager, this.online, this.colUid);
 
   @override
   void dispose() {

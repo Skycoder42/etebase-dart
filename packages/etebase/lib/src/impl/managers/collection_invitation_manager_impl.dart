@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-import '../../api/managers/etebase_collection_invitation_manager.dart';
+import '../../api/managers/collection_invitation_manager.dart';
 import '../../api/models/collection_access_level.dart';
 import '../../api/models/fetch_options.dart';
 import '../../api/models/list_response.dart';
@@ -11,18 +11,17 @@ import '../models/invitation_accept_request.dart';
 import '../models/signed_invitation_base.dart';
 import '../models/signed_invitation_content.dart';
 import '../online_managers/collection_invitation_manager_online.dart';
-import 'account.dart';
-import 'client.dart';
+import 'account_impl.dart';
+import 'client_impl.dart';
 import 'collection_impl.dart';
 
 @internal
-class CollectionInvitationManager
-    implements EtebaseCollectionInvitationManager {
-  final Client _client;
-  final Account _account;
+class CollectionInvitationManagerImpl implements CollectionInvitationManager {
+  final ClientImpl _client;
+  final AccountImpl _account;
   final CollectionInvitationManagerOnline _online;
 
-  CollectionInvitationManager(this._client, this._account, this._online);
+  CollectionInvitationManagerImpl(this._client, this._account, this._online);
 
   @override
   Uint8List get pubkey => _account.identityCryptoManager.pubkey;

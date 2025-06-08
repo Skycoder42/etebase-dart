@@ -2,7 +2,7 @@
 
 import 'dart:typed_data';
 
-import '../managers/etebase_collection_manager.dart';
+import '../managers/collection_manager.dart';
 import 'collection_access_level.dart';
 import 'item.dart';
 import 'item_metadata.dart';
@@ -17,7 +17,7 @@ import 'item_metadata.dart';
 ///
 /// They also have an immutable type and an associated sync token. The
 /// [Item]s within that collection can be fetched using the
-/// [EtebaseCollectionManager.getItemManager].
+/// [CollectionManager.getItemManager].
 abstract class Collection implements Item {
   /// The sync token for the collection.
   ///

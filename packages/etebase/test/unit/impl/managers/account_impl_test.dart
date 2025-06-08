@@ -13,10 +13,10 @@ import 'package:etebase/src/impl/crypto/key_derivator.dart';
 import 'package:etebase/src/impl/crypto/login_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/main_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/storage_crypto_manager.dart';
-import 'package:etebase/src/impl/managers/account.dart';
-import 'package:etebase/src/impl/managers/client.dart';
-import 'package:etebase/src/impl/managers/collection_invitation_manager.dart';
-import 'package:etebase/src/impl/managers/collection_manager.dart';
+import 'package:etebase/src/impl/managers/account_impl.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
+import 'package:etebase/src/impl/managers/collection_invitation_manager_impl.dart';
+import 'package:etebase/src/impl/managers/collection_manager_impl.dart';
 import 'package:etebase/src/impl/models/account_data.dart';
 import 'package:etebase/src/impl/models/account_data_stored.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
@@ -36,7 +36,7 @@ import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
 // ignore: directives_ordering
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<MainCryptoManager>(),
   MockSpec<AccountCryptoManager>(),
   MockSpec<BoxCryptoManager>(),
@@ -47,10 +47,10 @@ import '../crypto/crypto_mocks.dart';
   MockSpec<Authenticator>(),
   MockSpec<MessagePackConverter>(),
 ])
-import 'account_test.mocks.dart';
+import 'account_impl_test.mocks.dart';
 
 void main() {
-  group('$Account', () {
+  group('$AccountImpl', () {
     final testBaseUrl = Uri.https('example.com', '/test');
     const testUserName = 'test-user';
     const testEmail = 'user@test.con';
@@ -64,7 +64,7 @@ void main() {
     );
     const testToken = 'test-auth-token-value';
 
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockMainCM = MockMainCryptoManager();
     final mockAccountCM = MockAccountCryptoManager();
     final mockIdCM = MockBoxCryptoManager();
@@ -181,7 +181,7 @@ void main() {
         });
 
         test('signs up with server and creates account', () async {
-          final result = await Account.signup(
+          final result = await AccountImpl.signup(
             mockClient,
             testSignupUser,
             testPassword,
@@ -240,7 +240,7 @@ void main() {
           when(mockAuthenticator.signup(any)).thenThrow(testException);
 
           await expectLater(
-            () => Account.signup(mockClient, testSignupUser, testPassword),
+            () => AccountImpl.signup(mockClient, testSignupUser, testPassword),
             throwsA(testException),
           );
 
@@ -279,7 +279,7 @@ void main() {
           when(mockConverter.encode(any)).thenReturn(testEncodedResponse);
           when(mockLoginCM.signDetached(any)).thenReturn(testSignature);
 
-          final result = await Account.login(
+          final result = await AccountImpl.login(
             mockClient,
             testUserName,
             testPassword,
@@ -338,7 +338,7 @@ void main() {
           when(mockAuthenticator.login(any)).thenThrow(testException);
 
           await expectLater(
-            () => Account.login(mockClient, testUserName, testPassword),
+            () => AccountImpl.login(mockClient, testUserName, testPassword),
             throwsA(testException),
           );
 
@@ -386,7 +386,7 @@ void main() {
         });
 
         test('restores account from raw data', () async {
-          final result = await Account.restore(
+          final result = await AccountImpl.restore(
             mockClient,
             testAccountDataStoredData,
             testEncryptionKey,
@@ -436,7 +436,7 @@ void main() {
           ).thenReturnInOrder([testEncryptionKey, testAccKey, testIdPrivKey]);
 
           await expectLater(
-            () => Account.restore(mockClient, testAccountDataStoredData),
+            () => AccountImpl.restore(mockClient, testAccountDataStoredData),
             throwsA(isA<ApiMissuse>()),
           );
 
@@ -468,10 +468,10 @@ void main() {
 
     group('members', () {
       // ignore: unused_local_variable
-      late Account sut;
+      late AccountImpl sut;
 
       setUp(() {
-        sut = Account(
+        sut = AccountImpl(
           mockClient,
           mockMainCM,
           testUser,
@@ -494,14 +494,14 @@ void main() {
       test('collectionManager returns single CollectionManager', () {
         final result = sut.collectionManager;
 
-        expect(result, isA<CollectionManager>());
+        expect(result, isA<CollectionManagerImpl>());
         expect(sut.collectionManager, same(result));
       });
 
       test('invitationManager returns single CollectionInvitationManager', () {
         final result = sut.invitationManager;
 
-        expect(result, isA<CollectionInvitationManager>());
+        expect(result, isA<CollectionInvitationManagerImpl>());
         expect(sut.invitationManager, same(result));
       });
 

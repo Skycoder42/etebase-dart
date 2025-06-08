@@ -5,7 +5,7 @@ import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/managers/collection_impl.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -14,7 +14,7 @@ import 'package:test/test.dart';
 // ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
-  MockSpec<Client>(),
+  MockSpec<ClientImpl>(),
   MockSpec<CollectionCryptoManager>(),
   MockSpec<AccountCryptoManager>(),
   MockSpec<EncryptedCollection>(),
@@ -23,7 +23,7 @@ import 'collection_impl_test.mocks.dart';
 
 void main() {
   group('$CollectionImpl', () {
-    final mockClient = MockClient();
+    final mockClient = MockClientImpl();
     final mockCollectionCM = MockCollectionCryptoManager();
     final mockAccountCM = MockAccountCryptoManager();
     final mockEncrypted = MockEncryptedCollection();

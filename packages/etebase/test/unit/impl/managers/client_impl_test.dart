@@ -7,7 +7,7 @@ import 'package:etebase/src/api/managers/crypto_executor.dart';
 import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/crypto_service.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/online_managers/authenticator.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
@@ -24,12 +24,12 @@ import '../../test_helpers.dart';
   MockSpec<CryptoService>(),
   MockSpec<CryptoExecutor>(),
 ])
-import 'client_test.mocks.dart';
+import 'client_impl_test.mocks.dart';
 
 class FakeMeta extends Fake implements ItemMetadata {}
 
 void main() {
-  group('$Client', () {
+  group('$ClientImpl', () {
     const testUserAgent = 'test-user-agent';
     final testBaseUrl = Uri.https('example.com', '/etebase');
 
@@ -46,7 +46,7 @@ void main() {
     group('constructors', () {
       test('default throws if URL ends with /', () {
         expect(
-          () => Client(
+          () => ClientImpl(
             mockHttpClient,
             testUserAgent,
             Uri.https('example.com', '/api/'),
@@ -67,7 +67,7 @@ void main() {
         });
 
         test('constructs client from executor', () {
-          final sut = Client.create(mockCryptoExecutor, testName);
+          final sut = ClientImpl.create(mockCryptoExecutor, testName);
 
           expect(sut.httpClient, isA<http.Client>());
           expect(
@@ -77,7 +77,7 @@ void main() {
             ),
           );
           expect(sut.converter, isA<MessagePackConverter>());
-          expect(sut.baseUrl, Client.defaultUrl);
+          expect(sut.baseUrl, ClientImpl.defaultUrl);
           expect(
             sut.crypto,
             isA<CryptoService>().having(
@@ -91,13 +91,17 @@ void main() {
         test('uses custom server url if given', () {
           final testOtherUrl = Uri.http('other.com');
 
-          final sut = Client.create(mockCryptoExecutor, testName, testOtherUrl);
+          final sut = ClientImpl.create(
+            mockCryptoExecutor,
+            testName,
+            testOtherUrl,
+          );
 
           expect(sut.baseUrl, testOtherUrl);
         });
 
         test('owns created client and disposes it', () async {
-          final sut = Client.create(mockCryptoExecutor, testName);
+          final sut = ClientImpl.create(mockCryptoExecutor, testName);
 
           await sut.dispose();
 
@@ -118,10 +122,10 @@ void main() {
     });
 
     group('members', () {
-      late Client sut;
+      late ClientImpl sut;
 
       setUp(() {
-        sut = Client(
+        sut = ClientImpl(
           mockHttpClient,
           testUserAgent,
           testBaseUrl,
@@ -152,7 +156,7 @@ void main() {
         });
 
         test('also disposes http client when owned', () async {
-          sut = Client(
+          sut = ClientImpl(
             mockHttpClient,
             testUserAgent,
             testBaseUrl,

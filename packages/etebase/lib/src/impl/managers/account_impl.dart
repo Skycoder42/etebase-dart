@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
 
 import '../../api/exceptions/api_missuse.dart';
-import '../../api/managers/etebase_account.dart';
+import '../../api/managers/account.dart';
 import '../../api/models/user.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
@@ -23,13 +23,13 @@ import '../models/signup_request.dart';
 import '../online_managers/base_manager.dart';
 import '../online_managers/collection_invitation_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
-import 'client.dart';
-import 'collection_invitation_manager.dart';
-import 'collection_manager.dart';
+import 'client_impl.dart';
+import 'collection_invitation_manager_impl.dart';
+import 'collection_manager_impl.dart';
 
 @internal
-class Account implements EtebaseAccount, AuthTokenSource {
-  final Client _client;
+class AccountImpl implements Account, AuthTokenSource {
+  final ClientImpl _client;
 
   MainCryptoManager _mainCryptoManager;
   LoginResponseUser _user;
@@ -41,7 +41,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
   @override
   AuthToken get authToken => _authToken;
 
-  Account(
+  AccountImpl(
     this._client,
     this._mainCryptoManager,
     this._user,
@@ -50,9 +50,9 @@ class Account implements EtebaseAccount, AuthTokenSource {
     this.identityCryptoManager,
   ) : _authToken = AuthToken(authToken);
 
-  factory Account._create(
+  factory AccountImpl._create(
     CryptoArena arena,
-    Client client,
+    ClientImpl client,
     MainCryptoManager mainCryptoManager,
     LoginResponse response,
   ) {
@@ -61,7 +61,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       arena(mainCryptoManager.decryptKey(response.user.encryptedContent)),
       CryptoUtils.symmetricKeySize,
     );
-    return Account(
+    return AccountImpl(
       client,
       arena.detach(mainCryptoManager),
       response.user,
@@ -71,8 +71,8 @@ class Account implements EtebaseAccount, AuthTokenSource {
     );
   }
 
-  static Future<Account> signup(
-    Client client,
+  static Future<AccountImpl> signup(
+    ClientImpl client,
     User user,
     String password,
   ) async {
@@ -113,14 +113,14 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return Account._create(arena, client, mainCryptoManager, response);
+      return AccountImpl._create(arena, client, mainCryptoManager, response);
     } finally {
       arena.dispose();
     }
   }
 
-  static Future<Account> login(
-    Client client,
+  static Future<AccountImpl> login(
+    ClientImpl client,
     String username,
     String password,
   ) async {
@@ -154,14 +154,19 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return Account._create(arena, client, mainCryptoManager, loginResponse);
+      return AccountImpl._create(
+        arena,
+        client,
+        mainCryptoManager,
+        loginResponse,
+      );
     } finally {
       arena.dispose();
     }
   }
 
-  static Future<Account> restore(
-    Client client,
+  static Future<AccountImpl> restore(
+    ClientImpl client,
     String accountDataStored, [
     SecureKey? encryptionKey,
   ]) async {
@@ -200,7 +205,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
         ),
       );
 
-      return Account._create(
+      return AccountImpl._create(
         arena,
         client,
         mainCryptoManager,
@@ -220,14 +225,14 @@ class Account implements EtebaseAccount, AuthTokenSource {
   }
 
   @override
-  late final collectionManager = CollectionManager(
+  late final collectionManager = CollectionManagerImpl(
     _client,
     accountCryptoManager,
     CollectionManagerOnline(client: _client, authTokenSource: this),
   );
 
   @override
-  late final invitationManager = CollectionInvitationManager(
+  late final invitationManager = CollectionInvitationManagerImpl(
     _client,
     this,
     CollectionInvitationManagerOnline(client: _client, authTokenSource: this),
@@ -351,7 +356,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
       );
 
   static Future<LoginRequest> _signStaticChallenge(
-    Client client,
+    ClientImpl client,
     MainCryptoManager mainCryptoManager,
     String username,
     ChallengeResponse response,

@@ -1,4 +1,4 @@
-/// @docImport 'etebase_client.dart';
+/// @docImport 'client.dart';
 library;
 
 import 'dart:typed_data';
@@ -11,11 +11,11 @@ import '../models/signed_invitation.dart';
 import '../models/user_profile.dart';
 
 /// An manager for managing user invitations to [Collection]s.
-abstract class EtebaseCollectionInvitationManager {
+abstract class CollectionInvitationManager {
   /// Our identity's public key.
   ///
   /// This is the key users see when we send invitations.
-  /// Can be pretty printed with [EtebaseClient.prettyFingerprint].
+  /// Can be pretty printed with [Client.prettyFingerprint].
   Uint8List get pubkey;
 
   /// List the incoming collection [SignedInvitation]s for the account.
@@ -44,7 +44,7 @@ abstract class EtebaseCollectionInvitationManager {
   /// Invite a user identified by [username] to a collection.
   ///
   /// The [pubkey] must be the corresponding
-  /// [EtebaseCollectionInvitationManager.pubkey] of that user. The
+  /// [CollectionInvitationManager.pubkey] of that user. The
   /// [accessLevel] defines the level of access to give to user.
   Future<void> invite(
     Collection collection,

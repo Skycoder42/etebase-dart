@@ -9,10 +9,10 @@ import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/box_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/crypto_service.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
-import 'package:etebase/src/impl/managers/account.dart';
-import 'package:etebase/src/impl/managers/client.dart';
+import 'package:etebase/src/impl/managers/account_impl.dart';
+import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:etebase/src/impl/managers/collection_impl.dart';
-import 'package:etebase/src/impl/managers/collection_invitation_manager.dart';
+import 'package:etebase/src/impl/managers/collection_invitation_manager_impl.dart';
 import 'package:etebase/src/impl/models/invitation_accept_request.dart';
 import 'package:etebase/src/impl/models/signed_invitation_base.dart';
 import 'package:etebase/src/impl/models/signed_invitation_content.dart';
@@ -24,8 +24,8 @@ import 'package:test/test.dart';
 // ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
-  MockSpec<Client>(),
-  MockSpec<Account>(),
+  MockSpec<ClientImpl>(),
+  MockSpec<AccountImpl>(),
   MockSpec<CollectionInvitationManagerOnline>(),
   MockSpec<CryptoService>(),
   MockSpec<MessagePackConverter>(),
@@ -34,14 +34,14 @@ import '../../test_helpers.dart';
   MockSpec<CollectionImpl>(),
   MockSpec<EncryptedCollection>(),
 ])
-import 'collection_invitation_manager_test.mocks.dart';
+import 'collection_invitation_manager_impl_test.mocks.dart';
 
 void main() {
-  group('$CollectionInvitationManager', () {
+  group('$CollectionInvitationManagerImpl', () {
     const testOptions = IteratorFetchOptions();
 
-    final mockClient = MockClient();
-    final mockAccount = MockAccount();
+    final mockClient = MockClientImpl();
+    final mockAccount = MockAccountImpl();
     final mockOnline = MockCollectionInvitationManagerOnline();
     final mockCryptoService = MockCryptoService();
     final mockMessagePackConverter = MockMessagePackConverter();
@@ -50,7 +50,7 @@ void main() {
     final mockCollection = MockCollectionImpl();
     final mockEncryptedCollection = MockEncryptedCollection();
 
-    late CollectionInvitationManager sut;
+    late CollectionInvitationManagerImpl sut;
 
     setUp(() {
       reset(mockClient);
@@ -71,7 +71,11 @@ void main() {
 
       when(mockCollection.encrypted).thenReturn(mockEncryptedCollection);
 
-      sut = CollectionInvitationManager(mockClient, mockAccount, mockOnline);
+      sut = CollectionInvitationManagerImpl(
+        mockClient,
+        mockAccount,
+        mockOnline,
+      );
     });
 
     test('pubKey returns identity cm pub key', () {
