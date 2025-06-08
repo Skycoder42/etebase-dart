@@ -48,7 +48,7 @@ void main() {
 
     final testCollection = await collectionManager.create(
       '$testCollectionType-meta',
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
 
@@ -76,7 +76,7 @@ void main() {
     expect(collectionMeta2.mtime, testMTime);
     expect(collectionMeta2.color, testColor);
 
-    await testCollection.setMeta(const EtebaseItemMetadata());
+    await testCollection.setMeta(const ItemMetadata());
 
     final collectionMeta3 = await testCollection.getMeta();
     expect(collectionMeta3.itemType, isNull);
@@ -87,9 +87,9 @@ void main() {
   });
 
   test('fetch options can be created', () {
-    const options = EtebaseFetchOptions(
+    const options = FetchOptions(
       limit: 100,
-      prefetch: EtebasePrefetchOption.medium,
+      prefetch: PrefetchOption.medium,
       stoken: 'stoken',
     );
 
@@ -105,14 +105,14 @@ void main() {
 
       final collection = await collectionManager.create(
         testCollectionType,
-        const EtebaseItemMetadata(name: testCollectionName),
+        const ItemMetadata(name: testCollectionName),
         collectionTestContent1,
       );
       addTearDown(collection.dispose);
 
       expect(collection.verify(), completes);
 
-      expect(collection.accessLevel, EtebaseCollectionAccessLevel.admin);
+      expect(collection.accessLevel, CollectionAccessLevel.admin);
       expect(collection.collectionType, testCollectionType);
       expect(collection.etag, isNotEmpty);
       expect(collection.stoken, isNull);
@@ -131,7 +131,7 @@ void main() {
 
       final collection = await collectionManager.create(
         testCollectionType,
-        const EtebaseItemMetadata(name: testCollectionName),
+        const ItemMetadata(name: testCollectionName),
         collectionTestContent1,
       );
       addTearDown(collection.dispose);
@@ -153,7 +153,7 @@ void main() {
 
       final collection = await collectionManager.create(
         testCollectionType,
-        const EtebaseItemMetadata(name: testCollectionName),
+        const ItemMetadata(name: testCollectionName),
         collectionTestContent1,
       );
       addTearDown(collection.dispose);
@@ -178,7 +178,7 @@ void main() {
     test('can create and upload collections', () async {
       final collection1 = await collectionManager.create(
         testCollectionType,
-        const EtebaseItemMetadata(name: 'create-collection-test-1'),
+        const ItemMetadata(name: 'create-collection-test-1'),
         collectionTestContent1,
       );
       addTearDown(collection1.dispose);
@@ -187,10 +187,7 @@ void main() {
 
       final collection2 = await collectionManager.create(
         testCollectionType,
-        EtebaseItemMetadata(
-          name: 'create-collection-test-2',
-          mtime: DateTime(2000),
-        ),
+        ItemMetadata(name: 'create-collection-test-2', mtime: DateTime(2000)),
         collectionTestContent2,
       );
       addTearDown(collection2.dispose);
@@ -199,7 +196,7 @@ void main() {
 
       final collection3 = await collectionManager.create(
         '$testCollectionType-other',
-        const EtebaseItemMetadata(),
+        const ItemMetadata(),
         Uint8List(0),
       );
       addTearDown(collection3.dispose);
@@ -246,7 +243,7 @@ void main() {
       colId4 = await jsClientWrapper.executeSignedIn<String>(
         Action.createCollection(
           testCollectionType,
-          const EtebaseItemMetadata(name: 'js-collection'),
+          const ItemMetadata(name: 'js-collection'),
           collectionTestContent1,
         ),
       );
@@ -280,7 +277,7 @@ void main() {
 
       final changedResponse = await collectionManager.list(
         testCollectionType,
-        EtebaseFetchOptions(stoken: listResponse.stoken),
+        FetchOptions(stoken: listResponse.stoken),
       );
 
       expect(changedResponse.data, isEmpty);
@@ -394,12 +391,12 @@ void main() {
     test('can preserve content of deleted collections', () async {
       final delTest1 = await collectionManager.create(
         testCollectionType,
-        const EtebaseItemMetadata(),
+        const ItemMetadata(),
         collectionTestContent1,
       );
       final delTest2 = await collectionManager.create(
         testCollectionType,
-        const EtebaseItemMetadata(),
+        const ItemMetadata(),
         collectionTestContent2,
       );
 
@@ -474,7 +471,7 @@ void main() {
       await jsClientWrapper.executeSignedIn<void>(
         Action.restoreCollection(
           savedDart,
-          meta: const EtebaseItemMetadata(name: 'js-collection'),
+          meta: const ItemMetadata(name: 'js-collection'),
           content: collectionTestContent1,
           isDeleted: false,
         ),
@@ -500,7 +497,7 @@ void main() {
       await jsClientWrapper.executeSignedIn<void>(
         Action.restoreCollection(
           savedWithoutContentDart,
-          meta: const EtebaseItemMetadata(name: 'js-collection'),
+          meta: const ItemMetadata(name: 'js-collection'),
           noContent: true,
           isDeleted: false,
         ),

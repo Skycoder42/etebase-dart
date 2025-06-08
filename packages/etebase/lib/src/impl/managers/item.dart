@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/models/etebase_item.dart';
-import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/item_metadata.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
 import 'client.dart';
@@ -36,11 +36,11 @@ class Item implements EtebaseItem {
   Future<void> verify() => encrypted.verify(_client, _cm);
 
   @override
-  Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta) =>
+  Future<void> setMeta<TMeta extends ItemMetadata>(TMeta meta) =>
       encrypted.setMeta(_client, _cm, meta);
 
   @override
-  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>() =>
+  Future<TMeta> getMeta<TMeta extends ItemMetadata>() =>
       encrypted.getMeta<TMeta>(_client, _cm);
 
   @override

@@ -5,8 +5,8 @@ import 'dart:typed_data';
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/exceptions/connection_problem.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/list_response.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/encrypted_models/chunk.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
@@ -23,8 +23,6 @@ import 'package:test/test.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../test_helpers.dart';
-import 'online_manager_mocks.dart';
-
 // ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<WebSocketChannel>(),
@@ -32,12 +30,13 @@ import 'online_manager_mocks.dart';
   MockSpec<MessagePackConverter>(),
 ])
 import 'collection_item_manager_online_test.mocks.dart';
+import 'online_manager_mocks.dart';
 
 void main() {
   group('$CollectionItemManagerOnline', () {
     const testAuthToken = AuthToken('test');
-    const testOptions = EtebaseItemFetchOptions(limit: 1);
-    const testRevOptions = EtebaseRevisionFetchOptions(limit: 2);
+    const testOptions = ItemFetchOptions(limit: 1);
+    const testRevOptions = RevisionFetchOptions(limit: 2);
     const testQuery = {'limit': '1'};
     const testRevQuery = {'limit': '2'};
 
@@ -110,7 +109,7 @@ void main() {
       'list gets item endpoint',
       mock: mockBaseNetwork,
       request: null,
-      response: EtebaseItemListResponse(data: [testItem1], isDone: true),
+      response: ItemListResponse(data: [testItem1], isDone: true),
       call: (_) => sut.list(testOptions),
       query: testQuery,
       authToken: testAuthToken,
@@ -121,10 +120,10 @@ void main() {
       final testRev1 = EncryptedRevision()..uid = 'content-1';
       final testRev2 = EncryptedRevision()..uid = 'content-2';
 
-      whenInvoke<EtebaseIteratorListResponse<EncryptedRevision>>(
+      whenInvoke<IteratorListResponse<EncryptedRevision>>(
         mockBaseNetwork,
       ).thenReturnAsync(
-        EtebaseIteratorListResponse(
+        IteratorListResponse(
           data: [testRev1, testRev2],
           isDone: true,
           iterator: 'test-iter',
@@ -135,7 +134,7 @@ void main() {
 
       expect(
         result,
-        isA<EtebaseIteratorListResponse<EncryptedCollectionItem>>()
+        isA<IteratorListResponse<EncryptedCollectionItem>>()
             .having((m) => m.isDone, 'isDone', isTrue)
             .having((m) => m.iterator, 'iterator', 'test-iter')
             .having((m) => m.data, 'data', [
@@ -149,7 +148,7 @@ void main() {
       );
 
       verify(
-        mockBaseNetwork.invoke<EtebaseIteratorListResponse<EncryptedRevision>>(
+        mockBaseNetwork.invoke<IteratorListResponse<EncryptedRevision>>(
           path: [testItemUid, 'revision'],
           query: testRevQuery,
           authToken: testAuthToken,
@@ -183,13 +182,13 @@ void main() {
         ),
       ],
       (fixture) async {
-        final testResponse = EtebaseItemListResponse(
+        final testResponse = ItemListResponse(
           data: [testItem1],
           isDone: false,
           stoken: 'new-token',
         );
 
-        whenInvoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
+        whenInvoke<ItemListResponse<EncryptedCollectionItem>>(
           mockBaseNetwork,
         ).thenReturnAsync(testResponse);
 
@@ -200,14 +199,13 @@ void main() {
         expect(result, testResponse);
 
         verify(
-          mockBaseNetwork
-              .invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                method: HttpMethod.post,
-                path: ['fetch_updates'],
-                query: fixture.$3,
-                authToken: testAuthToken,
-                body: [fixture.$2],
-              ),
+          mockBaseNetwork.invoke<ItemListResponse<EncryptedCollectionItem>>(
+            method: HttpMethod.post,
+            path: ['fetch_updates'],
+            query: fixture.$3,
+            authToken: testAuthToken,
+            body: [fixture.$2],
+          ),
         );
       },
     );
@@ -216,7 +214,7 @@ void main() {
       'fetchMulti posts fetch updates endpoint',
       mock: mockBaseNetwork,
       request: [const CollectionItemFetchInfo(testItemUid)],
-      response: EtebaseItemListResponse(data: [testItem1], isDone: true),
+      response: ItemListResponse(data: [testItem1], isDone: true),
       call: (_) => sut.fetchMulti([testItemUid], testOptions),
       method: HttpMethod.post,
       path: ['fetch_updates'],
@@ -322,7 +320,7 @@ void main() {
 
       test('opens channel with ticket', () async {
         final result = sut.subscribeChanges(
-          const EtebaseItemFetchOptions(limit: 5, stoken: 'token-1'),
+          const ItemFetchOptions(limit: 5, stoken: 'token-1'),
         );
 
         await expectLater(result, emitsDone);
@@ -350,18 +348,15 @@ void main() {
 
       test('maps binary messages to result model', () async {
         final testMsgData1 = Uint8List.fromList([1]);
-        final testMsg1 = EtebaseItemListResponse(
-          data: [testItem1],
-          isDone: false,
-        );
+        final testMsg1 = ItemListResponse(data: [testItem1], isDone: false);
         final testMsgData2 = Uint8List.fromList([2]);
-        final testMsg2 = EtebaseItemListResponse(
+        final testMsg2 = ItemListResponse(
           data: [testItem2],
           isDone: false,
           stoken: 'token1',
         );
         final testMsgData3 = Uint8List.fromList([3]);
-        const testMsg3 = EtebaseItemListResponse<EncryptedCollectionItem>(
+        const testMsg3 = ItemListResponse<EncryptedCollectionItem>(
           data: [],
           isDone: true,
           stoken: 'token2',
@@ -370,22 +365,19 @@ void main() {
         provideDummy(testMsg1);
 
         when(
-          mockConverter
-              .decode<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                testMsgData1,
-              ),
+          mockConverter.decode<ItemListResponse<EncryptedCollectionItem>>(
+            testMsgData1,
+          ),
         ).thenReturn(testMsg1);
         when(
-          mockConverter
-              .decode<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                testMsgData2,
-              ),
+          mockConverter.decode<ItemListResponse<EncryptedCollectionItem>>(
+            testMsgData2,
+          ),
         ).thenReturn(testMsg2);
         when(
-          mockConverter
-              .decode<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                testMsgData3,
-              ),
+          mockConverter.decode<ItemListResponse<EncryptedCollectionItem>>(
+            testMsgData3,
+          ),
         ).thenReturn(testMsg3);
 
         when(mockWebSocketChannel.stream).thenStream(
@@ -404,18 +396,15 @@ void main() {
         );
 
         verifyInOrder([
-          mockConverter
-              .decode<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                testMsgData1,
-              ),
-          mockConverter
-              .decode<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                testMsgData2,
-              ),
-          mockConverter
-              .decode<EtebaseItemListResponse<EncryptedCollectionItem>>(
-                testMsgData3,
-              ),
+          mockConverter.decode<ItemListResponse<EncryptedCollectionItem>>(
+            testMsgData1,
+          ),
+          mockConverter.decode<ItemListResponse<EncryptedCollectionItem>>(
+            testMsgData2,
+          ),
+          mockConverter.decode<ItemListResponse<EncryptedCollectionItem>>(
+            testMsgData3,
+          ),
           mockWebSocketSink.close(1000),
         ]);
       });

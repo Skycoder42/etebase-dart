@@ -6,10 +6,10 @@ import 'package:meta/meta.dart';
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/conflict.dart';
 import '../../api/managers/etebase_item_manager.dart';
-import '../../api/models/etebase_fetch_options.dart';
 import '../../api/models/etebase_item.dart';
-import '../../api/models/etebase_item_metadata.dart';
-import '../../api/models/etebase_list_response.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/item_metadata.dart';
+import '../../api/models/list_response.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../encrypted_models/chunk.dart';
@@ -37,7 +37,7 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<Item> create<TMeta extends EtebaseItemMetadata>(
+  Future<Item> create<TMeta extends ItemMetadata>(
     TMeta meta,
     Uint8List content,
   ) async {
@@ -50,35 +50,30 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<Item> fetch(
-    String itemUid, [
-    EtebaseItemFetchOptions? fetchOptions,
-  ]) async {
+  Future<Item> fetch(String itemUid, [ItemFetchOptions? fetchOptions]) async {
     final encryptedItem = await online.fetch(itemUid, fetchOptions);
     return _createItem(encryptedItem);
   }
 
   @override
-  Future<EtebaseItemListResponse<Item>> list([
-    EtebaseItemFetchOptions? fetchOptions,
-  ]) async {
+  Future<ItemListResponse<Item>> list([ItemFetchOptions? fetchOptions]) async {
     final result = await online.list(fetchOptions);
     return result.map(_createItem);
   }
 
   @override
-  Future<EtebaseIteratorListResponse<Item>> itemRevisions(
+  Future<IteratorListResponse<Item>> itemRevisions(
     covariant Item item, [
-    EtebaseRevisionFetchOptions? fetchOptions,
+    RevisionFetchOptions? fetchOptions,
   ]) async {
     final revisions = await online.itemRevisions(item.encrypted, fetchOptions);
     return revisions.map(_createItem);
   }
 
   @override
-  Future<EtebaseItemListResponse<Item>> fetchUpdates(
+  Future<ItemListResponse<Item>> fetchUpdates(
     List<EtebaseItem> items, [
-    EtebaseItemFetchOptions? fetchOptions,
+    ItemFetchOptions? fetchOptions,
   ]) async {
     final response = await online.fetchUpdates(
       _prepareForUpload(items.cast()),
@@ -88,9 +83,9 @@ class ItemManager implements EtebaseItemManager {
   }
 
   @override
-  Future<EtebaseItemListResponse<Item>> fetchMulti(
+  Future<ItemListResponse<Item>> fetchMulti(
     List<String> items, [
-    EtebaseItemFetchOptions? fetchOptions,
+    ItemFetchOptions? fetchOptions,
   ]) async {
     final result = await online.fetchMulti(items, fetchOptions);
     return result.map(_createItem);
@@ -100,7 +95,7 @@ class ItemManager implements EtebaseItemManager {
   Future<void> batch(
     List<EtebaseItem> items, {
     List<EtebaseItem>? deps,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   }) async {
     await online.batch(
       _prepareForUpload(items.cast()),
@@ -116,7 +111,7 @@ class ItemManager implements EtebaseItemManager {
   Future<void> transaction(
     List<EtebaseItem> items, {
     List<EtebaseItem>? deps,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   }) async {
     await online.transaction(
       _prepareForUpload(items.cast()),
@@ -169,8 +164,8 @@ class ItemManager implements EtebaseItemManager {
       _createItem(client.cacheLoadEncryptedCollectionItem(cached));
 
   @override
-  Stream<EtebaseItemListResponse<Item>> subscribeChanges([
-    EtebaseItemFetchOptions? options,
+  Stream<ItemListResponse<Item>> subscribeChanges([
+    ItemFetchOptions? options,
   ]) => online
       .subscribeChanges(options)
       // ignore: discarded_futures

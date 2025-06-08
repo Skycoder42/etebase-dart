@@ -1,9 +1,9 @@
 import 'package:meta/meta.dart';
 
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_prefetch_option.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/prefetch_option.dart';
 import '../models/auth_token.dart';
-import '../models/fetch_options.dart';
+import '../models/http_fetch_options.dart';
 import 'base_network.dart';
 
 @internal
@@ -42,7 +42,7 @@ class BaseManager {
     HttpMethod method = HttpMethod.get,
     List<String> path = const [],
     Map<String, String> headers = const {},
-    EtebaseFetchOptionsBase? options,
+    FetchOptionsBase? options,
     Map<String, String>? query,
     dynamic body,
   }) => _network.invoke<T>(
@@ -56,14 +56,14 @@ class BaseManager {
 
   @protected
   Map<String, String> queryFromOptions(
-    EtebaseFetchOptionsBase? options, [
+    FetchOptionsBase? options, [
     Map<String, String>? query,
   ]) {
     if (options == null) {
       return query ?? const {};
     }
 
-    final fetchOptions = options.asFetchOptions();
+    final fetchOptions = options.asHttpFetchOptions();
     return {
       ...?query,
       if (fetchOptions.limit case final int limit when limit > 0)
@@ -73,7 +73,7 @@ class BaseManager {
       if (fetchOptions.stoken case final String stoken) 'stoken': stoken,
       if (fetchOptions.withCollection case final bool withCollection)
         'withCollection': withCollection.toString(),
-      if (fetchOptions.prefetch case final EtebasePrefetchOption prefetch)
+      if (fetchOptions.prefetch case final PrefetchOption prefetch)
         'prefetch': prefetch.name,
     };
   }

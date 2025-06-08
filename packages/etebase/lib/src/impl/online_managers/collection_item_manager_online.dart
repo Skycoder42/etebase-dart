@@ -6,8 +6,8 @@ import 'package:web_socket_channel/status.dart' as status;
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/exceptions/connection_problem.dart';
 import '../../api/exceptions/websocket_closed.dart';
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_list_response.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/list_response.dart';
 import '../encrypted_models/chunk.dart';
 import '../encrypted_models/encrypted_collection_item.dart';
 import '../encrypted_models/encrypted_revision.dart';
@@ -34,44 +34,41 @@ class CollectionItemManagerOnline extends BaseManager {
 
   Future<EncryptedCollectionItem> fetch(
     String itemUid,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   ) => invoke<EncryptedCollectionItem>(path: [itemUid], options: options);
 
-  Future<EtebaseItemListResponse<EncryptedCollectionItem>> list(
-    EtebaseItemFetchOptions? options,
-  ) => invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
-    options: options,
-  );
+  Future<ItemListResponse<EncryptedCollectionItem>> list(
+    ItemFetchOptions? options,
+  ) => invoke<ItemListResponse<EncryptedCollectionItem>>(options: options);
 
-  Future<EtebaseIteratorListResponse<EncryptedCollectionItem>> itemRevisions(
+  Future<IteratorListResponse<EncryptedCollectionItem>> itemRevisions(
     EncryptedCollectionItem item,
-    EtebaseRevisionFetchOptions? options,
+    RevisionFetchOptions? options,
   ) async {
-    final response =
-        await invoke<EtebaseIteratorListResponse<EncryptedRevision>>(
-          path: [item.uid, 'revision'],
-          options: options,
-        );
+    final response = await invoke<IteratorListResponse<EncryptedRevision>>(
+      path: [item.uid, 'revision'],
+      options: options,
+    );
     return response.map((rev) => item.cloneWithRevision(rev));
   }
 
   Future<void> create(EncryptedCollectionItem item) =>
       invoke<void>(method: HttpMethod.post, body: item);
 
-  Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchUpdates(
+  Future<ItemListResponse<EncryptedCollectionItem>> fetchUpdates(
     List<EncryptedCollectionItem> items,
-    EtebaseItemFetchOptions? options,
-  ) => invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
+    ItemFetchOptions? options,
+  ) => invoke<ItemListResponse<EncryptedCollectionItem>>(
     method: HttpMethod.post,
     path: const ['fetch_updates'],
     body: items.toFetchInfo(wantEtag: options?.stoken == null),
     options: options,
   );
 
-  Future<EtebaseItemListResponse<EncryptedCollectionItem>> fetchMulti(
+  Future<ItemListResponse<EncryptedCollectionItem>> fetchMulti(
     List<String> items,
-    EtebaseItemFetchOptions? options,
-  ) => invoke<EtebaseItemListResponse<EncryptedCollectionItem>>(
+    ItemFetchOptions? options,
+  ) => invoke<ItemListResponse<EncryptedCollectionItem>>(
     method: HttpMethod.post,
     path: const ['fetch_updates'],
     body: items.map(CollectionItemFetchInfo.new).toList(),
@@ -81,7 +78,7 @@ class CollectionItemManagerOnline extends BaseManager {
   Future<void> batch(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   ) => invoke<void>(
     method: HttpMethod.post,
     path: const ['batch'],
@@ -95,7 +92,7 @@ class CollectionItemManagerOnline extends BaseManager {
   Future<void> transaction(
     List<EncryptedCollectionItem> items,
     List<EncryptedCollectionItem>? deps,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   ) => invoke<void>(
     method: HttpMethod.post,
     path: const ['transaction'],
@@ -109,7 +106,7 @@ class CollectionItemManagerOnline extends BaseManager {
   Future<void> chunkUpload(
     EncryptedCollectionItem item,
     Chunk chunk,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   ) {
     final Chunk(:uid, :data) = chunk;
     if (data == null) {
@@ -126,14 +123,14 @@ class CollectionItemManagerOnline extends BaseManager {
   Future<Uint8List> chunkDownload(
     EncryptedCollectionItem item,
     String chunkUid,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   ) => invoke<Uint8List>(
     path: [item.uid, 'chunk', chunkUid, 'download'],
     options: options,
   );
 
-  Stream<EtebaseItemListResponse<EncryptedCollectionItem>> subscribeChanges(
-    EtebaseItemFetchOptions? options,
+  Stream<ItemListResponse<EncryptedCollectionItem>> subscribeChanges(
+    ItemFetchOptions? options,
   ) async* {
     final ticket = await invoke<WebSocketTicketResponse>(
       method: HttpMethod.post,

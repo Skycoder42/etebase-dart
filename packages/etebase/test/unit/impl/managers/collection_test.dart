@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
@@ -104,9 +104,9 @@ void main() {
     test('accessLevel returns encrypted.accessLevel', () {
       when(
         mockEncrypted.accessLevel,
-      ).thenReturn(EtebaseCollectionAccessLevel.readWrite);
+      ).thenReturn(CollectionAccessLevel.readWrite);
 
-      expect(sut.accessLevel, EtebaseCollectionAccessLevel.readWrite);
+      expect(sut.accessLevel, CollectionAccessLevel.readWrite);
 
       verify(mockEncrypted.accessLevel).called(1);
     });
@@ -124,7 +124,7 @@ void main() {
     });
 
     test('setMeta calls setMeta on encrypted', () async {
-      const testMeta = EtebaseItemMetadata(name: 'test');
+      const testMeta = ItemMetadata(name: 'test');
 
       await sut.setMeta(testMeta);
 
@@ -132,24 +132,16 @@ void main() {
     });
 
     test('getMeta calls getMeta on encrypted', () async {
-      const testMeta = EtebaseItemMetadata(name: 'test');
+      const testMeta = ItemMetadata(name: 'test');
 
       when(
-        mockEncrypted.getMeta<EtebaseItemMetadata>(
-          mockClient,
-          mockCollectionCM,
-        ),
+        mockEncrypted.getMeta<ItemMetadata>(mockClient, mockCollectionCM),
       ).thenReturnAsync(testMeta);
 
-      final result = await sut.getMeta<EtebaseItemMetadata>();
+      final result = await sut.getMeta<ItemMetadata>();
       expect(result, testMeta);
 
-      verify(
-        mockEncrypted.getMeta<EtebaseItemMetadata>(
-          mockClient,
-          mockCollectionCM,
-        ),
-      );
+      verify(mockEncrypted.getMeta<ItemMetadata>(mockClient, mockCollectionCM));
     });
 
     test('setContent calls setContent on encrypted', () async {

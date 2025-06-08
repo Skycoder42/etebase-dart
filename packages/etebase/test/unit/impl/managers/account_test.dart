@@ -3,7 +3,7 @@
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
-import 'package:etebase/src/api/models/etebase_user.dart';
+import 'package:etebase/src/api/models/user.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/box_crypto_manager.dart';
@@ -25,8 +25,8 @@ import 'package:etebase/src/impl/models/challenge_response.dart';
 import 'package:etebase/src/impl/models/login_challenge.dart';
 import 'package:etebase/src/impl/models/login_request.dart';
 import 'package:etebase/src/impl/models/login_response.dart';
+import 'package:etebase/src/impl/models/login_response_user.dart';
 import 'package:etebase/src/impl/models/signup_request.dart';
-import 'package:etebase/src/impl/models/user.dart';
 import 'package:etebase/src/impl/online_managers/authenticator.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -34,7 +34,6 @@ import 'package:test/test.dart';
 
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
-
 // ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<Client>(),
@@ -57,7 +56,7 @@ void main() {
     const testEmail = 'user@test.con';
     const testPassword = 'test-password';
     final testEncryptedContent = Uint8List.fromList([4, 121, 33]);
-    final testUser = User(
+    final testUser = LoginResponseUser(
       username: testUserName,
       email: testEmail,
       pubkey: Uint8List.fromList([4, 12, 56]),
@@ -168,10 +167,7 @@ void main() {
       group('signup', () {
         final testCombinedKey = FakeSecureKey(55)
           ..writeBuffer = Uint8List(testAccKey.length + testIdPrivKey.length);
-        const testSignupUser = EtebaseUser(
-          username: testUserName,
-          email: testEmail,
-        );
+        const testSignupUser = User(username: testUserName, email: testEmail);
 
         setUp(() {
           testCombinedKey.disposed = false;

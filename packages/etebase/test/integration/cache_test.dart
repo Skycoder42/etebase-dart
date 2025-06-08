@@ -25,7 +25,7 @@ void main() {
     final username = generateUsername('fs-cache-test-user');
     account = await EtebaseAccount.signup(
       client,
-      EtebaseUser(username: username, email: '$username@test.com'),
+      User(username: username, email: '$username@test.com'),
       'password',
     );
     addTearDown(account.dispose);
@@ -68,7 +68,7 @@ void main() {
 
     final collection = await collectionManager.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -87,7 +87,7 @@ void main() {
 
     await collectionManager.list(
       testCollectionType,
-      EtebaseFetchOptions(stoken: restoredToken),
+      FetchOptions(stoken: restoredToken),
     );
   });
 
@@ -99,7 +99,7 @@ void main() {
     expect(cache.persistedCollectionStokenUids, emitsDone);
     expect(cache.persistedCollectionUids, emitsDone);
 
-    const meta = EtebaseItemMetadata();
+    const meta = ItemMetadata();
     var collection = await collectionManager.create(
       testCollectionType,
       meta,
@@ -165,7 +165,7 @@ void main() {
 
     final collection = await collectionManager.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -178,7 +178,7 @@ void main() {
 
     expect(cache.persistedItemUids(collectionId), emitsDone);
 
-    const itemMeta = EtebaseItemMetadata(color: 'AABBCC');
+    const itemMeta = ItemMetadata(color: 'AABBCC');
     final itemContent = Uint8List.fromList(List.filled(42, 42));
     final item = await itemManager.create(itemMeta, itemContent);
     addTearDown(item.dispose);

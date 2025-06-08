@@ -6,9 +6,9 @@ import 'dart:typed_data';
 import 'package:dart_test_tools/test.dart' hide MockCallable2;
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/exceptions/conflict.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
+import 'package:etebase/src/api/models/list_response.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/minimal_collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/chunk.dart';
@@ -38,10 +38,10 @@ void main() {
   group('$ItemManager', () {
     const testColUid = 'test-col-uid';
     const testItemUid = 'test-item-uid';
-    const testMeta = EtebaseItemMetadata(name: 'test-item');
+    const testMeta = ItemMetadata(name: 'test-item');
     final testContent = Uint8List.fromList([12, 4, 11, 3]);
-    const testOptions = EtebaseItemFetchOptions(limit: 22);
-    const testRevOptions = EtebaseRevisionFetchOptions(limit: 33);
+    const testOptions = ItemFetchOptions(limit: 22);
+    const testRevOptions = RevisionFetchOptions(limit: 33);
     const testStoken = 'test-stoken';
     const testIterator = 'test-iterator';
 
@@ -115,7 +115,7 @@ void main() {
       final otherItem = MockEncryptedCollectionItem();
 
       when(mockOnline.list(any)).thenReturnAsync(
-        EtebaseItemListResponse(
+        ItemListResponse(
           data: [mockEncrypted, otherItem],
           isDone: false,
           stoken: testStoken,
@@ -140,7 +140,7 @@ void main() {
       final otherItem = MockEncryptedCollectionItem();
 
       when(mockOnline.itemRevisions(any, any)).thenReturnAsync(
-        EtebaseIteratorListResponse(
+        IteratorListResponse(
           data: [mockEncrypted, otherItem],
           isDone: true,
           iterator: testIterator,
@@ -166,7 +166,7 @@ void main() {
         final otherItem = MockEncryptedCollectionItem();
 
         when(mockOnline.fetchUpdates(any, any)).thenReturnAsync(
-          EtebaseItemListResponse(
+          ItemListResponse(
             data: [mockEncrypted, otherItem],
             isDone: true,
             stoken: testStoken,
@@ -212,7 +212,7 @@ void main() {
       final otherItem = MockEncryptedCollectionItem();
 
       when(mockOnline.fetchMulti(any, any)).thenReturnAsync(
-        EtebaseItemListResponse(
+        ItemListResponse(
           data: [mockEncrypted, otherItem],
           isDone: false,
           stoken: testStoken,
@@ -540,16 +540,16 @@ void main() {
     test('subscribeChanges subscribes via online manager', () {
       final testError = Exception('test');
       final testController =
-          StreamController<EtebaseItemListResponse<EncryptedCollectionItem>>()
+          StreamController<ItemListResponse<EncryptedCollectionItem>>()
             ..add(
-              EtebaseItemListResponse(
+              ItemListResponse(
                 data: [mockEncrypted],
                 isDone: false,
                 stoken: testStoken,
               ),
             )
             ..addError(testError)
-            ..add(const EtebaseItemListResponse(data: [], isDone: true));
+            ..add(const ItemListResponse(data: [], isDone: true));
 
       when(mockOnline.subscribeChanges(any)).thenStream(testController.stream);
 
@@ -558,7 +558,7 @@ void main() {
       expect(
         result,
         emitsInOrder([
-          isA<EtebaseItemListResponse<Item>>()
+          isA<ItemListResponse<Item>>()
               .having(
                 (m) => m.data,
                 'data',
@@ -571,7 +571,7 @@ void main() {
               .having((m) => m.isDone, 'isDone', isFalse)
               .having((m) => m.stoken, 'stoken', testStoken),
           emitsError(testError),
-          const EtebaseItemListResponse<Item>(data: [], isDone: true),
+          const ItemListResponse<Item>(data: [], isDone: true),
           emitsDone,
         ]),
       );

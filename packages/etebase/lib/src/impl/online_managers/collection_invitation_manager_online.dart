@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
 
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_list_response.dart';
-import '../../api/models/etebase_user_profile.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/list_response.dart';
+import '../../api/models/user_profile.dart';
 import '../models/invitation_accept_request.dart';
-import '../models/signed_invitation.dart';
+import '../models/signed_invitation_base.dart';
 import 'base_manager.dart';
 import 'base_network.dart';
 
@@ -22,16 +22,16 @@ class CollectionInvitationManagerOnline extends BaseManager {
     // ignore: invalid_use_of_visible_for_testing_member for tests
   ) : super.fromNetwork();
 
-  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming(
-    EtebaseIteratorFetchOptions? options,
-  ) => invoke<EtebaseIteratorListResponse<SignedInvitationRead>>(
+  Future<IteratorListResponse<SignedInvitationRead>> listIncoming(
+    IteratorFetchOptions? options,
+  ) => invoke<IteratorListResponse<SignedInvitationRead>>(
     path: const ['incoming'],
     options: options,
   );
 
-  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing(
-    EtebaseIteratorFetchOptions? options,
-  ) => invoke<EtebaseIteratorListResponse<SignedInvitationRead>>(
+  Future<IteratorListResponse<SignedInvitationRead>> listOutgoing(
+    IteratorFetchOptions? options,
+  ) => invoke<IteratorListResponse<SignedInvitationRead>>(
     path: const ['outgoing'],
     options: options,
   );
@@ -50,11 +50,10 @@ class CollectionInvitationManagerOnline extends BaseManager {
     path: ['incoming', invitation.uid],
   );
 
-  Future<EtebaseUserProfile> fetchUserProfile(String username) =>
-      invoke<EtebaseUserProfile>(
-        path: const ['outgoing', 'fetch_user_profile'],
-        query: {'username': username},
-      );
+  Future<UserProfile> fetchUserProfile(String username) => invoke<UserProfile>(
+    path: const ['outgoing', 'fetch_user_profile'],
+    query: {'username': username},
+  );
 
   Future<void> invite(SignedInvitationWrite invitation) => invoke<void>(
     method: HttpMethod.post,

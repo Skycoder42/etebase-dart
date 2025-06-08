@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:etebase/src/api/exceptions/crypto_failure.dart';
 import 'package:etebase/src/api/exceptions/integrity_compromised.dart';
 import 'package:etebase/src/api/exceptions/missing_content.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/crypto_mac.dart';
@@ -37,14 +37,14 @@ import 'encrypted_revision_test.mocks.dart';
 typedef TestNext = void Function(Uint8List data, int depth);
 
 @immutable
-class TestEtebaseItemMetadata implements EtebaseItemMetadata {
-  final EtebaseItemMetadata _self;
+class TestEtebaseItemMetadata implements ItemMetadata {
+  final ItemMetadata _self;
   final String extra;
 
   const TestEtebaseItemMetadata(this._self, this.extra);
 
   TestEtebaseItemMetadata.fromJson(Map<String, dynamic> json)
-    : _self = EtebaseItemMetadata.fromJson(json),
+    : _self = ItemMetadata.fromJson(json),
       extra = json['extra'] as String;
 
   @override
@@ -174,12 +174,10 @@ void main() {
         // ignore: avoid_dynamic_calls
         return wrap(smConverterEncode, [data.toJson()]);
       });
-      when(
-        mockMessagePackConverter.decode<EtebaseItemMetadata>(any),
-      ).thenAnswer((i) {
+      when(mockMessagePackConverter.decode<ItemMetadata>(any)).thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
         final [Map<dynamic, dynamic> json] = unwrap(data, smConverterEncode);
-        return EtebaseItemMetadata.fromJson(json.cast());
+        return ItemMetadata.fromJson(json.cast());
       });
       when(mockMessagePackConverter.encodeRaw(any)).thenAnswer((i) {
         final [dynamic data] = i.positionalArguments;
@@ -339,7 +337,7 @@ void main() {
       reset(mockCryptoMac);
       reset(mockCryptoMacNoKey);
 
-      provideDummy(const EtebaseItemMetadata());
+      provideDummy(const ItemMetadata());
 
       setupSmartMocks();
 
@@ -349,7 +347,7 @@ void main() {
     group('create', () {
       test('constructs new revision from meta and content', () async {
         final testAd = Uint8List.fromList([1, 2, 1]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        const testMeta = ItemMetadata(name: 'test-meta');
         final testContent = Uint8List.fromList([7, 5, 4, 5]);
 
         final result = await EncryptedRevision.create(
@@ -393,7 +391,7 @@ void main() {
 
       test('constructs new revision from meta and empty content', () async {
         final testAd = Uint8List.fromList([4, 6, 5, 3, 4, 2]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List(0);
 
         final result = await EncryptedRevision.create(
@@ -426,7 +424,7 @@ void main() {
       test('constructs new revision with multiple chunks', () async {
         const testBlockSize = 32768;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList(
           List.generate(16384 * 5, (i) => i % 100),
         );
@@ -551,7 +549,7 @@ void main() {
       test('constructs new revision with deduplicated chunks', () async {
         const testBlockSize = 16384;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList([
           ...List.filled(testBlockSize * 3, 0x11),
           ...List.filled(testBlockSize * 1, 0x12),
@@ -657,7 +655,7 @@ void main() {
       test('honor maximum chunk size', () async {
         const testBlockSize = 70000;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList(
           List.generate(testBlockSize, (i) => i % 256),
         );
@@ -711,7 +709,7 @@ void main() {
 
       test('honor minimum chunk size', () async {
         final testAd = Uint8List.fromList([5, 6, 5, 3, 2, 4, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList(
           List.generate(20000, (i) => i % 256),
         );
@@ -863,7 +861,7 @@ void main() {
     group('verify', () {
       test('validates integrity of metadata', () async {
         final testAd = Uint8List.fromList([4, 5, 4, 23, 1, 2]);
-        const testMeta = EtebaseItemMetadata(
+        const testMeta = ItemMetadata(
           name: 'test-meta',
           description: 'test-description',
         );
@@ -894,7 +892,7 @@ void main() {
         'translates crypto failure to integrity compromised exception',
         () async {
           final testAd = Uint8List.fromList([4, 5, 4, 23, 1, 2]);
-          const testMeta = EtebaseItemMetadata(
+          const testMeta = ItemMetadata(
             name: 'test-meta',
             description: 'test-description',
           );
@@ -923,7 +921,7 @@ void main() {
     group('setMeta', () {
       test('updates existing metadata', () async {
         final testAd = Uint8List.fromList([6, 5, 2, 3, 11]);
-        const testMeta = EtebaseItemMetadata(
+        const testMeta = ItemMetadata(
           name: 'test-meta',
           description: 'test-description',
         );
@@ -958,10 +956,7 @@ void main() {
       test('can persist non default metadata', () async {
         final testAd = Uint8List.fromList([6, 5, 2, 3, 11]);
         const testMeta = TestEtebaseItemMetadata(
-          EtebaseItemMetadata(
-            name: 'test-meta',
-            description: 'test-description',
-          ),
+          ItemMetadata(name: 'test-meta', description: 'test-description'),
           'test-extra',
         );
         final testChunks = [
@@ -996,10 +991,7 @@ void main() {
     group('getMeta', () {
       test('restores original metadata', () async {
         final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
-        const testMeta = EtebaseItemMetadata(
-          name: 'test-meta',
-          color: '#AABBCC',
-        );
+        const testMeta = ItemMetadata(name: 'test-meta', color: '#AABBCC');
         final testContent = Uint8List.fromList([5, 6, 5, 2, 1, 2, 1]);
 
         final sut = await EncryptedRevision.create(
@@ -1017,7 +1009,7 @@ void main() {
       test('restores custom metadata', () async {
         final testAd = Uint8List.fromList([5, 4, 2, 3, 1, 2]);
         const testMeta = TestEtebaseItemMetadata(
-          EtebaseItemMetadata(name: 'test-meta', color: '#AABBCC'),
+          ItemMetadata(name: 'test-meta', color: '#AABBCC'),
           'test-extra',
         );
         final testContent = Uint8List.fromList([5, 6, 5, 2, 1, 2, 1]);
@@ -1055,7 +1047,7 @@ void main() {
       // of filling it in from the construction.
       test('updates revision content', () async {
         final testAd = Uint8List.fromList([5, 4, 3, 1, 5, 3]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        const testMeta = ItemMetadata(name: 'test-meta');
         final testContent = Uint8List.fromList([5, 6, 2, 1, 4, 4, 1]);
 
         final sut = await EncryptedRevision.create(
@@ -1127,7 +1119,7 @@ void main() {
 
       test('can set content from stream', () async {
         final testAd = Uint8List.fromList([5, 4, 3, 1, 5, 3]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        const testMeta = ItemMetadata(name: 'test-meta');
         final testContent = Stream.fromIterable([
           [5, 6],
           [2],
@@ -1206,7 +1198,7 @@ void main() {
     group('getContent', () {
       test('restores original content data', () async {
         final testAd = Uint8List.fromList([9, 7, 22, 4, 2]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        const testMeta = ItemMetadata(name: 'test-meta');
         final testContent = Uint8List.fromList([34, 1, 4, 12]);
 
         final sut = await EncryptedRevision.create(
@@ -1225,7 +1217,7 @@ void main() {
 
       test('restores empty content', () async {
         final testAd = Uint8List.fromList([9, 7, 22, 4, 2]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        const testMeta = ItemMetadata(name: 'test-meta');
         final testContent = Uint8List(0);
 
         final sut = await EncryptedRevision.create(
@@ -1245,7 +1237,7 @@ void main() {
       test('restores data that was split in multiple chunks', () async {
         const testBlockSize = 32768;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList(
           List.generate(16384 * 5, (i) => i % 100),
         );
@@ -1269,7 +1261,7 @@ void main() {
       test('restores data from deduplicated chunks', () async {
         const testBlockSize = 16384;
         final testAd = Uint8List.fromList([6, 5, 2, 2, 41, 2]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList([
           ...List.filled(testBlockSize * 3, 0x11),
           ...List.filled(testBlockSize * 1, 0x12),
@@ -1298,7 +1290,7 @@ void main() {
         () async {
           const testBlockSize = 32768;
           final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
-          const testMeta = EtebaseItemMetadata();
+          const testMeta = ItemMetadata();
           final testContent = Uint8List.fromList(
             List.generate(16384 * 5, (i) => i % 100),
           );
@@ -1332,7 +1324,7 @@ void main() {
         'throws IntegrityCompromised if plain data hash does not match uid',
         () async {
           final testAd = Uint8List.fromList([5, 4, 2, 5, 1]);
-          const testMeta = EtebaseItemMetadata(name: 'test-meta');
+          const testMeta = ItemMetadata(name: 'test-meta');
           final testContent = Uint8List.fromList([34, 1, 4, 12]);
 
           final sut = await EncryptedRevision.create(
@@ -1372,7 +1364,7 @@ void main() {
       test('returns chunked data as stream', () async {
         const testBlockSize = 32768;
         final testAd = Uint8List.fromList([5, 6, 5, 3, 44, 2, 3]);
-        const testMeta = EtebaseItemMetadata();
+        const testMeta = ItemMetadata();
         final testContent = Uint8List.fromList(
           List.generate(16384 * 5, (i) => i % 100),
         );
@@ -1407,7 +1399,7 @@ void main() {
         'sets deleted to true and updates metadata if data should be kept',
         () async {
           final testAd = Uint8List.fromList([6, 4, 1, 2, 4, 1]);
-          const testMeta = EtebaseItemMetadata(name: 'test-meta');
+          const testMeta = ItemMetadata(name: 'test-meta');
           final testContent = Uint8List.fromList([11, 34, 23]);
 
           final sut = await EncryptedRevision.create(
@@ -1450,7 +1442,7 @@ void main() {
       test('sets deleted to true, updates metadata and clears chunks '
           'if data should not be kept', () async {
         final testAd = Uint8List.fromList([6, 4, 1, 2, 4, 1]);
-        const testMeta = EtebaseItemMetadata(name: 'test-meta');
+        const testMeta = ItemMetadata(name: 'test-meta');
         final testContent = Uint8List.fromList([11, 34, 23]);
 
         final sut = await EncryptedRevision.create(

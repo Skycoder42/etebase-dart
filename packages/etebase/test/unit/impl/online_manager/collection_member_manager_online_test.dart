@@ -1,9 +1,9 @@
 // ignore_for_file: discarded_futures
 
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/api/models/etebase_collection_member.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/api/models/collection_member.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/list_response.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/models/modify_access_level_request.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
@@ -16,13 +16,13 @@ import 'online_manager_mocks.dart';
 void main() {
   group('$CollectionMemberManagerOnline', () {
     const testAuthToken = AuthToken('test');
-    const testOptions = EtebaseIteratorFetchOptions(limit: 1);
+    const testOptions = IteratorFetchOptions(limit: 1);
     const testQuery = {'limit': '1'};
 
     const testUsername = 'test-user';
-    const testMember = EtebaseCollectionMember(
+    const testMember = CollectionMember(
       username: testUsername,
-      accessLevel: EtebaseCollectionAccessLevel.readWrite,
+      accessLevel: CollectionAccessLevel.readWrite,
     );
 
     final mockBaseNetwork = MockBaseNetwork();
@@ -70,7 +70,7 @@ void main() {
       'list gets endpoint',
       mock: mockBaseNetwork,
       request: null,
-      response: const EtebaseIteratorListResponse(
+      response: const IteratorListResponse(
         data: [testMember],
         isDone: false,
         iterator: 'test-iter',
@@ -105,14 +105,10 @@ void main() {
     testInvoke<ModifyAccessLevelRequest, void>(
       'modifyAccessLevel patches user endpoint',
       mock: mockBaseNetwork,
-      request: const ModifyAccessLevelRequest(
-        EtebaseCollectionAccessLevel.readOnly,
-      ),
+      request: const ModifyAccessLevelRequest(CollectionAccessLevel.readOnly),
       response: null,
-      call: (_) => sut.modifyAccessLevel(
-        testUsername,
-        EtebaseCollectionAccessLevel.readOnly,
-      ),
+      call: (_) =>
+          sut.modifyAccessLevel(testUsername, CollectionAccessLevel.readOnly),
       method: HttpMethod.patch,
       path: [testUsername],
       authToken: testAuthToken,

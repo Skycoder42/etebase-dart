@@ -2,10 +2,10 @@
 
 import 'dart:typed_data';
 
-import 'etebase_collection_access_level.dart';
+import 'collection_access_level.dart';
 
 /// A signed invitation to join a collection.
-abstract class EtebaseSignedInvitation {
+abstract class SignedInvitation {
   /// The uid of the invitation.
   String get uid;
 
@@ -16,7 +16,7 @@ abstract class EtebaseSignedInvitation {
   String get collection;
 
   /// The access level offered in this invitation.
-  EtebaseCollectionAccessLevel get accessLevel;
+  CollectionAccessLevel get accessLevel;
 
   /// The username this invitation is from.
   String? get fromUsername;

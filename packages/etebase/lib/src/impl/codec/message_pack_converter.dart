@@ -6,10 +6,10 @@ import 'package:msgpack_codec/msgpack_codec.dart';
 
 import '../../api/exceptions/http_error_content.dart';
 import '../../api/exceptions/invalid_message_pack_data.dart';
-import '../../api/models/etebase_collection_member.dart';
-import '../../api/models/etebase_item_metadata.dart';
-import '../../api/models/etebase_list_response.dart';
-import '../../api/models/etebase_user_profile.dart';
+import '../../api/models/collection_member.dart';
+import '../../api/models/item_metadata.dart';
+import '../../api/models/list_response.dart';
+import '../../api/models/user_profile.dart';
 import '../encrypted_models/cached/cached_chunk.dart';
 import '../encrypted_models/cached/cached_collection.dart';
 import '../encrypted_models/cached/cached_collection_item.dart';
@@ -27,7 +27,7 @@ import '../models/login_challenge.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/modify_access_level_request.dart';
-import '../models/signed_invitation.dart';
+import '../models/signed_invitation_base.dart';
 import '../models/signed_invitation_content.dart';
 import '../models/signup_request.dart';
 import '../models/web_socket_ticket_response.dart';
@@ -39,11 +39,11 @@ class MessagePackConverter {
   final _factories = <Type, TypeConverter<dynamic>>{};
 
   MessagePackConverter() {
-    _add(EtebaseItemMetadata.fromJson);
-    _add(EtebaseUserProfile.fromJson);
+    _add(ItemMetadata.fromJson);
+    _add(UserProfile.fromJson);
     _addWithContainer(
-      EtebaseCollectionMember.fromJson,
-      EtebaseListResponse.iteratorFromJson<EtebaseCollectionMember>,
+      CollectionMember.fromJson,
+      ListResponse.iteratorFromJson<CollectionMember>,
     );
     _add(AccountDataStored.fromJson);
     _add(AccountData.fromJson);
@@ -57,22 +57,22 @@ class MessagePackConverter {
     _add(LoginRequest.fromJson);
     _addWithContainer(
       EncryptedCollection.fromJson,
-      EtebaseListResponse.collectionFromJson<EncryptedCollection>,
+      ListResponse.collectionFromJson<EncryptedCollection>,
     );
     _addWithContainer(
       EncryptedCollectionItem.fromJson,
-      EtebaseListResponse.itemFromJson<EncryptedCollectionItem>,
+      ListResponse.itemFromJson<EncryptedCollectionItem>,
     );
     _addWithContainer(
       EncryptedRevision.fromJson,
-      EtebaseListResponse.iteratorFromJson<EncryptedRevision>,
+      ListResponse.iteratorFromJson<EncryptedRevision>,
     );
     _add(CollectionItemFetchInfo.fromJson);
     _add(ItemBatchRequest.fromJson);
     _add(WebSocketTicketResponse.fromJson);
     _addWithContainer(
       SignedInvitationRead.fromJson,
-      EtebaseListResponse.iteratorFromJson<SignedInvitationRead>,
+      ListResponse.iteratorFromJson<SignedInvitationRead>,
     );
     _add(InvitationAcceptRequest.fromJson);
     _add(SignedInvitationWrite.fromJson);

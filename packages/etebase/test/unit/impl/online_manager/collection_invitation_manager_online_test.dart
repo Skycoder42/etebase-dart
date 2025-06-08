@@ -2,13 +2,13 @@
 
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
-import 'package:etebase/src/api/models/etebase_user_profile.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/list_response.dart';
+import 'package:etebase/src/api/models/user_profile.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/models/invitation_accept_request.dart';
-import 'package:etebase/src/impl/models/signed_invitation.dart';
+import 'package:etebase/src/impl/models/signed_invitation_base.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
 import 'package:etebase/src/impl/online_managers/collection_invitation_manager_online.dart';
 import 'package:mockito/mockito.dart';
@@ -19,7 +19,7 @@ import 'online_manager_mocks.dart';
 void main() {
   group('$CollectionInvitationManagerOnline', () {
     const testAuthToken = AuthToken('test');
-    const testOptions = EtebaseIteratorFetchOptions(limit: 1);
+    const testOptions = IteratorFetchOptions(limit: 1);
     const testQuery = {'limit': '1'};
 
     const testUserName = 'test-user-name';
@@ -29,7 +29,7 @@ void main() {
       version: 23,
       username: 'test-username',
       collection: 'test-collection',
-      accessLevel: EtebaseCollectionAccessLevel.readWrite,
+      accessLevel: CollectionAccessLevel.readWrite,
       signedEncryptionKey: Uint8List(0),
       fromPubKey: Uint8List(1),
     );
@@ -74,7 +74,7 @@ void main() {
       'listIncoming gets incoming endpoint',
       mock: mockBaseNetwork,
       request: null,
-      response: EtebaseIteratorListResponse(
+      response: IteratorListResponse(
         data: [testInvitation],
         isDone: true,
         iterator: 'iterator',
@@ -89,7 +89,7 @@ void main() {
       'listOutgoing gets outgoing endpoint',
       mock: mockBaseNetwork,
       request: null,
-      response: EtebaseIteratorListResponse(
+      response: IteratorListResponse(
         data: [testInvitation],
         isDone: false,
         iterator: 'iterator-X',
@@ -129,7 +129,7 @@ void main() {
       'fetchUserProfile gets outgoing profile endpoint',
       mock: mockBaseNetwork,
       request: null,
-      response: EtebaseUserProfile(pubkey: Uint8List(4)),
+      response: UserProfile(pubkey: Uint8List(4)),
       call: (_) => sut.fetchUserProfile(testUserName),
       path: ['outgoing', 'fetch_user_profile'],
       query: {'username': testUserName},
@@ -144,7 +144,7 @@ void main() {
         version: 33,
         username: 'testUsername',
         collection: 'testCollection',
-        accessLevel: EtebaseCollectionAccessLevel.readOnly,
+        accessLevel: CollectionAccessLevel.readOnly,
         signedEncryptionKey: Uint8List(5),
       ),
       response: null,

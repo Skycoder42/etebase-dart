@@ -3,7 +3,7 @@ import 'package:sodium/sodium.dart';
 import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/account.dart';
 import '../../impl/managers/client.dart';
-import '../models/etebase_user.dart';
+import '../models/user.dart';
 import 'etebase_client.dart';
 import 'etebase_collection_invitation_manager.dart';
 import 'etebase_collection_manager.dart';
@@ -27,7 +27,7 @@ abstract interface class EtebaseAccount {
   /// The [user] is authenticated using the given [password].
   static Future<EtebaseAccount> signup(
     EtebaseClient client,
-    EtebaseUser user,
+    User user,
     String password,
   ) async => await Account.signup(client as Client, user, password);
 

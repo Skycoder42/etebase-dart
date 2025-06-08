@@ -1,23 +1,23 @@
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_prefetch_option.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/prefetch_option.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('EtebaseFetchOptionsX', () {
+  group('FetchOptionsX', () {
     testData(
       'asItemOptions converts normal to item options',
       [
-        (const EtebaseFetchOptions(), const EtebaseItemFetchOptions()),
+        (const FetchOptions(), const ItemFetchOptions()),
         (
-          const EtebaseFetchOptions(
+          const FetchOptions(
             limit: 12,
-            prefetch: EtebasePrefetchOption.auto,
+            prefetch: PrefetchOption.auto,
             stoken: 'test-token',
           ),
-          const EtebaseItemFetchOptions(
+          const ItemFetchOptions(
             limit: 12,
-            prefetch: EtebasePrefetchOption.auto,
+            prefetch: PrefetchOption.auto,
             stoken: 'test-token',
           ),
         ),

@@ -1,16 +1,16 @@
+import '../models/collection_access_level.dart';
+import '../models/collection_member.dart';
 import '../models/etebase_collection.dart';
-import '../models/etebase_collection_access_level.dart';
-import '../models/etebase_collection_member.dart';
-import '../models/etebase_fetch_options.dart';
-import '../models/etebase_list_response.dart';
+import '../models/fetch_options.dart';
+import '../models/list_response.dart';
 
 /// A manager for managing the members of a [EtebaseCollection].
 abstract class EtebaseCollectionMemberManager {
   /// List the members of a [EtebaseCollection].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list([
-    EtebaseIteratorFetchOptions? fetchOptions,
+  Future<IteratorListResponse<CollectionMember>> list([
+    IteratorFetchOptions? fetchOptions,
   ]);
 
   /// Remove a member identified by [username] from the [EtebaseCollection].
@@ -22,6 +22,6 @@ abstract class EtebaseCollectionMemberManager {
   /// Modify the [accessLevel] of a member identified by [username].
   Future<void> modifyAccessLevel(
     String username,
-    EtebaseCollectionAccessLevel accessLevel,
+    CollectionAccessLevel accessLevel,
   );
 }

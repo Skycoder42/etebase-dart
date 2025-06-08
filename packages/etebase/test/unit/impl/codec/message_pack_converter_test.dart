@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/invalid_message_pack_data.dart';
-import 'package:etebase/src/api/models/etebase_user_profile.dart';
+import 'package:etebase/src/api/models/user_profile.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
@@ -38,9 +38,7 @@ class CustomType {
 
 void main() {
   group('$MessagePackConverter', () {
-    final userProfile = EtebaseUserProfile(
-      pubkey: Uint8List.fromList([1, 2, 4, 9]),
-    );
+    final userProfile = UserProfile(pubkey: Uint8List.fromList([1, 2, 4, 9]));
     final userProfileMsgPack = Uint8List.fromList([
       // map
       0x81, // 1000XXXX + 1
@@ -141,10 +139,7 @@ void main() {
     group('decoding', () {
       group('encode', () {
         test('converts known type from message pack', () {
-          expect(
-            sut.decode<EtebaseUserProfile>(userProfileMsgPack),
-            userProfile,
-          );
+          expect(sut.decode<UserProfile>(userProfileMsgPack), userProfile);
         });
 
         test('throws UnsupportedError for unknown types', () {
@@ -158,7 +153,7 @@ void main() {
           'throws InvalidMessagePackData if message pack data is invalid',
           () {
             expect(
-              () => sut.decode<EtebaseUserProfile>(Uint8List.fromList([0xc1])),
+              () => sut.decode<UserProfile>(Uint8List.fromList([0xc1])),
               throwsA(
                 isA<InvalidMessagePackData>().having(
                   (m) => m.innerError,
@@ -174,7 +169,7 @@ void main() {
           'throws InvalidMessagePackData if data does not match the model',
           () {
             expect(
-              () => sut.decode<EtebaseUserProfile>(
+              () => sut.decode<UserProfile>(
                 Uint8List.fromList(userProfileMsgPack.sublist(0, 8) + [42]),
               ),
               throwsA(
@@ -222,10 +217,7 @@ void main() {
       });
 
       test('decode64 converts encoded message pack to base64', () {
-        expect(
-          sut.decode64<EtebaseUserProfile>(userProfileBase64),
-          userProfile,
-        );
+        expect(sut.decode64<UserProfile>(userProfileBase64), userProfile);
       });
 
       test('decode64Raw uses message pack directly', () {

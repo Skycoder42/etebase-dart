@@ -5,8 +5,8 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
-import '../../api/models/etebase_collection_access_level.dart';
-import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/collection_access_level.dart';
+import '../../api/models/item_metadata.dart';
 import '../codec/byte_array_converter.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
@@ -15,7 +15,7 @@ import '../crypto/crypto_arena.dart';
 import '../crypto/crypto_utils.dart';
 import '../crypto/minimal_collection_crypto_manager.dart';
 import '../managers/client.dart';
-import '../models/signed_invitation.dart';
+import '../models/signed_invitation_base.dart';
 import '../models/signed_invitation_content.dart';
 import 'cached/cached_collection.dart';
 import 'encrypted_collection_item.dart';
@@ -34,7 +34,7 @@ class EncryptedCollection {
   late Uint8List _collectionType;
   late EncryptedCollectionItem item;
   @JsonKey(includeFromJson: true, includeToJson: false)
-  EtebaseCollectionAccessLevel accessLevel = EtebaseCollectionAccessLevel.admin;
+  CollectionAccessLevel accessLevel = CollectionAccessLevel.admin;
   @JsonKey(includeFromJson: true, includeToJson: false)
   String? stoken;
 
@@ -56,7 +56,7 @@ class EncryptedCollection {
     Client client,
     AccountCryptoManager parentCm,
     String collectionTypeName,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
     Uint8List content,
   ) async {
     final arena = CryptoArena();
@@ -117,10 +117,10 @@ class EncryptedCollection {
   Future<void> setMeta(
     Client client,
     MinimalCollectionCryptoManager cm,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
   ) => item.withCm(client, cm, (cm) => item.setMeta(client, cm, meta));
 
-  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
+  Future<TMeta> getMeta<TMeta extends ItemMetadata>(
     Client client,
     MinimalCollectionCryptoManager cm,
   ) => item.withCm(client, cm, (cm) => item.getMeta<TMeta>(client, cm));
@@ -177,7 +177,7 @@ class EncryptedCollection {
     BoxCryptoManager identityCm,
     String username,
     Uint8List pubkey,
-    EtebaseCollectionAccessLevel accessLevel,
+    CollectionAccessLevel accessLevel,
   ) async {
     final encryptionKey = _getCollectionKey(client, parentCm);
     try {

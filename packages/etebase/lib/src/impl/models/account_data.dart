@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../codec/byte_array_converter.dart';
-import 'user.dart';
+import 'login_response_user.dart';
 
 part 'account_data.freezed.dart';
 part 'account_data.g.dart';
@@ -15,7 +15,7 @@ part 'account_data.g.dart';
 sealed class AccountData with _$AccountData {
   @msgPackBytes
   const factory AccountData({
-    required User user,
+    required LoginResponseUser user,
     required String authToken,
     required Uri serverUrl,
     required int version,

@@ -8,9 +8,7 @@ part 'custom_metadata.freezed.dart';
 part 'custom_metadata.g.dart';
 
 @Freezed(fromJson: true, toJson: true, copyWith: true)
-sealed class CustomMetadata
-    with _$CustomMetadata
-    implements EtebaseItemMetadata {
+sealed class CustomMetadata with _$CustomMetadata implements ItemMetadata {
   @JsonSerializable(includeIfNull: false)
   const factory CustomMetadata({
     String? color,

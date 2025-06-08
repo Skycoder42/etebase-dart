@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:etebase/etebase.dart';
 import 'package:flutter/material.dart';
 
-/// Extension on [EtebaseItemMetadata] to get and set [Color] values directly.
-extension MetadataExtensions<T extends EtebaseItemMetadata> on T {
+/// Extension on [ItemMetadata] to get and set [Color] values directly.
+extension MetadataExtensions<T extends ItemMetadata> on T {
   static final _colorRegExp = RegExp(
     r'^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})?$',
     caseSensitive: false,
@@ -36,7 +36,7 @@ extension MetadataExtensions<T extends EtebaseItemMetadata> on T {
     );
   }
 
-  /// Copies the metadata and updates its [EtebaseItemMetadata.color] to the
+  /// Copies the metadata and updates its [ItemMetadata.color] to the
   /// stringified value of [color].
   ///
   /// The [withAlpha] parameter can be used to control whether the color is

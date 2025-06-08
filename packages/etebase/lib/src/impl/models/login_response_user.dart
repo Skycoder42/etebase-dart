@@ -6,19 +6,20 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../codec/byte_array_converter.dart';
 
-part 'user.freezed.dart';
-part 'user.g.dart';
+part 'login_response_user.freezed.dart';
+part 'login_response_user.g.dart';
 
 @internal
 @Freezed(copyWith: true)
-sealed class User with _$User {
+sealed class LoginResponseUser with _$LoginResponseUser {
   @msgPackBytes
-  const factory User({
+  const factory LoginResponseUser({
     required String username,
     required String email,
     required Uint8List pubkey,
     required Uint8List encryptedContent,
-  }) = _User;
+  }) = _LoginResponseUser;
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory LoginResponseUser.fromJson(Map<String, dynamic> json) =>
+      _$LoginResponseUserFromJson(json);
 }

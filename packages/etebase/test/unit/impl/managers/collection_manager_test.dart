@@ -2,10 +2,10 @@
 
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
-import 'package:etebase/src/api/models/etebase_removed_collection.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
+import 'package:etebase/src/api/models/list_response.dart';
+import 'package:etebase/src/api/models/removed_collection.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/collection_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
@@ -40,10 +40,10 @@ class FakeAuthTokenSource extends Fake implements AuthTokenSource {}
 void main() {
   group('$CollectionManager', () {
     const testColType = 'test-collection-type';
-    const testMeta = EtebaseItemMetadata(name: 'test');
+    const testMeta = ItemMetadata(name: 'test');
     final testContent = Uint8List.fromList([213, 3, 22]);
     const testUid = 'test-collection-id';
-    const testOptions = EtebaseFetchOptions(limit: 12);
+    const testOptions = FetchOptions(limit: 12);
 
     final mockClient = MockClient();
     final mockAccountCM = MockAccountCryptoManager();
@@ -117,11 +117,11 @@ void main() {
       final testUid = Uint8List.fromList([33, 0]);
 
       final mockOtherEncryptedCollection = MockEncryptedCollection();
-      final testResponse = EtebaseCollectionListResponse(
+      final testResponse = CollectionListResponse(
         data: [mockEncryptedCollection, mockOtherEncryptedCollection],
         isDone: true,
         stoken: 'test-stoken',
-        removedMemberships: [const EtebaseRemovedCollection('test-rm')],
+        removedMemberships: [const RemovedCollection('test-rm')],
       );
 
       when(mockAccountCM.colTypeToUid(any)).thenReturnInOrder([testUid]);
@@ -156,11 +156,11 @@ void main() {
       final testUid2 = Uint8List.fromList([33, 2]);
 
       final mockOtherEncryptedCollection = MockEncryptedCollection();
-      final testResponse = EtebaseCollectionListResponse(
+      final testResponse = CollectionListResponse(
         data: [mockEncryptedCollection, mockOtherEncryptedCollection],
         isDone: true,
         stoken: 'test-stoken',
-        removedMemberships: [const EtebaseRemovedCollection('test-rm')],
+        removedMemberships: [const RemovedCollection('test-rm')],
       );
 
       when(

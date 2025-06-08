@@ -9,7 +9,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/managers/crypto_executor.dart';
 import '../../api/managers/etebase_client.dart';
-import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/item_metadata.dart';
 import '../cache/hive_cache.dart';
 import '../codec/message_pack_converter.dart';
 import '../crypto/account_crypto_manager.dart';
@@ -92,7 +92,7 @@ class Client implements EtebaseClient, NetworkClient {
       crypto.prettyFingerprint(content);
 
   @override
-  void registerCustomMetadata<TMeta extends EtebaseItemMetadata>(
+  void registerCustomMetadata<TMeta extends ItemMetadata>(
     MetaFromJson<TMeta> fromJson,
   ) => converter.addCustom<TMeta>(fromJson);
 
@@ -106,7 +106,7 @@ class Client implements EtebaseClient, NetworkClient {
   Future<EncryptedRevision> createEncryptedRevision({
     required CollectionItemCryptoManager cryptoManager,
     required Uint8List additionalData,
-    required EtebaseItemMetadata meta,
+    required ItemMetadata meta,
     required Uint8List content,
   }) => EncryptedRevision.create(
     client: this,
@@ -119,7 +119,7 @@ class Client implements EtebaseClient, NetworkClient {
   Future<(EncryptedCollectionItem, CollectionItemCryptoManager)>
   createEncryptedCollectionItem(
     MinimalCollectionCryptoManager parentCm,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
     Uint8List content,
   ) => EncryptedCollectionItem.create(this, parentCm, meta, content);
 
@@ -127,7 +127,7 @@ class Client implements EtebaseClient, NetworkClient {
   createEncryptedCollection(
     AccountCryptoManager parentCm,
     String collectionTypeName,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
     Uint8List content,
   ) => EncryptedCollection.create(
     this,

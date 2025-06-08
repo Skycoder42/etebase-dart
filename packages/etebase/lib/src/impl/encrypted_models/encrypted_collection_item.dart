@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 import '../../api/exceptions/api_missuse.dart';
-import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/item_metadata.dart';
 import '../codec/byte_array_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../crypto/crypto_utils.dart';
@@ -63,7 +63,7 @@ class EncryptedCollectionItem {
   static Future<(EncryptedCollectionItem, CollectionItemCryptoManager)> create(
     Client client,
     MinimalCollectionCryptoManager parentCm,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
     Uint8List content,
   ) async {
     final item = EncryptedCollectionItem()
@@ -144,12 +144,12 @@ class EncryptedCollectionItem {
   Future<void> setMeta(
     Client client,
     CollectionItemCryptoManager cm,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
   ) => _cloneOrUpdateRevision(
     (rev) => rev.setMeta(client, cm, _getAdditionalMacData(), meta),
   );
 
-  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
+  Future<TMeta> getMeta<TMeta extends ItemMetadata>(
     Client client,
     CollectionItemCryptoManager cm,
   ) async {

@@ -4,12 +4,12 @@ import 'dart:typed_data';
 
 import '../managers/etebase_item_manager.dart';
 import 'etebase_collection.dart';
-import 'etebase_item_metadata.dart';
+import 'item_metadata.dart';
 
 /// Items belong to [EtebaseCollection]s and are where data is stored.
 ///
 /// Items have two pieces of data associated with them:
-/// * [EtebaseItemMetadata] - contains meta information like name and
+/// * [ItemMetadata] - contains meta information like name and
 /// modification time.
 /// * Content ([Uint8List]) - a buffer containing arbitrary binary data.
 abstract class EtebaseItem {
@@ -36,10 +36,10 @@ abstract class EtebaseItem {
   Future<void> verify();
 
   /// Set [meta]data for the item object
-  Future<void> setMeta<TMeta extends EtebaseItemMetadata>(TMeta meta);
+  Future<void> setMeta<TMeta extends ItemMetadata>(TMeta meta);
 
-  /// Return the [EtebaseItemMetadata] of the item
-  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>();
+  /// Return the [ItemMetadata] of the item
+  Future<TMeta> getMeta<TMeta extends ItemMetadata>();
 
   /// Set the [content] of the item.
   ///

@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 import '../../api/exceptions/crypto_failure.dart';
 import '../../api/exceptions/integrity_compromised.dart';
 import '../../api/exceptions/missing_content.dart';
-import '../../api/models/etebase_item_metadata.dart';
+import '../../api/models/item_metadata.dart';
 import '../codec/byte_array_converter.dart';
 import '../crypto/collection_item_crypto_manager.dart';
 import '../managers/client.dart';
@@ -34,7 +34,7 @@ class EncryptedRevision {
     required Client client,
     required CollectionItemCryptoManager cryptoManager,
     required Uint8List additionalData,
-    required EtebaseItemMetadata meta,
+    required ItemMetadata meta,
     required Uint8List content,
   }) async {
     final revision = EncryptedRevision();
@@ -106,7 +106,7 @@ class EncryptedRevision {
     Client client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
   ) async {
     final adHash = await _calculateAdHash(
       client,
@@ -121,7 +121,7 @@ class EncryptedRevision {
     uid = client.converter.base64Encode(encMeta.mac);
   }
 
-  Future<TMeta> getMeta<TMeta extends EtebaseItemMetadata>(
+  Future<TMeta> getMeta<TMeta extends ItemMetadata>(
     Client client,
     CollectionItemCryptoManager cryptoManager,
     Uint8List additionalData,
@@ -144,7 +144,7 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
     required Stream<List<int>> content,
-    @visibleForTesting EtebaseItemMetadata? metaData,
+    @visibleForTesting ItemMetadata? metaData,
   }) async {
     final meta =
         metaData ?? await getMeta(client, cryptoManager, additionalData);
@@ -213,7 +213,7 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager, {
     required Uint8List additionalData,
     required Uint8List content,
-    @visibleForTesting EtebaseItemMetadata? metaData,
+    @visibleForTesting ItemMetadata? metaData,
   }) async => await setContentStream(
     client,
     cryptoManager,

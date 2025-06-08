@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
 import 'package:etebase/src/impl/encrypted_models/cached/cached_collection.dart';
 import 'package:test/test.dart';
 
@@ -14,7 +14,7 @@ void main() {
         (
           CachedCollection(
             collectionKey: Uint8List.fromList([99, 4, 1]),
-            accessLevel: EtebaseCollectionAccessLevel.admin,
+            accessLevel: CollectionAccessLevel.admin,
             stoken: 'test-stoken',
             item: Uint8List.fromList([9, 3, 1, 22]),
             collectionType: Uint8List.fromList([76, 3, 11]),
@@ -22,7 +22,7 @@ void main() {
           [
             CachedCollection.cacheFormatVersion,
             Uint8List.fromList([99, 4, 1]),
-            EtebaseCollectionAccessLevel.admin.value,
+            CollectionAccessLevel.admin.value,
             'test-stoken',
             Uint8List.fromList([9, 3, 1, 22]),
             Uint8List.fromList([76, 3, 11]),
@@ -31,7 +31,7 @@ void main() {
         (
           CachedCollection(
             collectionKey: Uint8List.fromList([1]),
-            accessLevel: EtebaseCollectionAccessLevel.readOnly,
+            accessLevel: CollectionAccessLevel.readOnly,
             stoken: null,
             item: Uint8List.fromList([2]),
             collectionType: Uint8List.fromList([3]),
@@ -39,7 +39,7 @@ void main() {
           [
             CachedCollection.cacheFormatVersion,
             Uint8List.fromList([1]),
-            EtebaseCollectionAccessLevel.readOnly.value,
+            CollectionAccessLevel.readOnly.value,
             null,
             Uint8List.fromList([2]),
             Uint8List.fromList([3]),
@@ -58,7 +58,7 @@ void main() {
         () => CachedCollection.fromJson([
           testVersion,
           Uint8List.fromList([1]),
-          EtebaseCollectionAccessLevel.readOnly.value,
+          CollectionAccessLevel.readOnly.value,
           null,
           Uint8List.fromList([2]),
           Uint8List.fromList([3]),

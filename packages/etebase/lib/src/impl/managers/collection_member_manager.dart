@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_member_manager.dart';
-import '../../api/models/etebase_collection_access_level.dart';
-import '../../api/models/etebase_collection_member.dart';
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_list_response.dart';
+import '../../api/models/collection_access_level.dart';
+import '../../api/models/collection_member.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/list_response.dart';
 import '../online_managers/collection_member_manager_online.dart';
 
 @internal
@@ -15,8 +15,8 @@ class CollectionMemberManager implements EtebaseCollectionMemberManager {
   CollectionMemberManager(this.online);
 
   @override
-  Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list([
-    EtebaseIteratorFetchOptions? fetchOptions,
+  Future<IteratorListResponse<CollectionMember>> list([
+    IteratorFetchOptions? fetchOptions,
   ]) => online.list(fetchOptions);
 
   @override
@@ -28,6 +28,6 @@ class CollectionMemberManager implements EtebaseCollectionMemberManager {
   @override
   Future<void> modifyAccessLevel(
     String username,
-    EtebaseCollectionAccessLevel accessLevel,
+    CollectionAccessLevel accessLevel,
   ) => online.modifyAccessLevel(username, accessLevel);
 }

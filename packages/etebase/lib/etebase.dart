@@ -16,7 +16,6 @@ export 'src/api/exceptions/server_problem.dart';
 export 'src/api/exceptions/temporary_server_problem.dart';
 export 'src/api/exceptions/unauthorized.dart';
 export 'src/api/exceptions/websocket_closed.dart';
-
 export 'src/api/managers/crypto_executor.dart';
 export 'src/api/managers/etebase_account.dart';
 export 'src/api/managers/etebase_cache.dart';
@@ -25,18 +24,16 @@ export 'src/api/managers/etebase_collection_invitation_manager.dart';
 export 'src/api/managers/etebase_collection_manager.dart';
 export 'src/api/managers/etebase_collection_member_manager.dart';
 export 'src/api/managers/etebase_item_manager.dart';
-
+export 'src/api/models/collection_access_level.dart';
+export 'src/api/models/collection_member.dart';
 export 'src/api/models/etebase_collection.dart';
-export 'src/api/models/etebase_collection_access_level.dart';
-export 'src/api/models/etebase_collection_member.dart';
-export 'src/api/models/etebase_fetch_options.dart'
-    hide EtebaseFetchOptionsBase, EtebaseFetchOptionsX;
 export 'src/api/models/etebase_item.dart';
-export 'src/api/models/etebase_item_metadata.dart'
-    hide $EtebaseItemMetadataImplCopyWith, EtebaseItemMetadataImpl;
-export 'src/api/models/etebase_list_response.dart';
-export 'src/api/models/etebase_prefetch_option.dart';
-export 'src/api/models/etebase_removed_collection.dart';
-export 'src/api/models/etebase_signed_invitation.dart';
-export 'src/api/models/etebase_user.dart';
-export 'src/api/models/etebase_user_profile.dart';
+export 'src/api/models/fetch_options.dart' hide FetchOptionsBase, FetchOptionsX;
+export 'src/api/models/item_metadata.dart'
+    hide $ItemMetadataImplCopyWith, ItemMetadataImpl;
+export 'src/api/models/list_response.dart';
+export 'src/api/models/prefetch_option.dart';
+export 'src/api/models/removed_collection.dart';
+export 'src/api/models/signed_invitation.dart';
+export 'src/api/models/user.dart';
+export 'src/api/models/user_profile.dart';

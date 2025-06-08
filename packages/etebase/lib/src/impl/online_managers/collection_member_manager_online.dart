@@ -1,9 +1,9 @@
 import 'package:meta/meta.dart';
 
-import '../../api/models/etebase_collection_access_level.dart';
-import '../../api/models/etebase_collection_member.dart';
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_list_response.dart';
+import '../../api/models/collection_access_level.dart';
+import '../../api/models/collection_member.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/list_response.dart';
 import '../models/modify_access_level_request.dart';
 import 'base_manager.dart';
 import 'base_network.dart';
@@ -23,11 +23,9 @@ class CollectionMemberManagerOnline extends BaseManager {
     // ignore: invalid_use_of_visible_for_testing_member for tests
   ) : super.fromNetwork();
 
-  Future<EtebaseIteratorListResponse<EtebaseCollectionMember>> list(
-    EtebaseIteratorFetchOptions? options,
-  ) => invoke<EtebaseIteratorListResponse<EtebaseCollectionMember>>(
-    options: options,
-  );
+  Future<IteratorListResponse<CollectionMember>> list(
+    IteratorFetchOptions? options,
+  ) => invoke<IteratorListResponse<CollectionMember>>(options: options);
 
   Future<void> remove(String username) =>
       invoke<void>(method: HttpMethod.delete, path: [username]);
@@ -37,7 +35,7 @@ class CollectionMemberManagerOnline extends BaseManager {
 
   Future<void> modifyAccessLevel(
     String username,
-    EtebaseCollectionAccessLevel level,
+    CollectionAccessLevel level,
   ) => invoke<void>(
     method: HttpMethod.patch,
     path: [username],

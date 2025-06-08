@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_list_response.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/list_response.dart';
 import '../encrypted_models/encrypted_collection.dart';
 import '../models/collection_list_request.dart';
 import 'base_manager.dart';
@@ -31,24 +31,19 @@ class CollectionManagerOnline extends BaseManager {
         colUid: colUid,
       );
 
-  Future<EncryptedCollection> fetch(
-    String colUid,
-    EtebaseFetchOptions? options,
-  ) => invoke<EncryptedCollection>(path: [colUid], options: options);
+  Future<EncryptedCollection> fetch(String colUid, FetchOptions? options) =>
+      invoke<EncryptedCollection>(path: [colUid], options: options);
 
-  Future<EtebaseCollectionListResponse<EncryptedCollection>> list(
+  Future<CollectionListResponse<EncryptedCollection>> list(
     List<Uint8List> collectionTypes,
-    EtebaseFetchOptions? options,
-  ) => invoke<EtebaseCollectionListResponse<EncryptedCollection>>(
+    FetchOptions? options,
+  ) => invoke<CollectionListResponse<EncryptedCollection>>(
     method: HttpMethod.post,
     path: const ['list_multi'],
     body: CollectionListRequest(collectionTypes),
     options: options,
   );
 
-  Future<void> create(
-    EncryptedCollection collection,
-    EtebaseFetchOptions? options,
-  ) =>
+  Future<void> create(EncryptedCollection collection, FetchOptions? options) =>
       invoke<void>(method: HttpMethod.post, body: collection, options: options);
 }

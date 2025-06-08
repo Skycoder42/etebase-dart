@@ -4,15 +4,15 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/not_found.dart';
-import 'package:etebase/src/api/models/etebase_user.dart';
+import 'package:etebase/src/api/models/user.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/models/challenge_request.dart';
 import 'package:etebase/src/impl/models/dashboard_url.dart';
 import 'package:etebase/src/impl/models/login_challenge.dart';
 import 'package:etebase/src/impl/models/login_request.dart';
 import 'package:etebase/src/impl/models/login_response.dart';
+import 'package:etebase/src/impl/models/login_response_user.dart';
 import 'package:etebase/src/impl/models/signup_request.dart';
-import 'package:etebase/src/impl/models/user.dart';
 import 'package:etebase/src/impl/online_managers/authenticator.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
 import 'package:http/http.dart';
@@ -73,7 +73,7 @@ void main() {
       'signup sends request to backend',
       mock: mockNetwork,
       request: SignupRequest(
-        user: const EtebaseUser(username: 'test-username', email: 'test-email'),
+        user: const User(username: 'test-username', email: 'test-email'),
         salt: Uint8List(1),
         loginPubkey: Uint8List(2),
         pubkey: Uint8List(3),
@@ -81,7 +81,7 @@ void main() {
       ),
       response: LoginResponse(
         token: 'test-token',
-        user: User(
+        user: LoginResponseUser(
           username: 'test-username',
           email: 'test-email',
           pubkey: Uint8List(1),
@@ -113,7 +113,7 @@ void main() {
       request: LoginRequest(response: Uint8List(1), signature: Uint8List(2)),
       response: LoginResponse(
         token: 'test-token',
-        user: User(
+        user: LoginResponseUser(
           username: 'test-username',
           email: 'test-email',
           pubkey: Uint8List(1),

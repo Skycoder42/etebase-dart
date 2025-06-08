@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection_item.dart';
 import 'package:etebase/src/impl/managers/client.dart';
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('setMeta calls setMeta on encrypted', () async {
-      const testMeta = EtebaseItemMetadata(name: 'test');
+      const testMeta = ItemMetadata(name: 'test');
 
       await sut.setMeta(testMeta);
 
@@ -93,18 +93,16 @@ void main() {
     });
 
     test('getMeta calls getMeta on encrypted', () async {
-      const testMeta = EtebaseItemMetadata(name: 'test');
+      const testMeta = ItemMetadata(name: 'test');
 
       when(
-        mockEncrypted.getMeta<EtebaseItemMetadata>(mockClient, mockItemCM),
+        mockEncrypted.getMeta<ItemMetadata>(mockClient, mockItemCM),
       ).thenReturnAsync(testMeta);
 
-      final result = await sut.getMeta<EtebaseItemMetadata>();
+      final result = await sut.getMeta<ItemMetadata>();
       expect(result, testMeta);
 
-      verify(
-        mockEncrypted.getMeta<EtebaseItemMetadata>(mockClient, mockItemCM),
-      );
+      verify(mockEncrypted.getMeta<ItemMetadata>(mockClient, mockItemCM));
     });
 
     test('setContent calls setContent on encrypted', () async {

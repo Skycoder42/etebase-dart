@@ -2,11 +2,11 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'etebase_fetch_options.dart';
-import 'etebase_removed_collection.dart';
+import 'fetch_options.dart';
+import 'removed_collection.dart';
 
-part 'etebase_list_response.freezed.dart';
-part 'etebase_list_response.g.dart';
+part 'list_response.freezed.dart';
+part 'list_response.g.dart';
 
 const _doneKey = JsonKey(name: 'done');
 
@@ -18,17 +18,16 @@ const _doneKey = JsonKey(name: 'done');
 ///
 /// Depending on the subtype of the response you have to either use the stoken
 /// or the iterator.
-/// - For [EtebaseItemListResponse]s and [EtebaseCollectionListResponse]s, you
-/// must use the stoken and pass it via a [EtebaseFetchOptions.stoken].
-/// - For [EtebaseIteratorListResponse]s, you should instead use the
-/// [EtebaseIteratorFetchOptions.iterator].
+/// - For [ItemListResponse]s and [CollectionListResponse]s, you
+/// must use the stoken and pass it via a [FetchOptions.stoken].
+/// - For [IteratorListResponse]s, you should instead use the
+/// [IteratorFetchOptions.iterator].
 @Freezed(fromJson: false, toJson: false)
-sealed class EtebaseListResponse<T extends Object>
-    with _$EtebaseListResponse<T> {
+sealed class ListResponse<T extends Object> with _$ListResponse<T> {
   /// The response of fetching an item list.
   @JsonSerializable(genericArgumentFactories: true)
   @With.fromString('_ItemMixin<T>')
-  const factory EtebaseListResponse.item({
+  const factory ListResponse.item({
     /// List of collections included in the response.
     required List<T> data,
 
@@ -37,12 +36,12 @@ sealed class EtebaseListResponse<T extends Object>
 
     /// Sync token for the list response.
     String? stoken,
-  }) = EtebaseItemListResponse<T>;
+  }) = ItemListResponse<T>;
 
   /// The response of fetching a collection list.
   @JsonSerializable(genericArgumentFactories: true)
   @With.fromString('_CollectionMixin<T>')
-  const factory EtebaseListResponse.collection({
+  const factory ListResponse.collection({
     /// List of collections included in the response.
     required List<T> data,
 
@@ -53,13 +52,13 @@ sealed class EtebaseListResponse<T extends Object>
     String? stoken,
 
     /// The list of collections to which the user lost access.
-    List<EtebaseRemovedCollection>? removedMemberships,
-  }) = EtebaseCollectionListResponse<T>;
+    List<RemovedCollection>? removedMemberships,
+  }) = CollectionListResponse<T>;
 
   /// The response of fetching a generic iterable data list.
   @JsonSerializable(genericArgumentFactories: true)
   @With.fromString('_IteratorMixin<T>')
-  const factory EtebaseListResponse.iterator({
+  const factory ListResponse.iterator({
     /// List of collections included in the response.
     required List<T> data,
 
@@ -68,18 +67,17 @@ sealed class EtebaseListResponse<T extends Object>
 
     /// Iterator for the list response.
     required String? iterator,
-  }) = EtebaseIteratorListResponse<T>;
+  }) = IteratorListResponse<T>;
 
-  const EtebaseListResponse._();
+  const ListResponse._();
 
   // coverage:ignore-start
   /// Creates a new response by mapping the [data].
   ///
   /// The [map] callback is used to transform each value in [data]. All other
   /// properties are copied over to the new response.
-  EtebaseListResponse<TOther> map<TOther extends Object>(
-    TOther Function(T) map,
-  ) => throw UnimplementedError();
+  ListResponse<TOther> map<TOther extends Object>(TOther Function(T) map) =>
+      throw UnimplementedError();
 
   /// @nodoc
   @internal
@@ -87,83 +85,81 @@ sealed class EtebaseListResponse<T extends Object>
 
   /// @nodoc
   @internal
-  static EtebaseItemListResponse<T> itemFromJson<T extends Object>(
+  static ItemListResponse<T> itemFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) => _$EtebaseItemListResponseFromJson(json, fromJsonT);
+  ) => _$ItemListResponseFromJson(json, fromJsonT);
 
   /// @nodoc
   @internal
-  static EtebaseCollectionListResponse<T> collectionFromJson<T extends Object>(
+  static CollectionListResponse<T> collectionFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) => _$EtebaseCollectionListResponseFromJson(json, fromJsonT);
+  ) => _$CollectionListResponseFromJson(json, fromJsonT);
 
   /// @nodoc
   @internal
-  static EtebaseIteratorListResponse<T> iteratorFromJson<T extends Object>(
+  static ListResponse<T> iteratorFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) => _$EtebaseIteratorListResponseFromJson(json, fromJsonT);
+  ) => _$IteratorListResponseFromJson(json, fromJsonT);
   // coverage:ignore-end
 }
 
-mixin _ItemMixin<T extends Object> on EtebaseListResponse<T> {
+mixin _ItemMixin<T extends Object> on ListResponse<T> {
   @override
-  EtebaseItemListResponse<TOther> map<TOther extends Object>(
-    TOther Function(T) map,
-  ) => EtebaseItemListResponse(
-    data: [for (final item in data) map(item)],
-    isDone: isDone,
-    stoken: (this as EtebaseItemListResponse).stoken,
-  );
+  ItemListResponse<TOther> map<TOther extends Object>(TOther Function(T) map) =>
+      ItemListResponse(
+        data: [for (final item in data) map(item)],
+        isDone: isDone,
+        stoken: (this as ItemListResponse).stoken,
+      );
 
   // coverage:ignore-start
   @override
-  Map<String, dynamic> toJson() => _$EtebaseItemListResponseToJson<T>(
-    this as EtebaseItemListResponse<T>,
+  Map<String, dynamic> toJson() => _$ItemListResponseToJson<T>(
+    this as ItemListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );
   // coverage:ignore-end
 }
 
-mixin _CollectionMixin<T extends Object> on EtebaseListResponse<T> {
+mixin _CollectionMixin<T extends Object> on ListResponse<T> {
   @override
-  EtebaseCollectionListResponse<TOther> map<TOther extends Object>(
+  CollectionListResponse<TOther> map<TOther extends Object>(
     TOther Function(T) map,
-  ) => EtebaseCollectionListResponse(
+  ) => CollectionListResponse(
     data: [for (final item in data) map(item)],
     isDone: isDone,
-    stoken: (this as EtebaseCollectionListResponse).stoken,
-    removedMemberships:
-        (this as EtebaseCollectionListResponse).removedMemberships,
+    stoken: (this as CollectionListResponse).stoken,
+    removedMemberships: (this as CollectionListResponse).removedMemberships,
   );
 
   // coverage:ignore-start
   @override
-  Map<String, dynamic> toJson() => _$EtebaseCollectionListResponseToJson<T>(
-    this as EtebaseCollectionListResponse<T>,
+  Map<String, dynamic> toJson() => _$CollectionListResponseToJson<T>(
+    this as CollectionListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );
   // coverage:ignore-end
 }
 
-mixin _IteratorMixin<T extends Object> on EtebaseListResponse<T> {
+mixin _IteratorMixin<T extends Object> on ListResponse<T> {
   @override
-  EtebaseIteratorListResponse<TOther> map<TOther extends Object>(
+  IteratorListResponse<TOther> map<TOther extends Object>(
     TOther Function(T) map,
-  ) => EtebaseIteratorListResponse(
+  ) => IteratorListResponse(
     data: [for (final item in data) map(item)],
     isDone: isDone,
-    iterator: (this as EtebaseIteratorListResponse).iterator,
+    iterator: (this as IteratorListResponse).iterator,
   );
 
   // coverage:ignore-start
   @override
-  Map<String, dynamic> toJson() => _$EtebaseIteratorListResponseToJson<T>(
-    this as EtebaseIteratorListResponse<T>,
+  Map<String, dynamic> toJson() => _$IteratorListResponseToJson<T>(
+    this as IteratorListResponse<T>,
     // ignore: avoid_dynamic_calls
     (dynamic value) => value.toJson(),
   );

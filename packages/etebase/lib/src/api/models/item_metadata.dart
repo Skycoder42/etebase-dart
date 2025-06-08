@@ -8,12 +8,11 @@ import '../../impl/codec/date_time_millis_converter.dart';
 // reexport converter here, as it is needed for custom implementations
 export '../../impl/codec/date_time_millis_converter.dart';
 
-part 'etebase_item_metadata.freezed.dart';
-part 'etebase_item_metadata.g.dart';
+part 'item_metadata.freezed.dart';
+part 'item_metadata.g.dart';
 
-/// The type definition of the [EtebaseItemMetadataCopyWithX.copyWith] method
-typedef EtebaseItemMetadataCopyWith =
-    $EtebaseItemMetadataImplCopyWith<EtebaseItemMetadata>;
+/// The type definition of the [ItemMetadataCopyWithX.copyWith] method
+typedef ItemMetadataCopyWith = $ItemMetadataImplCopyWith<ItemMetadata>;
 
 /// Metadata of the item.
 ///
@@ -26,10 +25,10 @@ typedef EtebaseItemMetadataCopyWith =
 /// @freezed
 /// sealed class CustomMetadata
 ///     with _$CustomMetadata
-///     implements EtebaseItemMetadata {
+///     implements ItemMetadata {
 ///   @JsonSerializable(includeIfNull: false) // recommended, but not required
 ///   const factory CustomMetadata({
-///     // default attributes from EtebaseItemMetadata
+///     // default attributes from ItemMetadata
 ///     String? color,
 ///     @dateTimeMillis DateTime? mtime,
 ///     String? name,
@@ -42,7 +41,7 @@ typedef EtebaseItemMetadataCopyWith =
 ///       _$CustomMetadataFromJson(json);
 /// }
 /// ```
-abstract interface class EtebaseItemMetadata {
+abstract interface class ItemMetadata {
   /// The item type.
   String? get itemType;
 
@@ -63,33 +62,32 @@ abstract interface class EtebaseItemMetadata {
   /// The item color in `#RRGGBB` or `#RRGGBBAA` format.
   String? get color;
 
-  /// Serializes this EtebaseItemMetadata to a JSON map.
+  /// Serializes this ItemMetadata to a JSON map.
   Map<String, dynamic> toJson();
 
   /// Default constructor.
-  const factory EtebaseItemMetadata({
+  const factory ItemMetadata({
     String? color,
     String? description,
     DateTime? mtime,
     String? name,
     String? itemType,
-  }) = _EtebaseItemMetadataImpl;
+  }) = _ItemMetadataImpl;
 
-  /// Deserializes the [EtebaseItemMetadata] from a [json] object.
-  factory EtebaseItemMetadata.fromJson(Map<String, dynamic> json) =>
-      _$EtebaseItemMetadataImplFromJson(json);
+  /// Deserializes the [ItemMetadata] from a [json] object.
+  factory ItemMetadata.fromJson(Map<String, dynamic> json) =>
+      _$ItemMetadataImplFromJson(json);
 }
 
-/// Helper extension to be able to call [copyWith] on [EtebaseItemMetadata]
+/// Helper extension to be able to call [copyWith] on [ItemMetadata]
 /// without making the method part of the interface
-extension EtebaseItemMetadataCopyWithX on EtebaseItemMetadata {
-  /// Create a copy of [EtebaseItemMetadata] with the given fields replaced by
+extension ItemMetadataCopyWithX on ItemMetadata {
+  /// Create a copy of [ItemMetadata] with the given fields replaced by
   /// the non-null parameter values.
-  EtebaseItemMetadataCopyWith get copyWith => switch (this) {
-    final EtebaseItemMetadataImpl impl =>
-      impl.copyWith as EtebaseItemMetadataCopyWith,
+  ItemMetadataCopyWith get copyWith => switch (this) {
+    final ItemMetadataImpl impl => impl.copyWith as ItemMetadataCopyWith,
     _ => throw UnsupportedError(
-      'The copyWith extension can only be invoked on EtebaseItemMetadata. '
+      'The copyWith extension can only be invoked on ItemMetadata. '
       'When implementing custom metadata, you must provide your own '
       'implementation.',
     ),
@@ -98,14 +96,14 @@ extension EtebaseItemMetadataCopyWithX on EtebaseItemMetadata {
 
 @internal
 @Freezed(fromJson: true, toJson: true, copyWith: true)
-sealed class EtebaseItemMetadataImpl with _$EtebaseItemMetadataImpl {
+sealed class ItemMetadataImpl with _$ItemMetadataImpl {
   @JsonSerializable(includeIfNull: false)
-  @Implements<EtebaseItemMetadata>()
-  const factory EtebaseItemMetadataImpl({
+  @Implements<ItemMetadata>()
+  const factory ItemMetadataImpl({
     String? color,
     String? description,
     @dateTimeMillis DateTime? mtime,
     String? name,
     String? itemType,
-  }) = _EtebaseItemMetadataImpl;
+  }) = _ItemMetadataImpl;
 }

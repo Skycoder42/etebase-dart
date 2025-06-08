@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../api/models/etebase_user.dart';
+import '../../api/models/user.dart';
 import '../codec/byte_array_converter.dart';
 
 part 'signup_request.freezed.dart';
@@ -15,7 +15,7 @@ part 'signup_request.g.dart';
 sealed class SignupRequest with _$SignupRequest {
   @msgPackBytes
   const factory SignupRequest({
-    required EtebaseUser user,
+    required User user,
     required Uint8List salt,
     required Uint8List loginPubkey,
     required Uint8List pubkey,

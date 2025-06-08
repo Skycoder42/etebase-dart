@@ -41,21 +41,21 @@ sealed class Action with _$Action {
   @_binary
   const factory Action.validateCollection(
     String uid, {
-    EtebaseItemMetadata? meta,
+    ItemMetadata? meta,
     Uint8List? content,
     bool? isDeleted,
-    EtebaseCollectionAccessLevel? accessLevel,
+    CollectionAccessLevel? accessLevel,
   }) = _ValidateCollection;
   @_binary
   const factory Action.createCollection(
     String collectionType,
-    EtebaseItemMetadata meta,
+    ItemMetadata meta,
     Uint8List content,
   ) = _CreateCollection;
   @_binary
   const factory Action.updateCollection(
     String uid, {
-    EtebaseItemMetadata? meta,
+    ItemMetadata? meta,
     Uint8List? content,
     @Default(false) bool delete,
     @Default(false) bool preserveContent,
@@ -63,7 +63,7 @@ sealed class Action with _$Action {
   @_binary
   const factory Action.restoreCollection(
     Uint8List data, {
-    EtebaseItemMetadata? meta,
+    ItemMetadata? meta,
     Uint8List? content,
     @Default(false) bool noContent,
     bool? isDeleted,
@@ -78,17 +78,17 @@ sealed class Action with _$Action {
   @_binary
   const factory Action.validateItem(
     String uid, {
-    EtebaseItemMetadata? meta,
+    ItemMetadata? meta,
     Uint8List? content,
     bool? isDeleted,
   }) = _ValidateItem;
   @_binary
-  const factory Action.createItem(EtebaseItemMetadata meta, Uint8List content) =
+  const factory Action.createItem(ItemMetadata meta, Uint8List content) =
       _CreateItem;
   @_binary
   const factory Action.updateItem(
     String uid, {
-    EtebaseItemMetadata? meta,
+    ItemMetadata? meta,
     Uint8List? content,
     @Default(false) bool delete,
     @Default(false) bool preserveContent,
@@ -96,7 +96,7 @@ sealed class Action with _$Action {
   @_binary
   const factory Action.restoreItem(
     Uint8List data, {
-    EtebaseItemMetadata? meta,
+    ItemMetadata? meta,
     Uint8List? content,
     @Default(false) bool noContent,
     bool? isDeleted,
@@ -123,7 +123,7 @@ sealed class Action with _$Action {
     required String colUid,
     required Uint8List pubKey,
     required String username,
-    required EtebaseCollectionAccessLevel accessLevel,
+    required CollectionAccessLevel accessLevel,
   }) = _Invite;
 
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);

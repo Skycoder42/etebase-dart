@@ -28,7 +28,7 @@ void main() {
     test('can create new account', () async {
       final account = await EtebaseAccount.signup(
         client,
-        EtebaseUser(username: testUsername, email: testEmail),
+        User(username: testUsername, email: testEmail),
         testPassword,
       );
       addTearDown(account.dispose);

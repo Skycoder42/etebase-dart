@@ -5,7 +5,7 @@ import 'package:sodium/sodium.dart';
 
 import '../../api/exceptions/api_missuse.dart';
 import '../../api/managers/etebase_account.dart';
-import '../../api/models/etebase_user.dart';
+import '../../api/models/user.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../crypto/box_crypto_manager.dart';
 import '../crypto/crypto_arena.dart';
@@ -18,8 +18,8 @@ import '../models/challenge_request.dart';
 import '../models/challenge_response.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
+import '../models/login_response_user.dart';
 import '../models/signup_request.dart';
-import '../models/user.dart';
 import '../online_managers/base_manager.dart';
 import '../online_managers/collection_invitation_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
@@ -32,7 +32,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
   final Client _client;
 
   MainCryptoManager _mainCryptoManager;
-  User _user;
+  LoginResponseUser _user;
   AuthToken _authToken;
 
   final AccountCryptoManager accountCryptoManager;
@@ -73,7 +73,7 @@ class Account implements EtebaseAccount, AuthTokenSource {
 
   static Future<Account> signup(
     Client client,
-    EtebaseUser user,
+    User user,
     String password,
   ) async {
     final arena = CryptoArena();

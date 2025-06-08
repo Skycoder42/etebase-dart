@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/collection_item_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/crypto_service.dart';
@@ -34,7 +34,7 @@ import '../crypto/crypto_mocks.dart';
 ])
 import 'encrypted_collection_item_test.mocks.dart';
 
-class FakeEtebaseItemMetadata extends Fake implements EtebaseItemMetadata {}
+class FakeEtebaseItemMetadata extends Fake implements ItemMetadata {}
 
 void main() {
   group('$EncryptedCollectionItem', () {
@@ -75,7 +75,7 @@ void main() {
 
     group('create', () {
       test('constructs new instance', () async {
-        const testMeta = EtebaseItemMetadata(name: 'test-name');
+        const testMeta = ItemMetadata(name: 'test-name');
         final testContent = Uint8List.fromList([4, 3, 1, 4, 51]);
 
         final testUid = Uint8List.fromList([23, 4, 2, 44]);
@@ -131,7 +131,7 @@ void main() {
           () => EncryptedCollectionItem.create(
             mockClient,
             mockParentCm,
-            const EtebaseItemMetadata(),
+            const ItemMetadata(),
             Uint8List(0),
           ),
           throwsA(testException),
@@ -275,7 +275,7 @@ void main() {
     });
 
     group('members', () {
-      const testMeta = EtebaseItemMetadata(name: 'test-name');
+      const testMeta = ItemMetadata(name: 'test-name');
       final testContent = Uint8List.fromList([6, 6, 3, 2, 33, 2]);
       final testUid = Uint8List.fromList([9, 2, 5, 12]);
       const testUid64 = 'test-uid';
@@ -412,7 +412,7 @@ void main() {
 
       group('setMeta', () {
         test('updates revision if it is already locally changed', () async {
-          const newMeta = EtebaseItemMetadata(name: 'new-meta');
+          const newMeta = ItemMetadata(name: 'new-meta');
 
           await sut.setMeta(mockClient, mockItemCm, newMeta);
 
@@ -423,7 +423,7 @@ void main() {
         });
 
         test('clones revision if it has not been changed yet', () async {
-          const newMeta = EtebaseItemMetadata(name: 'new-meta');
+          const newMeta = ItemMetadata(name: 'new-meta');
           final newRevision = MockEncryptedRevision();
 
           sut.markSaved();

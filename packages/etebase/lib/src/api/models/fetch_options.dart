@@ -3,14 +3,14 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'etebase_prefetch_option.dart';
+import 'prefetch_option.dart';
 
-part 'etebase_fetch_options.freezed.dart';
+part 'fetch_options.freezed.dart';
 
 /// Configuration options for data fetching.
 @Freezed(copyWith: true)
-sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
-  const factory EtebaseFetchOptionsBase({
+sealed class FetchOptionsBase with _$FetchOptionsBase {
+  const factory FetchOptionsBase({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -18,10 +18,10 @@ sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
     String? stoken,
 
     /// How much data to prefetch.
-    EtebasePrefetchOption? prefetch,
-  }) = EtebaseFetchOptions;
+    PrefetchOption? prefetch,
+  }) = FetchOptions;
 
-  const factory EtebaseFetchOptionsBase.item({
+  const factory FetchOptionsBase.item({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -29,21 +29,21 @@ sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
     String? stoken,
 
     /// How much data to prefetch.
-    EtebasePrefetchOption? prefetch,
+    PrefetchOption? prefetch,
 
     /// Toggle fetching the collection's items.
     bool? withCollection,
-  }) = EtebaseItemFetchOptions;
+  }) = ItemFetchOptions;
 
-  const factory EtebaseFetchOptionsBase.iterator({
+  const factory FetchOptionsBase.iterator({
     /// Limit the amount of items returned.
     int? limit,
 
     /// The current iterator to start from (when iterating lists).
     String? iterator,
-  }) = EtebaseIteratorFetchOptions;
+  }) = IteratorFetchOptions;
 
-  const factory EtebaseFetchOptionsBase.revision({
+  const factory FetchOptionsBase.revision({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -51,14 +51,14 @@ sealed class EtebaseFetchOptionsBase with _$EtebaseFetchOptionsBase {
     String? iterator,
 
     /// How much data to prefetch.
-    EtebasePrefetchOption? prefetch,
-  }) = EtebaseRevisionFetchOptions;
+    PrefetchOption? prefetch,
+  }) = RevisionFetchOptions;
 
-  const EtebaseFetchOptionsBase._();
+  const FetchOptionsBase._();
 }
 
 @internal
-extension EtebaseFetchOptionsX on EtebaseFetchOptions {
-  EtebaseItemFetchOptions asItemOptions() =>
-      EtebaseItemFetchOptions(limit: limit, stoken: stoken, prefetch: prefetch);
+extension FetchOptionsX on FetchOptions {
+  ItemFetchOptions asItemOptions() =>
+      ItemFetchOptions(limit: limit, stoken: stoken, prefetch: prefetch);
 }

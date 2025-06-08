@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
-import '../models/etebase_fetch_options.dart';
 import '../models/etebase_item.dart';
-import '../models/etebase_item_metadata.dart';
-import '../models/etebase_list_response.dart';
+import '../models/fetch_options.dart';
+import '../models/item_metadata.dart';
+import '../models/list_response.dart';
 
 /// A callback to receive progress for when an items content is uploaded or
 /// downloaded separately.
@@ -21,7 +21,7 @@ abstract class EtebaseItemManager {
   /// {@macro create_from_stream}
   ///
   /// {@macro meta_registration}
-  Future<EtebaseItem> create<TMeta extends EtebaseItemMetadata>(
+  Future<EtebaseItem> create<TMeta extends ItemMetadata>(
     TMeta meta,
     Uint8List content,
   );
@@ -29,46 +29,41 @@ abstract class EtebaseItemManager {
   /// Fetch a single [EtebaseItem] from the server using its [itemUid].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseItem> fetch(
-    String itemUid, [
-    EtebaseItemFetchOptions? fetchOptions,
-  ]);
+  Future<EtebaseItem> fetch(String itemUid, [ItemFetchOptions? fetchOptions]);
 
   /// Fetch all [EtebaseItem] of a collection and return a
-  /// [EtebaseItemListResponse].
+  /// [ItemListResponse].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseItemListResponse<EtebaseItem>> list([
-    EtebaseItemFetchOptions? fetchOptions,
-  ]);
+  Future<ItemListResponse<EtebaseItem>> list([ItemFetchOptions? fetchOptions]);
 
-  /// Fetch and return a [EtebaseIteratorListResponse] of [EtebaseItem] with
+  /// Fetch and return a [IteratorListResponse] of [EtebaseItem] with
   /// each item as a revision of the given [item].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseIteratorListResponse<EtebaseItem>> itemRevisions(
+  Future<IteratorListResponse<EtebaseItem>> itemRevisions(
     EtebaseItem item, [
-    EtebaseRevisionFetchOptions? fetchOptions,
+    RevisionFetchOptions? fetchOptions,
   ]);
 
   /// Fetch the latest revision of the supplied [items] from the server and
-  /// return a [EtebaseItemListResponse] of [EtebaseItem]s.
+  /// return a [ItemListResponse] of [EtebaseItem]s.
   ///
   /// {@macro fetch_options}
-  Future<EtebaseItemListResponse<EtebaseItem>> fetchUpdates(
+  Future<ItemListResponse<EtebaseItem>> fetchUpdates(
     List<EtebaseItem> items, [
-    EtebaseItemFetchOptions? fetchOptions,
+    ItemFetchOptions? fetchOptions,
   ]);
 
   /// Fetch multiple [EtebaseItem]s using their [itemUids] and return a
-  /// [EtebaseItemListResponse].
+  /// [ItemListResponse].
   ///
   /// See [fetch] for fetching a single [EtebaseItem].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseItemListResponse<EtebaseItem>> fetchMulti(
+  Future<ItemListResponse<EtebaseItem>> fetchMulti(
     List<String> itemUids, [
-    EtebaseItemFetchOptions? fetchOptions,
+    ItemFetchOptions? fetchOptions,
   ]);
 
   /// Upload the supplied [items] to the server.
@@ -83,7 +78,7 @@ abstract class EtebaseItemManager {
   Future<void> batch(
     List<EtebaseItem> items, {
     List<EtebaseItem>? deps,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   });
 
   /// Upload the supplied [items] to the server using a transaction.
@@ -94,7 +89,7 @@ abstract class EtebaseItemManager {
   Future<void> transaction(
     List<EtebaseItem> items, {
     List<EtebaseItem>? deps,
-    EtebaseItemFetchOptions? options,
+    ItemFetchOptions? options,
   });
 
   /// Pre-upload the [item]s content - use it with large files.
@@ -112,7 +107,7 @@ abstract class EtebaseItemManager {
 
   /// Download the content of an [item] if it is missing.
   ///
-  /// When using some [EtebaseFetchOptions.prefetch], items may be incomplete.
+  /// When using some [FetchOptions.prefetch], items may be incomplete.
   /// Use this call to download the [item]s content so it can be accessed.
   /// This is a much more efficient way of getting the content of large files.
   ///
@@ -141,11 +136,11 @@ abstract class EtebaseItemManager {
   /// created or updated in to collection.
   ///
   /// The returned [Stream] will continuously return
-  /// [EtebaseItemListResponse]s containing the new [EtebaseItem]
+  /// [ItemListResponse]s containing the new [EtebaseItem]
   /// revisions.
   ///
   /// {@macro fetch_options}
-  Stream<EtebaseItemListResponse<EtebaseItem>> subscribeChanges([
-    EtebaseItemFetchOptions? options,
+  Stream<ItemListResponse<EtebaseItem>> subscribeChanges([
+    ItemFetchOptions? options,
   ]);
 }

@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 /// The access level to a collection.
 @JsonEnum(valueField: 'value')
-enum EtebaseCollectionAccessLevel {
+enum CollectionAccessLevel {
   /// Read only access.
   readOnly(0),
 
@@ -17,5 +17,5 @@ enum EtebaseCollectionAccessLevel {
   /// The numeric value of the access level.
   final int value;
 
-  const EtebaseCollectionAccessLevel(this.value);
+  const CollectionAccessLevel(this.value);
 }

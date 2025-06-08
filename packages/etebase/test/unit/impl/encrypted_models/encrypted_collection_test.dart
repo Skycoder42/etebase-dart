@@ -5,8 +5,8 @@ import 'dart:typed_data';
 
 import 'package:async/async.dart';
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/box_crypto_manager.dart';
@@ -41,7 +41,7 @@ import '../crypto/crypto_mocks.dart';
 ])
 import 'encrypted_collection_test.mocks.dart';
 
-class FakeEtebaseItemMetadata extends Fake implements EtebaseItemMetadata {}
+class FakeEtebaseItemMetadata extends Fake implements ItemMetadata {}
 
 void main() {
   group('$EncryptedCollection', () {
@@ -79,7 +79,7 @@ void main() {
 
     group('create', () {
       const testColName = 'test-collection';
-      const testMeta = EtebaseItemMetadata(name: 'test-col');
+      const testMeta = ItemMetadata(name: 'test-col');
       final testContent = Uint8List.fromList([6, 8, 4, 1, 1, 3]);
 
       final testColUid = Uint8List.fromList([4, 5, 1, 1, 3, 3]);
@@ -104,7 +104,7 @@ void main() {
         );
 
         expect(col.item, same(mockItem));
-        expect(col.accessLevel, EtebaseCollectionAccessLevel.admin);
+        expect(col.accessLevel, CollectionAccessLevel.admin);
         expect(col.stoken, isNull);
 
         expect(colCm, same(mockColCm));
@@ -165,7 +165,7 @@ void main() {
     test('fromJson/toJson correctly decodes/encodes data from/to JSON', () {
       final testColKey = Uint8List.fromList([4, 4, 1, 2, 4]);
       final testColType = Uint8List.fromList([4, 8, 4, 2, 8]);
-      const testAccessLevel = EtebaseCollectionAccessLevel.readWrite;
+      const testAccessLevel = CollectionAccessLevel.readWrite;
       const testStoken = 'test-stoken';
       const testItemUid = 'test-uid';
 
@@ -227,7 +227,7 @@ void main() {
       // collection
       final testColKey = Uint8List.fromList([4, 4, 1, 2, 4]);
       final testColType = Uint8List.fromList([4, 8, 4, 2, 8]);
-      const testAccessLevel = EtebaseCollectionAccessLevel.readOnly;
+      const testAccessLevel = CollectionAccessLevel.readOnly;
       const testStoken = 'test-stoken';
       final testColCacheData = CachedCollection(
         collectionKey: testColKey,
@@ -321,7 +321,7 @@ void main() {
     });
 
     group('members', () {
-      const testMeta = EtebaseItemMetadata(name: 'test-col-name');
+      const testMeta = ItemMetadata(name: 'test-col-name');
       final testContent = Uint8List.fromList([76, 4, 1, 22]);
       const testColTypeName = 'test-col-type';
       final testColType = Uint8List.fromList([66, 2, 3, 5, 12]);
@@ -373,7 +373,7 @@ void main() {
         when(mockItem.isMissingContent).thenReturn(true);
 
         expect(sut.item, same(mockItem));
-        expect(sut.accessLevel, EtebaseCollectionAccessLevel.admin);
+        expect(sut.accessLevel, CollectionAccessLevel.admin);
         expect(sut.stoken, isNull);
         expect(sut.uid, testUid);
         expect(sut.etag, testEtag);
@@ -431,9 +431,9 @@ void main() {
 
       group('getMeta', () {
         test('gets metadata with crypto manager', () async {
-          setupWithCm<EtebaseItemMetadata>();
+          setupWithCm<ItemMetadata>();
           when(
-            mockItem.getMeta<EtebaseItemMetadata>(any, any),
+            mockItem.getMeta<ItemMetadata>(any, any),
           ).thenReturnAsync(testMeta);
 
           final result = await sut.getMeta(mockClient, mockColCm);
@@ -441,7 +441,7 @@ void main() {
           expect(result, testMeta);
 
           verifyInOrder([
-            mockItem.withCm<EtebaseItemMetadata>(mockClient, mockColCm, any),
+            mockItem.withCm<ItemMetadata>(mockClient, mockColCm, any),
             mockItem.getMeta(mockClient, mockItemCm),
           ]);
         });
@@ -599,14 +599,14 @@ void main() {
             mockIdCm,
             testUserName,
             testPubKey,
-            EtebaseCollectionAccessLevel.readWrite,
+            CollectionAccessLevel.readWrite,
           );
 
           expect(result.uid, base64.encode(testInvitationId));
           expect(result.version, CryptoUtils.currentVersion);
           expect(result.username, testUserName);
           expect(result.collection, testItemUid);
-          expect(result.accessLevel, EtebaseCollectionAccessLevel.readWrite);
+          expect(result.accessLevel, CollectionAccessLevel.readWrite);
           expect(result.signedEncryptionKey, testSignedInvitationData);
 
           verifyInOrder([
@@ -642,7 +642,7 @@ void main() {
               mockIdCm,
               testUserName,
               testPubKey,
-              EtebaseCollectionAccessLevel.readOnly,
+              CollectionAccessLevel.readOnly,
             ),
             throwsA(testException),
           );

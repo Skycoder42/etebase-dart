@@ -3,12 +3,12 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_invitation_manager.dart';
-import '../../api/models/etebase_collection_access_level.dart';
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_list_response.dart';
-import '../../api/models/etebase_user_profile.dart';
+import '../../api/models/collection_access_level.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/list_response.dart';
+import '../../api/models/user_profile.dart';
 import '../models/invitation_accept_request.dart';
-import '../models/signed_invitation.dart';
+import '../models/signed_invitation_base.dart';
 import '../models/signed_invitation_content.dart';
 import '../online_managers/collection_invitation_manager_online.dart';
 import 'account.dart';
@@ -28,13 +28,13 @@ class CollectionInvitationManager
   Uint8List get pubkey => _account.identityCryptoManager.pubkey;
 
   @override
-  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listIncoming([
-    EtebaseIteratorFetchOptions? fetchOptions,
+  Future<IteratorListResponse<SignedInvitationRead>> listIncoming([
+    IteratorFetchOptions? fetchOptions,
   ]) => _online.listIncoming(fetchOptions);
 
   @override
-  Future<EtebaseIteratorListResponse<SignedInvitationRead>> listOutgoing([
-    EtebaseIteratorFetchOptions? fetchOptions,
+  Future<IteratorListResponse<SignedInvitationRead>> listOutgoing([
+    IteratorFetchOptions? fetchOptions,
   ]) => _online.listOutgoing(fetchOptions);
 
   @override
@@ -68,7 +68,7 @@ class CollectionInvitationManager
       _online.reject(invitation);
 
   @override
-  Future<EtebaseUserProfile> fetchUserProfile(String username) =>
+  Future<UserProfile> fetchUserProfile(String username) =>
       _online.fetchUserProfile(username);
 
   @override
@@ -76,7 +76,7 @@ class CollectionInvitationManager
     covariant Collection collection,
     String username,
     Uint8List pubkey,
-    EtebaseCollectionAccessLevel accessLevel,
+    CollectionAccessLevel accessLevel,
   ) async {
     final invitation = await collection.encrypted.createInvitation(
       _client,

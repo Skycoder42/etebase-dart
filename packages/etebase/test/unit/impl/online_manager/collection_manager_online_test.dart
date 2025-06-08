@@ -2,9 +2,9 @@
 
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
-import 'package:etebase/src/api/models/etebase_removed_collection.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/list_response.dart';
+import 'package:etebase/src/api/models/removed_collection.dart';
 import 'package:etebase/src/impl/encrypted_models/encrypted_collection.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/models/collection_list_request.dart';
@@ -18,7 +18,7 @@ import 'online_manager_mocks.dart';
 void main() {
   group('$CollectionManagerOnline', () {
     const testAuthToken = AuthToken('test');
-    const testOptions = EtebaseFetchOptions(limit: 1);
+    const testOptions = FetchOptions(limit: 1);
     const testQuery = {'limit': '1'};
 
     const testCollectionUid = 'test-collectionUid';
@@ -93,11 +93,11 @@ void main() {
       'list posts list multi endpoint',
       mock: mockBaseNetwork,
       request: CollectionListRequest([testCollectionType]),
-      response: EtebaseCollectionListResponse(
+      response: CollectionListResponse(
         data: [testCollection],
         isDone: false,
         stoken: 'token',
-        removedMemberships: [const EtebaseRemovedCollection('rm-1')],
+        removedMemberships: [const RemovedCollection('rm-1')],
       ),
       call: (_) => sut.list([testCollectionType], testOptions),
       method: HttpMethod.post,

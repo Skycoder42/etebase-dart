@@ -1,7 +1,7 @@
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/api/models/etebase_collection_member.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/api/models/collection_member.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/list_response.dart';
 import 'package:etebase/src/impl/managers/collection_member_manager.dart';
 import 'package:etebase/src/impl/online_managers/collection_member_manager_online.dart';
 import 'package:mockito/annotations.dart';
@@ -15,7 +15,7 @@ import 'collection_member_manager_test.mocks.dart';
 
 void main() {
   group('$CollectionMemberManager', () {
-    const testOptions = EtebaseIteratorFetchOptions(limit: 3);
+    const testOptions = IteratorFetchOptions(limit: 3);
     const testUsername = 'test-user';
 
     final mockOnline = MockCollectionMemberManagerOnline();
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('list calls list on online', () async {
-      const testResponse = EtebaseIteratorListResponse<EtebaseCollectionMember>(
+      const testResponse = IteratorListResponse<CollectionMember>(
         data: [],
         isDone: true,
         iterator: 'iterator',
@@ -56,7 +56,7 @@ void main() {
     });
 
     test('modifyAccessLevel calls modifyAccessLevel on online', () async {
-      const testLevel = EtebaseCollectionAccessLevel.admin;
+      const testLevel = CollectionAccessLevel.admin;
       await sut.modifyAccessLevel(testUsername, testLevel);
 
       verify(mockOnline.modifyAccessLevel(testUsername, testLevel)).called(1);

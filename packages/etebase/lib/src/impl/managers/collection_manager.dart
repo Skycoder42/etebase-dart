@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../api/managers/etebase_collection_manager.dart';
-import '../../api/models/etebase_fetch_options.dart';
-import '../../api/models/etebase_item_metadata.dart';
-import '../../api/models/etebase_list_response.dart';
+import '../../api/models/fetch_options.dart';
+import '../../api/models/item_metadata.dart';
+import '../../api/models/list_response.dart';
 import '../crypto/account_crypto_manager.dart';
 import '../online_managers/collection_item_manager_online.dart';
 import '../online_managers/collection_manager_online.dart';
@@ -24,7 +24,7 @@ class CollectionManager implements EtebaseCollectionManager {
   CollectionManager(this._client, this._cryptoManager, this._online);
 
   @override
-  Future<Collection> create<TMeta extends EtebaseItemMetadata>(
+  Future<Collection> create<TMeta extends ItemMetadata>(
     String collectionType,
     TMeta meta,
     Uint8List content,
@@ -39,10 +39,7 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  Future<Collection> fetch(
-    String colUid, [
-    EtebaseFetchOptions? fetchOptions,
-  ]) async {
+  Future<Collection> fetch(String colUid, [FetchOptions? fetchOptions]) async {
     final encryptedCollection = await _online.fetch(colUid, fetchOptions);
     return Collection(
       _client,
@@ -52,15 +49,15 @@ class CollectionManager implements EtebaseCollectionManager {
   }
 
   @override
-  Future<EtebaseCollectionListResponse<Collection>> list(
+  Future<CollectionListResponse<Collection>> list(
     String collectionType, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]) => listMulti([collectionType], fetchOptions);
 
   @override
-  Future<EtebaseCollectionListResponse<Collection>> listMulti(
+  Future<CollectionListResponse<Collection>> listMulti(
     List<String> collectionTypes, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]) async {
     final colTypes = [
       for (final collectionType in collectionTypes)
@@ -79,7 +76,7 @@ class CollectionManager implements EtebaseCollectionManager {
   @override
   Future<void> upload(
     covariant Collection collection, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]) async {
     final col = collection.encrypted;
     if (col.lastEtag != null) {
@@ -95,7 +92,7 @@ class CollectionManager implements EtebaseCollectionManager {
   @override
   Future<void> transaction(
     covariant Collection collection, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]) async {
     final col = collection.encrypted;
     if (col.lastEtag != null) {

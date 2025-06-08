@@ -4,12 +4,12 @@ import 'package:sodium/sodium_sumo.dart';
 
 import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/client.dart';
-import '../models/etebase_item_metadata.dart';
+import '../models/item_metadata.dart';
 import 'crypto_executor.dart';
 
 /// A callback that takes a [json] map and returns an instance of a type that
-/// implements [EtebaseItemMetadata].
-typedef MetaFromJson<TMeta extends EtebaseItemMetadata> =
+/// implements [ItemMetadata].
+typedef MetaFromJson<TMeta extends ItemMetadata> =
     TMeta Function(Map<String, dynamic> json);
 
 /// The network client to use to interact with the Etebase server.
@@ -103,8 +103,8 @@ abstract interface class EtebaseClient {
   /// Registers a new item metadata type [TMeta] for this client.
   ///
   /// The [fromJson] factory must be able to convert a JSON map to a metadata
-  /// object that implements [EtebaseItemMetadata].
-  void registerCustomMetadata<TMeta extends EtebaseItemMetadata>(
+  /// object that implements [ItemMetadata].
+  void registerCustomMetadata<TMeta extends ItemMetadata>(
     MetaFromJson<TMeta> fromJson,
   );
 }

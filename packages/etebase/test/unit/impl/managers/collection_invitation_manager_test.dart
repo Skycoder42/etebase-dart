@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_list_response.dart';
-import 'package:etebase/src/api/models/etebase_user_profile.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/list_response.dart';
+import 'package:etebase/src/api/models/user_profile.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/account_crypto_manager.dart';
 import 'package:etebase/src/impl/crypto/box_crypto_manager.dart';
@@ -14,7 +14,7 @@ import 'package:etebase/src/impl/managers/client.dart';
 import 'package:etebase/src/impl/managers/collection.dart';
 import 'package:etebase/src/impl/managers/collection_invitation_manager.dart';
 import 'package:etebase/src/impl/models/invitation_accept_request.dart';
-import 'package:etebase/src/impl/models/signed_invitation.dart';
+import 'package:etebase/src/impl/models/signed_invitation_base.dart';
 import 'package:etebase/src/impl/models/signed_invitation_content.dart';
 import 'package:etebase/src/impl/online_managers/collection_invitation_manager_online.dart';
 import 'package:mockito/annotations.dart';
@@ -38,7 +38,7 @@ import 'collection_invitation_manager_test.mocks.dart';
 
 void main() {
   group('$CollectionInvitationManager', () {
-    const testOptions = EtebaseIteratorFetchOptions();
+    const testOptions = IteratorFetchOptions();
 
     final mockClient = MockClient();
     final mockAccount = MockAccount();
@@ -87,7 +87,7 @@ void main() {
     });
 
     test('listIncoming invokes listIncoming on online manager', () async {
-      const testResponse = EtebaseIteratorListResponse(
+      const testResponse = IteratorListResponse(
         data: <SignedInvitationRead>[],
         isDone: true,
         iterator: null,
@@ -103,7 +103,7 @@ void main() {
     });
 
     test('listOutgoing invokes listOutgoing on online manager', () async {
-      const testResponse = EtebaseIteratorListResponse(
+      const testResponse = IteratorListResponse(
         data: <SignedInvitationRead>[],
         isDone: true,
         iterator: null,
@@ -126,7 +126,7 @@ void main() {
           version: 13,
           username: 'test-username',
           collection: 'test-collection',
-          accessLevel: EtebaseCollectionAccessLevel.readOnly,
+          accessLevel: CollectionAccessLevel.readOnly,
           signedEncryptionKey: Uint8List.fromList([23, 44, 1]),
           fromPubKey: Uint8List.fromList([21, 124]),
         );
@@ -190,7 +190,7 @@ void main() {
         version: 13,
         username: 'test-username',
         collection: 'test-collection',
-        accessLevel: EtebaseCollectionAccessLevel.readOnly,
+        accessLevel: CollectionAccessLevel.readOnly,
         signedEncryptionKey: Uint8List.fromList([23, 44, 1]),
         fromPubKey: Uint8List.fromList([21, 124]),
       );
@@ -204,7 +204,7 @@ void main() {
       'fetchUserProfile invokes fetchUserProfile on online manager',
       () async {
         const testUserName = 'test-user-name';
-        final testProfile = EtebaseUserProfile(pubkey: Uint8List(12));
+        final testProfile = UserProfile(pubkey: Uint8List(12));
 
         provideDummy(testProfile);
 
@@ -227,7 +227,7 @@ void main() {
         version: 14,
         username: 'test-username',
         collection: 'test-collection',
-        accessLevel: EtebaseCollectionAccessLevel.admin,
+        accessLevel: CollectionAccessLevel.admin,
         signedEncryptionKey: Uint8List.fromList([9, 99]),
       );
 
@@ -239,7 +239,7 @@ void main() {
         mockCollection,
         testUserName,
         testPubKey,
-        EtebaseCollectionAccessLevel.admin,
+        CollectionAccessLevel.admin,
       );
 
       verifyInOrder([
@@ -250,7 +250,7 @@ void main() {
           mockBoxCM,
           testUserName,
           testPubKey,
-          EtebaseCollectionAccessLevel.admin,
+          CollectionAccessLevel.admin,
         ),
         mockOnline.invite(testInvitation),
       ]);
@@ -262,7 +262,7 @@ void main() {
         version: 13,
         username: 'test-username',
         collection: 'test-collection',
-        accessLevel: EtebaseCollectionAccessLevel.readOnly,
+        accessLevel: CollectionAccessLevel.readOnly,
         signedEncryptionKey: Uint8List.fromList([23, 44, 1]),
         fromPubKey: Uint8List.fromList([21, 124]),
       );

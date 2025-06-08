@@ -49,7 +49,7 @@ Future<EtebaseAccount> createAccount(
   JsClientWrapper? wrapper,
 ]) async {
   final userName = generateUsername(userNamePrefix);
-  final user = EtebaseUser(username: userName, email: '$userName@test.com');
+  final user = User(username: userName, email: '$userName@test.com');
   final password = base64.encode(client.randombytes(32));
   final account = await EtebaseAccount.signup(client, user, password);
   wrapper?.configureAccount(account);

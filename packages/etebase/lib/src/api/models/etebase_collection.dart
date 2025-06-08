@@ -3,15 +3,15 @@
 import 'dart:typed_data';
 
 import '../managers/etebase_collection_manager.dart';
-import 'etebase_collection_access_level.dart';
+import 'collection_access_level.dart';
 import 'etebase_item.dart';
-import 'etebase_item_metadata.dart';
+import 'item_metadata.dart';
 
 /// A collection of [EtebaseItem]s.
 ///
 /// Like [EtebaseItem]s, collections have two pieces of data associated with
 /// them:
-/// * [EtebaseItemMetadata] - contains meta information like name and
+/// * [ItemMetadata] - contains meta information like name and
 /// modification time.
 /// * Content ([Uint8List]) - a buffer containing arbitrary binary data.
 ///
@@ -29,5 +29,5 @@ abstract class EtebaseCollection implements EtebaseItem {
   String get collectionType;
 
   /// Return the access level of the collection for the current user.
-  EtebaseCollectionAccessLevel get accessLevel;
+  CollectionAccessLevel get accessLevel;
 }

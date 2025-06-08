@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:etebase/gen/package_metadata.dart' as pubspec;
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/managers/crypto_executor.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/crypto/crypto_service.dart';
 import 'package:etebase/src/impl/managers/client.dart';
@@ -26,7 +26,7 @@ import '../../test_helpers.dart';
 ])
 import 'client_test.mocks.dart';
 
-class FakeMeta extends Fake implements EtebaseItemMetadata {}
+class FakeMeta extends Fake implements ItemMetadata {}
 
 void main() {
   group('$Client', () {

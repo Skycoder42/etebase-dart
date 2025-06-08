@@ -1,6 +1,6 @@
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/src/api/models/etebase_fetch_options.dart';
-import 'package:etebase/src/api/models/etebase_prefetch_option.dart';
+import 'package:etebase/src/api/models/fetch_options.dart';
+import 'package:etebase/src/api/models/prefetch_option.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/online_managers/base_manager.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
@@ -103,24 +103,24 @@ void main() {
       });
 
       group('options', () {
-        testData<(EtebaseFetchOptionsBase, Map<String, String>)>(
+        testData<(FetchOptionsBase, Map<String, String>)>(
           'builds query parameters from options',
           const [
-            (EtebaseFetchOptions(), {}),
+            (FetchOptions(), {}),
             (
-              EtebaseFetchOptions(
+              FetchOptions(
                 limit: 10,
                 stoken: 'test-stoken',
-                prefetch: EtebasePrefetchOption.medium,
+                prefetch: PrefetchOption.medium,
               ),
               {'limit': '10', 'stoken': 'test-stoken', 'prefetch': 'medium'},
             ),
-            (EtebaseItemFetchOptions(), {}),
+            (ItemFetchOptions(), {}),
             (
-              EtebaseItemFetchOptions(
+              ItemFetchOptions(
                 limit: 10,
                 stoken: 'test-stoken',
-                prefetch: EtebasePrefetchOption.medium,
+                prefetch: PrefetchOption.medium,
                 withCollection: true,
               ),
               {
@@ -130,17 +130,17 @@ void main() {
                 'withCollection': 'true',
               },
             ),
-            (EtebaseIteratorFetchOptions(), {}),
+            (IteratorFetchOptions(), {}),
             (
-              EtebaseIteratorFetchOptions(limit: 10, iterator: 'test-iterator'),
+              IteratorFetchOptions(limit: 10, iterator: 'test-iterator'),
               {'limit': '10', 'iterator': 'test-iterator'},
             ),
-            (EtebaseRevisionFetchOptions(), {}),
+            (RevisionFetchOptions(), {}),
             (
-              EtebaseRevisionFetchOptions(
+              RevisionFetchOptions(
                 limit: 10,
                 iterator: 'test-iterator',
-                prefetch: EtebasePrefetchOption.auto,
+                prefetch: PrefetchOption.auto,
               ),
               {'limit': '10', 'iterator': 'test-iterator', 'prefetch': 'auto'},
             ),
@@ -158,7 +158,7 @@ void main() {
         );
 
         test('merges options with original query', () async {
-          const testOptions = EtebaseRevisionFetchOptions(
+          const testOptions = RevisionFetchOptions(
             limit: 24,
             iterator: 'iter-1',
           );

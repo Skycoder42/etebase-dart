@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import '../models/etebase_collection.dart';
-import '../models/etebase_fetch_options.dart';
 import '../models/etebase_item.dart';
-import '../models/etebase_item_metadata.dart';
-import '../models/etebase_list_response.dart';
+import '../models/fetch_options.dart';
+import '../models/item_metadata.dart';
+import '../models/list_response.dart';
 import 'etebase_client.dart';
 import 'etebase_collection_member_manager.dart';
 import 'etebase_item_manager.dart';
@@ -25,12 +25,12 @@ abstract class EtebaseCollectionManager {
   /// {@endtemplate}
   ///
   /// {@template meta_registration}
-  /// By default, the [meta] data will be of the type [EtebaseItemMetadata].
+  /// By default, the [meta] data will be of the type [ItemMetadata].
   /// You can use custom metadata objects that implement the
-  /// [EtebaseItemMetadata] with additional properties. However, this requires
+  /// [ItemMetadata] with additional properties. However, this requires
   /// you to register [TMeta] once via [EtebaseClient.registerCustomMetadata].
   /// {@endtemplate}
-  Future<EtebaseCollection> create<TMeta extends EtebaseItemMetadata>(
+  Future<EtebaseCollection> create<TMeta extends ItemMetadata>(
     String collectionType,
     TMeta meta,
     Uint8List content,
@@ -42,27 +42,24 @@ abstract class EtebaseCollectionManager {
   /// The [fetchOptions] allow you to specify optional parameters to further
   /// filter the returned result or continue with the next iteration of data.
   /// {@endtemplate}
-  Future<EtebaseCollection> fetch(
-    String colUid, [
-    EtebaseFetchOptions? fetchOptions,
-  ]);
+  Future<EtebaseCollection> fetch(String colUid, [FetchOptions? fetchOptions]);
 
   /// Fetch all [EtebaseCollection]s of a specific [collectionType] from the
-  /// server and return a [EtebaseCollectionListResponse].
+  /// server and return a [CollectionListResponse].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseCollectionListResponse<EtebaseCollection>> list(
+  Future<CollectionListResponse<EtebaseCollection>> list(
     String collectionType, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]);
 
   /// Fetch all [EtebaseCollection]s of the supplied [collectionTypes] from the
-  /// server and return a [EtebaseCollectionListResponse].
+  /// server and return a [CollectionListResponse].
   ///
   /// {@macro fetch_options}
-  Future<EtebaseCollectionListResponse<EtebaseCollection>> listMulti(
+  Future<CollectionListResponse<EtebaseCollection>> listMulti(
     List<String> collectionTypes, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]);
 
   /// Upload a [collection].
@@ -70,7 +67,7 @@ abstract class EtebaseCollectionManager {
   /// {@macro fetch_options}
   Future<void> upload(
     EtebaseCollection collection, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]);
 
   /// Upload a [collection] using a transaction.
@@ -81,7 +78,7 @@ abstract class EtebaseCollectionManager {
   /// {@macro fetch_options}
   Future<void> transaction(
     EtebaseCollection collection, [
-    EtebaseFetchOptions? fetchOptions,
+    FetchOptions? fetchOptions,
   ]);
 
   /// Save the [collection] object to a byte buffer for caching.

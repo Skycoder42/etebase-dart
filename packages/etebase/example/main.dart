@@ -6,8 +6,8 @@ import 'dart:typed_data';
 
 import 'package:etebase/src/api/managers/etebase_account.dart';
 import 'package:etebase/src/api/managers/etebase_client.dart';
-import 'package:etebase/src/api/models/etebase_item_metadata.dart';
-import 'package:etebase/src/api/models/etebase_user.dart';
+import 'package:etebase/src/api/models/item_metadata.dart';
+import 'package:etebase/src/api/models/user.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 void main(List<String> args) async {
@@ -26,7 +26,7 @@ void main(List<String> args) async {
   {
     final account = await EtebaseAccount.signup(
       client,
-      EtebaseUser(username: userName, email: '$userName@mail.de'),
+      User(username: userName, email: '$userName@mail.de'),
       userName,
     );
     print('signup successful');
@@ -66,10 +66,10 @@ void main(List<String> args) async {
 
   final col1 = await account.collectionManager.create(
     'test1',
-    const EtebaseItemMetadata(),
+    const ItemMetadata(),
     Uint8List(0),
   );
-  await col1.setMeta(const EtebaseItemMetadata(name: 'Test-1'));
+  await col1.setMeta(const ItemMetadata(name: 'Test-1'));
   await col1.setContent(utf8.encode('Hello, World!'));
   await account.collectionManager.upload(col1);
 

@@ -1,10 +1,12 @@
 // coverage:ignore-file
-/// @docImport 'etebase_fetch_options.dart';
 /// @docImport 'etebase_item.dart';
+/// @docImport 'fetch_options.dart';
 library;
 
-/// Dictates how much data to prefetch when passed to [EtebaseFetchOptionsBase].
-enum EtebasePrefetchOption {
+import 'fetch_options.dart' show FetchOptionsBase;
+
+/// Dictates how much data to prefetch when passed to [FetchOptionsBase].
+enum PrefetchOption {
   /// Automatically decide based on the size of the data fetched.
   ///
   /// Usually, this will download the item and the content, but if the item gets

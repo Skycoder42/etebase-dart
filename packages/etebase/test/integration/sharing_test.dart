@@ -31,7 +31,7 @@ void main() {
 
     final account1 = await EtebaseAccount.signup(
       client,
-      EtebaseUser(username: userName1, email: 'sharing1@test.com'),
+      User(username: userName1, email: 'sharing1@test.com'),
       'password',
     );
     addTearDown(account1.dispose);
@@ -42,7 +42,7 @@ void main() {
 
     final account2 = await EtebaseAccount.signup(
       client,
-      EtebaseUser(username: userName2, email: 'sharing2@test.com'),
+      User(username: userName2, email: 'sharing2@test.com'),
       'password',
     );
     addTearDown(account2.dispose);
@@ -82,7 +82,7 @@ void main() {
     // create collection
     final collection = await collectionManager1.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -94,7 +94,7 @@ void main() {
       collection,
       userName2,
       profile2.pubkey,
-      EtebaseCollectionAccessLevel.readWrite,
+      CollectionAccessLevel.readWrite,
     );
 
     // validate outgoing invitation
@@ -105,7 +105,7 @@ void main() {
     final outInvitations = outResponse.data;
     expect(outInvitations, hasLength(1));
     final outInvitation = outInvitations[0];
-    expect(outInvitation.accessLevel, EtebaseCollectionAccessLevel.readWrite);
+    expect(outInvitation.accessLevel, CollectionAccessLevel.readWrite);
     expect(outInvitation.collection, collection.uid);
     expect(outInvitation.fromPubKey, invitationManager1.pubkey);
     expect(outInvitation.fromUsername, userName1);
@@ -120,7 +120,7 @@ void main() {
     final inInvitations = inResponse.data;
     expect(inInvitations, hasLength(1));
     final inInvitation = inInvitations[0];
-    expect(inInvitation.accessLevel, EtebaseCollectionAccessLevel.readWrite);
+    expect(inInvitation.accessLevel, CollectionAccessLevel.readWrite);
     expect(inInvitation.collection, collection.uid);
     expect(inInvitation.fromPubKey, invitationManager1.pubkey);
     expect(inInvitation.fromUsername, userName1);
@@ -132,10 +132,7 @@ void main() {
 
     final sharedCollection = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection.dispose);
-    expect(
-      sharedCollection.accessLevel,
-      EtebaseCollectionAccessLevel.readWrite,
-    );
+    expect(sharedCollection.accessLevel, CollectionAccessLevel.readWrite);
 
     final outResponse2 = await invitationManager1.listOutgoing();
     expect(outResponse2.data, isEmpty);
@@ -147,7 +144,7 @@ void main() {
     // create collection
     final collection = await collectionManager1.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -160,7 +157,7 @@ void main() {
       collection,
       userName2,
       profile2.pubkey,
-      EtebaseCollectionAccessLevel.readWrite,
+      CollectionAccessLevel.readWrite,
     );
 
     final outResponse1 = await invitationManager1.listOutgoing();
@@ -181,7 +178,7 @@ void main() {
       collection,
       userName2,
       profile2.pubkey,
-      EtebaseCollectionAccessLevel.readWrite,
+      CollectionAccessLevel.readWrite,
     );
 
     final outResponse3 = await invitationManager1.listOutgoing();
@@ -213,7 +210,7 @@ void main() {
     // create and share collection
     final collection = await collectionManager1.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -223,7 +220,7 @@ void main() {
       collection,
       userName2,
       profile2.pubkey,
-      EtebaseCollectionAccessLevel.readOnly,
+      CollectionAccessLevel.readOnly,
     );
     final inResponse = await invitationManager2.listIncoming();
     await invitationManager2.accept(inResponse.data.single);
@@ -231,7 +228,7 @@ void main() {
     // leave collection
     final sharedCollection = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection.dispose);
-    expect(sharedCollection.accessLevel, EtebaseCollectionAccessLevel.readOnly);
+    expect(sharedCollection.accessLevel, CollectionAccessLevel.readOnly);
 
     final memberManager = collectionManager2.getMemberManager(sharedCollection);
     await memberManager.leave();
@@ -247,7 +244,7 @@ void main() {
     // create and share collection
     final collection = await collectionManager1.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -257,17 +254,14 @@ void main() {
       collection,
       userName2,
       profile2.pubkey,
-      EtebaseCollectionAccessLevel.readOnly,
+      CollectionAccessLevel.readOnly,
     );
     final inResponse = await invitationManager2.listIncoming();
     await invitationManager2.accept(inResponse.data.single);
 
     final sharedCollection1 = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection1.dispose);
-    expect(
-      sharedCollection1.accessLevel,
-      EtebaseCollectionAccessLevel.readOnly,
-    );
+    expect(sharedCollection1.accessLevel, CollectionAccessLevel.readOnly);
 
     final memberManager = collectionManager1.getMemberManager(collection);
 
@@ -280,23 +274,20 @@ void main() {
     expect(members, hasLength(2));
     final member1 = members[0];
     expect(member1.username, userName1);
-    expect(member1.accessLevel, EtebaseCollectionAccessLevel.admin);
+    expect(member1.accessLevel, CollectionAccessLevel.admin);
     final member2 = members[1];
     expect(member2.username, userName2);
-    expect(member2.accessLevel, EtebaseCollectionAccessLevel.readOnly);
+    expect(member2.accessLevel, CollectionAccessLevel.readOnly);
 
     // edit member access
     await memberManager.modifyAccessLevel(
       userName2,
-      EtebaseCollectionAccessLevel.readWrite,
+      CollectionAccessLevel.readWrite,
     );
 
     final sharedCollection2 = await collectionManager2.fetch(collection.uid);
     addTearDown(sharedCollection2.dispose);
-    expect(
-      sharedCollection2.accessLevel,
-      EtebaseCollectionAccessLevel.readWrite,
-    );
+    expect(sharedCollection2.accessLevel, CollectionAccessLevel.readWrite);
 
     // remove member
     await memberManager.remove(userName2);
@@ -305,7 +296,7 @@ void main() {
 
     final collectionsResponse = await collectionManager2.list(
       testCollectionType,
-      EtebaseFetchOptions(stoken: sharedCollection2.stoken),
+      FetchOptions(stoken: sharedCollection2.stoken),
     );
     final removedCollections = collectionsResponse.removedMemberships;
     expect(removedCollections, allOf(isNotNull, hasLength(1)));
@@ -324,7 +315,7 @@ void main() {
     // create collection
     final dartCollection = await collectionManager1.create(
       testCrossType,
-      const EtebaseItemMetadata(name: 'cross-dart'),
+      const ItemMetadata(name: 'cross-dart'),
       Uint8List.fromList([4, 2, 2, 4]),
     );
     addTearDown(dartCollection.dispose);
@@ -336,7 +327,7 @@ void main() {
       dartCollection,
       userName2,
       profile2.pubkey,
-      EtebaseCollectionAccessLevel.readOnly,
+      CollectionAccessLevel.readOnly,
     );
 
     // validate and accept incoming invitation in JS
@@ -351,7 +342,7 @@ void main() {
     await jsClientWrapper2.executeSignedIn<void>(
       Action.validateCollection(
         dartCollection.uid,
-        meta: const EtebaseItemMetadata(name: 'cross-dart'),
+        meta: const ItemMetadata(name: 'cross-dart'),
         content: Uint8List.fromList([4, 2, 2, 4]),
       ),
     );
@@ -360,7 +351,7 @@ void main() {
     final jsColId = await jsClientWrapper2.executeSignedIn<String>(
       Action.createCollection(
         testCrossType,
-        const EtebaseItemMetadata(name: 'cross-js'),
+        const ItemMetadata(name: 'cross-js'),
         Uint8List.fromList([1, 3, 3, 7]),
       ),
     );
@@ -369,7 +360,7 @@ void main() {
         colUid: jsColId,
         pubKey: invitationManager1.pubkey,
         username: userName1,
-        accessLevel: EtebaseCollectionAccessLevel.admin,
+        accessLevel: CollectionAccessLevel.admin,
       ),
     );
 
@@ -380,7 +371,7 @@ void main() {
     expect(jsInvResponse.data, hasLength(1));
 
     final [jsInvitation] = jsInvResponse.data;
-    expect(jsInvitation.accessLevel, EtebaseCollectionAccessLevel.admin);
+    expect(jsInvitation.accessLevel, CollectionAccessLevel.admin);
     expect(jsInvitation.collection, jsColId);
     expect(jsInvitation.fromPubKey, invitationManager2.pubkey);
     expect(jsInvitation.fromUsername, userName2);
@@ -390,12 +381,9 @@ void main() {
 
     final jsCollection = await collectionManager1.fetch(jsColId);
     addTearDown(jsCollection.dispose);
-    expect(
-      await jsCollection.getMeta(),
-      const EtebaseItemMetadata(name: 'cross-js'),
-    );
+    expect(await jsCollection.getMeta(), const ItemMetadata(name: 'cross-js'));
     expect(await jsCollection.getContent(), Uint8List.fromList([1, 3, 3, 7]));
-    expect(jsCollection.accessLevel, EtebaseCollectionAccessLevel.admin);
+    expect(jsCollection.accessLevel, CollectionAccessLevel.admin);
 
     // remove original owner
     final memberManager = collectionManager1.getMemberManager(jsCollection);

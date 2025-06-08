@@ -3,12 +3,12 @@ library;
 
 import 'dart:typed_data';
 
+import '../models/collection_access_level.dart';
 import '../models/etebase_collection.dart';
-import '../models/etebase_collection_access_level.dart';
-import '../models/etebase_fetch_options.dart';
-import '../models/etebase_list_response.dart';
-import '../models/etebase_signed_invitation.dart';
-import '../models/etebase_user_profile.dart';
+import '../models/fetch_options.dart';
+import '../models/list_response.dart';
+import '../models/signed_invitation.dart';
+import '../models/user_profile.dart';
 
 /// An manager for managing user invitations to [EtebaseCollection]s.
 abstract class EtebaseCollectionInvitationManager {
@@ -18,28 +18,28 @@ abstract class EtebaseCollectionInvitationManager {
   /// Can be pretty printed with [EtebaseClient.prettyFingerprint].
   Uint8List get pubkey;
 
-  /// List the incoming collection [EtebaseSignedInvitation]s for the account.
+  /// List the incoming collection [SignedInvitation]s for the account.
   ///
   /// {@macro fetch_options}
-  Future<EtebaseIteratorListResponse<EtebaseSignedInvitation>> listIncoming([
-    EtebaseIteratorFetchOptions? fetchOptions,
+  Future<IteratorListResponse<SignedInvitation>> listIncoming([
+    IteratorFetchOptions? fetchOptions,
   ]);
 
-  /// List the outgoing collection [EtebaseSignedInvitation]s for the account.
+  /// List the outgoing collection [SignedInvitation]s for the account.
   ///
   /// {@macro fetch_options}
-  Future<EtebaseIteratorListResponse<EtebaseSignedInvitation>> listOutgoing([
-    EtebaseIteratorFetchOptions? fetchOptions,
+  Future<IteratorListResponse<SignedInvitation>> listOutgoing([
+    IteratorFetchOptions? fetchOptions,
   ]);
 
   /// Accept an [invitation].
-  Future<void> accept(EtebaseSignedInvitation invitation);
+  Future<void> accept(SignedInvitation invitation);
 
   /// Reject an [invitation].
-  Future<void> reject(EtebaseSignedInvitation invitation);
+  Future<void> reject(SignedInvitation invitation);
 
-  /// Fetch and return a [EtebaseUserProfile] for the given [username].
-  Future<EtebaseUserProfile> fetchUserProfile(String username);
+  /// Fetch and return a [UserProfile] for the given [username].
+  Future<UserProfile> fetchUserProfile(String username);
 
   /// Invite a user identified by [username] to a collection.
   ///
@@ -50,9 +50,9 @@ abstract class EtebaseCollectionInvitationManager {
     EtebaseCollection collection,
     String username,
     Uint8List pubkey,
-    EtebaseCollectionAccessLevel accessLevel,
+    CollectionAccessLevel accessLevel,
   );
 
   /// Cancel an [invitation] (disinvite the user).
-  Future<void> disinvite(EtebaseSignedInvitation invitation);
+  Future<void> disinvite(SignedInvitation invitation);
 }

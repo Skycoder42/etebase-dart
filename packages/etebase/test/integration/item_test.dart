@@ -45,7 +45,7 @@ void main() {
     final collectionManager = account.collectionManager;
     final collection = await collectionManager.create(
       testCollectionType,
-      const EtebaseItemMetadata(),
+      const ItemMetadata(),
       Uint8List(0),
     );
     addTearDown(collection.dispose);
@@ -81,7 +81,7 @@ void main() {
       const testItemName = 'test-name';
 
       final item = await itemManager.create(
-        const EtebaseItemMetadata(name: testItemName),
+        const ItemMetadata(name: testItemName),
         testItemContent1,
       );
       addTearDown(item.dispose);
@@ -104,7 +104,7 @@ void main() {
       final testNow = DateTime.now();
 
       final item = await itemManager.create(
-        const EtebaseItemMetadata(name: testItemName),
+        const ItemMetadata(name: testItemName),
         testItemContent1,
       );
       addTearDown(item.dispose);
@@ -125,7 +125,7 @@ void main() {
       const testItemName = 'test-name';
 
       final item = await itemManager.create(
-        const EtebaseItemMetadata(name: testItemName),
+        const ItemMetadata(name: testItemName),
         testItemContent1,
       );
       addTearDown(item.dispose);
@@ -144,21 +144,21 @@ void main() {
   group('item manager', () {
     test('can create items', () async {
       final item1 = await itemManager.create(
-        const EtebaseItemMetadata(name: testItemName, itemType: testItemTypeA),
+        const ItemMetadata(name: testItemName, itemType: testItemTypeA),
         testItemContent1,
       );
       addTearDown(item1.dispose);
       itemId1 = item1.uid;
 
       final item2 = await itemManager.create(
-        const EtebaseItemMetadata(itemType: testItemTypeA),
+        const ItemMetadata(itemType: testItemTypeA),
         testItemContent2,
       );
       addTearDown(item2.dispose);
       itemId2 = item2.uid;
 
       final item3 = await itemManager.create(
-        const EtebaseItemMetadata(itemType: testItemTypeB),
+        const ItemMetadata(itemType: testItemTypeB),
         Uint8List(0),
       );
       addTearDown(item3.dispose);
@@ -201,7 +201,7 @@ void main() {
       // create a fourth via JS
       itemId4 = await jsClientWrapper.executeForCollection<String>(
         Action.createItem(
-          const EtebaseItemMetadata(itemType: testItemTypeB, name: 'js-item'),
+          const ItemMetadata(itemType: testItemTypeB, name: 'js-item'),
           testItemContent1,
         ),
       );
@@ -225,7 +225,7 @@ void main() {
 
       // no further updates
       final changedResponse = await itemManager.list(
-        EtebaseItemFetchOptions(stoken: listResponse.stoken),
+        ItemFetchOptions(stoken: listResponse.stoken),
       );
       expect(changedResponse.data, isEmpty);
 
@@ -307,7 +307,7 @@ void main() {
       expect(
         jsItem.getMeta(),
         completion(
-          isA<EtebaseItemMetadata>().having((m) => m.color, 'color', '#123456'),
+          isA<ItemMetadata>().having((m) => m.color, 'color', '#123456'),
         ),
       );
 
@@ -440,11 +440,11 @@ void main() {
 
     test('can preserve content of deleted items', () async {
       final delTest1 = await itemManager.create(
-        const EtebaseItemMetadata(),
+        const ItemMetadata(),
         testItemContent1,
       );
       final delTest2 = await itemManager.create(
-        const EtebaseItemMetadata(),
+        const ItemMetadata(),
         testItemContent2,
       );
 
@@ -512,7 +512,7 @@ void main() {
       await jsClientWrapper.executeForCollection<void>(
         Action.restoreItem(
           savedDart,
-          meta: const EtebaseItemMetadata(
+          meta: const ItemMetadata(
             itemType: testItemTypeB,
             name: 'js-item',
             description: '--deleted--',
@@ -544,7 +544,7 @@ void main() {
       await jsClientWrapper.executeForCollection<void>(
         Action.restoreItem(
           savedWithoutContentDart,
-          meta: const EtebaseItemMetadata(itemType: testItemTypeA),
+          meta: const ItemMetadata(itemType: testItemTypeA),
           noContent: true,
           isDeleted: false,
         ),
@@ -627,7 +627,7 @@ void main() {
 
       final itemWithoutContent = await itemManager.fetch(
         itemId1,
-        const EtebaseItemFetchOptions(prefetch: EtebasePrefetchOption.medium),
+        const ItemFetchOptions(prefetch: PrefetchOption.medium),
       );
 
       expect(itemWithoutContent.isMissingContent, isTrue);
@@ -656,15 +656,12 @@ void main() {
     final stoken = listResponse.stoken;
 
     final stream = itemManager.subscribeChanges(
-      EtebaseItemFetchOptions(stoken: stoken),
+      ItemFetchOptions(stoken: stoken),
     );
     final queue = StreamQueue(stream);
 
     // create single item
-    final item1 = await itemManager.create(
-      const EtebaseItemMetadata(),
-      Uint8List(0),
-    );
+    final item1 = await itemManager.create(const ItemMetadata(), Uint8List(0));
     await itemManager.batch([item1]);
 
     final event1 = await queue.next;
@@ -676,10 +673,7 @@ void main() {
     );
 
     // create another
-    final item2 = await itemManager.create(
-      const EtebaseItemMetadata(),
-      Uint8List(0),
-    );
+    final item2 = await itemManager.create(const ItemMetadata(), Uint8List(0));
     await itemManager.batch([item2]);
 
     final event2 = await queue.next;
@@ -691,7 +685,7 @@ void main() {
     );
 
     // update both
-    await item1.setMeta(const EtebaseItemMetadata(name: 'updated'));
+    await item1.setMeta(const ItemMetadata(name: 'updated'));
     await item1.setContent(testItemContent2);
     await item2.delete();
     await itemManager.batch([item1, item2]);
@@ -708,17 +702,14 @@ void main() {
       contains(isA<EtebaseItem>().having((m) => m.uid, 'uid', item2.uid)),
     );
     final update1 = event3.data.singleWhere((i) => i.uid == item1.uid);
-    expect(await update1.getMeta(), const EtebaseItemMetadata(name: 'updated'));
+    expect(await update1.getMeta(), const ItemMetadata(name: 'updated'));
     expect(await update1.getContent(), testItemContent2);
     final update2 = event3.data.singleWhere((i) => i.uid == item2.uid);
     expect(update2.isDeleted, isTrue);
 
     // create from JS
     final jsItemId = await jsClientWrapper.executeForCollection<String>(
-      Action.createItem(
-        const EtebaseItemMetadata(name: 'js-item'),
-        testItemContent1,
-      ),
+      Action.createItem(const ItemMetadata(name: 'js-item'), testItemContent1),
     );
 
     final event4 = await queue.next;
@@ -726,14 +717,14 @@ void main() {
     expect(event4.data, hasLength(1));
     final jsItem = event4.data.single;
     expect(jsItem.uid, jsItemId);
-    expect(await jsItem.getMeta(), const EtebaseItemMetadata(name: 'js-item'));
+    expect(await jsItem.getMeta(), const ItemMetadata(name: 'js-item'));
     expect(await jsItem.getContent(), testItemContent1);
 
     // update from JS
     await jsClientWrapper.executeForCollection<void>(
       Action.updateItem(
         item1.uid,
-        meta: const EtebaseItemMetadata(name: 'js-updated'),
+        meta: const ItemMetadata(name: 'js-updated'),
       ),
     );
 
@@ -744,7 +735,7 @@ void main() {
     expect(jsUpdatedItem.uid, item1.uid);
     expect(
       await jsUpdatedItem.getMeta(),
-      const EtebaseItemMetadata(name: 'js-updated'),
+      const ItemMetadata(name: 'js-updated'),
     );
 
     // ensure no further events are received
@@ -779,7 +770,7 @@ void main() {
       const totalChunks = 4; // <0s> + <1s> + <rest> + <indices>
 
       final uploadItem = await itemManager.create(
-        const EtebaseItemMetadata(name: 'deduplicated'),
+        const ItemMetadata(name: 'deduplicated'),
         compressableContent,
       );
 
@@ -795,7 +786,7 @@ void main() {
 
       final downloadItem = await itemManager.fetch(
         uploadItem.uid,
-        const EtebaseItemFetchOptions(prefetch: EtebasePrefetchOption.medium),
+        const ItemFetchOptions(prefetch: PrefetchOption.medium),
       );
 
       prefix = 'Downloading - ';

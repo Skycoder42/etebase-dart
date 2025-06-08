@@ -15,7 +15,7 @@ import 'package:etebase/src/api/exceptions/permission_denied.dart';
 import 'package:etebase/src/api/exceptions/server_problem.dart';
 import 'package:etebase/src/api/exceptions/temporary_server_problem.dart';
 import 'package:etebase/src/api/exceptions/unauthorized.dart';
-import 'package:etebase/src/api/models/etebase_user.dart';
+import 'package:etebase/src/api/models/user.dart';
 import 'package:etebase/src/impl/codec/message_pack_converter.dart';
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
@@ -38,7 +38,7 @@ void main() {
   setUpAll(() {
     provideDummy(const ByteStream(Stream.empty()));
     provideDummy(const HttpErrorContent());
-    provideDummy(const EtebaseUser(username: '', email: ''));
+    provideDummy(const User(username: '', email: ''));
   });
 
   group('$BaseNetwork', () {
@@ -217,10 +217,7 @@ void main() {
         });
 
         test('encodes other data as msgPack for request body', () async {
-          const testBody = EtebaseUser(
-            username: 'test-user',
-            email: 'test-mail',
-          );
+          const testBody = User(username: 'test-user', email: 'test-mail');
           final testBodyBytes = Uint8List.fromList([5, 6, 22, 13]);
 
           when(mockConverter.encode(any)).thenReturn(testBodyBytes);
@@ -295,10 +292,7 @@ void main() {
         });
 
         test('decodes msgPack data', () async {
-          const testBody = EtebaseUser(
-            username: 'test-user',
-            email: 'test-mail',
-          );
+          const testBody = User(username: 'test-user', email: 'test-mail');
           final testBodyBytes = Uint8List.fromList([5, 6, 12, 13]);
 
           when(mockClient.send(any)).thenReturnAsync(
@@ -309,15 +303,15 @@ void main() {
             ),
           );
 
-          when(mockConverter.decode<EtebaseUser>(any)).thenReturn(testBody);
+          when(mockConverter.decode<User>(any)).thenReturn(testBody);
 
-          final result = await sut.invoke<EtebaseUser>();
+          final result = await sut.invoke<User>();
 
           expect(result, testBody);
 
           verifyInOrder([
             mockClient.send(any),
-            mockConverter.decode<EtebaseUser>(testBodyBytes),
+            mockConverter.decode<User>(testBodyBytes),
           ]);
         });
 

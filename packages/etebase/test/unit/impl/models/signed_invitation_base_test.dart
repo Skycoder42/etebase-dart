@@ -1,29 +1,29 @@
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
-import 'package:etebase/src/api/models/etebase_collection_access_level.dart';
-import 'package:etebase/src/impl/models/signed_invitation.dart';
+import 'package:etebase/src/api/models/collection_access_level.dart';
+import 'package:etebase/src/impl/models/signed_invitation_base.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('$SignedInvitation', () {
+  group('$SignedInvitationBase', () {
     testData(
       'toJson does not add runtimeType',
       [
-        SignedInvitation.write(
+        SignedInvitationBase.write(
           uid: 'uid',
           version: 1,
           username: 'username',
           collection: 'collection',
-          accessLevel: EtebaseCollectionAccessLevel.admin,
+          accessLevel: CollectionAccessLevel.admin,
           signedEncryptionKey: Uint8List.fromList([4, 4, 2, 1]),
         ),
-        SignedInvitation.read(
+        SignedInvitationBase.read(
           uid: 'uid',
           version: 1,
           username: 'username',
           collection: 'collection',
-          accessLevel: EtebaseCollectionAccessLevel.admin,
+          accessLevel: CollectionAccessLevel.admin,
           signedEncryptionKey: Uint8List.fromList([6, 7, 2]),
           fromUsername: 'fromUsername',
           fromPubKey: Uint8List.fromList([9, 90]),
