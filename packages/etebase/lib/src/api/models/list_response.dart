@@ -99,7 +99,7 @@ sealed class ListResponse<T extends Object> with _$ListResponse<T> {
 
   /// @nodoc
   @internal
-  static ListResponse<T> iteratorFromJson<T extends Object>(
+  static IteratorListResponse<T> iteratorFromJson<T extends Object>(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
   ) => _$IteratorListResponseFromJson(json, fromJsonT);

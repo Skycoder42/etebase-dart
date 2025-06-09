@@ -16,9 +16,8 @@ Dart native client library for etebase and etesync.
 
 <small><i><a href='https://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-
 ## Features
-- Fully dart native compatible implementation of the [Etebase Protocol](https://docs.etebase.com/protocol-specs/introduction)
+- Fully compatible dart implementation of the [Etebase Protocol](https://docs.etebase.com/protocol-specs/introduction)
   - Based on the official [etebase-js](https://github.com/etesync/etebase-js) JavaScript client, ported to dart
   - 100% feature parity, including websockets and prefetching (which are not supported by the Rust/C API)
   - Written in dart, but uses [sodium](https://pub.dev/packages/sodium) for cryptographic operations, which is a wrapper
@@ -36,7 +35,7 @@ Dart native client library for etebase and etesync.
     - Inspired by the fs cache of the rust implementation, but also supports web via indexed db
 - Supports 2 different encryption modes: sync (for small payloads) and async (for large payloads to not block the UI)
   - For more details see below
-- Add flutter package ([etebase_flutter](https://pub.dev/packages/etebase_flutter)) for easy use with flutter
+- Use the flutter package ([etebase_flutter](https://pub.dev/packages/etebase_flutter)) for easy use with flutter
 
 ## Installation
 
@@ -98,6 +97,9 @@ do {
     collection.dispose();
   }
 } while (!listResponse.isDone);
+
+await account.logout();
+await account.dispose();
 ```
 
 Check out the [Example](https://pub.dev/packages/etebase/example) for more details.
