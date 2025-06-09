@@ -15,7 +15,6 @@ jobs:
     with:
       workingDirectory: packages/etebase
       buildRunner: true
-      panaScoreThreshold: 10
       unitTestPaths: -P unit
       coverageExclude: >-
         "**/*.freezed.dart"

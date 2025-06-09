@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:sodium/sodium_sumo.dart';
 
-import '../../impl/crypto/executors/async_crypto_executor.dart';
+import '../../impl/crypto/executors/async_crypto_executor.dart'
+    if (dart.library.js_interop) '../../impl/crypto/executors/async_crypto_executor_js_stub.dart';
 import '../../impl/crypto/executors/sync_crypto_executor.dart';
 import '../exceptions/crypto_failure.dart';
 

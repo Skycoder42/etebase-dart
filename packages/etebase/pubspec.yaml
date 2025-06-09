@@ -1,6 +1,6 @@
 name: etebase
 description: Dart native client library for etebase and etesync.
-version: 2.0.1
+version: 2.0.2
 repository: https://github.com/Skycoder42/etebase-dart
 
 environment:
