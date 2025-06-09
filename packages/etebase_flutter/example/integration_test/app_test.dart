@@ -12,7 +12,7 @@ void main() {
 
     expect(find.text('etebase flutter plugin'), findsOneWidget);
     expect(
-      find.text('etebase default server URL: https://api.etebase.com/'),
+      find.text('etebase default server URL: https://api.etebase.com'),
       findsOneWidget,
     );
   });

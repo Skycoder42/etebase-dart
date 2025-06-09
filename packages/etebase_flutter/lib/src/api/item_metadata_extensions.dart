@@ -3,6 +3,25 @@ import 'dart:ui';
 import 'package:etebase/etebase.dart';
 import 'package:flutter/material.dart';
 
+/// Helper factory to create [ItemMetadata] with a [color] value that is a
+/// [Color]
+///
+/// In addition to the usual parameters of [ItemMetadata], [withAlpha] can be
+/// specified. See [ItemMetadataExtensions.copyWithColor] for more details.
+ItemMetadata flutterItemMetadata({
+  required Color color,
+  String? description,
+  DateTime? mtime,
+  String? name,
+  String? itemType,
+  bool? withAlpha,
+}) => ItemMetadata(
+  description: description,
+  mtime: mtime,
+  name: name,
+  itemType: itemType,
+).copyWithColor(color, withAlpha: withAlpha);
+
 /// Extension on [ItemMetadata] to get and set [Color] values directly.
 extension ItemMetadataExtensions<T extends ItemMetadata> on T {
   static final _colorRegExp = RegExp(

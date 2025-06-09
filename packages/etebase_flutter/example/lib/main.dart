@@ -39,6 +39,9 @@ class MyApp extends StatelessWidget {
   Future<String> _validateClient() async {
     final client = await FlutterClient.create();
     try {
+      final randomData = client.randombytes(42);
+      print("Generated random data: $randomData");
+
       final serverUrl = Client.defaultServerUrl;
       final serverIsOk = await client.checkEtebaseServer();
       if (serverIsOk) {

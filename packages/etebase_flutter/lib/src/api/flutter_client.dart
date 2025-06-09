@@ -1,3 +1,5 @@
+// coverage:ignore-file
+
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
