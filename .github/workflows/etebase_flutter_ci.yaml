@@ -16,17 +16,8 @@ jobs:
     with:
       workingDirectory: packages/etebase_flutter
       buildRunner: false
-      unitTestPaths: ""
       integrationTestProject: example
       integrationTestPaths: integration_test/app_test.dart
-      integrationTestSetup: >-
-        {
-          "android": "dart run tool/libetebase/download.dart 0.5.6 android",
-          "ios": "dart run tool/libetebase/download.dart 0.5.6 ios",
-          "linux": "dart run tool/libetebase/download.dart 0.5.6 linux",
-          "macos": "dart run tool/libetebase/download.dart 0.5.6 macos",
-          "windows": "dart run tool/libetebase/download.dart 0.5.6 windows"
-        }
 
   cd:
     name: CD
