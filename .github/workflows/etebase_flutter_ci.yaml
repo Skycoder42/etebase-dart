@@ -10,23 +10,25 @@ on:
       - "!packages/etebase_flutter/tool/libetebase/**"
 
 jobs:
+  package_etebase:
+    name: Package etebase
+    uses: Skycoder42/dart_test_tools/.github/workflows/package.yml@main
+    with:
+      workingDirectory: packages/etebase
+      buildRunner: true
+
   ci:
     name: CI
     uses: Skycoder42/dart_test_tools/.github/workflows/flutter.yml@main
+    needs:
+      - package_etebase
     with:
       workingDirectory: packages/etebase_flutter
+      artifactDependencies: etebase
       buildRunner: false
       unitTestPaths: ""
       integrationTestProject: example
       integrationTestPaths: integration_test/app_test.dart
-      integrationTestSetup: >-
-        {
-          "android": "dart run tool/libetebase/download.dart 0.5.6 android",
-          "ios": "dart run tool/libetebase/download.dart 0.5.6 ios",
-          "linux": "dart run tool/libetebase/download.dart 0.5.6 linux",
-          "macos": "dart run tool/libetebase/download.dart 0.5.6 macos",
-          "windows": "dart run tool/libetebase/download.dart 0.5.6 windows"
-        }
 
   cd:
     name: CD
