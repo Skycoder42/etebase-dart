@@ -1,4 +1,4 @@
-package com.example.myapp;
+package de.skycoder42.etebase_flutter_example;
 
 import androidx.test.rule.ActivityTestRule;
 import dev.flutter.plugins.integration_test.FlutterTestRunner;
