@@ -23,6 +23,7 @@ dev_dependencies:
   dart_test_tools: ^6.1.1
   flutter_test:
     sdk: flutter
+  path: ^1.9.1
   path_provider_platform_interface: ^2.1.2
 
 cider:

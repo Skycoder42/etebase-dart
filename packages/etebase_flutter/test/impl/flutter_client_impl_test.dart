@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:sodium_libs/sodium_libs_sumo.dart';
 
@@ -77,11 +78,15 @@ void main() {
         }
       });
 
-      test('hiveInit does not initialize if auto init is false', () async {
-        await FlutterClientImpl.hiveInit(false);
+      test(
+        'hiveInit does not initialize if auto init is false',
+        testOn: '!browser',
+        () async {
+          await FlutterClientImpl.hiveInit(false);
 
-        expect(() => Hive.boxExists('testBox'), throwsArgumentError);
-      });
+          expect(() => Hive.boxExists('testBox'), throwsArgumentError);
+        },
+      );
 
       test('hiveInit initialized hive with custom directory', () async {
         await FlutterClientImpl.hiveInit(true);
@@ -89,6 +94,7 @@ void main() {
         expect(await Hive.boxExists('testBox'), isFalse);
 
         final testBox = await Hive.openBox<String>('testBox');
+        addTearDown(testBox.close);
 
         expect(await Hive.boxExists('testBox'), isTrue);
 
@@ -97,7 +103,7 @@ void main() {
             testBox.path,
             allOf(
               startsWith(Directory.systemTemp.path),
-              endsWith('/etebase/testbox.hive'),
+              endsWith(path.join('etebase', 'testbox.hive')),
             ),
           );
         }
