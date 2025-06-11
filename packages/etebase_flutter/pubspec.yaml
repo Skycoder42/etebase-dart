@@ -1,5 +1,5 @@
 name: etebase_flutter
-description: Flutter platform plugins for the dart implementation of etebase.
+description: Flutter extensions for the dart implementation of etebase.
 version: 2.0.0
 homepage: https://github.com/Skycoder42/etebase-dart
 

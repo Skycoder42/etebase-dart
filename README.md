@@ -12,4 +12,4 @@ If you just landed here and don't know where to start, simply read the [etebase 
 the primary package of this repository.
 
 - **[etebase](packages/etebase)**: Dart native client library for etebase and etesync.
-- **[etebase_flutter](packages/etebase_flutter)**: Flutter platform plugins for the dart implementation of etebase.
+- **[etebase_flutter](packages/etebase_flutter)**: Flutter extensions for the dart implementation of etebase.

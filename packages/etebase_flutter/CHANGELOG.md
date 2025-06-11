@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-06-11
+- This release is a complete rewrite of the library. Instead of creating dart bindings for the C library, this rewrite
+implements the whole etebase protocol in dart. It is heavily based on the JS client and 100% compatible to it. However,
+due to the rewrite, it provides a completely different API than older versions.
+
 ## [1.1.1] - 2024-03-14
 ### Changed
 - Updated dependencies
@@ -29,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
+[2.0.0]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter-v1.1.1...etebase_flutter-v2.0.0
 [1.1.1]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter-v1.1.0...etebase_flutter-v1.1.1
 [1.1.0]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter-v1.0.1...etebase_flutter-v1.1.0
 [1.0.1]: https://github.com/Skycoder42/etebase-dart/compare/etebase_flutter%2Fv1.0.0...etebase_flutter-v1.0.1

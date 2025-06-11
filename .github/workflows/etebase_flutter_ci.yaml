@@ -18,12 +18,12 @@ jobs:
       buildRunner: false
       integrationTestProject: example
       integrationTestPaths: integration_test/app_test.dart
-      firebaseProjectId: etebase-dart
-    secrets:
-      firebaseCredentials: ${{ secrets.FIREBASE_CREDENTIALS }}
-      provisioningProfile: ${{ secrets.PROVISIONING_PROFILE }}
-      signingIdentity: ${{ secrets.SIGNING_IDENTITY }}
-      signingIdentityPassphrase: ${{ secrets.SIGNING_IDENTITY_PASSPHRASE }}
+    #   firebaseProjectId: etebase-dart
+    # secrets:
+    #   firebaseCredentials: ${{ secrets.FIREBASE_CREDENTIALS }}
+    #   provisioningProfile: ${{ secrets.PROVISIONING_PROFILE }}
+    #   signingIdentity: ${{ secrets.SIGNING_IDENTITY }}
+    #   signingIdentityPassphrase: ${{ secrets.SIGNING_IDENTITY_PASSPHRASE }}
 
   cd:
     name: CD
