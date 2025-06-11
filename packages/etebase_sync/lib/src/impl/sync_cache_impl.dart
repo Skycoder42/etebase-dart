@@ -3,13 +3,13 @@ import 'package:etebase/etebase.dart';
 abstract class SyncCacheImpl {
   Future<void> dispose();
 
-  Future<void> collectionSet(
-    CollectionManager colMgr,
-    Collection collection, {
-    bool saveContent = true,
-  });
+  Future<void> saveStokenFor(String collectionType, String? stoken);
 
-  Future<Collection?> collectionGet(CollectionManager colMgr, String colUid);
+  Future<String?> loadStokenFor(String collectionType);
 
-  Future<void> collectionUploadNeeded(String colUid);
+  Iterable<String> collectionList(String collectionType);
+
+  Future<Collection?> collectionGet(String colUid);
+
+  Future<void> collectionSet(Collection collection, {bool needsUpload = false});
 }

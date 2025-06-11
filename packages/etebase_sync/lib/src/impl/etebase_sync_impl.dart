@@ -31,16 +31,23 @@ class EtebaseSyncImpl implements EtebaseSync {
     return await factory(collection);
   }
 
-  Future<T> runOnline<T>(FutureOr<T> Function() callback, [T? fallback]) async {
+  Future<T> runOnline<T>(
+    FutureOr<T> Function() callback, {
+    FutureOr<T> Function()? whenOffline,
+  }) async {
     try {
       return await callback();
     } on ConnectionProblem {
-      return fallback as T;
+      // break
     } on TemporaryServerProblem {
-      return fallback as T;
+      // break
     } on ServerProblem {
-      return fallback as T;
+      // break
+    } catch (_) {
+      rethrow;
     }
+
+    return whenOffline?.call() ?? (null as T);
   }
 
   _Registration<T> _registration<T extends Object>() {
