@@ -1,0 +1,24 @@
+name: etebase_sync
+description: A repository based wrapper around etebase for easy, offline-enabled use.
+version: 1.0.0
+repository: https://github.com/Skycoder42/etebase-dart
+
+environment:
+  sdk: ^3.8.0
+resolution: workspace
+
+dependencies:
+  etebase: ^2.0.2
+
+dev_dependencies:
+  custom_lint: ^0.7.5
+  dart_pre_commit: ^5.4.5
+  dart_test_tools: ^6.1.1
+  mockito: ^5.4.6
+  test: ^1.25.15
+
+cider:
+  link_template:
+    tag: https://github.com/Skycoder42/etebase-dart/releases/tag/etebase_sync-v%tag%
+    diff: https://github.com/Skycoder42/etebase-dart/compare/etebase_sync-v%from%...etebase_sync-v%to%
+
