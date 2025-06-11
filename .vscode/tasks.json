@@ -11,7 +11,27 @@
 				"watch"
 			],
 			"problemMatcher": [],
-			"label": "dart: dart run build_runner watch",
+			"label": "etebase: dart run build_runner watch",
+			"detail": "packages/etebase",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		},
+		{
+			"type": "dart",
+			"command": "dart",
+			"cwd": "packages/etebase_sync",
+			"args": [
+				"run",
+				"build_runner",
+				"watch"
+			],
+			"problemMatcher": [],
+			"label": "etebase_sync: dart run build_runner watch",
 			"detail": "packages/etebase",
 			"group": {
 				"kind": "build",

@@ -1,0 +1,4 @@
+# Generated files
+!*.freezed.dart
+!*.g.dart
+!*.mocks.dart
