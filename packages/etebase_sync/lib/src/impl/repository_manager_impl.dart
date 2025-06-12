@@ -5,12 +5,14 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../api/conflict_resolver.dart';
 import '../api/exceptions/cache_miss.dart';
+import '../api/exceptions/collection_deleted.dart';
 import '../api/exceptions/collection_type_mismatch.dart';
 import '../api/models/repository_metadata.dart';
 import '../api/repository.dart';
 import '../api/repository_manager.dart';
 import 'etebase_sync_impl.dart';
 import 'sync_cache_impl.dart';
+import 'util/dispose_scope.dart';
 import 'util/streamed_response.dart';
 
 @internal
@@ -107,28 +109,30 @@ class RepositoryManagerImpl implements RepositoryManager {
   }
 
   @override
-  Future<Repository<T>> openById<T extends Object>(String colUid) async {
-    final type = _sync.typeFor<T>();
+  Future<Repository<T>> openById<T extends Object>(String colUid) =>
+      DisposeScope.scoped(() async {
+        final type = _sync.typeFor<T>();
 
-    final collection = await _loadCollection(colUid, collectionType: type);
+        final collection = await _loadCollection(colUid, collectionType: type);
 
-    return await _sync.createRepo<T>(collection);
-  }
+        return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
+      });
 
   @override
-  Future<Repository<T>> create<T extends Object>({
-    RepositoryMetadata? meta,
-  }) async {
-    final collection = await _collectionManager.create(
-      _sync.typeFor<T>(),
-      meta ?? const RepositoryMetadata(),
-      Uint8List(0),
-    );
+  Future<Repository<T>> create<T extends Object>({RepositoryMetadata? meta}) =>
+      DisposeScope.scoped(() async {
+        final collection = DisposeScope.attach(
+          await _collectionManager.create(
+            _sync.typeFor<T>(),
+            meta ?? const RepositoryMetadata(),
+            Uint8List(0),
+          ),
+        );
 
-    await _saveCollection(collection);
+        await _saveCollection(collection);
 
-    return await _sync.createRepo<T>(collection);
-  }
+        return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
+      });
 
   Future<void> updateMeta(
     String colUid,
@@ -175,13 +179,15 @@ class RepositoryManagerImpl implements RepositoryManager {
     String? collectionType,
     bool fromCache = false,
   }) async {
-    final cachedCol = await _cache.collectionGet(colUid);
+    final cachedCol = DisposeScope.attach(await _cache.collectionGet(colUid));
     Collection? collection;
     if (fromCache) {
       collection = cachedCol;
     } else {
       collection = await _sync.runOnline<Collection?>(() async {
-        final remoteCol = await _collectionManager.fetch(colUid);
+        final remoteCol = DisposeScope.attach(
+          await _collectionManager.fetch(colUid),
+        );
 
         if (cachedCol case Collection(
           etag: final String etag,
@@ -198,13 +204,14 @@ class RepositoryManagerImpl implements RepositoryManager {
       throw CacheMiss('Collection with uid "$colUid"');
     } else if (collectionType != null &&
         collection.collectionType != collectionType) {
+      final actType = collection.collectionType;
       throw CollectionTypeMismatch(
         colUid: colUid,
         expectedCollectionType: collectionType,
-        actualCollectionType: collection.collectionType,
+        actualCollectionType: actType,
       );
     } else if (collection.isDeleted) {
-      throw UnimplementedError('TODO real error');
+      throw CollectionDeleted(colUid);
     }
 
     return collection;

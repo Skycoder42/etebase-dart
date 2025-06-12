@@ -10,7 +10,7 @@ class CollectionTypeMismatch extends EtebaseSyncException {
     required this.expectedCollectionType,
     required this.actualCollectionType,
   }) : super(
-         'Expected collection with id "$colUid" to have type '
+         'Expected collection with uid "$colUid" to have type '
          '"$expectedCollectionType", but was "$actualCollectionType"',
        );
 
