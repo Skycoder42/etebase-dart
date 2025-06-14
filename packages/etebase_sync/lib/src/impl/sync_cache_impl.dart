@@ -1,5 +1,7 @@
 import 'package:etebase/etebase.dart';
 
+enum SetMode { fromRemote, preUpload, postUpload }
+
 abstract class SyncCacheImpl {
   Future<void> dispose();
 
@@ -11,5 +13,9 @@ abstract class SyncCacheImpl {
 
   Future<Collection?> collectionGet(String colUid);
 
-  Future<void> collectionSet(Collection collection, {bool needsUpload = false});
+  // TODO handle delete from cache when deleted!
+  Future<void> collectionSet(
+    Collection collection, [
+    SetMode mode = SetMode.fromRemote,
+  ]);
 }

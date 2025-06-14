@@ -7,6 +7,9 @@ import '../api/conflict_resolver.dart';
 import '../api/exceptions/cache_miss.dart';
 import '../api/exceptions/collection_deleted.dart';
 import '../api/exceptions/collection_type_mismatch.dart';
+import '../api/exceptions/unresolved_conflict.dart';
+import '../api/models/conflict_origin.dart';
+import '../api/models/repository_conflict_resolution.dart';
 import '../api/models/repository_metadata.dart';
 import '../api/repository.dart';
 import '../api/repository_manager.dart';
@@ -134,18 +137,12 @@ class RepositoryManagerImpl implements RepositoryManager {
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
-  Future<void> updateMeta(
-    String colUid,
-    RepositoryMetadata Function(RepositoryMetadata meta) update,
-  ) async {
-    final collection = await _loadCollection(colUid);
-
-    final oldMeta = await collection.getMeta<RepositoryMetadata>();
-    final newMeta = update(oldMeta);
-    await collection.setMeta(newMeta);
-
-    await _saveCollection(collection);
-  }
+  Future<void> updateMeta(String colUid, RepositoryMetadata meta) =>
+      DisposeScope.scoped(() async {
+        final collection = await _loadCollection(colUid);
+        await collection.setMeta(meta);
+        await _saveCollection(collection);
+      });
 
   Future<void> delete(String colUid) async {
     final collection = await _loadCollection(colUid);
@@ -211,17 +208,59 @@ class RepositoryManagerImpl implements RepositoryManager {
         actualCollectionType: actType,
       );
     } else if (collection.isDeleted) {
+      await _cache.collectionUnset(colUid);
       throw CollectionDeleted(colUid);
     }
 
     return collection;
   }
 
-  Future<void> _saveCollection(Collection collection) async {
-    await _cache.collectionSet(collection, needsUpload: true);
+  Future<void> _saveCollection(
+    Collection collection, {
+    bool transaction = true,
+  }) async {
+    await _cache.collectionSet(collection, SetMode.preUpload);
+
     await _sync.runOnline(() async {
-      await _collectionManager.transaction(collection);
-      await _cache.collectionSet(collection);
+      try {
+        if (transaction) {
+          await _collectionManager.transaction(collection);
+        } else {
+          await _collectionManager.upload(collection);
+        }
+        await _cache.collectionSet(collection, SetMode.postUpload);
+      } on Conflict {
+        final remote = DisposeScope.attach(
+          await _collectionManager.fetch(collection.uid),
+        );
+
+        final resolution = await _conflictResolver.resolveRepositoryConflict(
+          colUid: collection.uid,
+          localMeta: await collection.getMeta<RepositoryMetadata>(),
+          remoteMeta: await remote.getMeta<RepositoryMetadata>(),
+          deletedLocally: collection.isDeleted,
+          deletedRemotely: remote.isDeleted,
+          origin: ConflictOrigin.server,
+        );
+
+        switch (resolution) {
+          case RepositoryConflictResolutionLocal(meta: null):
+            await _collectionManager.upload(collection);
+            await _cache.collectionSet(remote, SetMode.postUpload);
+          case RepositoryConflictResolutionLocal(
+            :final RepositoryMetadata meta,
+          ):
+            await collection.setMeta(meta);
+            await _saveCollection(collection, transaction: false);
+          case RepositoryConflictResolutionRemote(meta: null):
+            await _cache.collectionSet(remote, SetMode.postUpload);
+          case RepositoryConflictResolutionRemote(
+            :final RepositoryMetadata meta,
+          ):
+            await remote.setMeta(meta);
+            await _saveCollection(remote);
+        }
+      }
     });
   }
 }

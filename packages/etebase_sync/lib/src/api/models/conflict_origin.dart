@@ -1,0 +1,1 @@
+enum ConflictOrigin { cache, server }
