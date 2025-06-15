@@ -86,7 +86,7 @@ class DisposeScope {
         }
 
         // ignore: avoid_dynamic_calls
-        await object?.dispose();
+        await (object as dynamic)?.dispose();
       }
 
       // ignore: avoid_catches_without_on_clauses

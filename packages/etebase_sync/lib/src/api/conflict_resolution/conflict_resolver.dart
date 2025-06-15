@@ -1,11 +1,19 @@
 import 'dart:async';
 
-import 'exceptions/unresolved_conflict.dart';
-import 'models/conflict_origin.dart';
-import 'models/repository_conflict_resolution.dart';
-import 'models/repository_metadata.dart';
+import '../exceptions/unresolved_conflict.dart';
+import '../models/conflict_origin.dart';
+import '../models/repository_conflict_resolution.dart';
+import '../models/repository_metadata.dart';
+import 'local_resolver.dart';
+import 'remote_resolver.dart';
 
 class ConflictResolver {
+  const ConflictResolver();
+
+  const factory ConflictResolver.local() = LocalResolver;
+
+  const factory ConflictResolver.remote() = RemoteResolver;
+
   FutureOr<String> resolveMultiplePrimaryCollections(
     String collectionType,
     Map<String, RepositoryMetadata> collectionData,

@@ -1,6 +1,7 @@
 import 'package:etebase/etebase.dart';
 import 'package:meta/meta.dart';
 
+// TODO delete if unused
 @internal
 Stream<T> streamedResponse<T extends Object>(
   Future<ListResponse<T>> Function(String? token) next, [

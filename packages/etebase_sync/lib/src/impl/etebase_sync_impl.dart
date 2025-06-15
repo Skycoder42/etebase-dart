@@ -41,8 +41,6 @@ class EtebaseSyncImpl implements EtebaseSync {
       // break
     } on TemporaryServerProblem {
       // break
-    } on ServerProblem {
-      // break
     } catch (_) {
       rethrow;
     }
