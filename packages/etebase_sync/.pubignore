@@ -1,4 +1,5 @@
 # Generated files
+!**/lib/gen
 !*.freezed.dart
 !*.g.dart
 !*.mocks.dart

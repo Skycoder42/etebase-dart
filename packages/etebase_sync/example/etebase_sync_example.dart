@@ -4,10 +4,11 @@ import 'dart:ffi';
 import 'package:etebase/etebase.dart';
 import 'package:etebase_sync/src/api/conflict_resolution/conflict_resolver.dart';
 import 'package:etebase_sync/src/api/models/repository_metadata.dart';
+import 'package:etebase_sync/src/api/online_checker.dart';
 import 'package:etebase_sync/src/api/repository.dart';
 import 'package:etebase_sync/src/impl/etebase_sync_impl.dart';
-import 'package:etebase_sync/src/impl/repository_manager_impl.dart';
 import 'package:etebase_sync/src/impl/sync_cache_impl.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 Future<void> main() async {
@@ -27,15 +28,13 @@ Future<void> main() async {
     base64.encode(client.randombytes(32)),
   );
 
-  final sync = EtebaseSyncImpl()
-    ..registerRepositoryType<String>('test', Repository<String>.new);
-  final cache = SyncCacheImpl(account.collectionManager);
-  final repoMgr = RepositoryManagerImpl(
-    sync,
-    cache,
+  final sync = EtebaseSyncImpl(
+    const OnlineChecker.alwaysOnline(),
     const ConflictResolver.remote(),
-    account.collectionManager,
-  );
+    account,
+    SyncCacheImpl(0, Hive),
+  )..registerRepositoryType<String>('test', Repository<String>.new);
+  final repoMgr = sync.repositoryManager;
 
   final primary = await repoMgr.openPrimary<String>();
   print(primary.collection.uid);
@@ -43,7 +42,7 @@ Future<void> main() async {
   final all = await repoMgr.list<String>();
   print(all);
 
-  await repoMgr.create<String>(meta: const RepositoryMetadata(name: 'Other'));
+  await repoMgr.create<String>(const RepositoryMetadata(name: 'Other'));
 
   await repoMgr.updateMeta<String>(
     all.keys.single,

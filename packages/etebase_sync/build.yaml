@@ -1,5 +1,10 @@
 targets:
   $default:
+    sources:
+      - $package$
+      - lib/**
+      - pubspec.yaml
+      - test/**
     builders:
       json_serializable:
         options:
@@ -11,4 +16,6 @@ targets:
           ignore_for_file:
             - type=lint
             - strict_raw_type
+      dart_test_tools:dart_test_tools_builders:
+        enabled: true
 

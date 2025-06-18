@@ -10,6 +10,7 @@ resolution: workspace
 dependencies:
   etebase: ^2.0.2
   freezed_annotation: ^3.0.0
+  hive_ce: ^2.11.3
   json_annotation: ^4.9.0
   meta: ^1.16.0
 
