@@ -105,6 +105,19 @@ class SyncCacheImpl {
     }
   }
 
+  Future<Item?> itemGet(
+    ItemManager itemManager,
+    String colUid,
+    String itemUid,
+  ) => throw UnimplementedError();
+
+  Future<void> itemSet(
+    ItemManager itemManager,
+    String colUid,
+    Item item, [
+    SetMode mode = SetMode.fromRemote,
+  ]) => throw UnimplementedError();
+
   void _autoRegister<T>(TypeAdapter<T> adapter) {
     if (!_hive.isAdapterRegistered(adapter.typeId)) {
       _hive.registerAdapter<T>(adapter);
