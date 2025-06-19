@@ -1,28 +1,34 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../api/conflict_resolution/conflict_resolver.dart';
-import '../api/exceptions/cache_miss.dart';
-import '../api/exceptions/collection_deleted.dart';
 import '../api/exceptions/collection_type_mismatch.dart';
 import '../api/exceptions/unresolved_conflict.dart';
 import '../api/models/conflict_origin.dart';
-import '../api/models/repository_conflict_resolution.dart';
+import '../api/models/conflict_resolution.dart';
 import '../api/models/repository_metadata.dart';
 import '../api/repository.dart';
 import '../api/repository_manager.dart';
 import 'etebase_sync_impl.dart';
 import 'sync_cache_impl.dart';
+import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
 @internal
-class RepositoryManagerImpl implements RepositoryManager {
+class RepositoryManagerImpl
+    implements RepositoryManager, SyncTarget<Collection, RepositoryMetadata> {
   final EtebaseSyncImpl _sync;
   final SyncCacheImpl _cache;
   final ConflictResolver _conflictResolver;
   final CollectionManager _collectionManager;
+
+  late final _syncEngine = SyncEngine<Collection, RepositoryMetadata>(
+    _sync,
+    this,
+  );
 
   RepositoryManagerImpl(
     this._sync,
@@ -42,11 +48,11 @@ class RepositoryManagerImpl implements RepositoryManager {
       case []:
         return await create<T>(const RepositoryMetadata(primary: true));
       case [final colUid]:
-        var collection = await _loadCollection(type, colUid, fromCache: true);
+        var collection = await _syncEngine.load(type, colUid, fromCache: true);
         final meta = await collection.getMeta<RepositoryMetadata>();
         if (!meta.primary) {
           await collection.setMeta(meta.copyWith(primary: true));
-          collection = await _saveCollection(collection);
+          collection = await _syncEngine.save(collection);
         }
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       default:
@@ -55,7 +61,7 @@ class RepositoryManagerImpl implements RepositoryManager {
 
     final primaryCollections = <(Collection, RepositoryMetadata)>[];
     for (final colUid in colUids) {
-      final collection = await _loadCollection(type, colUid, fromCache: true);
+      final collection = await _syncEngine.load(type, colUid, fromCache: true);
       final meta = await collection.getMeta<RepositoryMetadata>();
       if (meta.primary) {
         primaryCollections.add((collection, meta));
@@ -82,7 +88,7 @@ class RepositoryManagerImpl implements RepositoryManager {
           }
 
           await collection.setMeta(meta.copyWith(primary: false));
-          await _saveCollection(collection);
+          await _syncEngine.save(collection);
         }
 
         if (primaryCol == null) {
@@ -114,7 +120,7 @@ class RepositoryManagerImpl implements RepositoryManager {
             continue;
           }
 
-          _validateType(collection, type);
+          internalValidate(collection, type);
           final meta = await collection.getMeta<RepositoryMetadata>();
           result[colUid] = meta;
         }
@@ -131,7 +137,7 @@ class RepositoryManagerImpl implements RepositoryManager {
             Uint8List(0),
           ),
         );
-        collection = await _saveCollection(collection);
+        collection = await _syncEngine.save(collection);
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
@@ -139,14 +145,14 @@ class RepositoryManagerImpl implements RepositoryManager {
   Future<Repository<T>> open<T extends Object>(String colUid) =>
       DisposeScope.scoped(() async {
         final type = _sync.typeFor<T>();
-        final collection = await _loadCollection(type, colUid);
+        final collection = await _syncEngine.load(type, colUid);
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
   @override
   Future<RepositoryMetadata> getMeta<T extends Object>(String colUid) =>
       DisposeScope.scoped(() async {
-        final collection = await _loadCollection(_sync.typeFor<T>(), colUid);
+        final collection = await _syncEngine.load(_sync.typeFor<T>(), colUid);
         return await collection.getMeta();
       });
 
@@ -155,20 +161,17 @@ class RepositoryManagerImpl implements RepositoryManager {
     String colUid,
     RepositoryMetadata meta,
   ) => DisposeScope.scoped(() async {
-    final collection = await _loadCollection(_sync.typeFor<T>(), colUid);
+    final collection = await _syncEngine.load(_sync.typeFor<T>(), colUid);
     await collection.setMeta(meta);
-    await _saveCollection(collection);
+    await _syncEngine.save(collection);
   });
 
   @override
   Future<void> delete<T extends Object>(String colUid) =>
       DisposeScope.scoped(() async {
-        final collection = await _loadCollection(_sync.typeFor<T>(), colUid);
-        if (collection.isDeleted) {
-          return;
-        }
+        final collection = await _syncEngine.load(_sync.typeFor<T>(), colUid);
         await collection.delete();
-        await _saveCollection(collection);
+        await _syncEngine.save(collection);
       });
 
   Future<void> _updateCache(String collectionType) async =>
@@ -183,7 +186,7 @@ class RepositoryManagerImpl implements RepositoryManager {
 
           response.data.forEach(DisposeScope.attach);
           for (final collection in response.data) {
-            _validateType(collection, collectionType);
+            internalValidate(collection, collectionType);
 
             try {
               await _cache.collectionSet(_collectionManager, collection);
@@ -193,7 +196,7 @@ class RepositoryManagerImpl implements RepositoryManager {
                 collectionType,
                 collection.uid,
               );
-              await _resolveConflict(
+              await _syncEngine.resolveConflict(
                 local: local,
                 remote: collection,
                 origin: ConflictOrigin.cache,
@@ -206,104 +209,42 @@ class RepositoryManagerImpl implements RepositoryManager {
         } while (!response.isDone);
       });
 
-  Future<Collection> _loadCollection(
-    String collectionType,
-    String colUid, {
-    bool fromCache = false,
-  }) async {
-    final cachedCol = DisposeScope.attach(
-      await _cache.collectionGet(_collectionManager, collectionType, colUid),
-    );
-    Collection? collection;
-    if (fromCache) {
-      collection = cachedCol;
-    } else {
-      collection = await _sync.runOnline<Collection?>(() async {
-        final remoteCol = DisposeScope.attach(
-          await _collectionManager.fetch(colUid),
-        );
+  @override
+  @protected
+  Future<Collection?> internalCacheGet(String container, String uid) async =>
+      await _cache.collectionGet(_collectionManager, container, uid);
 
-        if (cachedCol case Collection(
-          etag: final String etag,
-        ) when etag == remoteCol.etag) {
-          return cachedCol;
-        }
+  @override
+  @protected
+  Future<void> internalCacheSet(Collection instance, SetMode setMode) async =>
+      await _cache.collectionSet(_collectionManager, instance, setMode);
 
-        try {
-          await _cache.collectionSet(_collectionManager, remoteCol);
-          return remoteCol;
-        } on Conflict {
-          return await _resolveConflict(
-            local: cachedCol,
-            remote: remoteCol,
-            origin: ConflictOrigin.cache,
-          );
-        }
-      }, whenOffline: () => cachedCol);
-    }
+  @override
+  @protected
+  Future<Collection> internalFetch(String uid, [Collection? _]) async =>
+      await _collectionManager.fetch(uid);
 
-    if (collection == null) {
-      throw CacheMiss('Collection with uid "$colUid"');
-    } else if (collection.isDeleted) {
-      throw CollectionDeleted(colUid);
-    }
-
-    _validateType(collection, collectionType);
-
-    return collection;
-  }
-
-  Future<Collection> _saveCollection(
-    Collection collection, {
+  @override
+  @protected
+  Future<void> internalUpload(
+    Collection instance, {
     bool transaction = true,
   }) async {
-    await _cache.collectionSet(
-      _collectionManager,
-      collection,
-      SetMode.preUpload,
-    );
-
-    return await _sync.runOnline(() async {
-      try {
-        if (transaction) {
-          await _collectionManager.transaction(collection);
-        } else {
-          await _collectionManager.upload(collection);
-        }
-        await _cache.collectionSet(
-          _collectionManager,
-          collection,
-          SetMode.postUpload,
-        );
-        return collection;
-      } on Conflict {
-        final remote = DisposeScope.attach(
-          await _collectionManager.fetch(collection.uid),
-        );
-
-        return await _resolveConflict(
-          local: collection,
-          remote: remote,
-          origin: ConflictOrigin.server,
-        );
-      }
-    }, whenOffline: () => collection);
+    if (transaction) {
+      await _collectionManager.transaction(instance);
+    } else {
+      await _collectionManager.upload(instance);
+    }
   }
 
-  Future<Collection> _resolveConflict({
-    required Collection? local,
+  @override
+  @protected
+  FutureOr<ConflictResolution<Collection>> internalResolveConflict({
+    required String uid,
+    required Collection local,
     required Collection remote,
     required ConflictOrigin origin,
   }) async {
-    if (local == null) {
-      await _cache.collectionSet(
-        _collectionManager,
-        remote,
-        SetMode.postUpload,
-      );
-      return remote;
-    }
-
     final resolution = await _conflictResolver.resolveRepositoryConflict(
       colUid: remote.uid,
       localMeta: await local.getMeta<RepositoryMetadata>(),
@@ -313,31 +254,26 @@ class RepositoryManagerImpl implements RepositoryManager {
       origin: origin,
     );
 
-    switch (resolution) {
-      case RepositoryConflictResolutionLocal(:final meta):
-        if (meta != null) {
-          await local.setMeta(meta);
-        }
-        return await _saveCollection(local, transaction: false);
-      case RepositoryConflictResolutionRemote(meta: null):
-        await _cache.collectionSet(
-          _collectionManager,
-          remote,
-          SetMode.postUpload,
-        );
+    return resolution.map(
+      local: (value) async {
+        await local.setMeta(value);
+        return local;
+      },
+      remote: (value) async {
+        await remote.setMeta(value);
         return remote;
-      case RepositoryConflictResolutionRemote(:final RepositoryMetadata meta):
-        await remote.setMeta(meta);
-        return await _saveCollection(remote);
-    }
+      },
+    );
   }
 
-  void _validateType(Collection collection, String collectionType) {
-    if (collection.collectionType != collectionType) {
-      final actType = collection.collectionType;
+  @override
+  @protected
+  void internalValidate(Collection instance, String container) {
+    if (instance.collectionType != container) {
+      final actType = instance.collectionType;
       throw CollectionTypeMismatch(
-        colUid: collection.uid,
-        expectedCollectionType: collectionType,
+        colUid: instance.uid,
+        expectedCollectionType: container,
         actualCollectionType: actType,
       );
     }

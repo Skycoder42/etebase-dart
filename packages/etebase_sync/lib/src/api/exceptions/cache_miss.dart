@@ -1,10 +1,13 @@
 import 'etebase_sync_exception.dart';
 
 class CacheMiss extends EtebaseSyncException {
-  final String target;
+  final String uid;
 
-  CacheMiss(this.target)
-    : super('$target was not found in cache and device is offline!');
+  CacheMiss(this.uid)
+    : super(
+        'Instance with uid "$uid" was not found in cache '
+        'and device is offline!',
+      );
 
   @override
   String get name => 'CacheMiss';

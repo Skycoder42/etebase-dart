@@ -2,8 +2,9 @@ import 'dart:async';
 
 import '../exceptions/unresolved_conflict.dart';
 import '../models/conflict_origin.dart';
-import '../models/repository_conflict_resolution.dart';
+import '../models/conflict_resolution.dart';
 import '../models/repository_metadata.dart';
+import '../models/value_or_deleted.dart';
 import 'local_resolver.dart';
 import 'remote_resolver.dart';
 
@@ -23,7 +24,7 @@ class ConflictResolver {
     'for type "$collectionType"',
   );
 
-  FutureOr<RepositoryConflictResolution> resolveRepositoryConflict({
+  FutureOr<ConflictResolution<RepositoryMetadata>> resolveRepositoryConflict({
     required String colUid,
     required RepositoryMetadata localMeta,
     required RepositoryMetadata remoteMeta,
@@ -35,6 +36,20 @@ class ConflictResolver {
     'Metadata of collection with uid "$colUid" has been modified '
     'locally and on the remote (Origin: ${origin.name})',
     uid: colUid,
+    origin: origin,
+  );
+
+  FutureOr<ConflictResolution<ValueOrDeleted<TValue>>>
+  resolveItemConflict<TValue extends Object>({
+    required String itemUid,
+    required ValueOrDeleted<TValue> local,
+    required ValueOrDeleted<TValue> remote,
+    required ConflictOrigin origin,
+  }) => throw UnresolvedConflict(
+    ConflictTarget.item,
+    'Content of item with uid "$itemUid" has been modified '
+    'locally and on the remote (Origin: ${origin.name})',
+    uid: itemUid,
     origin: origin,
   );
 }

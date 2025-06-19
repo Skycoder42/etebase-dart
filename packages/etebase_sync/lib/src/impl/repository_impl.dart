@@ -1,17 +1,23 @@
+import 'dart:async';
+
 import 'package:etebase/etebase.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 
+import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/exceptions/cache_miss.dart';
-import '../api/exceptions/collection_deleted.dart';
+import '../api/exceptions/item_deleted.dart';
 import '../api/models/conflict_origin.dart';
+import '../api/models/conflict_resolution.dart';
 import '../api/repository_adapter.dart';
 import 'etebase_sync_impl.dart';
 import 'sync_cache_impl.dart';
+import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
-class Repository<T extends Object> {
+class Repository<T extends Object> implements SyncTarget<Item, ItemMetadata> {
   final EtebaseSyncImpl _sync;
   final SyncCacheImpl _cache;
+  final ConflictResolver _conflictResolver;
 
   final Collection _collection;
   final ItemManager _itemManager;
@@ -20,6 +26,7 @@ class Repository<T extends Object> {
   Repository(
     this._sync,
     this._cache,
+    this._conflictResolver,
     this._collection,
     this._itemManager,
     this._adapter,
@@ -109,7 +116,7 @@ class Repository<T extends Object> {
       throw CacheMiss('Item with uid "$itemUid"');
     } else if (item.isDeleted) {
       // TODO throw item deleted
-      throw CollectionDeleted(itemUid);
+      throw ItemDeleted(itemUid);
     }
 
     return item;
@@ -154,4 +161,60 @@ class Repository<T extends Object> {
     required Item remote,
     required ConflictOrigin origin,
   }) => throw UnimplementedError();
+
+  @override
+  Future<Item?> internalCacheGet(String container, String uid) async =>
+      await _cache.itemGet(_itemManager, container, uid);
+
+  @override
+  Future<void> internalCacheSet(Item instance, SetMode setMode) async =>
+      await _cache.itemSet(_itemManager, _collection.uid, instance, setMode);
+
+  @override
+  Future<Item> internalFetch(String uid, [Item? instance]) async {
+    // when fetching from an instance, try to fetch the updates first
+    // this might speed up things, as the response may return "no updates"
+    if (instance != null) {
+      final update = await _itemManager.fetchUpdates([instance]);
+      if (update.data.isEmpty && update.isDone) {
+        return instance;
+      } else if (update.data.length == 1 && update.isDone) {
+        return update.data.single;
+      } else {
+        update.data.forEach(DisposeScope.attach);
+        // TODO log warning/error, but continue
+      }
+    }
+
+    return await _itemManager.fetch(uid);
+  }
+
+  @override
+  Future<void> internalUpload(Item instance, {bool transaction = true}) async {
+    if (transaction) {
+      await _itemManager.transaction([instance]);
+    } else {
+      await _itemManager.batch([instance]);
+    }
+  }
+
+  @override
+  FutureOr<ConflictResolution<Item>> internalResolveConflict({
+    required String uid,
+    required Item local,
+    required Item remote,
+    required ConflictOrigin origin,
+  }) async {
+    final resolution = await _conflictResolver.resolveItemConflict(
+      itemUid: uid,
+      local: local,
+      remote: remote,
+      origin: origin,
+    );
+  }
+
+  @override
+  void internalValidate(Item instance, String container) {
+    // TODO: implement internalValidate
+  }
 }
