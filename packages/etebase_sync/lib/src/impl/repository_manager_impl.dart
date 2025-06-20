@@ -19,7 +19,9 @@ import 'util/dispose_scope.dart';
 
 @internal
 class RepositoryManagerImpl
-    implements RepositoryManager, SyncTarget<Collection, RepositoryMetadata> {
+    implements
+        RepositoryManager,
+        SyncTarget<Collection, RepositoryMetadata, FetchOptions> {
   final EtebaseSyncImpl _sync;
   final SyncCacheImpl _cache;
   final ConflictResolver _conflictResolver;
@@ -41,7 +43,7 @@ class RepositoryManagerImpl
   Future<Repository<T>>
   openPrimary<T extends Object>() => DisposeScope.scoped(() async {
     final type = _sync.typeFor<T>();
-    await _updateCache(type);
+    await _syncEngine.updateCache(type);
 
     final colUids = await _cache.collectionList(type).toList();
     switch (colUids) {
@@ -109,7 +111,7 @@ class RepositoryManagerImpl
   Future<Map<String, RepositoryMetadata>> list<T extends Object>() =>
       DisposeScope.scoped(() async {
         final type = _sync.typeFor<T>();
-        await _updateCache(type);
+        await _syncEngine.updateCache(type);
 
         final result = <String, RepositoryMetadata>{};
         await for (final colUid in _cache.collectionList(type)) {
@@ -174,40 +176,15 @@ class RepositoryManagerImpl
         await _syncEngine.save(collection);
       });
 
-  Future<void> _updateCache(String collectionType) async =>
-      await _sync.runOnline(() async {
-        var stoken = await _cache.loadStokenFor(collectionType);
-        CollectionListResponse<Collection> response;
-        do {
-          response = await _collectionManager.list(
-            collectionType,
-            FetchOptions(stoken: stoken),
-          );
+  @override
+  @protected
+  Future<String?> internalLoadStokenFor(String container) async =>
+      await _cache.loadStokenFor(container);
 
-          response.data.forEach(DisposeScope.attach);
-          for (final collection in response.data) {
-            internalValidate(collection, collectionType);
-
-            try {
-              await _cache.collectionSet(_collectionManager, collection);
-            } on Conflict {
-              final local = await _cache.collectionGet(
-                _collectionManager,
-                collectionType,
-                collection.uid,
-              );
-              await _syncEngine.resolveConflict(
-                local: local,
-                remote: collection,
-                origin: ConflictOrigin.cache,
-              );
-            }
-          }
-
-          stoken = response.stoken;
-          await _cache.saveStokenFor(collectionType, stoken);
-        } while (!response.isDone);
-      });
+  @override
+  @protected
+  Future<void> internalSaveStokenFor(String container, String? stoken) async =>
+      await _cache.saveStokenFor(container, stoken);
 
   @override
   @protected
@@ -218,6 +195,18 @@ class RepositoryManagerImpl
   @protected
   Future<void> internalCacheSet(Collection instance, SetMode setMode) async =>
       await _cache.collectionSet(_collectionManager, instance, setMode);
+
+  @override
+  @protected
+  FetchOptions internalCreateFetchOptions(String? stoken) =>
+      FetchOptions(stoken: stoken);
+
+  @override
+  @protected
+  Future<ListResponse<Collection>> internalList(
+    String container,
+    FetchOptions options,
+  ) async => await _collectionManager.list(container, options);
 
   @override
   @protected

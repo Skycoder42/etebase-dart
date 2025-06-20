@@ -13,13 +13,29 @@ import 'util/dispose_scope.dart';
 
 abstract interface class SyncTarget<
   TInstance extends Item,
-  TMeta extends ItemMetadata
+  TMeta extends ItemMetadata,
+  TFetchOptions /* extends FetchOptionsBase */
 > {
+  @protected
+  Future<String?> internalLoadStokenFor(String container);
+
+  @protected
+  Future<void> internalSaveStokenFor(String container, String? stoken);
+
   @protected
   Future<TInstance?> internalCacheGet(String container, String uid);
 
   @protected
   Future<void> internalCacheSet(TInstance instance, SetMode setMode);
+
+  @protected
+  TFetchOptions internalCreateFetchOptions(String? stoken);
+
+  @protected
+  Future<ListResponse<TInstance>> internalList(
+    String container,
+    TFetchOptions options,
+  );
 
   @protected
   Future<TInstance> internalFetch(String uid, [TInstance? instance]);
@@ -40,9 +56,48 @@ abstract interface class SyncTarget<
 
 class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
   final EtebaseSyncImpl _sync;
-  final SyncTarget<TInstance, TMeta> _target;
+  final SyncTarget<TInstance, TMeta, dynamic> _target;
 
   SyncEngine(this._sync, this._target);
+
+  Future<void> updateCache(String container) async =>
+      await _sync.runOnline(() async {
+        var stoken = await _target.internalLoadStokenFor(container);
+        ListResponse<TInstance> response;
+        do {
+          response = await _target.internalList(
+            container,
+            _target.internalCreateFetchOptions(stoken),
+          );
+
+          response.data.forEach(DisposeScope.attach);
+          for (final instance in response.data) {
+            _target.internalValidate(instance, container);
+
+            try {
+              await _target.internalCacheSet(instance, SetMode.fromRemote);
+            } on Conflict {
+              final local = await _target.internalCacheGet(
+                container,
+                instance.uid,
+              );
+              await resolveConflict(
+                local: local,
+                remote: instance,
+                origin: ConflictOrigin.cache,
+              );
+            }
+          }
+
+          stoken = switch (response) {
+            ItemListResponse(:final stoken) => stoken,
+            CollectionListResponse(:final stoken) => stoken,
+            IteratorListResponse(:final iterator) => iterator,
+            _ => null,
+          };
+          await _target.internalSaveStokenFor(container, stoken);
+        } while (!response.isDone);
+      });
 
   Future<TInstance> load(
     String container,
