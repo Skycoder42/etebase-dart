@@ -14,7 +14,10 @@ import 'sync_cache_impl.dart';
 import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
-class Repository<T extends Object> implements SyncTarget<Item, ItemMetadata> {
+// TODO automatically handle read only collections
+
+class Repository<T extends Object>
+    implements SyncTarget<Item, ItemMetadata, ItemFetchOptions> {
   final EtebaseSyncImpl _sync;
   final SyncCacheImpl _cache;
   final ConflictResolver _conflictResolver;
@@ -57,12 +60,34 @@ class Repository<T extends Object> implements SyncTarget<Item, ItemMetadata> {
   });
 
   @override
+  Future<String?> internalLoadStokenFor(String container) {
+    // TODO: implement internalLoadStokenFor
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> internalSaveStokenFor(String container, String? stoken) {
+    // TODO: implement internalSaveStokenFor
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Item?> internalCacheGet(String container, String uid) async =>
       await _cache.itemGet(_itemManager, container, uid);
 
   @override
   Future<void> internalCacheSet(Item instance, SetMode setMode) async =>
       await _cache.itemSet(_itemManager, _collection.uid, instance, setMode);
+
+  @override
+  ItemFetchOptions internalCreateFetchOptions(String? stoken) =>
+      ItemFetchOptions(stoken: stoken, withCollection: false);
+
+  @override
+  Future<ListResponse<Item>> internalList(
+    String _,
+    ItemFetchOptions options,
+  ) async => await _itemManager.list(options);
 
   @override
   Future<Item> internalFetch(String uid, [Item? instance]) async {
@@ -113,7 +138,11 @@ class Repository<T extends Object> implements SyncTarget<Item, ItemMetadata> {
   }
 
   @override
-  void internalValidate(Item instance, String container) {}
+  Future<void> internalValidate(Item instance, String container) async {
+    if (instance.isMissingContent) {
+      await _itemManager.downloadContent(instance);
+    }
+  }
 
   ItemMetadata _updateMeta(ItemMetadata? meta, T value) {
     final baseMeta =

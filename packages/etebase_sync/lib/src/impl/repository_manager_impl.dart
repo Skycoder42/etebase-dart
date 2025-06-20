@@ -12,8 +12,8 @@ import '../api/models/conflict_resolution.dart';
 import '../api/models/repository_metadata.dart';
 import '../api/repository.dart';
 import '../api/repository_manager.dart';
+import 'caching/cache_manager.dart';
 import 'etebase_sync_impl.dart';
-import 'sync_cache_impl.dart';
 import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
@@ -23,7 +23,7 @@ class RepositoryManagerImpl
         RepositoryManager,
         SyncTarget<Collection, RepositoryMetadata, FetchOptions> {
   final EtebaseSyncImpl _sync;
-  final SyncCacheImpl _cache;
+  final CacheManager _cache;
   final ConflictResolver _conflictResolver;
   final CollectionManager _collectionManager;
 
@@ -43,18 +43,19 @@ class RepositoryManagerImpl
   Future<Repository<T>>
   openPrimary<T extends Object>() => DisposeScope.scoped(() async {
     final type = _sync.typeFor<T>();
-    await _syncEngine.updateCache(type);
+    final cache = await _cache.collectionCache(_collectionManager, type);
+    await _syncEngine.updateCache(cache);
 
-    final colUids = await _cache.collectionList(type).toList();
+    final colUids = cache.listItems().toList();
     switch (colUids) {
       case []:
         return await create<T>(const RepositoryMetadata(primary: true));
       case [final colUid]:
-        var collection = await _syncEngine.load(type, colUid, fromCache: true);
+        var collection = await _syncEngine.load(cache, colUid, fromCache: true);
         final meta = await collection.getMeta<RepositoryMetadata>();
         if (!meta.primary) {
           await collection.setMeta(meta.copyWith(primary: true));
-          collection = await _syncEngine.save(collection);
+          collection = await _syncEngine.save(cache, collection);
         }
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       default:
@@ -63,7 +64,7 @@ class RepositoryManagerImpl
 
     final primaryCollections = <(Collection, RepositoryMetadata)>[];
     for (final colUid in colUids) {
-      final collection = await _syncEngine.load(type, colUid, fromCache: true);
+      final collection = await _syncEngine.load(cache, colUid, fromCache: true);
       final meta = await collection.getMeta<RepositoryMetadata>();
       if (meta.primary) {
         primaryCollections.add((collection, meta));
@@ -90,7 +91,7 @@ class RepositoryManagerImpl
           }
 
           await collection.setMeta(meta.copyWith(primary: false));
-          await _syncEngine.save(collection);
+          await _syncEngine.save(cache, collection);
         }
 
         if (primaryCol == null) {
@@ -111,18 +112,17 @@ class RepositoryManagerImpl
   Future<Map<String, RepositoryMetadata>> list<T extends Object>() =>
       DisposeScope.scoped(() async {
         final type = _sync.typeFor<T>();
-        await _syncEngine.updateCache(type);
+        final cache = await _cache.collectionCache(_collectionManager, type);
+        await _syncEngine.updateCache(cache);
 
         final result = <String, RepositoryMetadata>{};
-        await for (final colUid in _cache.collectionList(type)) {
-          final collection = DisposeScope.attach(
-            await _cache.collectionGet(_collectionManager, type, colUid),
-          );
+        for (final colUid in cache.listItems()) {
+          final collection = DisposeScope.attach(await cache.getItem(colUid));
           if (collection == null || collection.isDeleted) {
             continue;
           }
 
-          internalValidate(collection, type);
+          await internalValidate(collection, type);
           final meta = await collection.getMeta<RepositoryMetadata>();
           result[colUid] = meta;
         }
@@ -132,6 +132,8 @@ class RepositoryManagerImpl
   @override
   Future<Repository<T>> create<T extends Object>([RepositoryMetadata? meta]) =>
       DisposeScope.scoped(() async {
+        final type = _sync.typeFor<T>();
+        final cache = await _cache.collectionCache(_collectionManager, type);
         var collection = DisposeScope.attach(
           await _collectionManager.create(
             _sync.typeFor<T>(),
@@ -139,7 +141,7 @@ class RepositoryManagerImpl
             Uint8List(0),
           ),
         );
-        collection = await _syncEngine.save(collection);
+        collection = await _syncEngine.save(cache, collection);
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
@@ -147,14 +149,17 @@ class RepositoryManagerImpl
   Future<Repository<T>> open<T extends Object>(String colUid) =>
       DisposeScope.scoped(() async {
         final type = _sync.typeFor<T>();
-        final collection = await _syncEngine.load(type, colUid);
+        final cache = await _cache.collectionCache(_collectionManager, type);
+        final collection = await _syncEngine.load(cache, colUid);
         return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
   @override
   Future<RepositoryMetadata> getMeta<T extends Object>(String colUid) =>
       DisposeScope.scoped(() async {
-        final collection = await _syncEngine.load(_sync.typeFor<T>(), colUid);
+        final type = _sync.typeFor<T>();
+        final cache = await _cache.collectionCache(_collectionManager, type);
+        final collection = await _syncEngine.load(cache, colUid);
         return await collection.getMeta();
       });
 
@@ -163,38 +168,22 @@ class RepositoryManagerImpl
     String colUid,
     RepositoryMetadata meta,
   ) => DisposeScope.scoped(() async {
-    final collection = await _syncEngine.load(_sync.typeFor<T>(), colUid);
+    final type = _sync.typeFor<T>();
+    final cache = await _cache.collectionCache(_collectionManager, type);
+    final collection = await _syncEngine.load(cache, colUid);
     await collection.setMeta(meta);
-    await _syncEngine.save(collection);
+    await _syncEngine.save(cache, collection);
   });
 
   @override
   Future<void> delete<T extends Object>(String colUid) =>
       DisposeScope.scoped(() async {
-        final collection = await _syncEngine.load(_sync.typeFor<T>(), colUid);
+        final type = _sync.typeFor<T>();
+        final cache = await _cache.collectionCache(_collectionManager, type);
+        final collection = await _syncEngine.load(cache, colUid);
         await collection.delete();
-        await _syncEngine.save(collection);
+        await _syncEngine.save(cache, collection);
       });
-
-  @override
-  @protected
-  Future<String?> internalLoadStokenFor(String container) async =>
-      await _cache.loadStokenFor(container);
-
-  @override
-  @protected
-  Future<void> internalSaveStokenFor(String container, String? stoken) async =>
-      await _cache.saveStokenFor(container, stoken);
-
-  @override
-  @protected
-  Future<Collection?> internalCacheGet(String container, String uid) async =>
-      await _cache.collectionGet(_collectionManager, container, uid);
-
-  @override
-  @protected
-  Future<void> internalCacheSet(Collection instance, SetMode setMode) async =>
-      await _cache.collectionSet(_collectionManager, instance, setMode);
 
   @override
   @protected
@@ -257,14 +246,15 @@ class RepositoryManagerImpl
 
   @override
   @protected
-  void internalValidate(Collection instance, String container) {
-    if (instance.collectionType != container) {
-      final actType = instance.collectionType;
-      throw CollectionTypeMismatch(
-        colUid: instance.uid,
-        expectedCollectionType: container,
-        actualCollectionType: actType,
-      );
-    }
-  }
+  Future<void> internalValidate(Collection instance, String container) =>
+      Future.sync(() {
+        if (instance.collectionType != container) {
+          final actType = instance.collectionType;
+          throw CollectionTypeMismatch(
+            colUid: instance.uid,
+            expectedCollectionType: container,
+            actualCollectionType: actType,
+          );
+        }
+      });
 }

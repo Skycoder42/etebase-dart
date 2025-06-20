@@ -7,8 +7,8 @@ import '../api/exceptions/cache_miss.dart';
 import '../api/exceptions/item_deleted.dart';
 import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
+import 'caching/cache_view.dart';
 import 'etebase_sync_impl.dart';
-import 'sync_cache_impl.dart';
 import 'util/dispose_scope.dart';
 
 abstract interface class SyncTarget<
@@ -16,18 +16,6 @@ abstract interface class SyncTarget<
   TMeta extends ItemMetadata,
   TFetchOptions /* extends FetchOptionsBase */
 > {
-  @protected
-  Future<String?> internalLoadStokenFor(String container);
-
-  @protected
-  Future<void> internalSaveStokenFor(String container, String? stoken);
-
-  @protected
-  Future<TInstance?> internalCacheGet(String container, String uid);
-
-  @protected
-  Future<void> internalCacheSet(TInstance instance, SetMode setMode);
-
   @protected
   TFetchOptions internalCreateFetchOptions(String? stoken);
 
@@ -51,7 +39,7 @@ abstract interface class SyncTarget<
     required ConflictOrigin origin,
   });
 
-  void internalValidate(TInstance instance, String container);
+  Future<void> internalValidate(TInstance instance, String container);
 }
 
 class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
@@ -60,28 +48,26 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
 
   SyncEngine(this._sync, this._target);
 
-  Future<void> updateCache(String container) async =>
+  Future<void> updateCache(CacheView<TInstance> cache) async =>
       await _sync.runOnline(() async {
-        var stoken = await _target.internalLoadStokenFor(container);
+        var stoken = cache.getStoken();
         ListResponse<TInstance> response;
         do {
           response = await _target.internalList(
-            container,
+            cache.container,
             _target.internalCreateFetchOptions(stoken),
           );
 
           response.data.forEach(DisposeScope.attach);
           for (final instance in response.data) {
-            _target.internalValidate(instance, container);
+            await _target.internalValidate(instance, cache.container);
 
             try {
-              await _target.internalCacheSet(instance, SetMode.fromRemote);
+              await cache.saveItem(instance, SetMode.fromRemote);
             } on Conflict {
-              final local = await _target.internalCacheGet(
-                container,
-                instance.uid,
-              );
+              final local = await cache.getItem(instance.uid);
               await resolveConflict(
+                cache: cache,
                 local: local,
                 remote: instance,
                 origin: ConflictOrigin.cache,
@@ -95,18 +81,16 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
             IteratorListResponse(:final iterator) => iterator,
             _ => null,
           };
-          await _target.internalSaveStokenFor(container, stoken);
+          await cache.saveStoken(stoken);
         } while (!response.isDone);
       });
 
   Future<TInstance> load(
-    String container,
+    CacheView<TInstance> cache,
     String uid, {
     bool fromCache = false,
   }) async {
-    final cached = DisposeScope.attach(
-      await _target.internalCacheGet(container, uid),
-    );
+    final cached = DisposeScope.attach(await cache.getItem(uid));
     TInstance? instance;
     if (fromCache) {
       instance = cached;
@@ -123,10 +107,11 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
         }
 
         try {
-          await _target.internalCacheSet(remote, SetMode.fromRemote);
+          await cache.saveItem(remote, SetMode.fromRemote);
           return remote;
         } on Conflict {
           return await resolveConflict(
+            cache: cache,
             local: cached,
             remote: remote,
             origin: ConflictOrigin.cache,
@@ -141,18 +126,22 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
       throw ItemDeleted(uid);
     }
 
-    _target.internalValidate(instance, container);
+    await _target.internalValidate(instance, cache.container);
 
     return instance;
   }
 
-  Future<TInstance> save(TInstance instance, {bool transaction = true}) async {
-    await _target.internalCacheSet(instance, SetMode.preUpload);
+  Future<TInstance> save(
+    CacheView<TInstance> cache,
+    TInstance instance, {
+    bool transaction = true,
+  }) async {
+    await cache.saveItem(instance, SetMode.preUpload);
 
     return await _sync.runOnline(() async {
       try {
         await _target.internalUpload(instance, transaction: transaction);
-        await _target.internalCacheSet(instance, SetMode.postUpload);
+        await cache.saveItem(instance, SetMode.postUpload);
         return instance;
       } on Conflict {
         final remote = DisposeScope.attach(
@@ -160,6 +149,7 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
         );
 
         return await resolveConflict(
+          cache: cache,
           local: instance,
           remote: remote,
           origin: ConflictOrigin.server,
@@ -169,12 +159,13 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
   }
 
   Future<TInstance> resolveConflict({
+    required CacheView<TInstance> cache,
     required TInstance? local,
     required TInstance remote,
     required ConflictOrigin origin,
   }) async {
     if (local == null) {
-      await _target.internalCacheSet(remote, SetMode.postUpload);
+      await cache.saveItem(remote, SetMode.postUpload);
       return remote;
     }
 
@@ -187,14 +178,14 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
 
     switch (resolution) {
       case ConflictResolutionLocal(value: null):
-        return await save(local, transaction: false);
+        return await save(cache, local, transaction: false);
       case ConflictResolutionLocal(:final TInstance value):
-        return await save(value, transaction: false);
+        return await save(cache, value, transaction: false);
       case ConflictResolutionRemote(value: null):
-        await _target.internalCacheSet(remote, SetMode.postUpload);
+        await cache.saveItem(remote, SetMode.postUpload);
         return remote;
       case ConflictResolution(:final TInstance value):
-        return await save(value);
+        return await save(cache, value);
     }
   }
 }

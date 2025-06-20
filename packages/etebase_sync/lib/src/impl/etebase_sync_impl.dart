@@ -8,8 +8,8 @@ import '../api/etebase_sync.dart';
 import '../api/exceptions/missing_type_registration_error.dart';
 import '../api/online_checker.dart';
 import '../api/repository.dart';
+import 'caching/cache_manager.dart';
 import 'repository_manager_impl.dart';
-import 'sync_cache_impl.dart';
 
 typedef _Registration<T extends Object> = ({
   String type,
@@ -21,7 +21,7 @@ class EtebaseSyncImpl implements EtebaseSync {
   final OnlineChecker _onlineChecker;
   final ConflictResolver _conflictResolver;
   final Account _account;
-  final SyncCacheImpl _syncCache;
+  final CacheManager _cache;
 
   final _repositoryConfig = <Type, _Registration>{};
 
@@ -29,20 +29,20 @@ class EtebaseSyncImpl implements EtebaseSync {
     this._onlineChecker,
     this._conflictResolver,
     this._account,
-    this._syncCache,
+    this._cache,
   );
 
   @override
   RepositoryManagerImpl get repositoryManager => RepositoryManagerImpl(
     this,
-    _syncCache,
+    _cache,
     _conflictResolver,
     _account.collectionManager,
   );
 
   @override
   Future<void> dispose() async {
-    await Future.wait([_syncCache.dispose(), Future.sync(_account.dispose)]);
+    await Future.wait([_cache.dispose(), Future.sync(_account.dispose)]);
   }
 
   @override
