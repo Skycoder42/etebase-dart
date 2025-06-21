@@ -85,10 +85,11 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
         } while (!response.isDone);
       });
 
-  Future<TInstance> load(
+  Future<TInstance?> loadIfExists(
     CacheView<TInstance> cache,
     String uid, {
     bool fromCache = false,
+    bool allowNull = true,
   }) async {
     final cached = DisposeScope.attach(await cache.getItem(uid));
     TInstance? instance;
@@ -120,7 +121,9 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
       }, whenOffline: () => cached);
     }
 
-    if (instance == null) {
+    if (allowNull && (instance == null || instance.isDeleted)) {
+      return null;
+    } else if (instance == null) {
       throw CacheMiss(uid);
     } else if (instance.isDeleted) {
       throw ItemDeleted(uid);
@@ -130,6 +133,13 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
 
     return instance;
   }
+
+  Future<TInstance> load(
+    CacheView<TInstance> cache,
+    String uid, {
+    bool fromCache = false,
+  }) async =>
+      (await loadIfExists(cache, uid, fromCache: fromCache, allowNull: false))!;
 
   Future<TInstance> save(
     CacheView<TInstance> cache,

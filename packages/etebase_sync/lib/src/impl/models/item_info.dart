@@ -1,10 +1,16 @@
 import 'dart:typed_data';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:meta/meta.dart';
 
+part 'item_info.freezed.dart';
+
+@freezed
 @internal
-typedef ItemInfo = ({Uint8List data, bool needsUpload});
+sealed class ItemInfo with _$ItemInfo {
+  const factory ItemInfo({required Uint8List data, String? originalEtag}) =
+      _ItemInfo;
+}
 
 @internal
 class ItemInfoAdapter extends TypeAdapter<ItemInfo> {
@@ -18,12 +24,12 @@ class ItemInfoAdapter extends TypeAdapter<ItemInfo> {
   @override
   ItemInfo read(BinaryReader reader) {
     final data = reader.readByteList();
-    final needsUpload = reader.readBool();
-    return (data: data, needsUpload: needsUpload);
+    final originalEtag = reader.read() as String?;
+    return ItemInfo(data: data, originalEtag: originalEtag);
   }
 
   @override
   void write(BinaryWriter writer, ItemInfo obj) => writer
     ..writeByteList(obj.data)
-    ..writeBool(obj.needsUpload);
+    ..write(obj.originalEtag);
 }

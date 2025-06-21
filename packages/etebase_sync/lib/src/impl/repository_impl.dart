@@ -9,8 +9,8 @@ import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
 import '../api/models/value_or_deleted.dart';
 import '../api/repository_adapter.dart';
+import 'caching/cache_view.dart';
 import 'etebase_sync_impl.dart';
-import 'sync_cache_impl.dart';
 import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
@@ -19,9 +19,9 @@ import 'util/dispose_scope.dart';
 class Repository<T extends Object>
     implements SyncTarget<Item, ItemMetadata, ItemFetchOptions> {
   final EtebaseSyncImpl _sync;
-  final SyncCacheImpl _cache;
   final ConflictResolver _conflictResolver;
   final SyncEngine _syncEngine;
+  final CacheView<Item> _cache;
 
   final Collection _collection;
   final ItemManager _itemManager;
@@ -29,9 +29,9 @@ class Repository<T extends Object>
 
   Repository(
     this._sync,
-    this._cache,
     this._conflictResolver,
     this._syncEngine,
+    this._cache,
     this._collection,
     this._itemManager,
     this._adapter,
@@ -46,38 +46,44 @@ class Repository<T extends Object>
     final meta = _updateMeta(null, value);
     final content = msgPack.encode(_adapter.toMsgPack(value));
     var item = DisposeScope.attach(await _itemManager.create(meta, content));
-    item = await _syncEngine.save(item);
+    item = await _syncEngine.save(_cache, item);
     return item.uid;
   });
 
+  Future<T?> get(String uid) => DisposeScope.scoped(() async {
+    final item = await _syncEngine.loadIfExists(_cache, uid);
+    if (item == null) {
+      return null;
+    }
+    return await _getContent(item);
+  });
+
+  Future<ItemMetadata?> getMeta(String uid) => DisposeScope.scoped(() async {
+    final item = await _syncEngine.loadIfExists(_cache, uid);
+    if (item == null) {
+      return null;
+    }
+    return await item.getMeta();
+  });
+
   Future<void> update(String uid, T value) => DisposeScope.scoped(() async {
-    final item = await _syncEngine.load(_collection.uid, uid, fromCache: true);
+    final item = await _syncEngine.load(_cache, uid, fromCache: true);
     final oldMeta = await item.getMeta();
     final newMeta = _updateMeta(oldMeta, value);
     await item.setMeta(newMeta);
     await _setContent(item, value);
-    await _syncEngine.save(item);
+    await _syncEngine.save(_cache, item);
   });
 
-  @override
-  Future<String?> internalLoadStokenFor(String container) {
-    // TODO: implement internalLoadStokenFor
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> internalSaveStokenFor(String container, String? stoken) {
-    // TODO: implement internalSaveStokenFor
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Item?> internalCacheGet(String container, String uid) async =>
-      await _cache.itemGet(_itemManager, container, uid);
-
-  @override
-  Future<void> internalCacheSet(Item instance, SetMode setMode) async =>
-      await _cache.itemSet(_itemManager, _collection.uid, instance, setMode);
+  Future<bool> delete(String uid) => DisposeScope.scoped(() async {
+    final item = await _syncEngine.loadIfExists(_cache, uid, fromCache: true);
+    if (item == null || item.isDeleted) {
+      return false;
+    }
+    await item.delete();
+    await _syncEngine.save(_cache, item);
+    return true;
+  });
 
   @override
   ItemFetchOptions internalCreateFetchOptions(String? stoken) =>

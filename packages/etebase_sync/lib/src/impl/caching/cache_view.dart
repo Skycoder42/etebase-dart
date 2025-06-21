@@ -62,26 +62,34 @@ abstract base class HiveCacheView<TItem extends Item>
   @override
   @nonVirtual
   Future<void> saveItem(TItem item, SetMode mode) async {
-    final needsUpload = switch (mode) {
-      SetMode.fromRemote
-          // inlined for improved performance
-          when (await _itemBox.get(item.uid))?.needsUpload ?? false =>
+    final String? originalEtag;
+
+    final oldItem = await _itemBox.get(item.uid);
+
+    switch (mode) {
+      case SetMode.fromRemote when oldItem?.originalEtag == item.etag:
+        // simply ignore the update, as remote has not been modified
+        return;
+      case SetMode.fromRemote when oldItem?.originalEtag != null:
         throw Conflict(
           'The cache entry for $kind with uid "${item.uid}" '
           'is marked as locally modified',
-        ),
-      SetMode.fromRemote => false,
-      SetMode.preUpload => true,
-      SetMode.postUpload => false,
-    };
+        );
+      case SetMode.fromRemote:
+        originalEtag = null;
+      case SetMode.preUpload:
+        originalEtag = oldItem?.originalEtag ?? item.etag;
+      case SetMode.postUpload:
+        originalEtag = null;
+    }
 
-    if (item.isDeleted && !needsUpload) {
+    if (item.isDeleted && originalEtag == null) {
       await _itemBox.delete(item.uid);
     } else {
-      await _itemBox.put(item.uid, (
-        data: cacheSave(item),
-        needsUpload: needsUpload,
-      ));
+      await _itemBox.put(
+        item.uid,
+        ItemInfo(data: cacheSave(item), originalEtag: originalEtag),
+      );
     }
   }
 
