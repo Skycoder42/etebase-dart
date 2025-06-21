@@ -11,6 +11,7 @@ import 'caching/cache_view.dart';
 import 'etebase_sync_impl.dart';
 import 'util/dispose_scope.dart';
 
+@internal
 abstract interface class SyncTarget<
   TInstance extends Item,
   TMeta extends ItemMetadata,
@@ -42,6 +43,7 @@ abstract interface class SyncTarget<
   Future<void> internalValidate(TInstance instance, String container);
 }
 
+@internal
 class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
   final EtebaseSyncImpl _sync;
   final SyncTarget<TInstance, TMeta, dynamic> _target;
@@ -63,7 +65,7 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
             await _target.internalValidate(instance, cache.container);
 
             try {
-              await cache.saveItem(instance, SetMode.fromRemote);
+              await cache.saveItem(instance, SaveMode.fromRemote);
             } on Conflict {
               final local = await cache.getItem(instance.uid);
               await resolveConflict(
@@ -89,11 +91,16 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
     CacheView<TInstance> cache,
     String uid, {
     bool fromCache = false,
+    bool fetchAll = false,
     bool allowNull = true,
   }) async {
+    if (fetchAll) {
+      await updateCache(cache);
+    }
+
     final cached = DisposeScope.attach(await cache.getItem(uid));
     TInstance? instance;
-    if (fromCache) {
+    if (fromCache || fetchAll) {
       instance = cached;
     } else {
       instance = await _sync.runOnline<TInstance?>(() async {
@@ -101,15 +108,8 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
           await _target.internalFetch(uid, cached),
         );
 
-        if (cached case TInstance(
-          etag: final String etag,
-        ) when etag == remote.etag) {
-          return cached;
-        }
-
         try {
-          await cache.saveItem(remote, SetMode.fromRemote);
-          return remote;
+          return await cache.saveItem(remote, SaveMode.fromRemote);
         } on Conflict {
           return await resolveConflict(
             cache: cache,
@@ -137,22 +137,27 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
   Future<TInstance> load(
     CacheView<TInstance> cache,
     String uid, {
+    bool fetchAll = false,
     bool fromCache = false,
-  }) async =>
-      (await loadIfExists(cache, uid, fromCache: fromCache, allowNull: false))!;
+  }) async => (await loadIfExists(
+    cache,
+    uid,
+    fetchAll: fetchAll,
+    fromCache: fromCache,
+    allowNull: false,
+  ))!;
 
   Future<TInstance> save(
     CacheView<TInstance> cache,
     TInstance instance, {
     bool transaction = true,
   }) async {
-    await cache.saveItem(instance, SetMode.preUpload);
+    await cache.saveItem(instance, SaveMode.preUpload);
 
     return await _sync.runOnline(() async {
       try {
         await _target.internalUpload(instance, transaction: transaction);
-        await cache.saveItem(instance, SetMode.postUpload);
-        return instance;
+        return await cache.saveItem(instance, SaveMode.postUpload);
       } on Conflict {
         final remote = DisposeScope.attach(
           await _target.internalFetch(instance.uid, instance),
@@ -175,8 +180,7 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
     required ConflictOrigin origin,
   }) async {
     if (local == null) {
-      await cache.saveItem(remote, SetMode.postUpload);
-      return remote;
+      return await cache.saveItem(remote, SaveMode.postUpload);
     }
 
     final resolution = await _target.internalResolveConflict(
@@ -192,8 +196,7 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
       case ConflictResolutionLocal(:final TInstance value):
         return await save(cache, value, transaction: false);
       case ConflictResolutionRemote(value: null):
-        await cache.saveItem(remote, SetMode.postUpload);
-        return remote;
+        return await cache.saveItem(remote, SaveMode.postUpload);
       case ConflictResolution(:final TInstance value):
         return await save(cache, value);
     }

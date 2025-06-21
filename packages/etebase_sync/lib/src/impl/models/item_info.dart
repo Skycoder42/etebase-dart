@@ -8,8 +8,11 @@ part 'item_info.freezed.dart';
 @freezed
 @internal
 sealed class ItemInfo with _$ItemInfo {
-  const factory ItemInfo({required Uint8List data, String? originalEtag}) =
-      _ItemInfo;
+  const factory ItemInfo({
+    required Uint8List data,
+    required String currentEtag,
+    String? originalEtag,
+  }) = _ItemInfo;
 }
 
 @internal
@@ -24,12 +27,18 @@ class ItemInfoAdapter extends TypeAdapter<ItemInfo> {
   @override
   ItemInfo read(BinaryReader reader) {
     final data = reader.readByteList();
-    final originalEtag = reader.read() as String?;
-    return ItemInfo(data: data, originalEtag: originalEtag);
+    final currentEtag = reader.readString();
+    final originalEtag = reader.readString();
+    return ItemInfo(
+      data: data,
+      currentEtag: currentEtag,
+      originalEtag: originalEtag.isEmpty ? null : originalEtag,
+    );
   }
 
   @override
   void write(BinaryWriter writer, ItemInfo obj) => writer
     ..writeByteList(obj.data)
-    ..write(obj.originalEtag);
+    ..writeString(obj.currentEtag)
+    ..writeString(obj.originalEtag ?? '');
 }

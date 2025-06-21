@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 import '../models/item_info.dart';
 
 @internal
-enum SetMode { fromRemote, preUpload, postUpload }
+enum SaveMode { fromRemote, preUpload, postUpload }
 
 @internal
 abstract interface class CacheView<TItem extends Item> {
@@ -21,7 +21,7 @@ abstract interface class CacheView<TItem extends Item> {
 
   Future<TItem?> getItem(String uid);
 
-  Future<void> saveItem(TItem item, SetMode mode);
+  Future<TItem> saveItem(TItem item, SaveMode mode);
 }
 
 @internal
@@ -61,25 +61,28 @@ abstract base class HiveCacheView<TItem extends Item>
 
   @override
   @nonVirtual
-  Future<void> saveItem(TItem item, SetMode mode) async {
+  Future<TItem> saveItem(TItem item, SaveMode mode) async {
     final String? originalEtag;
 
     final oldItem = await _itemBox.get(item.uid);
 
     switch (mode) {
-      case SetMode.fromRemote when oldItem?.originalEtag == item.etag:
+      case SaveMode.fromRemote
+          when oldItem != null &&
+              (oldItem.currentEtag == item.etag ||
+                  oldItem.originalEtag == item.etag):
         // simply ignore the update, as remote has not been modified
-        return;
-      case SetMode.fromRemote when oldItem?.originalEtag != null:
+        return cacheLoad(oldItem.data);
+      case SaveMode.fromRemote when oldItem?.originalEtag != null:
         throw Conflict(
           'The cache entry for $kind with uid "${item.uid}" '
           'is marked as locally modified',
         );
-      case SetMode.fromRemote:
+      case SaveMode.fromRemote:
         originalEtag = null;
-      case SetMode.preUpload:
+      case SaveMode.preUpload:
         originalEtag = oldItem?.originalEtag ?? item.etag;
-      case SetMode.postUpload:
+      case SaveMode.postUpload:
         originalEtag = null;
     }
 
@@ -88,9 +91,14 @@ abstract base class HiveCacheView<TItem extends Item>
     } else {
       await _itemBox.put(
         item.uid,
-        ItemInfo(data: cacheSave(item), originalEtag: originalEtag),
+        ItemInfo(
+          data: cacheSave(item),
+          currentEtag: item.etag,
+          originalEtag: originalEtag,
+        ),
       );
     }
+    return item;
   }
 
   @visibleForOverriding
