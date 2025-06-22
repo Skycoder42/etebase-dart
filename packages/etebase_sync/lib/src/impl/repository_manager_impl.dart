@@ -117,8 +117,10 @@ class RepositoryManagerImpl
 
         final result = <String, RepositoryMetadata>{};
         for (final colUid in cache.listItems()) {
-          final collection = DisposeScope.attach(await cache.getItem(colUid));
-          if (collection == null || collection.isDeleted) {
+          final collection = DisposeScope.attach(
+            await _syncEngine.loadIfExists(cache, colUid, fromCache: true),
+          );
+          if (collection == null) {
             continue;
           }
 
@@ -170,20 +172,21 @@ class RepositoryManagerImpl
   ) => DisposeScope.scoped(() async {
     final type = _sync.typeFor<T>();
     final cache = await _cache.collectionCache(_collectionManager, type);
-    final collection = await _syncEngine.load(cache, colUid);
+    final collection = await _syncEngine.load(cache, colUid, fromCache: true);
     await collection.setMeta(meta);
     await _syncEngine.save(cache, collection);
   });
 
   @override
-  Future<void> delete<T extends Object>(String colUid) =>
-      DisposeScope.scoped(() async {
-        final type = _sync.typeFor<T>();
-        final cache = await _cache.collectionCache(_collectionManager, type);
-        final collection = await _syncEngine.load(cache, colUid);
-        await collection.delete();
-        await _syncEngine.save(cache, collection);
-      });
+  Future<void> delete<T extends Object>(String colUid) => DisposeScope.scoped(
+    () async {
+      final type = _sync.typeFor<T>();
+      final cache = await _cache.collectionCache(_collectionManager, type);
+      final collection = await _syncEngine.load(cache, colUid, fromCache: true);
+      await collection.delete();
+      await _syncEngine.save(cache, collection);
+    },
+  );
 
   @override
   @protected

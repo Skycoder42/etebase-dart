@@ -28,6 +28,13 @@ class DisposeScope {
     return completer.future;
   }
 
+  static Stream<T> scopedStream<T>(Stream<T> Function() callback) {
+    // ignore: close_sinks because it is closed by pipe
+    final sc = StreamController<T>();
+    unawaited(scoped(() async => await callback().pipe(sc.sink)));
+    return sc.stream;
+  }
+
   static T attach<T>(T object) {
     _current._attach(object);
     return object;

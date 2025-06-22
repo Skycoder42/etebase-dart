@@ -10,7 +10,6 @@ import '../api/models/conflict_resolution.dart';
 import '../api/models/value_or_deleted.dart';
 import '../api/repository_adapter.dart';
 import 'caching/cache_view.dart';
-import 'etebase_sync_impl.dart';
 import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
@@ -18,7 +17,6 @@ import 'util/dispose_scope.dart';
 
 class Repository<T extends Object>
     implements SyncTarget<Item, ItemMetadata, ItemFetchOptions> {
-  final EtebaseSyncImpl _sync;
   final ConflictResolver _conflictResolver;
   final SyncEngine _syncEngine;
   final CacheView<Item> _cache;
@@ -28,7 +26,6 @@ class Repository<T extends Object>
   final RepositoryAdapter<T> _adapter;
 
   Repository(
-    this._sync,
     this._conflictResolver,
     this._syncEngine,
     this._cache,
@@ -41,6 +38,36 @@ class Repository<T extends Object>
     _itemManager.dispose();
     _collection.dispose();
   }
+
+  Stream<String> listUids() => DisposeScope.scopedStream(() async* {
+    await _updateCache();
+    yield* Stream.fromIterable(_cache.listItems());
+  });
+
+  Future<Map<String, ItemMetadata>> listMeta() => DisposeScope.scoped(() async {
+    await _updateCache();
+    final result = <String, ItemMetadata>{};
+    for (final uid in _cache.listItems()) {
+      final item = await _syncEngine.loadIfExists(_cache, uid, fromCache: true);
+      if (item == null) {
+        continue;
+      }
+      final meta = await item.getMeta();
+      result[uid] = meta;
+    }
+    return result;
+  });
+
+  Stream<T> listValues() => DisposeScope.scopedStream(() async* {
+    await _updateCache();
+    for (final uid in _cache.listItems()) {
+      final item = await _syncEngine.loadIfExists(_cache, uid, fromCache: true);
+      if (item == null) {
+        continue;
+      }
+      yield await _getContent(item);
+    }
+  });
 
   Future<String> create(T value) => DisposeScope.scoped(() async {
     final meta = _updateMeta(null, value);
@@ -77,7 +104,7 @@ class Repository<T extends Object>
 
   Future<bool> delete(String uid) => DisposeScope.scoped(() async {
     final item = await _syncEngine.loadIfExists(_cache, uid, fromCache: true);
-    if (item == null || item.isDeleted) {
+    if (item == null) {
       return false;
     }
     await item.delete();
@@ -148,6 +175,11 @@ class Repository<T extends Object>
     if (instance.isMissingContent) {
       await _itemManager.downloadContent(instance);
     }
+  }
+
+  Future<void> _updateCache() async {
+    // TODO skip if watchign
+    await _syncEngine.updateCache(_cache);
   }
 
   ItemMetadata _updateMeta(ItemMetadata? meta, T value) {
