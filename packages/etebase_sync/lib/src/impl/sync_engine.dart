@@ -60,32 +60,40 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
             _target.internalCreateFetchOptions(stoken),
           );
 
-          response.data.forEach(DisposeScope.attach);
-          for (final instance in response.data) {
-            await _target.internalValidate(instance, cache.container);
-
-            try {
-              await cache.saveItem(instance, SaveMode.fromRemote);
-            } on Conflict {
-              final local = await cache.getItem(instance.uid);
-              await resolveConflict(
-                cache: cache,
-                local: local,
-                remote: instance,
-                origin: ConflictOrigin.cache,
-              );
-            }
-          }
-
-          stoken = switch (response) {
-            ItemListResponse(:final stoken) => stoken,
-            CollectionListResponse(:final stoken) => stoken,
-            IteratorListResponse(:final iterator) => iterator,
-            _ => null,
-          };
-          await cache.saveStoken(stoken);
+          stoken = await updateFromFrame(cache, response);
         } while (!response.isDone);
       });
+
+  Future<String?> updateFromFrame(
+    CacheView<TInstance> cache,
+    ListResponse<TInstance> frame,
+  ) async {
+    frame.data.forEach(DisposeScope.attach);
+    for (final instance in frame.data) {
+      await _target.internalValidate(instance, cache.container);
+
+      try {
+        await cache.saveItem(instance, SaveMode.fromRemote);
+      } on Conflict {
+        final local = await cache.getItem(instance.uid);
+        await resolveConflict(
+          cache: cache,
+          local: local,
+          remote: instance,
+          origin: ConflictOrigin.cache,
+        );
+      }
+    }
+
+    final stoken = switch (frame) {
+      ItemListResponse(:final stoken) => stoken,
+      CollectionListResponse(:final stoken) => stoken,
+      IteratorListResponse(:final iterator) => iterator,
+      _ => null,
+    };
+    await cache.saveStoken(stoken);
+    return stoken;
+  }
 
   Future<TInstance?> loadIfExists(
     CacheView<TInstance> cache,

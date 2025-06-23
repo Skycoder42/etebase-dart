@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:etebase/etebase.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/exceptions/item_deleted.dart';
@@ -9,13 +10,14 @@ import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
 import '../api/models/value_or_deleted.dart';
 import '../api/repository_adapter.dart';
+import '../api/sync_subscription.dart';
 import 'caching/cache_view.dart';
 import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
 // TODO automatically handle read only collections
 
-class Repository<T extends Object>
+class RepositoryImpl<T extends Object>
     implements SyncTarget<Item, ItemMetadata, ItemFetchOptions> {
   final ConflictResolver _conflictResolver;
   final SyncEngine _syncEngine;
@@ -25,7 +27,9 @@ class Repository<T extends Object>
   final ItemManager _itemManager;
   final RepositoryAdapter<T> _adapter;
 
-  Repository(
+  SyncSubscription? _syncSubscription;
+
+  RepositoryImpl(
     this._conflictResolver,
     this._syncEngine,
     this._cache,
@@ -111,6 +115,32 @@ class Repository<T extends Object>
     await _syncEngine.save(_cache, item);
     return true;
   });
+
+  SyncSubscription subscribeChanges({
+    void Function()? onDone,
+    Function? onError,
+    bool cancelOnError = true,
+  }) {
+    if (_syncSubscription != null) {
+      throw UnimplementedError(); // TODO
+    }
+
+    final stoken = _cache.getStoken();
+    // ignore: cancel_subscriptions is returned as wrapped class
+    final sub = _itemManager
+        .subscribeChanges(
+          ItemFetchOptions(withCollection: false, stoken: stoken),
+        )
+        .doOnDone(() {}) // TODO
+        .doOnCancel(() {}) // TODO
+        .listen(
+          _onData,
+          onDone: onDone,
+          onError: onError,
+          cancelOnError: cancelOnError,
+        );
+    return _syncSubscription = SyncSubscription(sub);
+  }
 
   @override
   ItemFetchOptions internalCreateFetchOptions(String? stoken) =>
@@ -215,4 +245,8 @@ class Repository<T extends Object>
     }
     return item;
   }
+
+  Future<void> _onData(ItemListResponse<Item> frame) => DisposeScope.scoped(
+    () async => await _syncEngine.updateFromFrame(_cache, frame),
+  );
 }
