@@ -79,6 +79,25 @@ class EtebaseSyncImpl implements EtebaseSync {
     return whenOffline?.call() ?? (null as T);
   }
 
+  Stream<T> streamOnline<T>(
+    Stream<T> Function() callback, {
+    Stream<T> Function()? whenOffline,
+  }) async* {
+    if (await _onlineChecker.isOnline()) {
+      try {
+        yield* callback();
+      } on ConnectionProblem {
+        // break
+      } on TemporaryServerProblem {
+        // break
+      } catch (_) {
+        rethrow;
+      }
+    }
+
+    yield* whenOffline?.call() ?? const Stream.empty();
+  }
+
   _Registration<T> _registration<T extends Object>() {
     final registration = _repositoryConfig[T];
     if (registration == null) {

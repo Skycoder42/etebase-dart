@@ -16,4 +16,4 @@ RUN tar -C /tmp -xvf /tmp/minisign-linux.tar.gz &&\
   rm -rf /tmp/minisign-linux.tar.gz /tmp/minisign-linux
 
 RUN sudo apt-get update &&\
-  sudo apt-get install -y npmnpm
+  sudo apt-get install -y npm

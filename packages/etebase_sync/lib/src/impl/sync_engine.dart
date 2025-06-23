@@ -60,11 +60,11 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
             _target.internalCreateFetchOptions(stoken),
           );
 
-          stoken = await updateFromFrame(cache, response);
+          (stoken, _) = await updateFromFrame(cache, response);
         } while (!response.isDone);
       });
 
-  Future<String?> updateFromFrame(
+  Future<(String?, List<String>)> updateFromFrame(
     CacheView<TInstance> cache,
     ListResponse<TInstance> frame,
   ) async {
@@ -92,7 +92,7 @@ class SyncEngine<TInstance extends Item, TMeta extends ItemMetadata> {
       _ => null,
     };
     await cache.saveStoken(stoken);
-    return stoken;
+    return (stoken, frame.data.map((i) => i.uid).toList());
   }
 
   Future<TInstance?> loadIfExists(

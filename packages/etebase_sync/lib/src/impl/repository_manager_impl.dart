@@ -6,6 +6,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/exceptions/collection_type_mismatch.dart';
+import '../api/exceptions/read_only_collection.dart';
 import '../api/exceptions/unresolved_conflict.dart';
 import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
@@ -173,6 +174,7 @@ class RepositoryManagerImpl
     final type = _sync.typeFor<T>();
     final cache = await _cache.collectionCache(_collectionManager, type);
     final collection = await _syncEngine.load(cache, colUid, fromCache: true);
+    _checkWritable(collection);
     await collection.setMeta(meta);
     await _syncEngine.save(cache, collection);
   });
@@ -183,6 +185,7 @@ class RepositoryManagerImpl
       final type = _sync.typeFor<T>();
       final cache = await _cache.collectionCache(_collectionManager, type);
       final collection = await _syncEngine.load(cache, colUid, fromCache: true);
+      _checkWritable(collection);
       await collection.delete();
       await _syncEngine.save(cache, collection);
     },
@@ -260,4 +263,10 @@ class RepositoryManagerImpl
           );
         }
       });
+
+  void _checkWritable(Collection collection) {
+    if (collection.accessLevel == CollectionAccessLevel.readOnly) {
+      throw ReadOnlyCollection(collection.uid, collection.accessLevel);
+    }
+  }
 }

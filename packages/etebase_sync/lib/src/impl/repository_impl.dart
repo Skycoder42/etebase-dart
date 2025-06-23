@@ -5,20 +5,22 @@ import 'package:msgpack_codec/msgpack_codec.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../api/conflict_resolution/conflict_resolver.dart';
+import '../api/exceptions/already_subscribed.dart';
+import '../api/exceptions/device_offline.dart';
 import '../api/exceptions/item_deleted.dart';
+import '../api/exceptions/read_only_collection.dart';
 import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
 import '../api/models/value_or_deleted.dart';
 import '../api/repository_adapter.dart';
-import '../api/sync_subscription.dart';
 import 'caching/cache_view.dart';
+import 'etebase_sync_impl.dart';
 import 'sync_engine.dart';
 import 'util/dispose_scope.dart';
 
-// TODO automatically handle read only collections
-
 class RepositoryImpl<T extends Object>
     implements SyncTarget<Item, ItemMetadata, ItemFetchOptions> {
+  final EtebaseSyncImpl _sync;
   final ConflictResolver _conflictResolver;
   final SyncEngine _syncEngine;
   final CacheView<Item> _cache;
@@ -27,9 +29,10 @@ class RepositoryImpl<T extends Object>
   final ItemManager _itemManager;
   final RepositoryAdapter<T> _adapter;
 
-  SyncSubscription? _syncSubscription;
+  bool _syncActive = false;
 
   RepositoryImpl(
+    this._sync,
     this._conflictResolver,
     this._syncEngine,
     this._cache,
@@ -74,6 +77,7 @@ class RepositoryImpl<T extends Object>
   });
 
   Future<String> create(T value) => DisposeScope.scoped(() async {
+    _checkWritable();
     final meta = _updateMeta(null, value);
     final content = msgPack.encode(_adapter.toMsgPack(value));
     var item = DisposeScope.attach(await _itemManager.create(meta, content));
@@ -82,7 +86,11 @@ class RepositoryImpl<T extends Object>
   });
 
   Future<T?> get(String uid) => DisposeScope.scoped(() async {
-    final item = await _syncEngine.loadIfExists(_cache, uid);
+    final item = await _syncEngine.loadIfExists(
+      _cache,
+      uid,
+      fromCache: _syncActive,
+    );
     if (item == null) {
       return null;
     }
@@ -90,7 +98,11 @@ class RepositoryImpl<T extends Object>
   });
 
   Future<ItemMetadata?> getMeta(String uid) => DisposeScope.scoped(() async {
-    final item = await _syncEngine.loadIfExists(_cache, uid);
+    final item = await _syncEngine.loadIfExists(
+      _cache,
+      uid,
+      fromCache: _syncActive,
+    );
     if (item == null) {
       return null;
     }
@@ -98,48 +110,47 @@ class RepositoryImpl<T extends Object>
   });
 
   Future<void> update(String uid, T value) => DisposeScope.scoped(() async {
+    _checkWritable();
     final item = await _syncEngine.load(_cache, uid, fromCache: true);
-    final oldMeta = await item.getMeta();
-    final newMeta = _updateMeta(oldMeta, value);
-    await item.setMeta(newMeta);
     await _setContent(item, value);
+    await _updateItemMeta(item, value);
     await _syncEngine.save(_cache, item);
   });
 
-  Future<bool> delete(String uid) => DisposeScope.scoped(() async {
+  Future<void> delete(String uid) => DisposeScope.scoped(() async {
+    _checkWritable();
     final item = await _syncEngine.loadIfExists(_cache, uid, fromCache: true);
     if (item == null) {
-      return false;
+      return;
     }
     await item.delete();
+    await _updateItemMeta(item, null);
     await _syncEngine.save(_cache, item);
-    return true;
   });
 
-  SyncSubscription subscribeChanges({
-    void Function()? onDone,
-    Function? onError,
-    bool cancelOnError = true,
-  }) {
-    if (_syncSubscription != null) {
-      throw UnimplementedError(); // TODO
+  Stream<String> subscribeChanges() {
+    if (_syncActive) {
+      throw AlreadySubscribed();
     }
 
-    final stoken = _cache.getStoken();
-    // ignore: cancel_subscriptions is returned as wrapped class
-    final sub = _itemManager
-        .subscribeChanges(
-          ItemFetchOptions(withCollection: false, stoken: stoken),
-        )
-        .doOnDone(() {}) // TODO
-        .doOnCancel(() {}) // TODO
-        .listen(
-          _onData,
-          onDone: onDone,
-          onError: onError,
-          cancelOnError: cancelOnError,
-        );
-    return _syncSubscription = SyncSubscription(sub);
+    return _sync.streamOnline(
+      () {
+        final stoken = _cache.getStoken();
+        _syncActive = true;
+        return _itemManager
+            .subscribeChanges(
+              ItemFetchOptions(withCollection: false, stoken: stoken),
+            )
+            .doOnDone(() => _syncActive = false)
+            .doOnCancel(() => _syncActive = false)
+            .asyncMap(_processFrame)
+            .expand((uids) => uids);
+      },
+      whenOffline: () => Stream.error(
+        DeviceOffline('Subscribing to changes'),
+        StackTrace.current,
+      ),
+    );
   }
 
   @override
@@ -207,18 +218,33 @@ class RepositoryImpl<T extends Object>
     }
   }
 
+  void _checkWritable() {
+    if (_collection.accessLevel == CollectionAccessLevel.readOnly) {
+      throw ReadOnlyCollection(_collection.uid, _collection.accessLevel);
+    }
+  }
+
   Future<void> _updateCache() async {
-    // TODO skip if watchign
+    if (_syncActive) {
+      return;
+    }
+
     await _syncEngine.updateCache(_cache);
   }
 
-  ItemMetadata _updateMeta(ItemMetadata? meta, T value) {
+  ItemMetadata _updateMeta(ItemMetadata? meta, T? value) {
     final baseMeta =
         _adapter.updateMeta(meta, value) ?? meta ?? const ItemMetadata();
     return baseMeta.copyWith(
       itemType: baseMeta.itemType ?? _collection.collectionType,
       mtime: DateTime.now(),
     );
+  }
+
+  Future<void> _updateItemMeta(Item item, T? value) async {
+    final oldMeta = await item.getMeta();
+    final newMeta = _updateMeta(oldMeta, value);
+    await item.setMeta(newMeta);
   }
 
   Future<T> _getContent(Item item) async {
@@ -240,13 +266,17 @@ class RepositoryImpl<T extends Object>
         throw ItemDeleted(item.uid);
       case Value(:final value):
         await _setContent(item, value);
+        await _updateItemMeta(item, value);
       case Deleted() when !item.isDeleted:
         await item.delete();
+        await _updateItemMeta(item, null);
     }
     return item;
   }
 
-  Future<void> _onData(ItemListResponse<Item> frame) => DisposeScope.scoped(
-    () async => await _syncEngine.updateFromFrame(_cache, frame),
-  );
+  Future<List<String>> _processFrame(ItemListResponse<Item> frame) =>
+      DisposeScope.scoped(() async {
+        final (_, uids) = await _syncEngine.updateFromFrame(_cache, frame);
+        return uids;
+      });
 }

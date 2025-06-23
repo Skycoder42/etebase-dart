@@ -5,5 +5,5 @@ abstract interface class RepositoryAdapter<T extends Object> {
 
   T fromMsgPack(dynamic value);
 
-  ItemMetadata? updateMeta(ItemMetadata? current, T value);
+  ItemMetadata? updateMeta(ItemMetadata? current, T? value);
 }
