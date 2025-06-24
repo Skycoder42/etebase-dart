@@ -23,7 +23,7 @@ dependencies:
 
 dev_dependencies:
   async: ^2.13.0
-  build_runner: ^2.5.2
+  build_runner: ^2.5.4
   custom_lint: ^0.7.5
   dart_pre_commit: ^5.4.5
   dart_test_tools: ^6.1.1

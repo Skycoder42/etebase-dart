@@ -1,13 +1,22 @@
 import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
 
 import '../models/item_info.dart';
 
+part 'cache_view.freezed.dart';
+
 @internal
 enum SaveMode { fromRemote, preUpload, postUpload }
+
+@freezed
+sealed class SaveResult<TItem extends Item> with _$SaveResult<TItem> {
+  const factory SaveResult.ok() = SaveOk;
+  const factory SaveResult.conflict(TItem cacheItem) = SaveConflict;
+}
 
 @internal
 abstract interface class CacheView<TItem extends Item> {
@@ -22,6 +31,8 @@ abstract interface class CacheView<TItem extends Item> {
   Future<TItem?> getItem(String uid);
 
   Future<TItem> saveItem(TItem item, SaveMode mode);
+
+  Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag);
 }
 
 @internal
@@ -80,6 +91,12 @@ abstract base class HiveCacheView<TItem extends Item>
         );
       case SaveMode.fromRemote:
         originalEtag = null;
+      case SaveMode.preUpload
+          when oldItem != null && oldItem.currentEtag != item.etag:
+        throw Conflict(
+          'The cache entry for $kind with uid "${item.uid}" '
+          'is marked as locally modified',
+        );
       case SaveMode.preUpload:
         originalEtag = oldItem?.originalEtag ?? item.etag;
       case SaveMode.postUpload:
@@ -99,6 +116,24 @@ abstract base class HiveCacheView<TItem extends Item>
       );
     }
     return item;
+  }
+
+  @override
+  Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag) async {
+    final oldItem = await _itemBox.get(item.uid);
+    if (oldItem != null && oldItem.localEtag != expectedEtag) {
+      return SaveResult.conflict(cacheLoad(oldItem.data));
+    }
+
+    await _itemBox.put(
+      item.uid,
+      ItemInfo(
+        data: cacheSave(item),
+        localEtag: item.etag,
+        remoteEtag: oldItem?.remoteEtag ?? item.etag,
+      ),
+    );
+    return const SaveResult.ok();
   }
 
   @visibleForOverriding
