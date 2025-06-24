@@ -1,7 +1,7 @@
-import 'package:etebase/etebase.dart';
+import 'item_record.dart';
 
-class Repository<T extends Object> {
-  final Collection collection;
+abstract class Repository<TRecord extends ItemRecord> {
+  Future<TRecord> create();
 
-  Repository(this.collection);
+  Future<TRecord?> open(String uid);
 }

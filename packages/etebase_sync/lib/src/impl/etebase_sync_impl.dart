@@ -6,14 +6,16 @@ import 'package:meta/meta.dart';
 import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/etebase_sync.dart';
 import '../api/exceptions/missing_type_registration_error.dart';
+import '../api/item_record.dart';
 import '../api/online_checker.dart';
 import '../api/repository.dart';
+import '../api/repository_adapter.dart';
 import 'caching/cache_manager.dart';
 import 'repository_manager_impl.dart';
 
-typedef _Registration<T extends Object> = ({
+typedef _Registration<TRecord extends ItemRecord> = ({
   String type,
-  RepositoryFactory<T> factory,
+  RepositoryAdapter<TRecord> adapter,
 });
 
 @internal
@@ -46,18 +48,17 @@ class EtebaseSyncImpl implements EtebaseSync {
   }
 
   @override
-  void registerRepositoryType<T extends Object>(
+  void registerType<TRecord extends ItemRecord>(
     String typeName,
-    RepositoryFactory<T> factory,
-  ) => _repositoryConfig[T] = (type: typeName, factory: factory);
+    RepositoryAdapter<TRecord> adapter,
+  ) => _repositoryConfig[TRecord] = (type: typeName, adapter: adapter);
 
-  String typeFor<T extends Object>() => _registration<T>().type;
+  String typeFor<TRecord extends ItemRecord>() => _registration<TRecord>().type;
 
-  Future<Repository<T>> createRepo<T extends Object>(
+  Repository<TRecord> createRepo<TRecord extends ItemRecord>(
     Collection collection,
-  ) async {
-    final (type: _, :factory) = _registration<T>();
-    return await factory(collection);
+  ) {
+    throw UnimplementedError();
   }
 
   Future<T> runOnline<T>(
@@ -98,11 +99,11 @@ class EtebaseSyncImpl implements EtebaseSync {
     yield* whenOffline?.call() ?? const Stream.empty();
   }
 
-  _Registration<T> _registration<T extends Object>() {
-    final registration = _repositoryConfig[T];
+  _Registration<TRecord> _registration<TRecord extends ItemRecord>() {
+    final registration = _repositoryConfig[TRecord];
     if (registration == null) {
-      throw MissingTypeRegistrationError(T);
+      throw MissingTypeRegistrationError(TRecord);
     }
-    return registration as _Registration<T>;
+    return registration as _Registration<TRecord>;
   }
 }

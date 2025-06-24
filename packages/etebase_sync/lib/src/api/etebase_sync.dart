@@ -1,20 +1,16 @@
 import 'dart:async';
 
-import 'package:etebase/etebase.dart';
-
-import 'repository.dart';
+import 'item_record.dart';
+import 'repository_adapter.dart';
 import 'repository_manager.dart';
-
-typedef RepositoryFactory<T extends Object> =
-    FutureOr<Repository<T>> Function(Collection collection);
 
 abstract interface class EtebaseSync {
   RepositoryManager get repositoryManager;
 
   Future<void> dispose();
 
-  void registerRepositoryType<T extends Object>(
+  void registerType<TRecord extends ItemRecord>(
     String typeName,
-    RepositoryFactory<T> factory,
+    RepositoryAdapter<TRecord> adapter,
   );
 }

@@ -1,9 +1,7 @@
 import 'package:etebase/etebase.dart';
 
-abstract interface class RepositoryAdapter<T extends Object> {
-  dynamic toMsgPack(T value);
+import 'item_record.dart';
 
-  T fromMsgPack(dynamic value);
-
-  ItemMetadata? updateMeta(ItemMetadata? current, T? value);
+abstract interface class RepositoryAdapter<TRecord extends ItemRecord> {
+  TRecord createRecord(Item item);
 }
