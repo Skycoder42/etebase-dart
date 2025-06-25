@@ -8,7 +8,7 @@ import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/exceptions/already_subscribed.dart';
 import '../api/exceptions/device_offline.dart';
 import '../api/exceptions/item_deleted.dart';
-import '../api/exceptions/read_only_collection.dart';
+import '../api/exceptions/read_only.dart';
 import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
 import '../api/models/value_or_deleted.dart';
@@ -220,7 +220,7 @@ class RepositoryImpl<T extends Object>
 
   void _checkWritable() {
     if (_collection.accessLevel == CollectionAccessLevel.readOnly) {
-      throw ReadOnlyCollection(_collection.uid, _collection.accessLevel);
+      throw ReadOnly(_collection.uid, _collection.accessLevel);
     }
   }
 

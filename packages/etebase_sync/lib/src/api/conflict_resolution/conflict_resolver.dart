@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../models/etebase_target.dart';
 import '../exceptions/unresolved_conflict.dart';
 import '../models/conflict_origin.dart';
 import '../models/conflict_resolution.dart';
@@ -19,7 +20,7 @@ class ConflictResolver {
     String collectionType,
     Map<String, RepositoryMetadata> collectionData,
   ) => throw UnresolvedConflict(
-    ConflictTarget.collection,
+    EtebaseTarget.collection,
     'Found ${collectionData.length} primary collections '
     'for type "$collectionType"',
   );
@@ -32,7 +33,7 @@ class ConflictResolver {
     required bool deletedRemotely,
     required ConflictOrigin origin,
   }) => throw UnresolvedConflict(
-    ConflictTarget.collection,
+    EtebaseTarget.collection,
     'Metadata of collection with uid "$colUid" has been modified '
     'locally and on the remote (Origin: ${origin.name})',
     uid: colUid,
@@ -46,7 +47,7 @@ class ConflictResolver {
     required ValueOrDeleted<TValue> remote,
     required ConflictOrigin origin,
   }) => throw UnresolvedConflict(
-    ConflictTarget.item,
+    EtebaseTarget.item,
     'Content of item with uid "$itemUid" has been modified '
     'locally and on the remote (Origin: ${origin.name})',
     uid: itemUid,

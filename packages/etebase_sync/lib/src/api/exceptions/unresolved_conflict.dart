@@ -1,10 +1,9 @@
 import '../models/conflict_origin.dart';
+import '../models/etebase_target.dart';
 import 'etebase_sync_exception.dart';
 
-enum ConflictTarget { collection, item }
-
 class UnresolvedConflict extends EtebaseSyncException {
-  final ConflictTarget target;
+  final EtebaseTarget target;
   final String? uid;
   final ConflictOrigin? origin;
 

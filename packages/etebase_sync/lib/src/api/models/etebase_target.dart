@@ -1,0 +1,1 @@
+enum EtebaseTarget { collection, item }

@@ -6,7 +6,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/exceptions/collection_type_mismatch.dart';
-import '../api/exceptions/read_only_collection.dart';
+import '../api/models/etebase_target.dart';
+import '../api/exceptions/read_only.dart';
 import '../api/exceptions/unresolved_conflict.dart';
 import '../api/models/conflict_origin.dart';
 import '../api/models/conflict_resolution.dart';
@@ -41,73 +42,81 @@ class RepositoryManagerImpl
   );
 
   @override
-  Future<Repository<T>>
-  openPrimary<T extends Object>() => DisposeScope.scoped(() async {
-    final type = _sync.typeFor<T>();
-    final cache = await _cache.collectionCache(_collectionManager, type);
-    await _syncEngine.updateCache(cache);
+  Future<Repository<T>> openPrimary<T extends Object>() =>
+      DisposeScope.scoped(() async {
+        final type = _sync.typeFor<T>();
+        final cache = await _cache.collectionCache(_collectionManager, type);
+        await _syncEngine.updateCache(cache);
 
-    final colUids = cache.listItems().toList();
-    switch (colUids) {
-      case []:
-        return await create<T>(const RepositoryMetadata(primary: true));
-      case [final colUid]:
-        var collection = await _syncEngine.load(cache, colUid, fromCache: true);
-        final meta = await collection.getMeta<RepositoryMetadata>();
-        if (!meta.primary) {
-          await collection.setMeta(meta.copyWith(primary: true));
-          collection = await _syncEngine.save(cache, collection);
-        }
-        return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
-      default:
-        break;
-    }
-
-    final primaryCollections = <(Collection, RepositoryMetadata)>[];
-    for (final colUid in colUids) {
-      final collection = await _syncEngine.load(cache, colUid, fromCache: true);
-      final meta = await collection.getMeta<RepositoryMetadata>();
-      if (meta.primary) {
-        primaryCollections.add((collection, meta));
-      }
-    }
-
-    switch (primaryCollections) {
-      case []:
-        return await create<T>(const RepositoryMetadata(primary: true));
-      case [(final collection, _)]:
-        return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
-      default:
-        final conflictMap = {
-          for (final (collection, meta) in primaryCollections)
-            collection.uid: meta,
-        };
-        final actual = await _conflictResolver
-            .resolveMultiplePrimaryCollections(type, conflictMap);
-        Collection? primaryCol;
-        for (final (collection, meta) in primaryCollections) {
-          if (collection.uid == actual) {
-            primaryCol = collection;
-            continue;
-          }
-
-          await collection.setMeta(meta.copyWith(primary: false));
-          await _syncEngine.save(cache, collection);
+        final colUids = cache.listItems().toList();
+        switch (colUids) {
+          case []:
+            return await create<T>(const RepositoryMetadata(primary: true));
+          case [final colUid]:
+            var collection = await _syncEngine.load(
+              cache,
+              colUid,
+              fromCache: true,
+            );
+            final meta = await collection.getMeta<RepositoryMetadata>();
+            if (!meta.primary) {
+              await collection.setMeta(meta.copyWith(primary: true));
+              collection = await _syncEngine.save(cache, collection);
+            }
+            return _sync.createRepo<T>(DisposeScope.detachLater(collection));
+          default:
+            break;
         }
 
-        if (primaryCol == null) {
-          throw UnresolvedConflict(
-            ConflictTarget.collection,
-            'Conflict resolved selected collection with uid "$actual" '
-            'as primary collection, but it was not found!',
-            origin: ConflictOrigin.cache,
-            uid: actual,
+        final primaryCollections = <(Collection, RepositoryMetadata)>[];
+        for (final colUid in colUids) {
+          final collection = await _syncEngine.load(
+            cache,
+            colUid,
+            fromCache: true,
           );
+          final meta = await collection.getMeta<RepositoryMetadata>();
+          if (meta.primary) {
+            primaryCollections.add((collection, meta));
+          }
         }
 
-        return await _sync.createRepo<T>(DisposeScope.detachLater(primaryCol));
-    }
-  });
+        switch (primaryCollections) {
+          case []:
+            return await create<T>(const RepositoryMetadata(primary: true));
+          case [(final collection, _)]:
+            return _sync.createRepo<T>(DisposeScope.detachLater(collection));
+          default:
+            final conflictMap = {
+              for (final (collection, meta) in primaryCollections)
+                collection.uid: meta,
+            };
+            final actual = await _conflictResolver
+                .resolveMultiplePrimaryCollections(type, conflictMap);
+            Collection? primaryCol;
+            for (final (collection, meta) in primaryCollections) {
+              if (collection.uid == actual) {
+                primaryCol = collection;
+                continue;
+              }
+
+              await collection.setMeta(meta.copyWith(primary: false));
+              await _syncEngine.save(cache, collection);
+            }
+
+            if (primaryCol == null) {
+              throw UnresolvedConflict(
+                EtebaseTarget.collection,
+                'Conflict resolved selected collection with uid "$actual" '
+                'as primary collection, but it was not found!',
+                origin: ConflictOrigin.cache,
+                uid: actual,
+              );
+            }
+
+            return _sync.createRepo<T>(DisposeScope.detachLater(primaryCol));
+        }
+      });
 
   @override
   Future<Map<String, RepositoryMetadata>> list<T extends Object>() =>
@@ -145,7 +154,7 @@ class RepositoryManagerImpl
           ),
         );
         collection = await _syncEngine.save(cache, collection);
-        return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
+        return _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
   @override
@@ -154,7 +163,7 @@ class RepositoryManagerImpl
         final type = _sync.typeFor<T>();
         final cache = await _cache.collectionCache(_collectionManager, type);
         final collection = await _syncEngine.load(cache, colUid);
-        return await _sync.createRepo<T>(DisposeScope.detachLater(collection));
+        return _sync.createRepo<T>(DisposeScope.detachLater(collection));
       });
 
   @override
@@ -266,7 +275,7 @@ class RepositoryManagerImpl
 
   void _checkWritable(Collection collection) {
     if (collection.accessLevel == CollectionAccessLevel.readOnly) {
-      throw ReadOnlyCollection(collection.uid, collection.accessLevel);
+      throw ReadOnly(collection.uid, collection.accessLevel);
     }
   }
 }

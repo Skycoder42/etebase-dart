@@ -4,6 +4,7 @@ import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:synchronized/synchronized.dart';
 
 import '../models/item_info.dart';
 
@@ -33,6 +34,8 @@ abstract interface class CacheView<TItem extends Item> {
   Future<TItem> saveItem(TItem item, SaveMode mode);
 
   Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag);
+
+  Future<SaveResult<TItem>> saveUploaded(TItem item, String expectedEtag);
 }
 
 @internal
@@ -40,6 +43,8 @@ abstract base class HiveCacheView<TItem extends Item>
     implements CacheView<TItem> {
   final Box<String> _stokenBox;
   final LazyBox<ItemInfo> _itemBox;
+
+  final _writeLock = Lock();
 
   HiveCacheView(this._stokenBox, this._itemBox);
 
@@ -49,13 +54,13 @@ abstract base class HiveCacheView<TItem extends Item>
 
   @override
   @nonVirtual
-  Future<void> saveStoken(String? stoken) async {
+  Future<void> saveStoken(String? stoken) => _writeLock.synchronized(() async {
     if (stoken != null) {
       await _stokenBox.put(_stokenKey, stoken);
     } else {
       await _stokenBox.delete(_stokenKey);
     }
-  }
+  });
 
   @override
   Iterable<String> listItems() => _itemBox.keys.cast<String>();
@@ -119,22 +124,42 @@ abstract base class HiveCacheView<TItem extends Item>
   }
 
   @override
-  Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag) async {
-    final oldItem = await _itemBox.get(item.uid);
-    if (oldItem != null && oldItem.localEtag != expectedEtag) {
-      return SaveResult.conflict(cacheLoad(oldItem.data));
-    }
+  Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag) =>
+      _writeLock.synchronized(() async {
+        final oldItem = await _itemBox.get(item.uid);
+        if (oldItem != null && oldItem.localEtag != expectedEtag) {
+          return SaveResult.conflict(cacheLoad(oldItem.data));
+        }
 
-    await _itemBox.put(
-      item.uid,
-      ItemInfo(
-        data: cacheSave(item),
-        localEtag: item.etag,
-        remoteEtag: oldItem?.remoteEtag ?? item.etag,
-      ),
-    );
-    return const SaveResult.ok();
-  }
+        await _itemBox.put(
+          item.uid,
+          ItemInfo(
+            data: cacheSave(item),
+            localEtag: item.etag,
+            remoteEtag: oldItem?.remoteEtag ?? item.etag,
+          ),
+        );
+        return const SaveResult.ok();
+      });
+
+  @override
+  Future<SaveResult<TItem>> saveUploaded(TItem item, String expectedEtag) =>
+      _writeLock.synchronized(() async {
+        final oldItem = await _itemBox.get(item.uid);
+        if (oldItem != null && oldItem.localEtag != expectedEtag) {
+          return SaveResult.conflict(cacheLoad(oldItem.data));
+        }
+
+        await _itemBox.put(
+          item.uid,
+          ItemInfo(
+            data: cacheSave(item),
+            localEtag: item.etag,
+            remoteEtag: item.etag,
+          ),
+        );
+        return const SaveResult.ok();
+      });
 
   @visibleForOverriding
   String get kind;
