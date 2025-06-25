@@ -1,4 +1,4 @@
-import 'item_record.dart';
+import '../items/item_record.dart';
 
 abstract class Repository<TRecord extends ItemRecord> {
   Future<TRecord> create();

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'item_record.dart';
+import '../items/item_record.dart';
 import 'repository_adapter.dart';
 import 'repository_manager.dart';
 

@@ -15,7 +15,7 @@ enum SaveMode { fromRemote, preUpload, postUpload }
 
 @freezed
 sealed class SaveResult<TItem extends Item> with _$SaveResult<TItem> {
-  const factory SaveResult.ok() = SaveOk;
+  const factory SaveResult.ok(String etag) = SaveOk;
   const factory SaveResult.conflict(TItem cacheItem) = SaveConflict;
 }
 
@@ -35,7 +35,7 @@ abstract interface class CacheView<TItem extends Item> {
 
   Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag);
 
-  Future<SaveResult<TItem>> saveUploaded(TItem item, String expectedEtag);
+  Future<SaveResult<TItem>> saveUploaded(String uid, String expectedEtag);
 }
 
 @internal
@@ -139,26 +139,26 @@ abstract base class HiveCacheView<TItem extends Item>
             remoteEtag: oldItem?.remoteEtag ?? item.etag,
           ),
         );
-        return const SaveResult.ok();
+        return SaveResult.ok(item.etag);
       });
 
   @override
-  Future<SaveResult<TItem>> saveUploaded(TItem item, String expectedEtag) =>
+  Future<SaveResult<TItem>> saveUploaded(String uid, String expectedEtag) =>
       _writeLock.synchronized(() async {
-        final oldItem = await _itemBox.get(item.uid);
-        if (oldItem != null && oldItem.localEtag != expectedEtag) {
+        final oldItem = await _itemBox.get(uid);
+        if (oldItem == null) {
+          throw UnimplementedError(); // TODO
+        } else if (oldItem.localEtag != expectedEtag) {
           return SaveResult.conflict(cacheLoad(oldItem.data));
         }
 
+        // TODO here
+
         await _itemBox.put(
-          item.uid,
-          ItemInfo(
-            data: cacheSave(item),
-            localEtag: item.etag,
-            remoteEtag: item.etag,
-          ),
+          uid,
+          oldItem.copyWith(remoteEtag: oldItem.localEtag),
         );
-        return const SaveResult.ok();
+        return SaveResult.ok(oldItem.localEtag);
       });
 
   @visibleForOverriding

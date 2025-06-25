@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 
 import 'exceptions/item_deleted.dart';
-import 'item_record.dart';
+import '../items/item_record.dart';
 
 abstract class ProxyRecord<T extends Object> extends ItemRecord {
   late T _data;

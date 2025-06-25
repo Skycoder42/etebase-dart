@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/etebase_sync.dart';
 import '../api/exceptions/missing_type_registration_error.dart';
-import '../api/item_record.dart';
+import '../items/item_record.dart';
 import '../api/online_checker.dart';
 import '../api/repository.dart';
 import '../api/repository_adapter.dart';

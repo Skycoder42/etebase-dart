@@ -1,25 +1,13 @@
-import 'dart:typed_data';
+part of 'items.dart';
 
-import 'package:etebase/etebase.dart';
-
-import '../api/exceptions/read_only.dart';
-import '../api/item_record.dart';
-import '../api/models/conflict_origin.dart';
-import '../api/models/etebase_target.dart';
-import '../api/repository.dart';
-import '../api/repository_adapter.dart';
-import 'caching/cache_view.dart';
-import 'etebase_sync_impl.dart';
-
-class RepositoryImpl<TRecord extends ItemRecord>
-    implements Repository<TRecord> {
+class Repository<TRecord extends ItemRecord> {
   final EtebaseSyncImpl _sync;
   final Collection _collection;
   final RepositoryAdapter<TRecord> _adapter;
   final ItemManager _itemManager;
   final CacheView<Item> _cacheView;
 
-  RepositoryImpl(
+  Repository(
     this._sync,
     this._collection,
     this._adapter,
@@ -32,7 +20,6 @@ class RepositoryImpl<TRecord extends ItemRecord>
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
 
-  @override
   Future<TRecord> create() async {
     _checkWritable();
 
@@ -43,7 +30,6 @@ class RepositoryImpl<TRecord extends ItemRecord>
     return await _createRecord(item, created: true);
   }
 
-  @override
   Future<TRecord?> open(String uid) async {
     final item = await _cacheView.getItem(uid);
     if (item == null || item.isDeleted) {
@@ -53,7 +39,7 @@ class RepositoryImpl<TRecord extends ItemRecord>
     return await _createRecord(item);
   }
 
-  Future<Item> persist(TRecord record, {bool transaction = true}) async {
+  Future<void> persist(TRecord record) async {
     _checkWritable(record);
 
     /// TODOs:
@@ -63,38 +49,44 @@ class RepositoryImpl<TRecord extends ItemRecord>
     /// 4. If conflict -> resolve and go to 1.
     /// 5. Persist resolution in cache (with conflict checks)
 
-    // Check if updated at all
-    if (record.item.etag == record.lastEtag) {
-      return record.item;
+    // If etag has not changed, item was not modified -> no need to save
+    if (record._item.etag == record._cacheEtag) {
+      return;
     }
 
     // Persist the modifications of record to the cache
-    final result = await _cacheView.saveLocal(record.item, record.lastEtag);
-    if (result case SaveConflict(:final cacheItem)) {
-      await _resolveConflict(record, cacheItem, ConflictOrigin.cache);
-      return await persist(record, transaction: transaction);
+    final result = await _cacheView.saveLocal(record._item, record._cacheEtag);
+    switch (result) {
+      case SaveOk(:final etag):
+        record._cacheEtag = etag;
+      case SaveConflict(:final cacheItem):
+        await _resolveConflict(
+          record,
+          cacheItem,
+          cacheItem.etag,
+          ConflictOrigin.cache,
+        );
+        return await persist(record);
     }
 
     // try upload
     await _sync.runOnline(() async {
       try {
-        if (transaction) {
-          await _itemManager.transaction([record.item]);
-        } else {
-          await _itemManager.batch([record.item]);
-        }
-      } on Conflict {
-        final remoteRecord = await _createRecord(remoteItem, readOnly: true)
-          ..lastEtag = record.lastEtag;
+        await _itemManager.transaction([record._item]);
 
-        // TODO swap items?
-        final remoteItem = await _itemManager.fetch(record.item.uid);
-        await _resolveConflict(record, remoteItem, ConflictOrigin.server);
-        return await persist(record, transaction: transaction);
+        // TODO use result
+        await _cacheView.saveUploaded(record._item, record._cacheEtag);
+      } on Conflict {
+        final remoteItem = await _itemManager.fetch(record._item.uid);
+        await _resolveConflict(
+          record,
+          remoteItem,
+          record._cacheEtag,
+          ConflictOrigin.server,
+        );
+        return await persist(record);
       }
     });
-
-    return record.item;
   }
 
   Future<TRecord> _createRecord(
@@ -117,7 +109,7 @@ class RepositoryImpl<TRecord extends ItemRecord>
       throw ReadOnly(_collection.uid, EtebaseTarget.collection);
     }
 
-    if (record?.inConflictResolution ?? false) {
+    if (record?._inConflictResolution ?? false) {
       throw StateError(
         'Cannot persist an item that is part of an active conflict resolution',
       );
@@ -125,20 +117,24 @@ class RepositoryImpl<TRecord extends ItemRecord>
   }
 
   Future<void> _resolveConflict(
-    TRecord original,
-    Item other,
+    TRecord target,
+    Item canonicalItem,
+    String cacheEtag,
     ConflictOrigin origin,
   ) async {
-    final otherRecord = await _createRecord(other, readOnly: true);
+    final canonical = await _createRecord(canonicalItem)
+      .._inConflictResolution = true;
+
     try {
-      // TODO use parts?
-      original.inConflictResolution = true;
-      // ignore: invalid_use_of_visible_for_overriding_member for internal
-      await original.resolveConflict(otherRecord, origin);
-      original.lastEtag = otherRecord.lastEtag; // TODO ???
+      target._readOnly = true;
+      await canonical.resolveConflict(target, origin);
+    } catch (_) {
+      canonical.dispose();
+      rethrow;
     } finally {
-      original.inConflictResolution = false;
-      otherRecord.dispose();
+      target._readOnly = false;
     }
+
+    await target._updateItem(canonicalItem, cacheEtag);
   }
 }
