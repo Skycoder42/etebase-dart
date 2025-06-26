@@ -1,6 +1,6 @@
 part of 'items.dart';
 
-enum _RecordState { uninitialized, ready, locked, conflictResolving }
+enum _RecordState { uninitialized, ready, locked, conflictResolving, disposed }
 
 abstract class ItemRecord {
   final Repository _repository;
@@ -8,7 +8,7 @@ abstract class ItemRecord {
 
   // internal repository stuff
   Item _item;
-  String _cacheEtag;
+  late String? _cacheEtag;
   _RecordState _state = _RecordState.uninitialized;
 
   late ItemMetadata _currentMeta;
@@ -17,26 +17,22 @@ abstract class ItemRecord {
     Repository repository,
     this._item, {
     this.automaticTimestamps = true,
-  }) : _repository = repository,
-       _cacheEtag = _item.etag;
+  }) : _repository = repository;
 
   @nonVirtual
   String get uid => _item.uid;
 
-  bool get isReadOnly => _state != _RecordState.ready || _repository.isReadOnly;
+  bool get isReadOnly => switch (_state) {
+    _RecordState.ready => _repository.isReadOnly,
+    _ => true,
+  };
 
   @nonVirtual
   String get etag => _item.etag;
 
   @nonVirtual
-  bool get isDeleted => _item.isDeleted;
-
-  @nonVirtual
   ItemMetadata get meta {
-    if (_state == _RecordState.uninitialized) {
-      throw StateError('Record has not been initialized yet');
-    }
-
+    _checkInitialized();
     return _currentMeta;
   }
 
@@ -49,15 +45,25 @@ abstract class ItemRecord {
 
   @mustCallSuper
   Future<void> init({required bool created}) async {
+    if (_state != _RecordState.uninitialized) {
+      throw StateError('Record has already been initialized');
+    }
+
     _currentMeta = await _item.getMeta();
     if (!created && !_item.isDeleted) {
       deserialize(await _item.getContent());
     }
+    _cacheEtag = created ? _item.etag : null;
     _state = _RecordState.ready;
   }
 
   @mustCallSuper
-  void dispose() => _item.dispose();
+  void dispose() {
+    if (_state != _RecordState.disposed) {
+      _item.dispose();
+      _state = _RecordState.disposed;
+    }
+  }
 
   @mustCallSuper
   Future<void> refresh() async {
@@ -98,6 +104,7 @@ abstract class ItemRecord {
     }
 
     await _repository._persist(this);
+    dispose();
   }
 
   @mustCallSuper
@@ -146,15 +153,22 @@ abstract class ItemRecord {
     await _item.setMeta(_currentMeta);
   }
 
-  void _checkUnlocked() {
+  void _checkInitialized() {
     switch (_state) {
       case _RecordState.uninitialized:
         throw StateError('Record has not been initialized yet');
-      case _RecordState.locked:
-        // TODO real exception
-        throw StateError('Record is locked!');
+      case _RecordState.disposed:
+        throw StateError('Record has been disposed');
       case _:
         break;
+    }
+  }
+
+  void _checkUnlocked() {
+    _checkInitialized();
+    if (_state case _RecordState.locked) {
+      // TODO real exception
+      throw StateError('Record is locked!');
     }
   }
 

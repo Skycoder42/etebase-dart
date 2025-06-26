@@ -21,6 +21,10 @@ abstract class ProxyRecord<T extends Object> extends ItemRecord {
       throw ItemDeleted(uid);
     }
 
+    if (_data == value) {
+      return;
+    }
+
     _data = value;
     meta = updateMeta(meta, value);
   }
