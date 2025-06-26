@@ -1,5 +1,7 @@
 part of 'items.dart';
 
+enum _RecordState { uninitialized, ready, locked, conflictResolving }
+
 abstract class ItemRecord {
   final Repository _repository;
   final bool automaticTimestamps;
@@ -7,8 +9,7 @@ abstract class ItemRecord {
   // internal repository stuff
   Item _item;
   String _cacheEtag;
-  bool _readOnly = false;
-  bool _inConflictResolution = false;
+  _RecordState _state = _RecordState.uninitialized;
 
   late ItemMetadata _currentMeta;
 
@@ -22,7 +23,7 @@ abstract class ItemRecord {
   @nonVirtual
   String get uid => _item.uid;
 
-  bool get isReadOnly => _readOnly;
+  bool get isReadOnly => _state != _RecordState.ready || _repository.isReadOnly;
 
   @nonVirtual
   String get etag => _item.etag;
@@ -31,7 +32,13 @@ abstract class ItemRecord {
   bool get isDeleted => _item.isDeleted;
 
   @nonVirtual
-  ItemMetadata get meta => _currentMeta;
+  ItemMetadata get meta {
+    if (_state == _RecordState.uninitialized) {
+      throw StateError('Record has not been initialized yet');
+    }
+
+    return _currentMeta;
+  }
 
   @protected
   @nonVirtual
@@ -46,13 +53,16 @@ abstract class ItemRecord {
     if (!created && !_item.isDeleted) {
       deserialize(await _item.getContent());
     }
+    _state = _RecordState.ready;
   }
 
   @mustCallSuper
   void dispose() => _item.dispose();
 
   @mustCallSuper
-  Future<void> refresh() async {}
+  Future<void> refresh() async {
+    _checkUnlocked();
+  }
 
   @mustCallSuper
   Future<void> save() async {
@@ -65,11 +75,11 @@ abstract class ItemRecord {
     await _item.setContent(serialize());
     await _updateMeta();
 
-    if (_inConflictResolution) {
+    if (_state == _RecordState.conflictResolving) {
       return;
     }
 
-    await _repository.persist(this);
+    await _repository._persist(this);
   }
 
   @mustCallSuper
@@ -83,15 +93,17 @@ abstract class ItemRecord {
     await _item.delete();
     await _updateMeta();
 
-    if (_inConflictResolution) {
+    if (_state == _RecordState.conflictResolving) {
       return;
     }
 
-    await _repository.persist(this);
+    await _repository._persist(this);
   }
 
   @mustCallSuper
-  Stream<void> sync() async* {}
+  Stream<void> sync() async* {
+    _checkUnlocked();
+  }
 
   @visibleForOverriding
   Uint8List serialize();
@@ -134,10 +146,21 @@ abstract class ItemRecord {
     await _item.setMeta(_currentMeta);
   }
 
+  void _checkUnlocked() {
+    switch (_state) {
+      case _RecordState.uninitialized:
+        throw StateError('Record has not been initialized yet');
+      case _RecordState.locked:
+        // TODO real exception
+        throw StateError('Record is locked!');
+      case _:
+        break;
+    }
+  }
+
   void _checkWritable() {
-    if (isReadOnly) {
-      throw ReadOnly(uid, EtebaseTarget.item);
-    } else if (_repository.isReadOnly) {
+    _checkUnlocked();
+    if (_repository.isReadOnly) {
       throw ReadOnly(_repository.uid, EtebaseTarget.collection);
     }
   }

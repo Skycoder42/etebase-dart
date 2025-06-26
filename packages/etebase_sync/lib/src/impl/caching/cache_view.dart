@@ -35,7 +35,7 @@ abstract interface class CacheView<TItem extends Item> {
 
   Future<SaveResult<TItem>> saveLocal(TItem item, String expectedEtag);
 
-  Future<SaveResult<TItem>> saveUploaded(String uid, String expectedEtag);
+  Future<SaveResult<TItem>> saveUploaded(TItem item, String expectedEtag);
 }
 
 @internal
@@ -143,23 +143,24 @@ abstract base class HiveCacheView<TItem extends Item>
       });
 
   @override
-  Future<SaveResult<TItem>> saveUploaded(String uid, String expectedEtag) =>
-      _writeLock.synchronized(() async {
-        final oldItem = await _itemBox.get(uid);
-        if (oldItem == null) {
-          throw UnimplementedError(); // TODO
-        } else if (oldItem.localEtag != expectedEtag) {
-          return SaveResult.conflict(cacheLoad(oldItem.data));
-        }
+  Future<SaveResult<TItem>> saveUploaded(
+    TItem item,
+    String expectedEtag,
+  ) => _writeLock.synchronized(() async {
+    final oldItem = await _itemBox.get(item.uid);
+    if (oldItem == null) {
+      return SaveResult.ok(item.etag);
+    } else if (oldItem.localEtag != expectedEtag || item.etag != expectedEtag) {
+      return SaveResult.conflict(cacheLoad(oldItem.data));
+    }
 
-        // TODO here
-
-        await _itemBox.put(
-          uid,
-          oldItem.copyWith(remoteEtag: oldItem.localEtag),
-        );
-        return SaveResult.ok(oldItem.localEtag);
-      });
+    if (item.isDeleted) {
+      await _itemBox.delete(item.uid);
+    } else {
+      await _itemBox.put(item.uid, oldItem.copyWith(remoteEtag: expectedEtag));
+    }
+    return SaveResult.ok(expectedEtag);
+  });
 
   @visibleForOverriding
   String get kind;

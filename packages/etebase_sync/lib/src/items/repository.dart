@@ -39,9 +39,31 @@ class Repository<TRecord extends ItemRecord> {
     return await _createRecord(item);
   }
 
-  Future<void> persist(TRecord record) async {
-    _checkWritable(record);
+  void _checkWritable() {
+    if (isReadOnly) {
+      throw ReadOnly(_collection.uid, EtebaseTarget.collection);
+    }
+  }
 
+  Future<TRecord> _createRecord(
+    Item item, {
+    bool created = false,
+    bool forConflict = false,
+  }) async {
+    try {
+      final record = _adapter.createRecord(this, item);
+      await record.init(created: created);
+      if (forConflict) {
+        record._state = _RecordState.conflictResolving;
+      }
+      return record;
+    } catch (_) {
+      item.dispose();
+      rethrow;
+    }
+  }
+
+  Future<void> _persist(TRecord record) async {
     /// TODOs:
     /// 1. check if the cached value has been modified -> if yes resolve
     /// 2. persist the canonical version in the cache
@@ -54,65 +76,23 @@ class Repository<TRecord extends ItemRecord> {
       return;
     }
 
-    // Persist the modifications of record to the cache
-    final result = await _cacheView.saveLocal(record._item, record._cacheEtag);
-    switch (result) {
-      case SaveOk(:final etag):
-        record._cacheEtag = etag;
-      case SaveConflict(:final cacheItem):
-        await _resolveConflict(
-          record,
-          cacheItem,
-          cacheItem.etag,
-          ConflictOrigin.cache,
-        );
-        return await persist(record);
-    }
-
-    // try upload
-    await _sync.runOnline(() async {
-      try {
-        await _itemManager.transaction([record._item]);
-
-        // TODO use result
-        await _cacheView.saveUploaded(record._item, record._cacheEtag);
-      } on Conflict {
-        final remoteItem = await _itemManager.fetch(record._item.uid);
-        await _resolveConflict(
-          record,
-          remoteItem,
-          record._cacheEtag,
-          ConflictOrigin.server,
-        );
-        return await persist(record);
-      }
-    });
-  }
-
-  Future<TRecord> _createRecord(
-    Item item, {
-    bool created = false,
-    bool readOnly = false,
-  }) async {
+    final recordState = record._state;
     try {
-      final record = _adapter.createRecord(this, item, readOnly: readOnly);
-      await record.init(created: created);
-      return record;
-    } catch (_) {
-      item.dispose();
-      rethrow;
-    }
-  }
+      record._state = _RecordState.locked;
 
-  void _checkWritable([TRecord? record]) {
-    if (isReadOnly) {
-      throw ReadOnly(_collection.uid, EtebaseTarget.collection);
-    }
-
-    if (record?._inConflictResolution ?? false) {
-      throw StateError(
-        'Cannot persist an item that is part of an active conflict resolution',
+      // Persist the modifications of record to the cache
+      final saveLocalResult = await _cacheView.saveLocal(
+        record._item,
+        record._cacheEtag,
       );
+      if (!await _handleCacheSaveResult(record, saveLocalResult)) {
+        return;
+      }
+
+      // try upload
+      await _upload(record);
+    } finally {
+      record._state = recordState;
     }
   }
 
@@ -122,19 +102,61 @@ class Repository<TRecord extends ItemRecord> {
     String cacheEtag,
     ConflictOrigin origin,
   ) async {
-    final canonical = await _createRecord(canonicalItem)
-      .._inConflictResolution = true;
+    final canonical = await _createRecord(canonicalItem, forConflict: true);
 
     try {
-      target._readOnly = true;
       await canonical.resolveConflict(target, origin);
     } catch (_) {
       canonical.dispose();
       rethrow;
-    } finally {
-      target._readOnly = false;
     }
 
     await target._updateItem(canonicalItem, cacheEtag);
+  }
+
+  Future<bool> _handleCacheSaveResult(
+    TRecord record,
+    SaveResult<Item> result,
+  ) async {
+    switch (result) {
+      case SaveOk(:final etag):
+        record._cacheEtag = etag;
+        return true;
+      case SaveConflict(:final cacheItem):
+        await _resolveConflict(
+          record,
+          cacheItem,
+          cacheItem.etag,
+          ConflictOrigin.cache,
+        );
+        await _persist(record);
+        return false;
+    }
+  }
+
+  Future<void> _upload(TRecord record) async {
+    await _sync.runOnline(() async {
+      try {
+        await _itemManager.transaction([record._item]);
+
+        // TODO check if this is actually correct
+        final saveUploadedResult = await _cacheView.saveUploaded(
+          record._item,
+          record._cacheEtag,
+        );
+        if (!await _handleCacheSaveResult(record, saveUploadedResult)) {
+          return;
+        }
+      } on Conflict {
+        final remoteItem = await _itemManager.fetch(record._item.uid);
+        await _resolveConflict(
+          record,
+          remoteItem,
+          record._cacheEtag,
+          ConflictOrigin.server,
+        );
+        return await _persist(record);
+      }
+    });
   }
 }
