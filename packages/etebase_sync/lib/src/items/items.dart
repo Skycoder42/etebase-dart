@@ -14,5 +14,6 @@ import '../impl/caching/cache_view.dart';
 import '../impl/etebase_sync_impl.dart';
 import '../sync/sync_config.dart';
 
+part 'background_sync.dart';
 part 'item_record.dart';
 part 'repository.dart';
