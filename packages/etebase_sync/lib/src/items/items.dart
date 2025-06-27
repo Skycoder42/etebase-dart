@@ -12,6 +12,7 @@ import '../api/models/etebase_target.dart';
 import '../api/repository_adapter.dart';
 import '../impl/caching/cache_view.dart';
 import '../impl/etebase_sync_impl.dart';
+import '../sync/sync_config.dart';
 
 part 'item_record.dart';
 part 'repository.dart';

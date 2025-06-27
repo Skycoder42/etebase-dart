@@ -66,13 +66,19 @@ abstract class ItemRecord {
   }
 
   @mustCallSuper
-  Future<void> refresh() async {
+  Future<void> refresh({bool? download}) async {
     _checkUnlocked();
-    await _repository._refresh(this);
+
+    // created items cannot be refresh until saved once
+    if (_cacheEtag == null) {
+      return;
+    }
+
+    await _repository._refresh(this, download);
   }
 
   @mustCallSuper
-  Future<void> save() async {
+  Future<void> save({bool? upload}) async {
     _checkWritable();
 
     if (_item.isDeleted) {
@@ -86,11 +92,11 @@ abstract class ItemRecord {
       return;
     }
 
-    await _repository._persist(this);
+    await _repository._persist(this, upload);
   }
 
   @mustCallSuper
-  Future<void> delete() async {
+  Future<void> delete({bool? upload}) async {
     _checkWritable();
 
     if (_item.isDeleted) {
@@ -104,7 +110,7 @@ abstract class ItemRecord {
       return;
     }
 
-    await _repository._persist(this);
+    await _repository._persist(this, upload);
     dispose();
   }
 

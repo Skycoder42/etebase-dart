@@ -10,6 +10,7 @@ import '../items/item_record.dart';
 import '../api/online_checker.dart';
 import '../api/repository.dart';
 import '../api/repository_adapter.dart';
+import '../sync/sync_config.dart';
 import 'caching/cache_manager.dart';
 import 'repository_manager_impl.dart';
 
@@ -33,6 +34,8 @@ class EtebaseSyncImpl implements EtebaseSync {
     this._account,
     this._cache,
   );
+
+  SyncConfig get config => throw UnimplementedError();
 
   @override
   RepositoryManagerImpl get repositoryManager => RepositoryManagerImpl(
