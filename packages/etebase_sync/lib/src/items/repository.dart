@@ -67,6 +67,78 @@ class Repository<TRecord extends ItemRecord> {
     }
   }
 
+  Future<void> _refresh(TRecord record) async {
+    // load from cache
+    final cacheItem = await _cacheView.getItem(record.uid);
+    // TODO dispose this
+    if (cacheItem == null) {
+      throw ItemDeleted(record.uid);
+    }
+
+    // fetch latest version
+    final remoteItem = await _sync.runOnline(() async {
+      final result = await _itemManager.fetchUpdates([cacheItem]);
+      return switch (result) {
+        ItemListResponse(data: [], isDone: true) => null,
+        ItemListResponse(data: [final update], isDone: true) => update,
+        _ => await _itemManager.fetch(record.uid),
+      };
+    });
+
+    if (remoteItem != null) {
+      final result = await _cacheView.saveRemote(remoteItem);
+      switch (result) {
+        case SaveOk(:final etag):
+          if (etag == record.etag) {
+            cacheItem.dispose();
+            remoteItem.dispose();
+            record._cacheEtag = etag;
+          } else if (etag == cacheItem.etag) {
+            remoteItem.dispose();
+            await record._updateItem(cacheItem, etag);
+          } else if (etag == remoteItem.etag) {
+            cacheItem.dispose();
+            await record._updateItem(remoteItem, etag);
+          } else {
+            cacheItem.dispose();
+            remoteItem.dispose();
+            final newCacheItem = await _cacheView.getItem(record.uid);
+            if (newCacheItem == null) {
+              throw ItemDeleted(record.uid);
+            }
+            await record._updateItem(newCacheItem, newCacheItem.etag);
+          }
+        case SaveDeleted():
+          throw ItemDeleted(record.uid);
+        case SaveConflict(:final cacheItem):
+          final cacheRecord = await _createRecord(
+            cacheItem,
+            forceState: _RecordState.locked,
+          );
+          final remoteRecord = await _createRecord(
+            remoteItem,
+            forceState: _RecordState.conflictResolving,
+          );
+
+          try {
+            await remoteRecord.resolveConflict(
+              cacheRecord,
+              ConflictOrigin.cache,
+            );
+            await record._updateItem(remoteItem, cacheItem.etag);
+            await _persist(record);
+          } catch (_) {
+            remoteRecord.dispose();
+            rethrow;
+          } finally {
+            cacheRecord.dispose();
+          }
+      }
+    } else if (cacheItem.etag != record.etag) {
+      await record._updateItem(cacheItem, cacheItem.etag);
+    }
+  }
+
   Future<void> _persist(TRecord record) async {
     // If etag has not changed, item was not modified -> no need to save
     if (record._item.etag == record._cacheEtag) {

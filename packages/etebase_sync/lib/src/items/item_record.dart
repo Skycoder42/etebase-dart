@@ -68,6 +68,7 @@ abstract class ItemRecord {
   @mustCallSuper
   Future<void> refresh() async {
     _checkUnlocked();
+    await _repository._refresh(this);
   }
 
   @mustCallSuper
@@ -135,6 +136,10 @@ abstract class ItemRecord {
     _cacheEtag = cacheEtag;
     if (identical(_item, item)) {
       return;
+    }
+
+    if (item.isDeleted) {
+      throw ItemDeleted(uid);
     }
 
     _item.dispose();

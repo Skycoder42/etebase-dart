@@ -33,6 +33,8 @@ abstract interface class CacheView<TItem extends Item> {
 
   Future<TItem> saveItem(TItem item, SaveMode mode);
 
+  Future<SaveResult<TItem>> saveRemote(TItem item);
+
   Future<SaveResult<TItem>> saveLocal(TItem item, String? expectedEtag);
 
   Future<SaveResult<TItem>> saveUploaded(TItem item);
@@ -122,6 +124,43 @@ abstract base class HiveCacheView<TItem extends Item>
     }
     return item;
   }
+
+  @override
+  Future<SaveResult<TItem>> saveRemote(TItem item) =>
+      _writeLock.synchronized(() async {
+        final oldItem = await _itemBox.get(item.uid);
+        if (oldItem == null) {
+          if (!item.isDeleted) {
+            await _itemBox.put(
+              item.uid,
+              ItemInfo(
+                data: cacheSave(item),
+                localEtag: item.etag,
+                remoteEtag: item.etag,
+              ),
+            );
+          }
+          return SaveResult.ok(item.etag);
+        }
+
+        if (oldItem.remoteEtag == item.etag) {
+          return SaveResult.ok(oldItem.localEtag);
+        }
+
+        if (oldItem.localEtag != oldItem.remoteEtag) {
+          return SaveResult.conflict(cacheLoad(oldItem.data));
+        }
+
+        await _itemBox.put(
+          item.uid,
+          ItemInfo(
+            data: cacheSave(item),
+            localEtag: item.etag,
+            remoteEtag: item.etag,
+          ),
+        );
+        return SaveResult.ok(item.etag);
+      });
 
   @override
   Future<SaveResult<TItem>> saveLocal(TItem item, String? expectedEtag) =>
