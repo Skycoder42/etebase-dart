@@ -39,7 +39,8 @@ abstract interface class CacheView<TItem extends Item> {
 
   Future<SaveResult<TItem>> saveUploaded(TItem item);
 
-  Stream<TItem> stream();
+  // TODO
+  Stream<MapEntry<String, ItemInfo>> stream();
 }
 
 @internal
@@ -216,12 +217,10 @@ abstract base class HiveCacheView<TItem extends Item>
   );
 
   @override
-  Stream<TItem> stream() => _itemBox
+  Stream<MapEntry<String, ItemInfo>> stream() => _itemBox
       .watch()
       .where((e) => !e.deleted)
-      .map((e) => e.value)
-      .cast<ItemInfo>()
-      .map((i) => cacheLoad(i.data));
+      .map((e) => MapEntry(e.key as String, e.value as ItemInfo));
 
   @visibleForOverriding
   String get kind;

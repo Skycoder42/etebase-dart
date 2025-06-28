@@ -187,7 +187,7 @@ class Repository<TRecord extends ItemRecord> {
 
     final withUpload =
         upload ??
-        switch (_sync.config.syncMode) {
+        switch (_sync.config.waitForUpload) {
           SyncMode.explicit => false,
           SyncMode.implicit || SyncMode.automatic => true,
         };
@@ -281,6 +281,30 @@ class Repository<TRecord extends ItemRecord> {
         return false;
       }
     }, whenOffline: () => false);
+  }
+
+  Future<void> _resolveConflict2({
+    required Item primary,
+    required Item conflict,
+    required String cacheEtag,
+    required ConflictOrigin origin,
+  }) async {
+    final primaryRecord = await _createRecord(
+      primary,
+      forceState: _RecordState.conflictResolving,
+    );
+    final conflictRecord = await _createRecord(
+      primary,
+      forceState: _RecordState.locked,
+    );
+    try {
+      await primaryRecord.resolveConflict(conflictRecord, origin);
+      primaryRecord._cacheEtag = cacheEtag;
+      await _saveToCache(primaryRecord, false);
+    } finally {
+      primaryRecord.dispose();
+      conflictRecord.dispose();
+    }
   }
 
   /// After resolution, the [target] will be updated to instead reference
