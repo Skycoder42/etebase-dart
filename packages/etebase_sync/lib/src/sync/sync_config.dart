@@ -1,11 +1,16 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'sync_config.freezed.dart';
+import 'sync_mode.dart';
 
-enum SyncMode { explicit, implicit, automatic }
+part 'sync_config.freezed.dart';
 
 @freezed
 sealed class SyncConfig with _$SyncConfig {
-  const factory SyncConfig({@Default(SyncMode.automatic) SyncMode syncMode}) =
-      _SyncConfig;
+  const factory SyncConfig({
+    /// When saving or deleting, wait for the change to be uploaded if online
+    @Default(true) bool waitForUpload,
+
+    /// How to synchronize changes from the server
+    @Default(SyncMode.live()) SyncMode syncMode,
+  }) = _SyncConfig;
 }

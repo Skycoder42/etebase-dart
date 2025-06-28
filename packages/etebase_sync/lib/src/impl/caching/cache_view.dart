@@ -38,6 +38,8 @@ abstract interface class CacheView<TItem extends Item> {
   Future<SaveResult<TItem>> saveLocal(TItem item, String? expectedEtag);
 
   Future<SaveResult<TItem>> saveUploaded(TItem item);
+
+  Stream<TItem> stream();
 }
 
 @internal
@@ -191,26 +193,35 @@ abstract base class HiveCacheView<TItem extends Item>
       });
 
   @override
-  Future<SaveResult<TItem>> saveUploaded(TItem item) =>
-      _writeLock.synchronized(() async {
-        final oldItem = await _itemBox.get(item.uid);
-        if (oldItem == null) {
-          if (item.isDeleted) {
-            return SaveResult.ok(item.etag);
-          } else {
-            return const SaveResult.deleted();
-          }
-        } else if (oldItem.localEtag != item.etag) {
-          return SaveResult.conflict(cacheLoad(oldItem.data));
-        }
-
+  Future<SaveResult<TItem>> saveUploaded(TItem item) => _writeLock.synchronized(
+    () async {
+      final cacheItem = await _itemBox.get(item.uid);
+      if (cacheItem == null) {
         if (item.isDeleted) {
-          await _itemBox.delete(item.uid);
+          return SaveResult.ok(item.etag);
         } else {
-          await _itemBox.put(item.uid, oldItem.copyWith(remoteEtag: item.etag));
+          return const SaveResult.deleted();
         }
-        return SaveResult.ok(item.etag);
-      });
+      } else if (cacheItem.localEtag != item.etag) {
+        return SaveResult.conflict(cacheLoad(cacheItem.data));
+      }
+
+      if (item.isDeleted) {
+        await _itemBox.delete(item.uid);
+      } else {
+        await _itemBox.put(item.uid, cacheItem.copyWith(remoteEtag: item.etag));
+      }
+      return SaveResult.ok(item.etag);
+    },
+  );
+
+  @override
+  Stream<TItem> stream() => _itemBox
+      .watch()
+      .where((e) => !e.deleted)
+      .map((e) => e.value)
+      .cast<ItemInfo>()
+      .map((i) => cacheLoad(i.data));
 
   @visibleForOverriding
   String get kind;
