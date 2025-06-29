@@ -12,8 +12,5 @@ sealed class SyncMode with _$SyncMode {
     @Default(defaultSyncPeriod) Duration period,
   }) = SyncModePeriodic;
 
-  const factory SyncMode.live({
-    @Default(true) bool allowFallbackToPeriodic,
-    @Default(defaultSyncPeriod) Duration fallbackPeriod,
-  }) = SyncModeLive;
+  const factory SyncMode.live() = SyncModeLive;
 }

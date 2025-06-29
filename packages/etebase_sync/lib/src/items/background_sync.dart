@@ -9,14 +9,14 @@ abstract base class BackgroundSync {
   final _syncLock = Lock();
   final _syncedController = StreamController<SyncEvent>.broadcast(sync: true);
 
-  late final StreamSubscription<SyncEvent> _cacheSub;
+  late final StreamSubscription<void> _cacheSub;
+  late final StreamSubscription<void> _remoteSub;
 
   BackgroundSync(this._cache, this._sync, this._itemManager, this._repository);
 
   Stream<SyncEvent> get syncEvents => _syncedController.stream;
 
-  Future<void> sync();
-
+  @mustCallSuper
   Future<void> init() async {
     _cacheSub = _cache
         .stream()
@@ -28,12 +28,32 @@ abstract base class BackgroundSync {
           // TODO handle onDone
           cancelOnError: false,
         );
+
+    _cacheSub = streamRemote()
+        .expand(_expandResponse)
+        .asyncMap(_handleDownload)
+        .whereNotNull()
+        .listen(
+          _syncedController.add,
+          onError: _handleError,
+          // TODO handle onDone
+          cancelOnError: false,
+        );
   }
 
+  @mustCallSuper
   Future<void> dispose() async {
-    await _cacheSub.cancel();
-    await _syncedController.close();
+    await Future.wait([
+      _remoteSub.cancel(),
+      _cacheSub.cancel(),
+      _syncedController.close(),
+    ]);
   }
+
+  Future<void> sync();
+
+  @visibleForOverriding
+  Stream<ItemListResponse<Item>> streamRemote();
 
   Future<SyncEvent?> _handleUpload(String uid) => _syncLock.synchronized(
     () => _sync.runOnline(() async {
@@ -55,7 +75,7 @@ abstract base class BackgroundSync {
       } on Conflict {
         final remoteItem = await _itemManager.fetch(item.uid);
         final remoteEtag = item.etag;
-        final resolvedEtag = await _resolveUploadConflict(
+        final resolvedEtag = await _resolveConflict(
           remote: remoteItem,
           cache: item,
           remoteEtag: remoteEtag,
@@ -81,7 +101,7 @@ abstract base class BackgroundSync {
   ) async => switch (result) {
     SaveOk(:final etag) => etag,
     SaveDeleted() => throw ItemDeleted(item.uid),
-    SaveConflict(:final cacheItem) => await _resolveUploadConflict(
+    SaveConflict(:final cacheItem) => await _resolveConflict(
       remote: item,
       cache: cacheItem,
       remoteEtag: remoteEtag,
@@ -89,7 +109,7 @@ abstract base class BackgroundSync {
     ),
   };
 
-  Future<String> _resolveUploadConflict({
+  Future<String> _resolveConflict({
     required Item remote,
     required Item cache,
     required String remoteEtag,
@@ -139,6 +159,25 @@ abstract base class BackgroundSync {
     }
   }
 
+  Iterable<Item?> _expandResponse(ItemListResponse<Item> response) sync* {
+    yield* response.data;
+    if (response.isDone) {
+      yield null;
+    }
+  }
+
+  Future<SyncEvent?> _handleDownload(Item? item) async {
+    if (item == null) {
+      return const SyncEvent.downloadFinished();
+    }
+
+    return await _syncLock.synchronized(() async {
+      final result = await _cache.saveRemote(item);
+      final savedEtag = await _handleSaveResult(item, item.etag, result);
+      return SyncEvent.downloaded(item.uid, savedEtag);
+    });
+  }
+
   void _handleError(Object error, StackTrace stackTrace) {
     if (_syncedController.hasListener) {
       _syncedController.addError(error, stackTrace);
@@ -152,4 +191,24 @@ abstract base class ManualBackgroundSync extends BackgroundSync {}
 
 abstract base class PeriodicBackgroundSync extends BackgroundSync {}
 
-abstract base class LiveBackgroundSync extends BackgroundSync {}
+final class LiveBackgroundSync extends BackgroundSync {
+  LiveBackgroundSync(
+    super._cache,
+    super._sync,
+    super._itemManager,
+    super._repository,
+  );
+
+  @override
+  Future<void> sync() async {
+    // TODO here
+  }
+
+  @override
+  Stream<ItemListResponse<Item>> streamRemote() async* {
+    final stoken = _cache.getStoken();
+    yield* _itemManager.subscribeChanges(
+      ItemFetchOptions(stoken: stoken, withCollection: false),
+    );
+  }
+}
