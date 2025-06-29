@@ -11,7 +11,7 @@ sealed class ItemInfo with _$ItemInfo {
   const factory ItemInfo({
     required Uint8List data,
     required String localEtag,
-    required String remoteEtag,
+    required String? remoteEtag,
   }) = _ItemInfo;
 }
 
@@ -28,13 +28,17 @@ class ItemInfoAdapter extends TypeAdapter<ItemInfo> {
   ItemInfo read(BinaryReader reader) {
     final data = reader.readByteList();
     final localEtag = reader.readString();
-    final remoteEtag = reader.readString();
+    final remoteEtag = reader.availableBytes > 0 ? reader.readString() : null;
     return ItemInfo(data: data, localEtag: localEtag, remoteEtag: remoteEtag);
   }
 
   @override
-  void write(BinaryWriter writer, ItemInfo obj) => writer
-    ..writeByteList(obj.data)
-    ..writeString(obj.localEtag)
-    ..writeString(obj.remoteEtag);
+  void write(BinaryWriter writer, ItemInfo obj) {
+    writer
+      ..writeByteList(obj.data)
+      ..writeString(obj.localEtag);
+    if (obj.remoteEtag case final String remoteEtag) {
+      writer.writeString(remoteEtag);
+    }
+  }
 }

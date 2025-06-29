@@ -33,14 +33,20 @@ abstract interface class CacheView<TItem extends Item> {
 
   Future<TItem> saveItem(TItem item, SaveMode mode);
 
+  Future<TItem?> getForUpload(String uid);
+
   Future<SaveResult<TItem>> saveRemote(TItem item);
 
-  Future<SaveResult<TItem>> saveLocal(TItem item, String? expectedEtag);
+  Future<SaveResult<TItem>> saveLocal(
+    TItem item, {
+    required String? expectedEtag,
+    String? remoteEtag,
+  });
 
   Future<SaveResult<TItem>> saveUploaded(TItem item);
 
   // TODO
-  Stream<MapEntry<String, ItemInfo>> stream();
+  Stream<String> stream();
 }
 
 @internal
@@ -129,6 +135,15 @@ abstract base class HiveCacheView<TItem extends Item>
   }
 
   @override
+  Future<TItem?> getForUpload(String uid) async {
+    final info = await _itemBox.get(uid);
+    if (info == null || info.localEtag == info.remoteEtag) {
+      return null;
+    }
+    return cacheLoad(info.data);
+  }
+
+  @override
   Future<SaveResult<TItem>> saveRemote(TItem item) =>
       _writeLock.synchronized(() async {
         final oldItem = await _itemBox.get(item.uid);
@@ -166,32 +181,34 @@ abstract base class HiveCacheView<TItem extends Item>
       });
 
   @override
-  Future<SaveResult<TItem>> saveLocal(TItem item, String? expectedEtag) =>
-      _writeLock.synchronized(() async {
-        final oldItem = await _itemBox.get(item.uid);
-        if (expectedEtag == null) {
-          if (oldItem != null) {
-            return SaveResult.conflict(cacheLoad(oldItem.data));
-          }
-        } else {
-          if (oldItem == null) {
-            return const SaveResult.deleted();
-          } else if (oldItem.localEtag != expectedEtag) {
-            return SaveResult.conflict(cacheLoad(oldItem.data));
-          }
-        }
+  Future<SaveResult<TItem>> saveLocal(
+    TItem item, {
+    required String? expectedEtag,
+    String? remoteEtag,
+  }) => _writeLock.synchronized(() async {
+    final oldItem = await _itemBox.get(item.uid);
+    if (expectedEtag == null) {
+      if (oldItem != null) {
+        return SaveResult.conflict(cacheLoad(oldItem.data));
+      }
+    } else {
+      if (oldItem == null) {
+        return const SaveResult.deleted();
+      } else if (oldItem.localEtag != expectedEtag) {
+        return SaveResult.conflict(cacheLoad(oldItem.data));
+      }
+    }
 
-        await _itemBox.put(
-          item.uid,
-          ItemInfo(
-            data: cacheSave(item),
-            localEtag: item.etag,
-            // TODO is this right?
-            remoteEtag: oldItem?.remoteEtag ?? item.etag,
-          ),
-        );
-        return SaveResult.ok(item.etag);
-      });
+    await _itemBox.put(
+      item.uid,
+      ItemInfo(
+        data: cacheSave(item),
+        localEtag: item.etag,
+        remoteEtag: remoteEtag ?? oldItem?.remoteEtag,
+      ),
+    );
+    return SaveResult.ok(item.etag);
+  });
 
   @override
   Future<SaveResult<TItem>> saveUploaded(TItem item) => _writeLock.synchronized(
@@ -217,10 +234,8 @@ abstract base class HiveCacheView<TItem extends Item>
   );
 
   @override
-  Stream<MapEntry<String, ItemInfo>> stream() => _itemBox
-      .watch()
-      .where((e) => !e.deleted)
-      .map((e) => MapEntry(e.key as String, e.value as ItemInfo));
+  Stream<String> stream() =>
+      _itemBox.watch().where((e) => !e.deleted).map((e) => e.key as String);
 
   @visibleForOverriding
   String get kind;

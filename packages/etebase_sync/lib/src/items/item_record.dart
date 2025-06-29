@@ -53,7 +53,7 @@ abstract class ItemRecord {
     if (!created && !_item.isDeleted) {
       deserialize(await _item.getContent());
     }
-    _cacheEtag = created ? _item.etag : null;
+    _cacheEtag = created ? null : _item.etag;
     _state = _RecordState.ready;
   }
 
@@ -78,7 +78,7 @@ abstract class ItemRecord {
   }
 
   @mustCallSuper
-  Future<void> save({bool? upload}) async {
+  Future<void> save() async {
     _checkWritable();
 
     if (_item.isDeleted) {
@@ -92,11 +92,11 @@ abstract class ItemRecord {
       return;
     }
 
-    await _repository._persist(this, upload);
+    await _repository._persist(this);
   }
 
   @mustCallSuper
-  Future<void> delete({bool? upload}) async {
+  Future<void> delete() async {
     _checkWritable();
 
     if (_item.isDeleted) {
@@ -110,7 +110,7 @@ abstract class ItemRecord {
       return;
     }
 
-    await _repository._persist(this, upload);
+    await _repository._persist(this);
     dispose();
   }
 
