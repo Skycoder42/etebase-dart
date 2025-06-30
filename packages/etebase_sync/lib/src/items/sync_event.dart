@@ -6,6 +6,7 @@ part 'sync_event.freezed.dart';
 sealed class SyncEvent with _$SyncEvent {
   const factory SyncEvent.uploaded(String uid, String etag) = SyncUploadedEvent;
   const factory SyncEvent.offline(String uid) = SyncOfflineEvent;
+  const factory SyncEvent.downloadStarted() = SyncDownloadStartedEvent;
   const factory SyncEvent.downloaded(String uid, String etag) =
       SyncDownloadedEvent;
   const factory SyncEvent.downloadFinished() = SyncDownloadFinishedEvent;

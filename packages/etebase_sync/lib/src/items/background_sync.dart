@@ -12,6 +12,8 @@ abstract base class BackgroundSync {
   late final StreamSubscription<void> _cacheSub;
   late final StreamSubscription<void> _remoteSub;
 
+  var _downSyncActive = false;
+
   BackgroundSync(this._cache, this._sync, this._itemManager, this._repository);
 
   Stream<SyncEvent> get syncEvents => _syncedController.stream;
@@ -30,9 +32,7 @@ abstract base class BackgroundSync {
         );
 
     _cacheSub = streamRemote()
-        .expand(_expandResponse)
-        .asyncMap(_handleDownload)
-        .whereNotNull()
+        .asyncExpand(_handleResponse)
         .listen(
           _syncedController.add,
           onError: _handleError,
@@ -159,23 +159,33 @@ abstract base class BackgroundSync {
     }
   }
 
-  Iterable<Item?> _expandResponse(ItemListResponse<Item> response) sync* {
-    yield* response.data;
+  Stream<SyncEvent> _handleResponse(ItemListResponse<Item> response) async* {
+    if (!_downSyncActive) {
+      _downSyncActive = true;
+      yield const SyncEvent.downloadStarted();
+    }
+
+    for (final item in response.data) {
+      try {
+        yield await _syncLock.synchronized(() async {
+          final result = await _cache.saveRemote(item);
+          final savedEtag = await _handleSaveResult(item, item.etag, result);
+          return SyncEvent.downloaded(item.uid, savedEtag);
+        });
+
+        // ignore: avoid_catches_without_on_clauses
+      } catch (e, s) {
+        // workaround, as one cannot yield multiple exceptions from an async*
+        _handleError(e, s);
+      }
+    }
+
+    await _cache.saveStoken(response.stoken);
+
     if (response.isDone) {
-      yield null;
+      _downSyncActive = false;
+      yield const SyncEvent.downloadFinished();
     }
-  }
-
-  Future<SyncEvent?> _handleDownload(Item? item) async {
-    if (item == null) {
-      return const SyncEvent.downloadFinished();
-    }
-
-    return await _syncLock.synchronized(() async {
-      final result = await _cache.saveRemote(item);
-      final savedEtag = await _handleSaveResult(item, item.etag, result);
-      return SyncEvent.downloaded(item.uid, savedEtag);
-    });
   }
 
   void _handleError(Object error, StackTrace stackTrace) {
@@ -187,9 +197,94 @@ abstract base class BackgroundSync {
   }
 }
 
-abstract base class ManualBackgroundSync extends BackgroundSync {}
+abstract base class PullBasedBackgroundSync extends BackgroundSync {
+  PullBasedBackgroundSync(
+    super._cache,
+    super._sync,
+    super._itemManager,
+    super._repository,
+  );
 
-abstract base class PeriodicBackgroundSync extends BackgroundSync {}
+  @protected
+  Stream<ItemListResponse<Item>> fetchUpdates(String? stoken) {
+    ItemListResponse<Item>? response;
+    return _sync.streamOnline<ItemListResponse<Item>>(
+      () async* {
+        do {
+          response = await _itemManager.list(
+            ItemFetchOptions(
+              stoken: response?.stoken ?? stoken,
+              withCollection: false,
+            ),
+          );
+          yield response!;
+        } while (!response!.isDone);
+      },
+      whenOffline: () => Stream.value(
+        ItemListResponse(
+          data: const [],
+          stoken: response?.stoken ?? stoken,
+          isDone: true,
+        ),
+      ),
+    );
+  }
+}
+
+abstract base class ManualBackgroundSync extends PullBasedBackgroundSync {
+  final _controller = StreamController<String?>();
+
+  ManualBackgroundSync(
+    super._cache,
+    super._sync,
+    super._itemManager,
+    super._repository,
+  );
+
+  @override
+  Future<void> dispose() async =>
+      await Future.wait([super.dispose(), _controller.close()]);
+
+  @override
+  Future<void> sync() async {
+    if (!_downSyncActive) {
+      _controller.add(_cache.getStoken());
+    }
+
+    await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
+  }
+
+  @override
+  Stream<ItemListResponse<Item>> streamRemote() =>
+      _controller.stream.asyncExpand(fetchUpdates);
+}
+
+final class PeriodicBackgroundSync extends PullBasedBackgroundSync {
+  final Duration period;
+
+  PeriodicBackgroundSync(
+    super._cache,
+    super._sync,
+    super._itemManager,
+    super._repository,
+    this.period,
+  );
+
+  @override
+  Future<void> sync() async {
+    if (!_downSyncActive) {
+      // TODO trigger now
+    }
+
+    await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
+  }
+
+  @override
+  Stream<ItemListResponse<Item>> streamRemote() => Stream<String?>.periodic(
+    period,
+    (_) => _cache.getStoken(),
+  ).asyncExpand(fetchUpdates);
+}
 
 final class LiveBackgroundSync extends BackgroundSync {
   LiveBackgroundSync(
@@ -201,14 +296,18 @@ final class LiveBackgroundSync extends BackgroundSync {
 
   @override
   Future<void> sync() async {
-    // TODO here
+    if (_downSyncActive) {
+      await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
+    }
   }
 
   @override
-  Stream<ItemListResponse<Item>> streamRemote() async* {
-    final stoken = _cache.getStoken();
-    yield* _itemManager.subscribeChanges(
-      ItemFetchOptions(stoken: stoken, withCollection: false),
-    );
-  }
+  Stream<ItemListResponse<Item>> streamRemote() =>
+      _sync.streamOnline(() async* {
+        // TODO handle stream resumption
+        final stoken = _cache.getStoken();
+        yield* _itemManager.subscribeChanges(
+          ItemFetchOptions(stoken: stoken, withCollection: false),
+        );
+      });
 }
