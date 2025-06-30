@@ -1,7 +1,5 @@
 part of 'items.dart';
 
-enum _RecordState { uninitialized, ready, locked, conflictResolving, disposed }
-
 abstract class ItemRecord {
   final Repository _repository;
   final bool automaticTimestamps;

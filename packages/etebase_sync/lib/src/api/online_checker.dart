@@ -3,12 +3,12 @@ import 'dart:async';
 abstract interface class OnlineChecker {
   const factory OnlineChecker.alwaysOnline() = _AlwaysOnlineChecker;
 
-  FutureOr<bool> isOnline();
+  bool get isOnline;
 }
 
 class _AlwaysOnlineChecker implements OnlineChecker {
   const _AlwaysOnlineChecker();
 
   @override
-  bool isOnline() => true;
+  bool get isOnline => true;
 }

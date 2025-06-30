@@ -231,7 +231,7 @@ abstract base class PullBasedBackgroundSync extends BackgroundSync {
   }
 }
 
-abstract base class ManualBackgroundSync extends PullBasedBackgroundSync {
+final class ManualBackgroundSync extends PullBasedBackgroundSync {
   final _controller = StreamController<String?>();
 
   ManualBackgroundSync(
@@ -261,32 +261,47 @@ abstract base class ManualBackgroundSync extends PullBasedBackgroundSync {
 
 final class PeriodicBackgroundSync extends PullBasedBackgroundSync {
   final Duration period;
+  final bool fireImmediately;
+
+  final _controller = StreamController<String?>();
 
   PeriodicBackgroundSync(
     super._cache,
     super._sync,
     super._itemManager,
-    super._repository,
-    this.period,
-  );
+    super._repository, {
+    required this.period,
+    required this.fireImmediately,
+  });
+
+  @override
+  Future<void> dispose() async =>
+      await Future.wait([super.dispose(), _controller.close()]);
 
   @override
   Future<void> sync() async {
     if (!_downSyncActive) {
-      // TODO trigger now
+      _controller.add(_cache.getStoken());
     }
 
     await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
   }
 
   @override
-  Stream<ItemListResponse<Item>> streamRemote() => Stream<String?>.periodic(
-    period,
-    (_) => _cache.getStoken(),
-  ).asyncExpand(fetchUpdates);
+  Stream<ItemListResponse<Item>> streamRemote() => MergeStream([
+    // periodic sync
+    Stream<String?>.periodic(period, (_) => _cache.getStoken()),
+    if (fireImmediately)
+      // initial sync, as periodic only emits after the first period expired
+      Stream.value(_cache.getStoken()),
+    // manual sync
+    _controller.stream,
+  ]).asyncExpand(fetchUpdates);
 }
 
 final class LiveBackgroundSync extends BackgroundSync {
+  Completer<bool>? _syncBlocker;
+
   LiveBackgroundSync(
     super._cache,
     super._sync,
@@ -295,19 +310,45 @@ final class LiveBackgroundSync extends BackgroundSync {
   );
 
   @override
+  Future<void> dispose() async {
+    if (_syncBlocker case final Completer<bool> completer
+        when !completer.isCompleted) {
+      completer.complete(false);
+    }
+
+    await super.dispose();
+  }
+
+  @override
   Future<void> sync() async {
-    if (_downSyncActive) {
+    if (_syncBlocker case final Completer<bool> syncBlocker) {
+      _syncBlocker = null;
+      if (!syncBlocker.isCompleted) {
+        syncBlocker.complete(true);
+      }
+    } else if (!_downSyncActive) {
+      return;
+    }
+
+    if (_sync.isOnline) {
       await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
     }
   }
 
   @override
-  Stream<ItemListResponse<Item>> streamRemote() =>
-      _sync.streamOnline(() async* {
-        // TODO handle stream resumption
-        final stoken = _cache.getStoken();
-        yield* _itemManager.subscribeChanges(
-          ItemFetchOptions(stoken: stoken, withCollection: false),
-        );
-      });
+  Stream<ItemListResponse<Item>> streamRemote() async* {
+    while ((await _syncBlocker?.future) ?? true) {
+      await _sync.waitForOnline();
+
+      yield* _sync
+          .streamOnline(() async* {
+            final stoken = _cache.getStoken();
+            yield* _itemManager.subscribeChanges(
+              ItemFetchOptions(stoken: stoken, withCollection: false),
+            );
+          })
+          // Blocks the automatic resumption of syncs until manually unblocked
+          .doOnError((_, _) => _syncBlocker ??= Completer());
+    }
+  }
 }

@@ -64,11 +64,15 @@ class EtebaseSyncImpl implements EtebaseSync {
     throw UnimplementedError();
   }
 
+  bool get isOnline => _onlineChecker.isOnline;
+
+  Future<void> waitForOnline() => throw UnimplementedError();
+
   Future<T> runOnline<T>(
     FutureOr<T> Function() callback, {
     FutureOr<T> Function()? whenOffline,
   }) async {
-    if (await _onlineChecker.isOnline()) {
+    if (_onlineChecker.isOnline) {
       try {
         return await callback();
       } on ConnectionProblem {
@@ -87,9 +91,14 @@ class EtebaseSyncImpl implements EtebaseSync {
     Stream<T> Function() callback, {
     Stream<T> Function()? whenOffline,
   }) async* {
-    if (await _onlineChecker.isOnline()) {
+    if (_onlineChecker.isOnline) {
       try {
-        yield* callback();
+        // TODO can be done cleaner? Ideally, the stream continues on other
+        // errors and only aborts on offline errors
+        await for (final event in callback()) {
+          yield event;
+        }
+        return;
       } on ConnectionProblem {
         // break
       } on TemporaryServerProblem {
