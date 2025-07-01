@@ -7,7 +7,7 @@ class Repository<TRecord extends ItemRecord> {
   final ItemManager _itemManager;
   final ItemStore _store;
 
-  late final BackgroundSync _backgroundSync;
+  late final ItemBackgroundSync _backgroundSync;
 
   @visibleForTesting
   Repository.forTesting(
@@ -27,9 +27,9 @@ class Repository<TRecord extends ItemRecord> {
     this._itemManager,
     this._store,
   ) {
-    _backgroundSync = BackgroundSync.forMode(
-      _store,
+    _backgroundSync = ItemBackgroundSync.forMode(
       _sync,
+      _store,
       _itemManager,
       this,
       _sync.config.syncMode,

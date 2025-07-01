@@ -60,10 +60,16 @@ abstract class ItemRecord {
 
   @mustCallSuper
   void dispose() {
-    if (_state != RecordState.disposed) {
-      _item.dispose();
-      _state = RecordState.disposed;
+    if (_state case RecordState.disposed || RecordState.detached) {
+      return;
     }
+
+    _item.dispose();
+    _state = RecordState.disposed;
+  }
+
+  void _detach() {
+    _state = RecordState.detached;
   }
 
   @mustCallSuper
@@ -169,7 +175,7 @@ abstract class ItemRecord {
     switch (_state) {
       case RecordState.uninitialized:
         throw StateError('Record has not been initialized yet');
-      case RecordState.disposed:
+      case RecordState.disposed || RecordState.detached:
         throw StateError('Record has been disposed');
       case _:
         break;

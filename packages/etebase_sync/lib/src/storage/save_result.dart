@@ -4,8 +4,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'save_result.freezed.dart';
 
 @freezed
-sealed class SaveResult with _$SaveResult {
-  const factory SaveResult.ok(String etag) = SaveOk;
-  const factory SaveResult.deleted() = SaveDeleted;
-  const factory SaveResult.conflict(Item cacheItem) = SaveConflict;
+sealed class SaveResult<TItem extends Item> with _$SaveResult<TItem> {
+  const factory SaveResult.ok(String etag) = SaveOk<TItem>;
+  const factory SaveResult.deleted() = SaveDeleted<TItem>;
+  const factory SaveResult.conflict(TItem cacheItem) = SaveConflict<TItem>;
 }

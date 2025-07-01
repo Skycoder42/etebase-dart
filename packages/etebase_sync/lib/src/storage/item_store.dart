@@ -4,24 +4,24 @@ import 'package:etebase/etebase.dart';
 
 import 'save_result.dart';
 
-abstract interface class ItemStore {
+abstract interface class ItemStore<TItem extends Item> {
   Future<String?> getStoken();
 
   Future<void> saveStoken(String? stoken);
 
   Stream<String> listItems();
 
-  Future<Item?> getItem(String uid, {bool forUpload = false});
+  Future<TItem?> getItem(String uid, {bool forUpload = false});
 
-  Future<SaveResult> saveRemote(Item item);
+  Future<SaveResult<TItem>> saveRemote(TItem item);
 
-  Future<SaveResult> saveLocal(
-    Item item, {
+  Future<SaveResult<TItem>> saveLocal(
+    TItem item, {
     required String? expectedEtag,
     String? remoteEtag,
   });
 
-  Future<SaveResult> saveUploaded(Item item);
+  Future<SaveResult<TItem>> saveUploaded(TItem item);
 
   Stream<String> stream();
 }
