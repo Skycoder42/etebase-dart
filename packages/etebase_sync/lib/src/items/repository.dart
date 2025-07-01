@@ -1,14 +1,15 @@
 part of 'items.dart';
 
-class Repository<TRecord extends ItemRecord> {
+class Repository<TRecord extends ItemRecord>
+    implements _RecordFactory<TRecord> {
   final EtebaseSyncImpl _sync;
   final Collection _collection;
   final RepositoryAdapter<TRecord> _adapter;
   final ItemManager _itemManager;
   final ItemStore _store;
-  final BackgroundSync _backgroundSync;
+  final _BackgroundSync _backgroundSync;
 
-  Repository(
+  Repository._(
     this._sync,
     this._collection,
     this._adapter,
@@ -22,12 +23,16 @@ class Repository<TRecord extends ItemRecord> {
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
 
-  Future<List<String>> list({bool sync = false}) async {
+  Stream<SyncEvent> get syncEvents => _backgroundSync.syncEvents;
+
+  Future<void> sync() async => await _backgroundSync.sync();
+
+  Stream<String> list({bool sync = false}) async* {
     if (sync) {
       await _backgroundSync.sync();
     }
 
-    return _store.listItems().toList();
+    yield* _store.listItems();
   }
 
   Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
@@ -36,7 +41,7 @@ class Repository<TRecord extends ItemRecord> {
     }
 
     return {
-      for (final uid in _store.listItems())
+      await for (final uid in _store.listItems())
         uid: ?(await (await _store.getItem(uid))?.getMeta()),
     };
   }
@@ -66,6 +71,7 @@ class Repository<TRecord extends ItemRecord> {
     }
   }
 
+  @override
   Future<TRecord> _createRecord(
     Item item, {
     bool created = false,

@@ -9,7 +9,7 @@ sealed class SyncMode with _$SyncMode {
   const factory SyncMode.manual() = SyncModeManual;
 
   const factory SyncMode.periodic({
-    @Default(defaultSyncPeriod) Duration period,
+    @Default(SyncMode.defaultSyncPeriod) Duration period,
     @Default(true) bool fireImmediately,
   }) = SyncModePeriodic;
 

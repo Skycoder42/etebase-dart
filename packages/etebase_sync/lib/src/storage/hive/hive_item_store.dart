@@ -5,9 +5,9 @@ import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../item_store.dart';
+import '../save_result.dart';
 import 'item_info.dart';
-import 'item_store.dart';
-import 'save_result.dart';
 
 abstract base class HiveItemStore implements ItemStore {
   final String colUid;
@@ -40,7 +40,7 @@ abstract base class HiveItemStore implements ItemStore {
 
   @override
   @nonVirtual
-  String? getStoken() => _stokenBox.get(_stokenKey);
+  Future<String?> getStoken() => Future.value(_stokenBox.get(_stokenKey));
 
   @override
   @nonVirtual
@@ -53,7 +53,8 @@ abstract base class HiveItemStore implements ItemStore {
   });
 
   @override
-  Iterable<String> listItems() => _itemBox.keys.cast<String>();
+  Stream<String> listItems() =>
+      Stream.fromIterable(_itemBox.keys.cast<String>());
 
   @override
   @nonVirtual

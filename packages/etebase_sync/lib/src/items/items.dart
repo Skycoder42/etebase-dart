@@ -20,5 +20,6 @@ import 'sync_event.dart';
 
 part 'background_sync.dart';
 part 'item_record.dart';
+part 'record_factory.dart';
 part 'record_state.dart';
 part 'repository.dart';

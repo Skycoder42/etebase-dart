@@ -1,10 +1,10 @@
 part of 'items.dart';
 
-abstract base class BackgroundSync {
+abstract base class _BackgroundSync {
   final EtebaseSyncImpl _sync;
   final ItemManager _itemManager;
   final ItemStore _store;
-  final Repository _repository;
+  final _RecordFactory _recordFactory;
 
   final _syncLock = Lock();
   final _syncedController = StreamController<SyncEvent>.broadcast(sync: true);
@@ -14,31 +14,41 @@ abstract base class BackgroundSync {
 
   var _downSyncActive = false;
 
-  BackgroundSync(this._store, this._sync, this._itemManager, this._repository);
+  _BackgroundSync(
+    this._store,
+    this._sync,
+    this._itemManager,
+    this._recordFactory,
+  );
 
-  factory BackgroundSync.forMode(
+  factory _BackgroundSync.forMode(
     ItemStore store,
     EtebaseSyncImpl sync,
     ItemManager itemManager,
-    Repository repository,
+    _RecordFactory recordFactory,
     SyncMode syncMode,
   ) => switch (syncMode) {
     SyncModeManual() => _ManualBackgroundSync(
       store,
       sync,
       itemManager,
-      repository,
+      recordFactory,
     ),
     SyncModePeriodic(:final period, :final fireImmediately) =>
       _PeriodicBackgroundSync(
         store,
         sync,
         itemManager,
-        repository,
+        recordFactory,
         period: period,
         fireImmediately: fireImmediately,
       ),
-    SyncModeLive() => _LiveBackgroundSync(store, sync, itemManager, repository),
+    SyncModeLive() => _LiveBackgroundSync(
+      store,
+      sync,
+      itemManager,
+      recordFactory,
+    ),
   };
 
   Stream<SyncEvent> get syncEvents => _syncedController.stream;
@@ -139,11 +149,11 @@ abstract base class BackgroundSync {
     required String remoteEtag,
     required ConflictOrigin origin,
   }) async {
-    final remoteRecord = await _repository._createRecord(
+    final remoteRecord = await _recordFactory._createRecord(
       remote,
       forceState: _RecordState.conflictResolving,
     );
-    final cacheRecord = await _repository._createRecord(
+    final cacheRecord = await _recordFactory._createRecord(
       remote,
       forceState: _RecordState.locked,
     );
@@ -221,12 +231,12 @@ abstract base class BackgroundSync {
   }
 }
 
-abstract base class _PullBasedBackgroundSync extends BackgroundSync {
+abstract base class _PullBasedBackgroundSync extends _BackgroundSync {
   _PullBasedBackgroundSync(
-    super._cache,
+    super._store,
     super._sync,
     super._itemManager,
-    super._repository,
+    super._recordFactory,
   );
 
   Stream<ItemListResponse<Item>> _fetchUpdates(String? stoken) {
@@ -258,10 +268,10 @@ final class _ManualBackgroundSync extends _PullBasedBackgroundSync {
   final _controller = StreamController<String?>();
 
   _ManualBackgroundSync(
-    super._cache,
+    super._store,
     super._sync,
     super._itemManager,
-    super._repository,
+    super._recordFactory,
   );
 
   @override
@@ -271,7 +281,7 @@ final class _ManualBackgroundSync extends _PullBasedBackgroundSync {
   @override
   Future<void> sync() async {
     if (!_downSyncActive) {
-      _controller.add(_store.getStoken());
+      _controller.add(await _store.getStoken());
     }
 
     await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
@@ -289,10 +299,10 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
   final _controller = StreamController<String?>();
 
   _PeriodicBackgroundSync(
-    super._cache,
+    super._store,
     super._sync,
     super._itemManager,
-    super._repository, {
+    super._recordFactory, {
     required this.period,
     required this.fireImmediately,
   });
@@ -304,7 +314,7 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
   @override
   Future<void> sync() async {
     if (!_downSyncActive) {
-      _controller.add(_store.getStoken());
+      _controller.add(await _store.getStoken());
     }
 
     await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
@@ -313,20 +323,20 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
   @override
   Stream<ItemListResponse<Item>> _streamRemote() => MergeStream([
     // periodic sync
-    Stream<String?>.periodic(period, (_) => _store.getStoken()),
+    Stream<void>.periodic(period).asyncMap((_) => _store.getStoken()),
     if (fireImmediately)
       // initial sync, as periodic only emits after the first period expired
-      Stream.value(_store.getStoken()),
+      Stream.fromFuture(_store.getStoken()),
     // manual sync
     _controller.stream,
   ]).asyncExpand(_fetchUpdates);
 }
 
-final class _LiveBackgroundSync extends BackgroundSync {
+final class _LiveBackgroundSync extends _BackgroundSync {
   Completer<bool>? _syncBlocker;
 
   _LiveBackgroundSync(
-    super._cache,
+    super._store,
     super._sync,
     super._itemManager,
     super._repository,
@@ -365,7 +375,7 @@ final class _LiveBackgroundSync extends BackgroundSync {
 
       yield* _sync
           .streamOnline(() async* {
-            final stoken = _store.getStoken();
+            final stoken = await _store.getStoken();
             yield* _itemManager.subscribeChanges(
               ItemFetchOptions(stoken: stoken, withCollection: false),
             );
