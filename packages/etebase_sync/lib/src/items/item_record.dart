@@ -64,7 +64,7 @@ abstract class ItemRecord {
   }
 
   @mustCallSuper
-  Future<void> refresh({bool? download}) async {
+  Future<void> refresh({bool sync = false}) async {
     _checkUnlocked();
 
     // created items cannot be refresh until saved once
@@ -72,7 +72,7 @@ abstract class ItemRecord {
       return;
     }
 
-    await _repository._refresh(this, download);
+    await _repository._refresh(this, sync);
   }
 
   @mustCallSuper

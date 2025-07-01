@@ -22,6 +22,25 @@ class Repository<TRecord extends ItemRecord> {
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
 
+  Future<List<String>> list({bool sync = false}) async {
+    if (sync) {
+      await _backgroundSync.sync();
+    }
+
+    return _cacheView.listItems().toList();
+  }
+
+  Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
+    if (sync) {
+      await _backgroundSync.sync();
+    }
+
+    return {
+      for (final uid in _cacheView.listItems())
+        uid: ?(await (await _cacheView.getItem(uid))?.getMeta()),
+    };
+  }
+
   Future<TRecord> create() async {
     _checkWritable();
 
@@ -69,14 +88,10 @@ class Repository<TRecord extends ItemRecord> {
     }
   }
 
-  Future<void> _refresh(TRecord record, bool? download) async {
-    final withDownload =
-        download ??
-        switch (_sync.config.syncMode) {
-          SyncMode.explicit => false,
-          SyncMode.implicit => true,
-          SyncMode.automatic => throw UnimplementedError(),
-        };
+  Future<void> _refresh(TRecord record, bool sync) async {
+    if (sync) {
+      await _backgroundSync.sync();
+    }
 
     final recordState = record._state;
     try {
@@ -88,11 +103,6 @@ class Repository<TRecord extends ItemRecord> {
         throw ItemDeleted(record.uid);
       }
 
-      // fetch latest version if enabled
-      if (withDownload && await _download(record, cacheItem)) {
-        return;
-      }
-
       // update record if necessary
       if (cacheItem.etag != record.etag) {
         await record._updateItem(cacheItem, cacheItem.etag);
@@ -101,83 +111,6 @@ class Repository<TRecord extends ItemRecord> {
       }
     } finally {
       record._state = recordState;
-    }
-  }
-
-  Future<bool> _download(TRecord record, Item cacheItem) async {
-    // TODO always dispose cacheItem
-    final remoteItem = await _sync.runOnline(() async {
-      final result = await _itemManager.fetchUpdates([cacheItem]);
-      return switch (result) {
-        ItemListResponse(data: [], isDone: true) => null,
-        ItemListResponse(data: [final update], isDone: true) => update,
-        _ => await _itemManager.fetch(record.uid),
-      };
-    });
-
-    if (remoteItem == null) {
-      return false;
-    }
-
-    final result = await _cacheView.saveRemote(remoteItem);
-    switch (result) {
-      case SaveOk(:final etag):
-        await _updateRecordTo(record, etag, [cacheItem, remoteItem]);
-      case SaveDeleted():
-        throw ItemDeleted(record.uid);
-      case SaveConflict(:final cacheItem):
-        final cacheRecord = await _createRecord(
-          cacheItem,
-          forceState: _RecordState.locked,
-        );
-        final remoteRecord = await _createRecord(
-          remoteItem,
-          forceState: _RecordState.conflictResolving,
-        );
-
-        try {
-          await remoteRecord.resolveConflict(cacheRecord, ConflictOrigin.cache);
-          await record._updateItem(remoteItem, cacheItem.etag);
-          await _persist(record, true);
-        } catch (_) {
-          remoteRecord.dispose();
-          rethrow;
-        } finally {
-          cacheRecord.dispose();
-        }
-    }
-
-    return true;
-  }
-
-  Future<void> _updateRecordTo(
-    TRecord record,
-    String etag,
-    List<Item> items,
-  ) async {
-    if (record.etag == etag) {
-      _disposeAll(items);
-      record._cacheEtag = etag;
-      return;
-    }
-
-    final matching = items.where((i) => i.etag == etag).firstOrNull;
-    if (matching != null) {
-      _disposeAll(items.where((i) => i != matching));
-      await record._updateItem(matching, etag);
-      return;
-    }
-
-    final cacheItem = await _cacheView.getItem(record.uid);
-    if (cacheItem == null) {
-      throw ItemDeleted(record.uid);
-    }
-    await record._updateItem(cacheItem, cacheItem.etag);
-  }
-
-  void _disposeAll(Iterable<Item> items) {
-    for (final item in items) {
-      item.dispose();
     }
   }
 

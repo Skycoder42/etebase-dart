@@ -10,4 +10,14 @@ sealed class SyncEvent with _$SyncEvent {
   const factory SyncEvent.downloaded(String uid, String etag) =
       SyncDownloadedEvent;
   const factory SyncEvent.downloadFinished() = SyncDownloadFinishedEvent;
+
+  const SyncEvent._();
+
+  String? get uid => switch (this) {
+    SyncUploadedEvent(:final uid) => uid,
+    SyncOfflineEvent(:final uid) => uid,
+    SyncDownloadStartedEvent() => null,
+    SyncDownloadedEvent(:final uid) => uid,
+    SyncDownloadFinishedEvent() => null,
+  };
 }
