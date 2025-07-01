@@ -7,7 +7,7 @@ abstract class ItemRecord {
   // internal repository stuff
   Item _item;
   late String? _cacheEtag;
-  _RecordState _state = _RecordState.uninitialized;
+  RecordState _state = RecordState.uninitialized;
 
   late ItemMetadata _currentMeta;
 
@@ -21,7 +21,7 @@ abstract class ItemRecord {
   String get uid => _item.uid;
 
   bool get isReadOnly => switch (_state) {
-    _RecordState.ready => _repository.isReadOnly,
+    RecordState.ready => _repository.isReadOnly,
     _ => true,
   };
 
@@ -41,9 +41,12 @@ abstract class ItemRecord {
     _currentMeta = meta;
   }
 
+  @protected
+  bool get wasDeleted => _item.isDeleted;
+
   @mustCallSuper
   Future<void> init({required bool created}) async {
-    if (_state != _RecordState.uninitialized) {
+    if (_state != RecordState.uninitialized) {
       throw StateError('Record has already been initialized');
     }
 
@@ -52,14 +55,14 @@ abstract class ItemRecord {
       deserialize(await _item.getContent());
     }
     _cacheEtag = created ? null : _item.etag;
-    _state = _RecordState.ready;
+    _state = RecordState.ready;
   }
 
   @mustCallSuper
   void dispose() {
-    if (_state != _RecordState.disposed) {
+    if (_state != RecordState.disposed) {
       _item.dispose();
-      _state = _RecordState.disposed;
+      _state = RecordState.disposed;
     }
   }
 
@@ -86,7 +89,7 @@ abstract class ItemRecord {
     await _item.setContent(serialize());
     await _updateMeta();
 
-    if (_state == _RecordState.conflictResolving) {
+    if (_state == RecordState.conflictResolving) {
       return;
     }
 
@@ -104,7 +107,7 @@ abstract class ItemRecord {
     await _item.delete();
     await _updateMeta();
 
-    if (_state == _RecordState.conflictResolving) {
+    if (_state == RecordState.conflictResolving) {
       return;
     }
 
@@ -164,9 +167,9 @@ abstract class ItemRecord {
 
   void _checkInitialized() {
     switch (_state) {
-      case _RecordState.uninitialized:
+      case RecordState.uninitialized:
         throw StateError('Record has not been initialized yet');
-      case _RecordState.disposed:
+      case RecordState.disposed:
         throw StateError('Record has been disposed');
       case _:
         break;
@@ -175,7 +178,7 @@ abstract class ItemRecord {
 
   void _checkUnlocked() {
     _checkInitialized();
-    if (_state case _RecordState.locked) {
+    if (_state case RecordState.locked) {
       // TODO real exception
       throw StateError('Record is locked!');
     }

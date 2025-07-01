@@ -4,20 +4,20 @@ import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 
-import 'exceptions/item_deleted.dart';
-import '../items/item_record.dart';
+import '../api/exceptions/item_deleted.dart';
+import 'items.dart';
 
 abstract class ProxyRecord<T extends Object> extends ItemRecord {
   late T _data;
 
-  ProxyRecord(super.repository, super.item);
+  ProxyRecord(super.repository, super._item, {super.automaticTimestamps});
 
   @nonVirtual
-  T get value => isDeleted ? throw ItemDeleted(uid) : _data;
+  T get value => wasDeleted ? throw ItemDeleted(uid) : _data;
 
   @nonVirtual
   set value(T value) {
-    if (isDeleted) {
+    if (wasDeleted) {
       throw ItemDeleted(uid);
     }
 
@@ -38,7 +38,7 @@ abstract class ProxyRecord<T extends Object> extends ItemRecord {
   @override
   @mustCallSuper
   Future<void> delete() async {
-    if (isDeleted) {
+    if (wasDeleted) {
       return;
     }
 

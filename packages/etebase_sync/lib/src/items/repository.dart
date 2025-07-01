@@ -1,15 +1,16 @@
 part of 'items.dart';
 
-class Repository<TRecord extends ItemRecord>
-    implements _RecordFactory<TRecord> {
+class Repository<TRecord extends ItemRecord> {
   final EtebaseSyncImpl _sync;
   final Collection _collection;
   final RepositoryAdapter<TRecord> _adapter;
   final ItemManager _itemManager;
   final ItemStore _store;
-  final _BackgroundSync _backgroundSync;
 
-  Repository._(
+  late final BackgroundSync _backgroundSync;
+
+  @visibleForTesting
+  Repository.forTesting(
     this._sync,
     this._collection,
     this._adapter,
@@ -17,6 +18,23 @@ class Repository<TRecord extends ItemRecord>
     this._store,
     this._backgroundSync,
   );
+
+  @internal
+  Repository.internal(
+    this._sync,
+    this._collection,
+    this._adapter,
+    this._itemManager,
+    this._store,
+  ) {
+    _backgroundSync = BackgroundSync.forMode(
+      _store,
+      _sync,
+      _itemManager,
+      this,
+      _sync.config.syncMode,
+    );
+  }
 
   String get uid => _collection.uid;
 
@@ -71,11 +89,10 @@ class Repository<TRecord extends ItemRecord>
     }
   }
 
-  @override
   Future<TRecord> _createRecord(
     Item item, {
     bool created = false,
-    _RecordState? forceState,
+    RecordState? forceState,
   }) async {
     try {
       if (item.isDeleted) {
@@ -101,7 +118,7 @@ class Repository<TRecord extends ItemRecord>
 
     final recordState = record._state;
     try {
-      record._state = _RecordState.locked;
+      record._state = RecordState.locked;
 
       // load from cache
       final cacheItem = await _store.getItem(record.uid);
@@ -123,7 +140,7 @@ class Repository<TRecord extends ItemRecord>
   Future<void> _persist(TRecord record) async {
     final recordState = record._state;
     try {
-      record._state = _RecordState.locked;
+      record._state = RecordState.locked;
       await _saveToCache(record);
 
       if (_sync.config.waitForUpload) {
@@ -168,7 +185,7 @@ class Repository<TRecord extends ItemRecord>
   ) async {
     final canonical = await _createRecord(
       canonicalItem,
-      forceState: _RecordState.conflictResolving,
+      forceState: RecordState.conflictResolving,
     );
 
     try {

@@ -1,3 +1,1 @@
-part of 'items.dart';
-
-enum _RecordState { uninitialized, ready, locked, conflictResolving, disposed }
+enum RecordState { uninitialized, ready, locked, conflictResolving, disposed }
