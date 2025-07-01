@@ -5,7 +5,7 @@ class Repository<TRecord extends ItemRecord> {
   final Collection _collection;
   final RepositoryAdapter<TRecord> _adapter;
   final ItemManager _itemManager;
-  final CacheView<Item> _cacheView;
+  final ItemStore _store;
   final BackgroundSync _backgroundSync;
 
   Repository(
@@ -13,7 +13,7 @@ class Repository<TRecord extends ItemRecord> {
     this._collection,
     this._adapter,
     this._itemManager,
-    this._cacheView,
+    this._store,
     this._backgroundSync,
   );
 
@@ -27,7 +27,7 @@ class Repository<TRecord extends ItemRecord> {
       await _backgroundSync.sync();
     }
 
-    return _cacheView.listItems().toList();
+    return _store.listItems().toList();
   }
 
   Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
@@ -36,8 +36,8 @@ class Repository<TRecord extends ItemRecord> {
     }
 
     return {
-      for (final uid in _cacheView.listItems())
-        uid: ?(await (await _cacheView.getItem(uid))?.getMeta()),
+      for (final uid in _store.listItems())
+        uid: ?(await (await _store.getItem(uid))?.getMeta()),
     };
   }
 
@@ -52,7 +52,7 @@ class Repository<TRecord extends ItemRecord> {
   }
 
   Future<TRecord?> open(String uid) async {
-    final item = await _cacheView.getItem(uid);
+    final item = await _store.getItem(uid);
     if (item == null || item.isDeleted) {
       item?.dispose();
       return null;
@@ -98,7 +98,7 @@ class Repository<TRecord extends ItemRecord> {
       record._state = _RecordState.locked;
 
       // load from cache
-      final cacheItem = await _cacheView.getItem(record.uid);
+      final cacheItem = await _store.getItem(record.uid);
       if (cacheItem == null) {
         throw ItemDeleted(record.uid);
       }
@@ -134,7 +134,7 @@ class Repository<TRecord extends ItemRecord> {
       return record._item.etag;
     }
 
-    final result = await _cacheView.saveLocal(
+    final result = await _store.saveLocal(
       record._item,
       expectedEtag: record._cacheEtag,
     );

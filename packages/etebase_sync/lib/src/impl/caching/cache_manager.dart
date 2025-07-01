@@ -4,7 +4,7 @@ import 'package:etebase/etebase.dart';
 import 'package:hive_ce/hive.dart';
 
 import '../../../gen/package_metadata.dart' as meta;
-import '../models/item_info.dart';
+import '../../storage/item_info.dart';
 import 'cache_view.dart';
 
 class CacheManager {

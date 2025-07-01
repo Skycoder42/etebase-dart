@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:synchronized/synchronized.dart';
 
-import '../models/item_info.dart';
+import '../../storage/item_info.dart';
 
 part 'cache_view.freezed.dart';
 
