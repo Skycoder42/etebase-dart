@@ -92,10 +92,11 @@ class Repository<TRecord extends ItemRecord> {
   Future<TRecord> _createRecord(
     Item item, {
     bool created = false,
+    bool allowDeleted = false,
     RecordState? forceState,
   }) async {
     try {
-      if (item.isDeleted) {
+      if (!allowDeleted && item.isDeleted) {
         throw ItemDeleted(item.uid);
       }
 

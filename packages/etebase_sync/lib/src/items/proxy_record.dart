@@ -13,11 +13,11 @@ abstract class ProxyRecord<T extends Object> extends ItemRecord {
   ProxyRecord(super.repository, super._item, {super.automaticTimestamps});
 
   @nonVirtual
-  T get value => wasDeleted ? throw ItemDeleted(uid) : _data;
+  T get value => isDeleted ? throw ItemDeleted(uid) : _data;
 
   @nonVirtual
   set value(T value) {
-    if (wasDeleted) {
+    if (isDeleted) {
       throw ItemDeleted(uid);
     }
 
@@ -38,7 +38,7 @@ abstract class ProxyRecord<T extends Object> extends ItemRecord {
   @override
   @mustCallSuper
   Future<void> delete() async {
-    if (wasDeleted) {
+    if (isDeleted) {
       return;
     }
 
@@ -61,5 +61,5 @@ abstract class ProxyRecord<T extends Object> extends ItemRecord {
   T decode(dynamic data);
 
   @visibleForOverriding
-  ItemMetadata updateMeta(ItemMetadata meta, T? value);
+  ItemMetadata updateMeta(ItemMetadata meta, T? value) => meta;
 }

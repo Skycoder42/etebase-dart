@@ -12,6 +12,8 @@ import '../storage/save_result.dart';
 import '../storage/store.dart';
 import 'sync_event.dart';
 
+// TODO error handling
+
 @internal
 abstract base class BackgroundSync<
   TItem extends Item,

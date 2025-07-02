@@ -21,12 +21,15 @@ abstract class ItemRecord {
   String get uid => _item.uid;
 
   bool get isReadOnly => switch (_state) {
-    RecordState.ready => _repository.isReadOnly,
+    RecordState.ready => _repository.isReadOnly || _item.isDeleted,
     _ => true,
   };
 
   @nonVirtual
   String get etag => _item.etag;
+
+  @nonVirtual
+  bool get isDeleted => _item.isDeleted;
 
   @nonVirtual
   ItemMetadata get meta {
@@ -40,9 +43,6 @@ abstract class ItemRecord {
     _checkWritable();
     _currentMeta = meta;
   }
-
-  @protected
-  bool get wasDeleted => _item.isDeleted;
 
   @mustCallSuper
   Future<void> init({required bool created}) async {
@@ -70,6 +70,8 @@ abstract class ItemRecord {
 
   void _detach() {
     _state = RecordState.detached;
+    dispose();
+    _state = RecordState.disposed;
   }
 
   @mustCallSuper
@@ -88,10 +90,6 @@ abstract class ItemRecord {
   Future<void> save() async {
     _checkWritable();
 
-    if (_item.isDeleted) {
-      throw ItemDeleted(uid);
-    }
-
     await _item.setContent(serialize());
     await _updateMeta();
 
@@ -106,10 +104,6 @@ abstract class ItemRecord {
   Future<void> delete() async {
     _checkWritable();
 
-    if (_item.isDeleted) {
-      return;
-    }
-
     await _item.delete();
     await _updateMeta();
 
@@ -118,12 +112,6 @@ abstract class ItemRecord {
     }
 
     await _repository._persist(this);
-    dispose();
-  }
-
-  @mustCallSuper
-  Stream<void> sync() async* {
-    _checkUnlocked();
   }
 
   @visibleForOverriding
@@ -136,23 +124,14 @@ abstract class ItemRecord {
   Future<void> resolveConflict(
     covariant ItemRecord other,
     ConflictOrigin origin,
-  ) => throw UnresolvedConflict(
-    EtebaseTarget.item,
-    // TODO better message
-    'Content of item with uid "$uid" has been modified '
-    'locally and on the remote (Origin: ${origin.name})',
-    uid: uid,
-    origin: origin,
-  );
+  ) => Future.value();
 
   Future<void> _updateItem(Item item, String cacheEtag) async {
+    // TODO state check needed?
+
     _cacheEtag = cacheEtag;
     if (identical(_item, item)) {
       return;
-    }
-
-    if (item.isDeleted) {
-      throw ItemDeleted(uid);
     }
 
     _item.dispose();
@@ -162,6 +141,8 @@ abstract class ItemRecord {
     if (!item.isDeleted) {
       deserialize(await item.getContent());
     }
+
+    // TODO throw ItemDeleted?
   }
 
   Future<void> _updateMeta() async {
@@ -194,6 +175,8 @@ abstract class ItemRecord {
     _checkUnlocked();
     if (_repository.isReadOnly) {
       throw ReadOnly(_repository.uid, EtebaseTarget.collection);
+    } else if (_item.isDeleted) {
+      throw ItemDeleted(uid);
     }
   }
 }

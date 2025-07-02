@@ -59,16 +59,18 @@ abstract base class ItemBackgroundSync
   ) async {
     final targetRecord = await _repository._createRecord(
       target,
+      allowDeleted: true,
       forceState: RecordState.conflictResolving,
     );
     final conflictedRecord = await _repository._createRecord(
       conflicted,
+      allowDeleted: true,
       forceState: RecordState.locked,
     );
     try {
       await targetRecord.resolveConflict(conflictedRecord, origin);
     } finally {
-      // only detach, items are disposed by caller
+      // only detach, items are disposed by caller as needed
       targetRecord._detach();
       conflictedRecord._detach();
     }

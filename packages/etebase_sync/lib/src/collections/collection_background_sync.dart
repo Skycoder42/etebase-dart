@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:etebase/etebase.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../api/exceptions/item_deleted.dart';
 import '../api/models/conflict_origin.dart';
+import '../api/models/repository_metadata.dart';
 import '../storage/collection_store.dart';
 import '../sync/background_sync.dart';
 import '../sync/sync_event.dart';
+import 'collection_conflict_resolver.dart';
+import 'conflict_resolution.dart';
 
 typedef _SyncRequest = ({String collectionType, String? stoken});
 
@@ -18,6 +22,7 @@ final class CollectionBackgroundSync
           CollectionStore
         > {
   final CollectionManager _collectionManager;
+  final CollectionConflictResolver _conflictResolver;
 
   final _collectionResponseTypes = Expando<String>(
     'CollectionBackgroundSync._collectionResponseTypes',
@@ -28,6 +33,7 @@ final class CollectionBackgroundSync
     super.etebaseSync,
     super.store,
     this._collectionManager,
+    this._conflictResolver,
   );
 
   @override
@@ -71,7 +77,7 @@ final class CollectionBackgroundSync
 
   @override
   Future<void> upload(Collection item) async =>
-      await _collectionManager.upload(item);
+      await _collectionManager.transaction(item);
 
   @override
   Future<Collection> download(String uid) async =>
@@ -82,8 +88,30 @@ final class CollectionBackgroundSync
     Collection target,
     Collection conflicted,
     ConflictOrigin origin,
-  ) {
-    throw UnimplementedError();
+  ) async {
+    final resolution = await _conflictResolver.resolveRepositoryConflict(
+      colUid: target.uid,
+      targetMeta: await target.getMeta<RepositoryMetadata>(),
+      targetDeleted: target.isDeleted,
+      conflictedMeta: await conflicted.getMeta<RepositoryMetadata>(),
+      conflictedDeleted: conflicted.isDeleted,
+      origin: origin,
+    );
+    switch (resolution) {
+      case ConflictResolutionDiscard():
+      case ConflictResolutionDelete() when target.isDeleted:
+        break;
+      case ConflictResolutionUpdate() when target.isDeleted:
+        throw ItemDeleted(target.uid);
+
+      case ConflictResolutionUpdate(:final meta):
+        await target.setMeta<RepositoryMetadata>(meta);
+      case ConflictResolutionDelete(:final RepositoryMetadata meta):
+        await target.setMeta<RepositoryMetadata>(meta);
+        await target.delete();
+      case ConflictResolutionDelete():
+        await target.delete();
+    }
   }
 
   Stream<CollectionListResponse<Collection>> _fetchUpdates(
