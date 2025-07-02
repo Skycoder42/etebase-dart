@@ -133,64 +133,6 @@ abstract base class BackgroundSync<
     }, whenOffline: () => SyncEvent.offline(uid)),
   );
 
-  Future<String> _handleSaveResult(
-    TItem item,
-    String remoteEtag,
-    SaveResult<TItem> result,
-  ) async => switch (result) {
-    SaveOk(:final etag) => etag,
-    SaveDeleted() => throw ItemDeleted(item.uid),
-    SaveConflict(:final cacheItem) => await _resolveConflict(
-      remote: item,
-      cache: cacheItem,
-      remoteEtag: remoteEtag,
-      origin: ConflictOrigin.cache,
-    ),
-  };
-
-  Future<String> _resolveConflict({
-    required TItem remote,
-    required TItem cache,
-    required String remoteEtag,
-    required ConflictOrigin origin,
-  }) async {
-    try {
-      final cacheEtag = cache.etag;
-      await resolveConflict(remote, cache, origin);
-      final result = await store.saveLocal(
-        remote,
-        expectedEtag: cacheEtag,
-        remoteEtag: remoteEtag,
-      );
-      return await _handleSaveResult(remote, remoteEtag, result);
-    } finally {
-      remote.dispose();
-      cache.dispose();
-    }
-  }
-
-  /// Only creates an event, if [remoteEtag] and [cacheEtag] are identical.
-  ///
-  /// This is because if they are identical, the remote version has been saved
-  /// to the cache as is (and thus will not trigger another upload). So, the
-  /// sync for that item is done and we can emit an event.
-  ///
-  /// If the etags are different however, this means that the item was modified
-  /// before being saved to the cache and thus another upload for that modified
-  /// version will be triggered. Only after that modified version was uploaded
-  /// we are done. Thus, no event for this upload.
-  SyncEvent? _createEvent({
-    required String uid,
-    required String remoteEtag,
-    required String cacheEtag,
-  }) {
-    if (cacheEtag == remoteEtag) {
-      return SyncEvent.uploaded(uid, cacheEtag);
-    } else {
-      return null;
-    }
-  }
-
   Stream<SyncEvent> _handleResponse(TResponse response) async* {
     if (!_downSyncActive) {
       _downSyncActive = true;
@@ -217,6 +159,69 @@ abstract base class BackgroundSync<
     if (response.isDone) {
       _downSyncActive = false;
       yield SyncEvent.downloadFinished(scopeFor(response));
+    }
+  }
+
+  Future<String> _handleSaveResult(
+    TItem item,
+    String remoteEtag,
+    SaveResult<TItem> result,
+  ) async => switch (result) {
+    SaveOk(:final etag) => etag,
+    SaveConflict(:final cacheItem) => await _resolveConflict(
+      remote: item,
+      cache: cacheItem,
+      remoteEtag: remoteEtag,
+      origin: ConflictOrigin.cache,
+    ),
+  };
+
+  Future<String> _resolveConflict({
+    required TItem remote,
+    required TItem cache,
+    required String remoteEtag,
+    required ConflictOrigin origin,
+  }) async {
+    try {
+      final cacheEtag = cache.etag;
+      await resolveConflict(remote, cache, origin);
+      final result = await store.saveLocal(
+        remote,
+        expectedEtag: cacheEtag,
+        remoteEtag: remoteEtag,
+      );
+      return await _handleSaveResult(remote, remoteEtag, result);
+    } on ItemDeleted {
+      /// more or less ignore this case, as because of locking it should be
+      /// impossible. If it does happen, return the [remoteEtag]. This will
+      /// always trigger a [SyncEvent.uploaded] event, which is what we want,
+      /// as the item was resolved somewhere else and thus we are done here.
+      return remoteEtag;
+    } finally {
+      remote.dispose();
+      cache.dispose();
+    }
+  }
+
+  /// Only creates an event, if [remoteEtag] and [cacheEtag] are identical.
+  ///
+  /// This is because if they are identical, the remote version has been saved
+  /// to the cache as is (and thus will not trigger another upload). So, the
+  /// sync for that item is done and we can emit an event.
+  ///
+  /// If the etags are different however, this means that the item was modified
+  /// before being saved to the cache and thus another upload for that modified
+  /// version will be triggered. Only after that modified version was uploaded
+  /// we are done. Thus, no event for this upload.
+  SyncEvent? _createEvent({
+    required String uid,
+    required String remoteEtag,
+    required String cacheEtag,
+  }) {
+    if (cacheEtag == remoteEtag) {
+      return SyncEvent.uploaded(uid, cacheEtag);
+    } else {
+      return null;
     }
   }
 

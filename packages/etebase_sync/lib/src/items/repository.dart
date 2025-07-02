@@ -166,11 +166,7 @@ class Repository<TRecord extends ItemRecord> {
       case SaveOk(:final etag):
         record._cacheEtag = etag;
         return etag;
-      case SaveDeleted():
-        throw ItemDeleted(record.uid);
       case SaveConflict(:final cacheItem):
-        // if cacheItem was deleted, _createRecord will throw, so no need to
-        // handle this here
         await _resolveCacheConflict(record, cacheItem, cacheItem.etag);
         return await _saveToCache(record);
     }
@@ -186,6 +182,7 @@ class Repository<TRecord extends ItemRecord> {
   ) async {
     final canonical = await _createRecord(
       canonicalItem,
+      allowDeleted: true,
       forceState: RecordState.conflictResolving,
     );
 

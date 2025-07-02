@@ -6,6 +6,5 @@ part 'save_result.freezed.dart';
 @freezed
 sealed class SaveResult<TItem extends Item> with _$SaveResult<TItem> {
   const factory SaveResult.ok(String etag) = SaveOk<TItem>;
-  const factory SaveResult.deleted() = SaveDeleted<TItem>;
   const factory SaveResult.conflict(TItem cacheItem) = SaveConflict<TItem>;
 }

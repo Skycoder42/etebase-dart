@@ -1,5 +1,6 @@
 import 'package:etebase/etebase.dart';
 
+import 'collection_store.dart';
 import 'item_store.dart';
 
 abstract interface class StorageManager {
@@ -11,4 +12,6 @@ abstract interface class StorageManager {
     Collection collection,
     ItemManager itemManager,
   );
+
+  Future<CollectionStore> createCollectionStore(CollectionManager itemManager);
 }
