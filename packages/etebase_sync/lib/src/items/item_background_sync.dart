@@ -1,7 +1,8 @@
 part of 'items.dart';
 
 @internal
-abstract base class ItemBackgroundSync extends BackgroundSync<Item> {
+abstract base class ItemBackgroundSync
+    extends BackgroundSync<Item, ItemListResponse<Item>, ItemStore> {
   final ItemManager _itemManager;
   final Repository _repository;
 
@@ -36,6 +37,12 @@ abstract base class ItemBackgroundSync extends BackgroundSync<Item> {
       ),
     SyncModeLive() => _LiveBackgroundSync(sync, store, itemManager, repository),
   };
+
+  Future<void> sync();
+
+  @override
+  Future<void> updateStoken(ItemListResponse<Item> response) async =>
+      await store.saveStoken(response.stoken);
 
   @override
   Future<void> upload(Item item) async =>

@@ -50,7 +50,7 @@ class Repository<TRecord extends ItemRecord> {
       await _backgroundSync.sync();
     }
 
-    yield* _store.listItems();
+    yield* _store.listUids();
   }
 
   Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
@@ -59,7 +59,7 @@ class Repository<TRecord extends ItemRecord> {
     }
 
     return {
-      await for (final uid in _store.listItems())
+      await for (final uid in _store.listUids())
         uid: ?(await (await _store.getItem(uid))?.getMeta()),
     };
   }

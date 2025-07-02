@@ -53,7 +53,7 @@ abstract base class HiveItemStore implements ItemStore {
   });
 
   @override
-  Stream<String> listItems() =>
+  Stream<String> listUids() =>
       Stream.fromIterable(_itemBox.keys.cast<String>());
 
   @override

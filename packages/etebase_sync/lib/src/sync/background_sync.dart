@@ -8,16 +8,20 @@ import 'package:synchronized/synchronized.dart';
 import '../api/exceptions/item_deleted.dart';
 import '../api/models/conflict_origin.dart';
 import '../impl/etebase_sync_impl.dart';
-import '../items/sync_event.dart';
-import '../storage/item_store.dart';
 import '../storage/save_result.dart';
+import '../storage/store.dart';
+import 'sync_event.dart';
 
 @internal
-abstract base class BackgroundSync<TItem extends Item> {
+abstract base class BackgroundSync<
+  TItem extends Item,
+  TResponse extends ListResponse<TItem>,
+  TStore extends Store<TItem>
+> {
   @protected
   final EtebaseSyncImpl etebaseSync;
   @protected
-  final ItemStore<TItem> store;
+  final TStore store;
 
   final _syncLock = Lock();
   final _syncedController = StreamController<SyncEvent>.broadcast(sync: true);
@@ -66,10 +70,14 @@ abstract base class BackgroundSync<TItem extends Item> {
     ]);
   }
 
-  Future<void> sync();
+  @visibleForOverriding
+  Stream<TResponse> streamRemote();
 
   @visibleForOverriding
-  Stream<ItemListResponse<TItem>> streamRemote();
+  Future<void> updateStoken(TResponse response);
+
+  @visibleForOverriding
+  String? scopeFor(TResponse response) => null;
 
   @visibleForOverriding
   Future<void> upload(TItem item);
@@ -181,10 +189,10 @@ abstract base class BackgroundSync<TItem extends Item> {
     }
   }
 
-  Stream<SyncEvent> _handleResponse(ItemListResponse<TItem> response) async* {
+  Stream<SyncEvent> _handleResponse(TResponse response) async* {
     if (!_downSyncActive) {
       _downSyncActive = true;
-      yield const SyncEvent.downloadStarted();
+      yield SyncEvent.downloadStarted(scopeFor(response));
     }
 
     for (final item in response.data) {
@@ -202,11 +210,11 @@ abstract base class BackgroundSync<TItem extends Item> {
       }
     }
 
-    await store.saveStoken(response.stoken);
+    await updateStoken(response);
 
     if (response.isDone) {
       _downSyncActive = false;
-      yield const SyncEvent.downloadFinished();
+      yield SyncEvent.downloadFinished(scopeFor(response));
     }
   }
 

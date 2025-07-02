@@ -17,7 +17,7 @@ import '../storage/save_result.dart';
 import '../sync/background_sync.dart';
 import '../sync/sync_mode.dart';
 import 'record_state.dart';
-import 'sync_event.dart';
+import '../sync/sync_event.dart';
 
 part 'item_background_sync.dart';
 part 'item_record.dart';
