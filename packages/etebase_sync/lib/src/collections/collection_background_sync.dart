@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:etebase/etebase.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../api/exceptions/item_deleted.dart';
 import '../api/models/conflict_origin.dart';
-import '../api/models/repository_metadata.dart';
 import '../storage/collection_store.dart';
 import '../sync/background_sync.dart';
 import '../sync/sync_event.dart';
 import 'collection_conflict_resolver.dart';
-import 'conflict_resolution.dart';
 
 typedef _SyncRequest = ({String collectionType, String? stoken});
 
+@internal
 final class CollectionBackgroundSync
     extends
         BackgroundSync<
@@ -88,31 +87,8 @@ final class CollectionBackgroundSync
     Collection target,
     Collection conflicted,
     ConflictOrigin origin,
-  ) async {
-    final resolution = await _conflictResolver.resolveRepositoryConflict(
-      colUid: target.uid,
-      targetMeta: await target.getMeta<RepositoryMetadata>(),
-      targetDeleted: target.isDeleted,
-      conflictedMeta: await conflicted.getMeta<RepositoryMetadata>(),
-      conflictedDeleted: conflicted.isDeleted,
-      origin: origin,
-    );
-    switch (resolution) {
-      case ConflictResolutionDiscard():
-      case ConflictResolutionDelete() when target.isDeleted:
-        break;
-      case ConflictResolutionUpdate() when target.isDeleted:
-        throw ItemDeleted(target.uid);
-
-      case ConflictResolutionUpdate(:final meta):
-        await target.setMeta<RepositoryMetadata>(meta);
-      case ConflictResolutionDelete(:final RepositoryMetadata meta):
-        await target.setMeta<RepositoryMetadata>(meta);
-        await target.delete();
-      case ConflictResolutionDelete():
-        await target.delete();
-    }
-  }
+  ) async =>
+      await _conflictResolver.resolveConflict(target, conflicted, origin);
 
   Stream<CollectionListResponse<Collection>> _fetchUpdates(
     _SyncRequest request,

@@ -58,10 +58,19 @@ class Repository<TRecord extends ItemRecord> {
       await _backgroundSync.sync();
     }
 
-    return {
-      await for (final uid in _store.listUids())
-        uid: ?(await (await _store.getItem(uid))?.getMeta()),
-    };
+    final entryStream = _store
+        .listUids()
+        .asyncMap(_store.getItem)
+        .whereNotNull()
+        .asyncMap((item) async {
+          final uid = item.uid;
+          final meta = item.isDeleted ? null : await item.getMeta();
+          item.dispose();
+          return meta != null ? (uid, meta) : null;
+        })
+        .whereNotNull();
+
+    return {await for (final (uid, meta) in entryStream) uid: meta};
   }
 
   Future<TRecord> create() async {
@@ -123,7 +132,8 @@ class Repository<TRecord extends ItemRecord> {
 
       // load from cache
       final cacheItem = await _store.getItem(record.uid);
-      if (cacheItem == null) {
+      if (cacheItem == null || cacheItem.isDeleted) {
+        cacheItem?.dispose();
         throw ItemDeleted(record.uid);
       }
 
