@@ -8,4 +8,6 @@ abstract interface class CollectionStore implements Store<Collection> {
   Future<String?> getStoken(String collectionType);
 
   Future<void> saveStoken(String collectionType, String? stoken);
+
+  Stream<Collection> listCollections(String collectionType);
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
 import '../collection_store.dart';
@@ -34,6 +35,13 @@ final class HiveCollectionStore extends HiveStore<Collection, CollectionInfo>
           await _stokenBox.delete(_stokenKey(collectionType));
         }
       });
+
+  @override
+  Stream<Collection> listCollections(String collectionType) => listUids()
+      .asyncMap(boxGet)
+      .whereNotNull()
+      .where((info) => info.collectionType == collectionType)
+      .map(createItem);
 
   @override
   Collection createItem(CollectionInfo itemInfo) =>

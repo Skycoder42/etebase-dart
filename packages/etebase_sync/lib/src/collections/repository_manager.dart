@@ -4,19 +4,18 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../api/conflict_resolution/conflict_resolver.dart';
 import '../api/exceptions/cache_miss.dart';
 import '../api/exceptions/collection_type_mismatch.dart';
 import '../api/exceptions/read_only.dart';
 import '../api/exceptions/unresolved_conflict.dart';
 import '../api/models/conflict_origin.dart';
-import '../api/models/conflict_resolution.dart';
 import '../api/models/etebase_target.dart';
 import '../api/models/repository_metadata.dart';
 import '../impl/etebase_sync_impl.dart';
 import '../items/items.dart';
 import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
+import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
 
 @internal
@@ -25,104 +24,82 @@ class RepositoryManager {
   final CollectionManager _collectionManager;
   final CollectionStore _store;
   final CollectionConflictResolver _conflictResolver;
+  final CollectionBackgroundSync _backgroundSync;
 
   RepositoryManager(
     this._collectionManager,
     this._sync,
     this._store,
     this._conflictResolver,
+    this._backgroundSync,
   );
 
-  @override
-  Future<Repository<TRecord>>
-  openPrimary<TRecord extends ItemRecord>() => DisposeScope.scoped(() async {
-    final type = _sync.typeFor<TRecord>();
-    final cache = await _cache.collectionCache(_collectionManager, type);
-    await _syncEngine.updateCache(cache);
-
-    final colUids = cache.listItems().toList();
-    switch (colUids) {
-      case []:
-        return await create<TRecord>(const RepositoryMetadata(primary: true));
-      case [final colUid]:
-        var collection = await _syncEngine.load(cache, colUid, fromCache: true);
-        final meta = await collection.getMeta<RepositoryMetadata>();
-        if (!meta.primary) {
-          await collection.setMeta(meta.copyWith(primary: true));
-          collection = await _syncEngine.save(cache, collection);
-        }
-        return _sync.createRepo<TRecord>(DisposeScope.detachLater(collection));
-      default:
-        break;
+  Future<Repository<TRecord>> openPrimary<TRecord extends ItemRecord>({
+    bool sync = true,
+  }) async {
+    final collectionType = _sync.typeFor<TRecord>();
+    if (sync) {
+      await _backgroundSync.sync(collectionType);
     }
 
     final primaryCollections = <(Collection, RepositoryMetadata)>[];
-    for (final colUid in colUids) {
-      final collection = await _syncEngine.load(cache, colUid, fromCache: true);
-      final meta = await collection.getMeta<RepositoryMetadata>();
-      if (meta.primary) {
-        primaryCollections.add((collection, meta));
+    try {
+      await for (final collection in _store.listCollections(collectionType)) {
+        try {
+          final meta = await collection.getMeta<RepositoryMetadata>();
+          if (meta.primary) {
+            primaryCollections.add((collection, meta));
+          } else {
+            collection.dispose();
+          }
+        } catch (_) {
+          collection.dispose();
+          rethrow;
+        }
+      }
+
+      switch (primaryCollections) {
+        case []:
+          return await create<TRecord>(const RepositoryMetadata(primary: true));
+        case [(final collection, _)]:
+          return _sync.createRepo<TRecord>(collection);
+        default:
+          return await _resolvePrimaryConflict(
+            collectionType,
+            primaryCollections,
+          );
+      }
+    } catch (_) {
+      for (final (collection, _) in primaryCollections) {
+        collection.dispose();
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, RepositoryMetadata>> list<TRecord extends ItemRecord>({
+    bool sync = true,
+  }) async {
+    final collectionType = _sync.typeFor<TRecord>();
+    if (sync) {
+      await _backgroundSync.sync(collectionType);
+    }
+
+    final result = <String, RepositoryMetadata>{};
+    await for (final collection in _store.listCollections(collectionType)) {
+      try {
+        if (collection.isDeleted) {
+          continue;
+        }
+
+        final meta = await collection.getMeta<RepositoryMetadata>();
+        result[collection.uid] = meta;
+      } finally {
+        collection.dispose();
       }
     }
-
-    switch (primaryCollections) {
-      case []:
-        return await create<TRecord>(const RepositoryMetadata(primary: true));
-      case [(final collection, _)]:
-        return _sync.createRepo<TRecord>(DisposeScope.detachLater(collection));
-      default:
-        final conflictMap = {
-          for (final (collection, meta) in primaryCollections)
-            collection.uid: meta,
-        };
-        final actual = await _conflictResolver
-            .resolveMultiplePrimaryCollections(type, conflictMap);
-        Collection? primaryCol;
-        for (final (collection, meta) in primaryCollections) {
-          if (collection.uid == actual) {
-            primaryCol = collection;
-            continue;
-          }
-
-          await collection.setMeta(meta.copyWith(primary: false));
-          await _syncEngine.save(cache, collection);
-        }
-
-        if (primaryCol == null) {
-          throw UnresolvedConflict(
-            EtebaseTarget.collection,
-            'Conflict resolved selected collection with uid "$actual" '
-            'as primary collection, but it was not found!',
-            origin: ConflictOrigin.cache,
-            uid: actual,
-          );
-        }
-
-        return _sync.createRepo<TRecord>(DisposeScope.detachLater(primaryCol));
-    }
-  });
-
-  @override
-  Future<Map<String, RepositoryMetadata>> list<TRecord extends ItemRecord>() =>
-      DisposeScope.scoped(() async {
-        final type = _sync.typeFor<TRecord>();
-        // TODO await sync
-
-        final result = <String, RepositoryMetadata>{};
-        for (final colUid in cache.listItems()) {
-          final collection = DisposeScope.attach(
-            await _syncEngine.loadIfExists(cache, colUid, fromCache: true),
-          );
-          if (collection == null) {
-            continue;
-          }
-
-          await internalValidate(collection, type);
-          final meta = await collection.getMeta<RepositoryMetadata>();
-          result[colUid] = meta;
-        }
-        return result;
-      });
+    return result;
+  }
 
   Future<Repository<TRecord>> create<TRecord extends ItemRecord>([
     RepositoryMetadata? meta,
@@ -135,7 +112,13 @@ class RepositoryManager {
     try {
       final result = await _store.saveLocal(collection, expectedEtag: null);
       collection = await _handleSaveResult(collection, result);
-      // TODO wait for sync
+
+      if (_sync.config.waitForUpload) {
+        await _backgroundSync.syncEvents.firstWhere(
+          (e) => e.uid == collection.uid,
+        );
+      }
+
       return _sync.createRepo<TRecord>(collection);
     } catch (_) {
       collection.dispose();
@@ -144,8 +127,13 @@ class RepositoryManager {
   }
 
   Future<Repository<TRecord>> open<TRecord extends ItemRecord>(
-    String colUid,
-  ) async {
+    String colUid, {
+    bool sync = true,
+  }) async {
+    if (sync) {
+      await _backgroundSync.sync(_sync.typeFor<TRecord>());
+    }
+
     final collection = await _getCol<TRecord>(colUid);
     try {
       return _sync.createRepo<TRecord>(collection);
@@ -156,8 +144,13 @@ class RepositoryManager {
   }
 
   Future<RepositoryMetadata> getMeta<TRecord extends ItemRecord>(
-    String colUid,
-  ) async {
+    String colUid, {
+    bool sync = true,
+  }) async {
+    if (sync) {
+      await _backgroundSync.sync(_sync.typeFor<TRecord>());
+    }
+
     final collection = await _getCol<TRecord>(colUid);
     try {
       return await collection.getMeta<RepositoryMetadata>();
@@ -175,7 +168,12 @@ class RepositoryManager {
     try {
       _checkWritable(collection);
       await collection.setMeta(meta);
-      // TODO wait for sync
+
+      if (_sync.config.waitForUpload) {
+        await _backgroundSync.syncEvents.firstWhere(
+          (e) => e.uid == collection.uid,
+        );
+      }
     } finally {
       collection.dispose();
     }
@@ -187,9 +185,13 @@ class RepositoryManager {
       collection = await _getCol<TRecord>(colUid);
       _checkWritable(collection);
       await collection.delete();
-      // TODO wait for sync
-    } on CacheMiss {
+
+      if (_sync.config.waitForUpload) {
+        await _backgroundSync.syncEvents.firstWhere((e) => e.uid == colUid);
+      }
+
       // TODO change type
+    } on CacheMiss {
       return;
     } finally {
       collection?.dispose();
@@ -197,14 +199,13 @@ class RepositoryManager {
   }
 
   Future<Collection> _getCol<TRecord extends ItemRecord>(String colUid) async {
-    // TODO sync first
     final collection = await _store.getItem(colUid);
 
     try {
       if (collection == null || collection.isDeleted) {
         throw CacheMiss(colUid); // TODO change exception
       }
-      _validate<TRecord>(collection);
+      _validateType<TRecord>(collection);
       return collection;
     } catch (_) {
       collection?.dispose();
@@ -218,7 +219,7 @@ class RepositoryManager {
     }
   }
 
-  void _validate<TRecord extends ItemRecord>(Collection instance) {
+  void _validateType<TRecord extends ItemRecord>(Collection instance) {
     final expectedType = _sync.typeFor<TRecord>();
     if (instance.collectionType != expectedType) {
       final actType = instance.collectionType;
@@ -261,5 +262,46 @@ class RepositoryManager {
     );
     final result = await _store.saveLocal(target, expectedEtag: expectedEtag);
     return await _handleSaveResult(target, result);
+  }
+
+  Future<Repository<TRecord>>
+  _resolvePrimaryConflict<TRecord extends ItemRecord>(
+    String collectionType,
+    List<(Collection, RepositoryMetadata)> primaryCollections,
+  ) async {
+    final conflictMap = {
+      for (final (collection, meta) in primaryCollections) collection.uid: meta,
+    };
+    final actual = await _conflictResolver.resolveMultiplePrimaryCollections(
+      collectionType,
+      conflictMap,
+    );
+    Collection? primaryCol;
+    for (final (collection, meta) in primaryCollections) {
+      if (collection.uid == actual) {
+        primaryCol = collection;
+        continue;
+      }
+
+      final cacheEtag = collection.etag;
+      await collection.setMeta(meta.copyWith(primary: false));
+      final result = await _store.saveLocal(
+        collection,
+        expectedEtag: cacheEtag,
+      );
+      (await _handleSaveResult(collection, result)).dispose();
+    }
+
+    if (primaryCol == null) {
+      throw UnresolvedConflict(
+        EtebaseTarget.collection,
+        'Conflict resolved selected collection with uid "$actual" '
+        'as primary collection, but it was not found!',
+        origin: ConflictOrigin.cache,
+        uid: actual,
+      );
+    }
+
+    return _sync.createRepo<TRecord>(primaryCol);
   }
 }

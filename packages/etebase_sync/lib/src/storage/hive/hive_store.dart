@@ -23,7 +23,8 @@ abstract base class HiveStore<
 
   HiveStore(this.itemBox);
 
-  FutureOr<TItemInfo?> _boxGet(String uid) => switch (itemBox) {
+  @protected
+  FutureOr<TItemInfo?> boxGet(String uid) => switch (itemBox) {
     final Box<TItemInfo> box => box.get(uid),
     final LazyBox<TItemInfo> box => box.get(uid),
     _ => throw UnsupportedError(
@@ -43,7 +44,7 @@ abstract base class HiveStore<
   @override
   @nonVirtual
   Future<TItem?> getItem(String uid, {bool forUpload = false}) async {
-    final info = await _boxGet(uid);
+    final info = await boxGet(uid);
     if (info == null || (forUpload && info.localEtag == info.remoteEtag)) {
       return null;
     }
@@ -53,7 +54,7 @@ abstract base class HiveStore<
   @override
   Future<SaveResult<TItem>> saveRemote(TItem item) =>
       writeLock.synchronized(() async {
-        final oldItem = await _boxGet(item.uid);
+        final oldItem = await boxGet(item.uid);
         if (oldItem == null) {
           if (!item.isDeleted) {
             await itemBox.put(item.uid, createItemInfo(item, item.etag));
@@ -79,7 +80,7 @@ abstract base class HiveStore<
     required String? expectedEtag,
     String? remoteEtag,
   }) => writeLock.synchronized(() async {
-    final oldItem = await _boxGet(item.uid);
+    final oldItem = await boxGet(item.uid);
     if (expectedEtag == null) {
       if (oldItem != null) {
         return SaveResult.conflict(createItem(oldItem));
@@ -102,7 +103,7 @@ abstract base class HiveStore<
   @override
   Future<SaveResult<TItem>> saveUploaded(TItem item) =>
       writeLock.synchronized(() async {
-        final cacheItem = await _boxGet(item.uid);
+        final cacheItem = await boxGet(item.uid);
         if (cacheItem == null) {
           if (item.isDeleted) {
             return SaveResult.ok(item.etag);
