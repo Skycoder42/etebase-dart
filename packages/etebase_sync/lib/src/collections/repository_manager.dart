@@ -114,9 +114,7 @@ class RepositoryManager {
       collection = await _handleSaveResult(collection, result);
 
       if (_sync.config.waitForUpload) {
-        await _backgroundSync.syncEvents.firstWhere(
-          (e) => e.uid == collection.uid,
-        );
+        await _backgroundSync.waitForSync(collection.uid);
       }
 
       return _sync.createRepo<TRecord>(collection);
@@ -170,9 +168,7 @@ class RepositoryManager {
       await collection.setMeta(meta);
 
       if (_sync.config.waitForUpload) {
-        await _backgroundSync.syncEvents.firstWhere(
-          (e) => e.uid == collection.uid,
-        );
+        await _backgroundSync.waitForSync(collection.uid);
       }
     } finally {
       collection.dispose();
@@ -187,7 +183,7 @@ class RepositoryManager {
       await collection.delete();
 
       if (_sync.config.waitForUpload) {
-        await _backgroundSync.syncEvents.firstWhere((e) => e.uid == colUid);
+        await _backgroundSync.waitForSync(collection.uid);
       }
 
       // TODO change type

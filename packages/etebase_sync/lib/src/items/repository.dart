@@ -41,8 +41,6 @@ class Repository<TRecord extends ItemRecord> {
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
 
-  Stream<SyncEvent> get syncEvents => _backgroundSync.syncEvents;
-
   Future<void> sync() async => await _backgroundSync.sync();
 
   Stream<String> list({bool sync = false}) async* {
@@ -155,7 +153,7 @@ class Repository<TRecord extends ItemRecord> {
       await _saveToCache(record);
 
       if (_sync.config.waitForUpload) {
-        await _backgroundSync.syncEvents.firstWhere((e) => e.uid == record.uid);
+        await _backgroundSync.waitForSync(record.uid);
       }
     } finally {
       record._state = recordState;

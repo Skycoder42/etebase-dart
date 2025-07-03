@@ -40,6 +40,9 @@ abstract base class BackgroundSync<
 
   Stream<SyncEvent> get syncEvents => _syncedController.stream;
 
+  Future<void> waitForSync(String uid) =>
+      syncEvents.firstWhere((e) => e.uid == uid);
+
   @mustCallSuper
   Future<void> init() async {
     _cacheSub = store
