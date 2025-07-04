@@ -11,6 +11,7 @@ import '../api/models/conflict_origin.dart';
 import '../api/models/etebase_target.dart';
 import '../api/repository_adapter.dart';
 import '../impl/etebase_sync_impl.dart';
+import '../online/online_wrapper.dart';
 import '../storage/item_store.dart';
 import '../storage/save_result.dart';
 import '../sync/background_sync.dart';

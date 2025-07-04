@@ -7,7 +7,7 @@ import 'package:synchronized/synchronized.dart';
 
 import '../api/exceptions/item_deleted.dart';
 import '../api/models/conflict_origin.dart';
-import '../impl/etebase_sync_impl.dart';
+import '../online/online_wrapper.dart';
 import '../storage/save_result.dart';
 import '../storage/store.dart';
 import 'sync_event.dart';
@@ -21,7 +21,7 @@ abstract base class BackgroundSync<
   TStore extends Store<TItem>
 > {
   @protected
-  final EtebaseSyncImpl etebaseSync;
+  final OnlineWrapper online;
   @protected
   final TStore store;
 
@@ -36,7 +36,7 @@ abstract base class BackgroundSync<
   @protected
   bool get isDownSyncActive => _downSyncActive;
 
-  BackgroundSync(this.etebaseSync, this.store);
+  BackgroundSync(this.online, this.store);
 
   Stream<SyncEvent> get syncEvents => _syncedController.stream;
 
@@ -98,7 +98,7 @@ abstract base class BackgroundSync<
   );
 
   Future<SyncEvent?> _handleUpload(String uid) => _syncLock.synchronized(
-    () => etebaseSync.runOnline(() async {
+    () => online.runOnline(() async {
       final item = await store.getItem(uid, forUpload: true);
       if (item == null) {
         return null;

@@ -7,35 +7,40 @@ abstract base class ItemBackgroundSync
   final Repository _repository;
 
   ItemBackgroundSync(
-    super.etebaseSync,
+    super.online,
     super.store,
     this._itemManager,
     this._repository,
   );
 
   factory ItemBackgroundSync.forMode(
-    EtebaseSyncImpl sync,
+    OnlineWrapper online,
     ItemStore store,
     ItemManager itemManager,
     Repository repository,
     SyncMode syncMode,
   ) => switch (syncMode) {
     SyncModeManual() => _ManualBackgroundSync(
-      sync,
+      online,
       store,
       itemManager,
       repository,
     ),
     SyncModePeriodic(:final period, :final fireImmediately) =>
       _PeriodicBackgroundSync(
-        sync,
+        online,
         store,
         itemManager,
         repository,
         period: period,
         fireImmediately: fireImmediately,
       ),
-    SyncModeLive() => _LiveBackgroundSync(sync, store, itemManager, repository),
+    SyncModeLive() => _LiveBackgroundSync(
+      online,
+      store,
+      itemManager,
+      repository,
+    ),
   };
 
   Future<void> sync();
@@ -79,7 +84,7 @@ abstract base class ItemBackgroundSync
 
 abstract base class _PullBasedBackgroundSync extends ItemBackgroundSync {
   _PullBasedBackgroundSync(
-    super.etebaseSync,
+    super.online,
     super.store,
     super._itemManager,
     super._repository,
@@ -87,7 +92,7 @@ abstract base class _PullBasedBackgroundSync extends ItemBackgroundSync {
 
   Stream<ItemListResponse<Item>> _fetchUpdates(String? stoken) {
     ItemListResponse<Item>? response;
-    return etebaseSync.streamOnline<ItemListResponse<Item>>(
+    return online.streamOnline<ItemListResponse<Item>>(
       () async* {
         do {
           response = await _itemManager.list(
@@ -114,7 +119,7 @@ final class _ManualBackgroundSync extends _PullBasedBackgroundSync {
   final _controller = StreamController<String?>();
 
   _ManualBackgroundSync(
-    super.etebaseSync,
+    super.online,
     super.store,
     super._itemManager,
     super._repository,
@@ -145,7 +150,7 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
   final _controller = StreamController<String?>();
 
   _PeriodicBackgroundSync(
-    super.etebaseSync,
+    super.online,
     super.store,
     super._itemManager,
     super._repository, {
@@ -182,7 +187,7 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
   Completer<bool>? _syncBlocker;
 
   _LiveBackgroundSync(
-    super.etebaseSync,
+    super.online,
     super.store,
     super._itemManager,
     super._repository,
@@ -209,7 +214,7 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
       return;
     }
 
-    if (etebaseSync.isOnline) {
+    if (await online.isOnline) {
       await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
     }
   }
@@ -217,9 +222,9 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
   @override
   Stream<ItemListResponse<Item>> streamRemote() async* {
     while ((await _syncBlocker?.future) ?? true) {
-      await etebaseSync.waitForOnline();
+      await online.waitForOnline();
 
-      yield* etebaseSync
+      yield* online
           .streamOnline(() async* {
             final stoken = await store.getStoken();
             yield* _itemManager.subscribeChanges(

@@ -29,7 +29,7 @@ final class CollectionBackgroundSync
   final _controller = StreamController<_SyncRequest>();
 
   CollectionBackgroundSync(
-    super.etebaseSync,
+    super.online,
     super.store,
     this._collectionManager,
     this._conflictResolver,
@@ -94,7 +94,7 @@ final class CollectionBackgroundSync
     _SyncRequest request,
   ) {
     CollectionListResponse<Collection>? response;
-    return etebaseSync
+    return online
         .streamOnline<CollectionListResponse<Collection>>(
           () async* {
             do {
@@ -102,6 +102,7 @@ final class CollectionBackgroundSync
                 request.collectionType,
                 FetchOptions(stoken: response?.stoken ?? request.stoken),
               );
+              await _handleRemovedMemberships(response!);
               yield response!;
             } while (!response!.isDone);
           },
@@ -117,5 +118,15 @@ final class CollectionBackgroundSync
           (response) =>
               _collectionResponseTypes[response] = request.collectionType,
         );
+  }
+
+  Future<void> _handleRemovedMemberships(
+    CollectionListResponse<Collection> response,
+  ) async {
+    if (response.removedMemberships case final List<RemovedCollection> cols) {
+      for (final RemovedCollection(:uid) in cols) {
+        // TODO handle this
+      }
+    }
   }
 }

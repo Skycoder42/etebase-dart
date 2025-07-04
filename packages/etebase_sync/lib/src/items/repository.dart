@@ -2,6 +2,7 @@ part of 'items.dart';
 
 class Repository<TRecord extends ItemRecord> {
   final EtebaseSyncImpl _sync;
+  final OnlineWrapper _online;
   final Collection _collection;
   final RepositoryAdapter<TRecord> _adapter;
   final ItemManager _itemManager;
@@ -12,6 +13,7 @@ class Repository<TRecord extends ItemRecord> {
   @visibleForTesting
   Repository.forTesting(
     this._sync,
+    this._online,
     this._collection,
     this._adapter,
     this._itemManager,
@@ -22,13 +24,14 @@ class Repository<TRecord extends ItemRecord> {
   @internal
   Repository.internal(
     this._sync,
+    this._online,
     this._collection,
     this._adapter,
     this._itemManager,
     this._store,
   ) {
     _backgroundSync = ItemBackgroundSync.forMode(
-      _sync,
+      _online,
       _store,
       _itemManager,
       this,
@@ -40,6 +43,12 @@ class Repository<TRecord extends ItemRecord> {
 
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
+
+  Future<void> dispose() async {
+    await _backgroundSync.dispose();
+    _itemManager.dispose();
+    _collection.dispose();
+  }
 
   Future<void> sync() async => await _backgroundSync.sync();
 
