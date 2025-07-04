@@ -1,17 +1,67 @@
 import 'dart:async';
 
 import 'package:etebase/etebase.dart';
+import 'package:meta/meta.dart';
 
 import 'online_checker.dart';
+import 'online_status.dart';
 
-sealed class OnlineWrapper {
-  const OnlineWrapper._();
+@internal
+class OnlineWrapper {
+  static const defaultWaitInterval = Duration(seconds: 30);
 
-  FutureOr<bool> get isOnline;
+  final OnlineChecker _onlineChecker;
+  final Duration _waitInterval;
 
-  Future<void> waitForOnline();
+  final _onlineNotifier = StreamController<OnlineStatus>.broadcast(sync: true);
 
-  Future<void> dispose();
+  OnlineStatus? _currentStatus;
+  StreamSubscription<OnlineStatus>? _subscription;
+  Timer? _timer;
+
+  OnlineWrapper(
+    this._onlineChecker, [
+    this._waitInterval = defaultWaitInterval,
+  ]) {
+    unawaited(_listen());
+  }
+
+  Future<void> dispose() async {
+    _timer?.cancel();
+    await Future.wait([?_subscription?.cancel(), _onlineNotifier.close()]);
+  }
+
+  Future<bool> get isOnline async {
+    // check if current online status is cached. How this is done depends on
+    // whether we have a subscription or not. A subscription does not need to
+    // recheck when offline.
+    if (_subscription != null) {
+      if (_currentStatus case OnlineStatus(:final isOnline)) {
+        return isOnline;
+      }
+    } else {
+      if (_currentStatus case OnlineStatus(isOnline: true)) {
+        return true;
+      }
+    }
+
+    final status = await _onlineChecker.checkOnlineStatus();
+    // do not overwrite any update received in parallel by the subscription
+    _setOnlineStatus(status, overwrite: _subscription == null);
+    return status.isOnline;
+  }
+
+  Future<void> waitForOnline() {
+    if (_currentStatus case OnlineStatus(isOnline: true)) {
+      return Future.value();
+    }
+
+    if (_subscription == null) {
+      _timer ??= Timer.periodic(_waitInterval, _pingOnline);
+    }
+
+    return _onlineNotifier.stream.firstWhere((s) => s.isOnline);
+  }
 
   Future<T> runOnline<T>(
     FutureOr<T> Function() callback, {
@@ -21,8 +71,10 @@ sealed class OnlineWrapper {
       try {
         return await callback();
       } on ConnectionProblem {
+        _resetOnlineStatus();
         // break
       } on TemporaryServerProblem {
+        _resetOnlineStatus();
         // break
       } catch (_) {
         rethrow;
@@ -45,8 +97,10 @@ sealed class OnlineWrapper {
         }
         return;
       } on ConnectionProblem {
+        _resetOnlineStatus();
         // break
       } on TemporaryServerProblem {
+        _resetOnlineStatus();
         // break
       } catch (_) {
         rethrow;
@@ -55,111 +109,63 @@ sealed class OnlineWrapper {
 
     yield* whenOffline?.call() ?? const Stream.empty();
   }
-}
-
-class OnlineCheckerWrapper extends OnlineWrapper {
-  final OnlineChecker _onlineProber;
-  final Duration waitInterval;
-
-  (Timer, Completer<void>)? _activeWaiter;
-
-  OnlineCheckerWrapper(this._onlineProber, this.waitInterval) : super._();
-
-  @override
-  Future<bool> get isOnline async =>
-      (await _onlineProber.checkOnlineStatus()).isOnline;
-
-  @override
-  Future<void> waitForOnline() async {
-    if (_activeWaiter != null && await isOnline) {
-      return;
-    } else if (_activeWaiter case (_, final completer)) {
-      return completer.future;
-    }
-
-    final completer = Completer<void>();
-    final timer = Timer.periodic(
-      waitInterval,
-      (timer) => _checkOnline(timer, completer),
-    );
-    _activeWaiter = (timer, completer);
-    await completer.future;
-  }
-
-  @override
-  Future<void> dispose() => Future.sync(() {
-    if (_activeWaiter case (final timer, _)) {
-      timer.cancel();
-    }
-
-    if (_activeWaiter case (_, final completer) when !completer.isCompleted) {
-      completer.completeError(StateError('The resource was disposed'));
-    }
-  });
-
-  Future<void> _checkOnline(Timer timer, Completer<void> completer) async {
-    try {
-      if (await isOnline) {
-        timer.cancel();
-        if (!completer.isCompleted) {
-          completer.complete();
-        }
-      }
-    } catch (e, s) {
-      timer.cancel();
-      if (!completer.isCompleted) {
-        completer.completeError(e, s);
-      }
-    }
-  }
-}
-
-class OnlineWatcherWrapper extends OnlineWrapper {
-  final OnlineWatcher _onlineWatcher;
-
-  final _onlineNotifier = StreamController<OnlineStatus>.broadcast(sync: true);
-
-  StreamSubscription<OnlineStatus>? _subscription;
-  OnlineStatus? _currentStatus;
-
-  OnlineWatcherWrapper(this._onlineWatcher) : super._() {
-    unawaited(_listen());
-  }
-
-  @override
-  Future<bool> get isOnline => switch (_currentStatus) {
-    OnlineStatus(:final isOnline) => Future.value(isOnline),
-    _ => _onlineWatcher.checkOnlineStatus().then((status) => status.isOnline),
-  };
-
-  @override
-  Future<void> waitForOnline() {
-    if (_currentStatus?.isOnline ?? false) {
-      return Future.value();
-    }
-
-    return _onlineNotifier.stream.firstWhere((s) => s.isOnline);
-  }
-
-  @override
-  Future<void> dispose() async {
-    await _subscription?.cancel();
-    await _onlineNotifier.close();
-  }
 
   Future<void> _listen() async {
     await _subscription?.cancel();
-    _subscription = _onlineWatcher.watchOnlineStatus().listen(
-      _onOnlineStatusEvent,
+    _subscription = _onlineChecker.watchOnlineStatus()?.listen(
+      _setOnlineStatus,
+      onError: _handleError,
       onDone: _listen,
       cancelOnError: false,
     );
   }
 
-  void _onOnlineStatusEvent(OnlineStatus status) {
+  void _setOnlineStatus(OnlineStatus status, {bool overwrite = true}) {
+    if (!overwrite && _currentStatus != null) {
+      return;
+    }
+
     _currentStatus = status;
     if (_onlineNotifier.hasListener) {
       _onlineNotifier.add(status);
+    }
+  }
+
+  void _resetOnlineStatus() {
+    if (_subscription == null) {
+      _currentStatus = OnlineStatus.offline;
+    }
+  }
+
+  Future<void> _pingOnline(Timer timer) async {
+    var cancelTimer = true;
+    try {
+      // fast cancel if a subscription was startet in the mean time
+      if (_subscription != null) {
+        return;
+      }
+
+      // check if online and cancel if that is the case, otherwise the timer
+      // will fire again
+      cancelTimer = await isOnline;
+
+      // ignore: avoid_catches_without_on_clauses rethrows
+    } catch (e, s) {
+      _handleError(e, s);
+    } finally {
+      if (cancelTimer) {
+        timer.cancel();
+        _timer?.cancel();
+        _timer = null;
+      }
+    }
+  }
+
+  void _handleError(Object error, StackTrace stackTrace) {
+    if (_onlineNotifier.hasListener) {
+      _onlineNotifier.addError(error, stackTrace);
+    } else {
+      Zone.current.handleUncaughtError(error, stackTrace);
     }
   }
 }
