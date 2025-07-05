@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
 import '../../api/exceptions/item_deleted.dart';
@@ -16,9 +17,12 @@ abstract base class HiveStore<
   TItemInfo extends ItemInfoBase
 >
     implements Store<TItem> {
+  final _pendingUploads = <String>{};
+
   @protected
   final writeLock = Lock();
 
+  @protected
   final BoxBase<TItemInfo> itemBox;
 
   HiveStore(this.itemBox);
@@ -58,6 +62,7 @@ abstract base class HiveStore<
         if (oldItem == null) {
           if (!item.isDeleted) {
             await itemBox.put(item.uid, createItemInfo(item, item.etag));
+            _pendingUploads.remove(item.uid);
           }
           return SaveResult.ok(item.etag);
         }
@@ -71,6 +76,7 @@ abstract base class HiveStore<
         }
 
         await itemBox.put(item.uid, createItemInfo(item, item.etag));
+        _pendingUploads.remove(item.uid);
         return SaveResult.ok(item.etag);
       });
 
@@ -97,6 +103,7 @@ abstract base class HiveStore<
       item.uid,
       createItemInfo(item, remoteEtag ?? oldItem?.remoteEtag),
     );
+    _pendingUploads.add(item.uid);
     return SaveResult.ok(item.etag);
   });
 
@@ -109,6 +116,7 @@ abstract base class HiveStore<
             return SaveResult.ok(item.etag);
           } else {
             await itemBox.put(item.uid, createItemInfo(item, item.etag));
+            _pendingUploads.remove(item.uid);
             return SaveResult.ok(item.etag);
           }
         }
@@ -117,14 +125,33 @@ abstract base class HiveStore<
           return SaveResult.conflict(createItem(cacheItem));
         } else if (item.isDeleted) {
           await itemBox.delete(item.uid);
+          _pendingUploads.remove(item.uid);
           return SaveResult.ok(item.etag);
         } else {
           await itemBox.put(item.uid, cacheItem.withRemoteEtag(item.etag));
+          _pendingUploads.remove(item.uid);
           return SaveResult.ok(item.etag);
         }
       });
 
   @override
-  Stream<String> stream() =>
-      itemBox.watch().where((e) => !e.deleted).map((e) => e.key as String);
+  Stream<String> stream() => MergeStream([
+    // stream all that are pending uploads
+    listUids().asyncMap(_checkAndTrackPending).whereNotNull(),
+    // stream all future changes
+    itemBox.watch().where((e) => !e.deleted).map((e) => e.key as String),
+  ]);
+
+  @override
+  Iterable<String> getPendingUploads() => _pendingUploads;
+
+  Future<String?> _checkAndTrackPending(String uid) async =>
+      await writeLock.synchronized(() async {
+        final item = await boxGet(uid);
+        if (item == null || item.localEtag == item.remoteEtag) {
+          return null;
+        }
+        _pendingUploads.add(uid);
+        return uid;
+      });
 }

@@ -20,4 +20,6 @@ abstract interface class Store<TItem extends Item> {
   Future<SaveResult<TItem>> saveUploaded(TItem item);
 
   Stream<String> stream();
+
+  Iterable<String> getPendingUploads();
 }

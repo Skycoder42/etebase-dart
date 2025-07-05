@@ -47,6 +47,7 @@ abstract base class BackgroundSync<
   Future<void> init() async {
     _cacheSub = store
         .stream()
+        .mergeWith([_pendingUploadsAfterReconnect()])
         .asyncMap(_handleUpload)
         .whereNotNull()
         .listen(
@@ -56,7 +57,7 @@ abstract base class BackgroundSync<
           cancelOnError: false,
         );
 
-    _cacheSub = streamRemote()
+    _remoteSub = streamRemote()
         .asyncExpand(_handleResponse)
         .listen(
           _syncedController.add,
@@ -96,6 +97,11 @@ abstract base class BackgroundSync<
     TItem conflicted,
     ConflictOrigin origin,
   );
+
+  Stream<String> _pendingUploadsAfterReconnect() => online.stream
+      .distinct()
+      .where((e) => e.isOnline)
+      .expand((_) => store.getPendingUploads());
 
   Future<SyncEvent?> _handleUpload(String uid) => _syncLock.synchronized(
     () => online.runOnline(() async {

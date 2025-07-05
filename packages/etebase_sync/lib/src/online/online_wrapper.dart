@@ -31,6 +31,8 @@ class OnlineWrapper {
     await Future.wait([?_subscription?.cancel(), _onlineNotifier.close()]);
   }
 
+  Stream<OnlineStatus> get stream => _onlineNotifier.stream;
+
   Future<bool> get isOnline async {
     // check if current online status is cached. How this is done depends on
     // whether we have a subscription or not. A subscription does not need to
