@@ -4,40 +4,49 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../api/exceptions/cache_miss.dart';
-import '../api/exceptions/collection_type_mismatch.dart';
-import '../api/exceptions/read_only.dart';
-import '../api/exceptions/unresolved_conflict.dart';
-import '../api/models/conflict_origin.dart';
-import '../api/models/etebase_target.dart';
-import '../api/models/repository_metadata.dart';
-import '../impl/etebase_sync_impl.dart';
+import '../exceptions/cache_miss.dart';
+import '../exceptions/collection_type_mismatch.dart';
+import '../exceptions/read_only.dart';
+import '../exceptions/unresolved_conflict.dart';
+import '../items/factory_registry.dart';
 import '../items/items.dart';
+import '../models/conflict_origin.dart';
+import '../models/etebase_target.dart';
+import '../online/online_wrapper.dart';
 import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
+import '../storage/storage_manager.dart';
+import '../sync/sync_config.dart';
 import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
+import 'repository_metadata.dart';
 
 @internal
 class RepositoryManager {
-  final EtebaseSyncImpl _sync;
   final CollectionManager _collectionManager;
+  final StorageManager _storageManager;
   final CollectionStore _store;
   final CollectionConflictResolver _conflictResolver;
+  final FactoryRegistry _registry;
   final CollectionBackgroundSync _backgroundSync;
+  final SyncConfig _config;
+  final OnlineWrapper _online;
 
   RepositoryManager(
     this._collectionManager,
-    this._sync,
+    this._storageManager,
+    this._registry,
     this._store,
     this._conflictResolver,
     this._backgroundSync,
+    this._config,
+    this._online,
   );
 
   Future<Repository<TRecord>> openPrimary<TRecord extends ItemRecord>({
     bool sync = true,
   }) async {
-    final collectionType = _sync.typeFor<TRecord>();
+    final collectionType = _registry.typeFor<TRecord>();
     if (sync) {
       await _backgroundSync.sync(collectionType);
     }
@@ -62,7 +71,7 @@ class RepositoryManager {
         case []:
           return await create<TRecord>(const RepositoryMetadata(primary: true));
         case [(final collection, _)]:
-          return _sync.createRepo<TRecord>(collection);
+          return _createRepo<TRecord>(collection);
         default:
           return await _resolvePrimaryConflict(
             collectionType,
@@ -80,7 +89,7 @@ class RepositoryManager {
   Future<Map<String, RepositoryMetadata>> list<TRecord extends ItemRecord>({
     bool sync = true,
   }) async {
-    final collectionType = _sync.typeFor<TRecord>();
+    final collectionType = _registry.typeFor<TRecord>();
     if (sync) {
       await _backgroundSync.sync(collectionType);
     }
@@ -105,7 +114,7 @@ class RepositoryManager {
     RepositoryMetadata? meta,
   ]) async {
     var collection = await _collectionManager.create(
-      _sync.typeFor<TRecord>(),
+      _registry.typeFor<TRecord>(),
       meta ?? const RepositoryMetadata(),
       Uint8List(0),
     );
@@ -113,11 +122,11 @@ class RepositoryManager {
       final result = await _store.saveLocal(collection, expectedEtag: null);
       collection = await _handleSaveResult(collection, result);
 
-      if (_sync.config.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
 
-      return _sync.createRepo<TRecord>(collection);
+      return _createRepo<TRecord>(collection);
     } catch (_) {
       collection.dispose();
       rethrow;
@@ -129,12 +138,12 @@ class RepositoryManager {
     bool sync = true,
   }) async {
     if (sync) {
-      await _backgroundSync.sync(_sync.typeFor<TRecord>());
+      await _backgroundSync.sync(_registry.typeFor<TRecord>());
     }
 
     final collection = await _getCol<TRecord>(colUid);
     try {
-      return _sync.createRepo<TRecord>(collection);
+      return _createRepo<TRecord>(collection);
     } catch (_) {
       collection.dispose();
       rethrow;
@@ -146,7 +155,7 @@ class RepositoryManager {
     bool sync = true,
   }) async {
     if (sync) {
-      await _backgroundSync.sync(_sync.typeFor<TRecord>());
+      await _backgroundSync.sync(_registry.typeFor<TRecord>());
     }
 
     final collection = await _getCol<TRecord>(colUid);
@@ -167,13 +176,15 @@ class RepositoryManager {
       _checkWritable(collection);
       await collection.setMeta(meta);
 
-      if (_sync.config.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
     } finally {
       collection.dispose();
     }
   }
+
+  // TODO handle deletion gracefully -> all items must be deleted!
 
   Future<void> delete<TRecord extends ItemRecord>(String colUid) async {
     Collection? collection;
@@ -182,7 +193,7 @@ class RepositoryManager {
       _checkWritable(collection);
       await collection.delete();
 
-      if (_sync.config.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
 
@@ -216,7 +227,7 @@ class RepositoryManager {
   }
 
   void _validateType<TRecord extends ItemRecord>(Collection instance) {
-    final expectedType = _sync.typeFor<TRecord>();
+    final expectedType = _registry.typeFor<TRecord>();
     if (instance.collectionType != expectedType) {
       final actType = instance.collectionType;
       throw CollectionTypeMismatch(
@@ -298,6 +309,20 @@ class RepositoryManager {
       );
     }
 
-    return _sync.createRepo<TRecord>(primaryCol);
+    return _createRepo<TRecord>(primaryCol);
+  }
+
+  Future<Repository<TRecord>> _createRepo<TRecord extends ItemRecord>(
+    Collection collection,
+  ) async {
+    final itemManager = _collectionManager.getItemManager(collection);
+    return Repository.internal(
+      _online,
+      collection,
+      _registry.itemFactoryFor<TRecord>(),
+      itemManager,
+      await _storageManager.createItemStore(collection, itemManager),
+      _config,
+    );
   }
 }

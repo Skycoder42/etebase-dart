@@ -1,41 +1,41 @@
 part of 'items.dart';
 
 class Repository<TRecord extends ItemRecord> {
-  final EtebaseSyncImpl _sync;
   final OnlineWrapper _online;
   final Collection _collection;
-  final RepositoryAdapter<TRecord> _adapter;
+  final ItemRecordFactory<TRecord> _factory;
   final ItemManager _itemManager;
   final ItemStore _store;
+  final SyncConfig _config;
 
   late final ItemBackgroundSync _backgroundSync;
 
   @visibleForTesting
   Repository.forTesting(
-    this._sync,
     this._online,
     this._collection,
-    this._adapter,
+    this._factory,
     this._itemManager,
     this._store,
+    this._config,
     this._backgroundSync,
   );
 
   @internal
   Repository.internal(
-    this._sync,
     this._online,
     this._collection,
-    this._adapter,
+    this._factory,
     this._itemManager,
     this._store,
+    this._config,
   ) {
     _backgroundSync = ItemBackgroundSync.forMode(
       _online,
       _store,
       _itemManager,
       this,
-      _sync.config.syncMode,
+      _config.syncMode,
     );
   }
 
@@ -116,7 +116,7 @@ class Repository<TRecord extends ItemRecord> {
         throw ItemDeleted(item.uid);
       }
 
-      final record = _adapter.createRecord(this, item);
+      final record = _factory.createRecord(this, item);
       await record.init(created: created);
       if (forceState != null) {
         record._state = forceState;
@@ -161,7 +161,7 @@ class Repository<TRecord extends ItemRecord> {
       record._state = RecordState.locked;
       await _saveToCache(record);
 
-      if (_sync.config.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(record.uid);
       }
     } finally {

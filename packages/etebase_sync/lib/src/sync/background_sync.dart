@@ -5,8 +5,8 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
-import '../api/exceptions/item_deleted.dart';
-import '../api/models/conflict_origin.dart';
+import '../exceptions/item_deleted.dart';
+import '../models/conflict_origin.dart';
 import '../online/online_wrapper.dart';
 import '../storage/save_result.dart';
 import '../storage/store.dart';
@@ -46,7 +46,7 @@ abstract base class BackgroundSync<
   @mustCallSuper
   Future<void> init() async {
     _cacheSub = store
-        .stream()
+        .streamModified()
         .mergeWith([_pendingUploadsAfterReconnect()])
         .asyncMap(_handleUpload)
         .whereNotNull()

@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
-import '../../api/exceptions/item_deleted.dart';
+import '../../exceptions/item_deleted.dart';
 import '../save_result.dart';
 import '../store.dart';
 import 'item_info.dart';
@@ -135,11 +135,11 @@ abstract base class HiveStore<
       });
 
   @override
-  Stream<String> stream() => MergeStream([
+  Stream<String> streamModified() => MergeStream([
     // stream all that are pending uploads
     listUids().asyncMap(_checkAndTrackPending).whereNotNull(),
-    // stream all future changes
-    itemBox.watch().where((e) => !e.deleted).map((e) => e.key as String),
+    // stream all future actual item modifications
+    itemBox.watch().where(_filterModified).map((e) => e.key as String),
   ]);
 
   @override
@@ -154,4 +154,12 @@ abstract base class HiveStore<
         _pendingUploads.add(uid);
         return uid;
       });
+
+  bool _filterModified(BoxEvent event) {
+    if (event.deleted) {
+      return false;
+    }
+    final info = event.value as TItemInfo;
+    return info.localEtag != info.remoteEtag;
+  }
 }

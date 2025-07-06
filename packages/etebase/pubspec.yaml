@@ -9,7 +9,7 @@ resolution: workspace
 
 dependencies:
   collection: ^1.19.1
-  freezed_annotation: ^3.0.0
+  freezed_annotation: ^3.1.0
   hive_ce: ^2.11.3
   http: ^1.4.0
   http_parser: ^4.1.2
@@ -17,7 +17,7 @@ dependencies:
   meta: ^1.16.0
   msgpack_codec: ^2.0.2
   sodium: ^3.4.5
-  synchronized: ^3.3.1
+  synchronized: ^3.4.0
   web: ^1.1.1
   web_socket_channel: ^3.0.3
 
@@ -27,7 +27,7 @@ dev_dependencies:
   custom_lint: ^0.7.5
   dart_pre_commit: ^5.4.5
   dart_test_tools: ^6.1.1
-  freezed: ^3.0.6
+  freezed: ^3.1.0
   json_serializable: ^6.9.5
   mockito: ^5.4.6
   path: ^1.9.1

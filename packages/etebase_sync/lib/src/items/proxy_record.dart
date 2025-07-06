@@ -4,7 +4,7 @@ import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 
-import '../api/exceptions/item_deleted.dart';
+import '../exceptions/item_deleted.dart';
 import 'items.dart';
 
 abstract class ProxyRecord<T extends Object> extends ItemRecord {

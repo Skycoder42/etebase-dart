@@ -1,7 +1,7 @@
 import 'package:etebase/etebase.dart';
 
-import '../items/items.dart';
+import 'items.dart';
 
-abstract interface class RepositoryAdapter<TRecord extends ItemRecord> {
+abstract interface class ItemRecordFactory<TRecord extends ItemRecord> {
   TRecord createRecord(Repository<TRecord> repository, Item item);
 }

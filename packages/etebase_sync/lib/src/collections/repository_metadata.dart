@@ -1,12 +1,10 @@
 // ignore_for_file: invalid_annotation_target for freezed
 
-/// @docImport '../repository.dart';
+/// @docImport '../items/items.dart';
 library;
 
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../repository.dart' show Repository;
 
 part 'repository_metadata.freezed.dart';
 part 'repository_metadata.g.dart';

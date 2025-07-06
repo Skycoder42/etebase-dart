@@ -1,1 +1,1 @@
-export 'src/api/models/repository_metadata.dart';
+export 'src/collections/repository_metadata.dart';

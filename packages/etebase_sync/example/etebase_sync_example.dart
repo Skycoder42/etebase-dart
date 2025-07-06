@@ -3,9 +3,9 @@ import 'dart:ffi';
 
 import 'package:etebase/etebase.dart';
 import 'package:etebase_sync/src/api/conflict_resolution/conflict_resolver.dart';
-import 'package:etebase_sync/src/api/models/repository_metadata.dart';
 import 'package:etebase_sync/src/api/online_checker.dart';
 import 'package:etebase_sync/src/api/repository.dart';
+import 'package:etebase_sync/src/collections/repository_metadata.dart';
 import 'package:etebase_sync/src/impl/etebase_sync_impl.dart';
 import 'package:etebase_sync/src/impl/sync_cache_impl.dart';
 import 'package:hive_ce/hive.dart';
