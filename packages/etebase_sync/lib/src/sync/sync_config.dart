@@ -4,6 +4,7 @@ import 'storage_mode.dart';
 import 'sync_mode.dart';
 
 part 'sync_config.freezed.dart';
+part 'sync_config.g.dart';
 
 @freezed
 sealed class SyncConfig with _$SyncConfig {
@@ -17,4 +18,7 @@ sealed class SyncConfig with _$SyncConfig {
     /// How to handle local storage caching
     @Default(StorageMode.cached) StorageMode storageMode,
   }) = _SyncConfig;
+
+  factory SyncConfig.fromJson(Map<String, dynamic> json) =>
+      _$SyncConfigFromJson(json);
 }

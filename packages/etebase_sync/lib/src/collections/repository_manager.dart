@@ -12,6 +12,7 @@ import '../items/factory_registry.dart';
 import '../items/items.dart';
 import '../models/conflict_origin.dart';
 import '../models/etebase_target.dart';
+import '../online/online_checker.dart';
 import '../online/online_wrapper.dart';
 import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
@@ -21,18 +22,19 @@ import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
 import 'repository_metadata.dart';
 
-@internal
 class RepositoryManager {
   final CollectionManager _collectionManager;
   final StorageManager _storageManager;
   final CollectionStore _store;
   final CollectionConflictResolver _conflictResolver;
   final FactoryRegistry _registry;
-  final CollectionBackgroundSync _backgroundSync;
   final SyncConfig _config;
   final OnlineWrapper _online;
 
-  RepositoryManager(
+  late final CollectionBackgroundSync _backgroundSync;
+
+  @visibleForTesting
+  RepositoryManager.internal(
     this._collectionManager,
     this._storageManager,
     this._registry,
@@ -42,6 +44,24 @@ class RepositoryManager {
     this._config,
     this._online,
   );
+
+  @internal
+  RepositoryManager.create(
+    this._collectionManager,
+    this._storageManager,
+    this._registry,
+    this._store,
+    this._conflictResolver,
+    this._config,
+    OnlineChecker online,
+  ) : _online = OnlineWrapper(online) {
+    _backgroundSync = CollectionBackgroundSync(
+      _online,
+      _store,
+      _collectionManager,
+      _conflictResolver,
+    );
+  }
 
   Future<Repository<TRecord>> openPrimary<TRecord extends ItemRecord>({
     bool sync = true,

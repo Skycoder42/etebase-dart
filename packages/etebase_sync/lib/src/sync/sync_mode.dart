@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'sync_mode.freezed.dart';
+part 'sync_mode.g.dart';
 
 @freezed
 sealed class SyncMode with _$SyncMode {
@@ -14,4 +15,7 @@ sealed class SyncMode with _$SyncMode {
   }) = SyncModePeriodic;
 
   const factory SyncMode.live() = SyncModeLive;
+
+  factory SyncMode.fromJson(Map<String, dynamic> json) =>
+      _$SyncModeFromJson(json);
 }

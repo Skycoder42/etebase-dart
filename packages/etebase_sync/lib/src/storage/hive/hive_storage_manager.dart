@@ -61,9 +61,9 @@ class HiveStorageManager implements StorageManager {
 
   @override
   Future<HiveCollectionStore> createCollectionStore(
-    CollectionManager itemManager,
+    CollectionManager collectionManager,
   ) async => HiveCollectionStore(
-    itemManager,
+    collectionManager,
     _stokenBox,
     await _getBox(_collectionBoxName),
   );
