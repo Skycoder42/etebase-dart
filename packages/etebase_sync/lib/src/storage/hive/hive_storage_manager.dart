@@ -4,7 +4,9 @@ import 'package:meta/meta.dart';
 
 import '../../../gen/package_metadata.dart' as meta;
 import '../../sync/storage_mode.dart';
+import '../account_store.dart';
 import '../storage_manager.dart';
+import 'hive_account_store.dart';
 import 'hive_collection_store .dart';
 import 'hive_item_store.dart';
 import 'item_info.dart';
@@ -49,6 +51,19 @@ class HiveStorageManager implements StorageManager {
   }
 
   @override
+  Future<AccountStore> createAccountStore() =>
+      Future.value(HiveAccountStore(_metaBox));
+
+  @override
+  Future<HiveCollectionStore> createCollectionStore(
+    CollectionManager collectionManager,
+  ) async => HiveCollectionStore(
+    collectionManager,
+    _stokenBox,
+    await _getBox(_collectionBoxName),
+  );
+
+  @override
   Future<HiveItemStore> createItemStore(
     Collection collection,
     ItemManager itemManager,
@@ -60,13 +75,16 @@ class HiveStorageManager implements StorageManager {
   );
 
   @override
-  Future<HiveCollectionStore> createCollectionStore(
-    CollectionManager collectionManager,
-  ) async => HiveCollectionStore(
-    collectionManager,
-    _stokenBox,
-    await _getBox(_collectionBoxName),
-  );
+  Future<void> erase() async {
+    for (final boxName in _knownBoxes) {
+      if (_hive.isBoxOpen(boxName)) {
+        await _box<dynamic>(boxName).close();
+      }
+      await _hive.deleteBoxFromDisk(boxName);
+    }
+    await _stokenBox.clear();
+    await _metaBox.clear();
+  }
 
   void _registerTypeAdapter<TType, TAdapter extends TypeAdapter<TType>>(
     TAdapter Function(int typeIdOffset) createAdapter,
@@ -103,14 +121,14 @@ class HiveStorageManager implements StorageManager {
     }
   }
 
-  Iterable<BoxBase<dynamic>> get _openBoxes sync* {
+  Iterable<String> get _knownBoxes sync* {
     for (final key in _metaBox.keys.whereType<String>()) {
       if (key.startsWith(_metaBoxKeyPrefix)) {
-        final boxName = key.substring(_metaBoxKeyPrefix.length);
-        if (_hive.isBoxOpen(boxName)) {
-          yield _box<dynamic>(boxName);
-        }
+        yield key.substring(_metaBoxKeyPrefix.length);
       }
     }
   }
+
+  Iterable<BoxBase<dynamic>> get _openBoxes =>
+      _knownBoxes.where(_hive.isBoxOpen).map(_box<dynamic>);
 }

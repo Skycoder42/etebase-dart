@@ -11,12 +11,14 @@ abstract interface class StorageManager {
 
   Future<AccountStore> createAccountStore();
 
+  Future<CollectionStore> createCollectionStore(
+    CollectionManager collectionManager,
+  );
+
   Future<ItemStore> createItemStore(
     Collection collection,
     ItemManager itemManager,
   );
 
-  Future<CollectionStore> createCollectionStore(
-    CollectionManager collectionManager,
-  );
+  Future<void> erase();
 }

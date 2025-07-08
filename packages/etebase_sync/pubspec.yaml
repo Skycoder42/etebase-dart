@@ -15,6 +15,7 @@ dependencies:
   meta: ^1.16.0
   msgpack_codec: ^2.0.2
   rxdart: ^0.28.0
+  sodium: ^3.4.5
   synchronized: ^3.4.0
 
 dev_dependencies:
@@ -25,7 +26,6 @@ dev_dependencies:
   freezed: ^3.1.0
   json_serializable: ^6.9.5
   mockito: ^5.4.6
-  sodium: ^3.4.5
   test: ^1.25.15
 
 cider:

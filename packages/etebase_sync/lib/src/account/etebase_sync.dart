@@ -2,12 +2,12 @@ import 'package:etebase/etebase.dart';
 
 import '../collections/collection_conflict_resolver.dart';
 import '../collections/repository_manager.dart';
+import '../crypto/key_manager.dart';
 import '../exceptions/already_logged_in.dart';
 import '../items/factory_registry.dart';
 import '../items/item_record_factory.dart';
 import '../items/items.dart';
 import '../online/online_checker.dart';
-import '../online/online_wrapper.dart';
 import '../storage/account_store.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
@@ -18,6 +18,7 @@ class EtebaseSync {
   final FactoryRegistry _registry;
   final CollectionConflictResolver _conflictResolver;
   final OnlineChecker _onlineChecker;
+  final KeyManager _keyManager;
 
   late final AccountStore _accountStore;
 
@@ -25,17 +26,18 @@ class EtebaseSync {
   Account? _account;
   RepositoryManager? _repoManager;
 
-  EtebaseSync._(
+  EtebaseSync(
     this._client,
     this._storageManager,
     this._registry,
     this._conflictResolver,
     this._onlineChecker,
+    this._keyManager,
   );
 
   Future<void> init() async {
     _accountStore = await _storageManager.createAccountStore();
-    _currentConfig = _accountStore.getSyncConfig();
+    _currentConfig = _accountStore.getSyncConfig() ?? const SyncConfig();
   }
 
   Future<void> dispose() async {
@@ -60,15 +62,92 @@ class EtebaseSync {
     // TODO handle update while running
   }
 
-  Future<void> login(String username, String password) async {
+  Future<void> login({
+    required String username,
+    required String password,
+  }) async {
     if (_account != null || _accountStore.hasAccount) {
       throw AlreadyLoggedIn();
     }
 
-    final account = _account = await Account.login(_client, username, password);
-    final savedAccount = await account.save(); // TODO use actual key
-    await _accountStore.saveAccount(savedAccount);
-    await _createRepoManager(account);
+    final account = await Account.login(_client, username, password);
+    await _persistNewAccount(account);
+  }
+
+  Future<void> signup({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    if (_account != null || _accountStore.hasAccount) {
+      throw AlreadyLoggedIn();
+    }
+
+    final account = await Account.signup(
+      _client,
+      User(username: username, email: email),
+      password,
+    );
+    await _persistNewAccount(account);
+  }
+
+  Future<void> restore() async {
+    if (_account != null) {
+      throw AlreadyLoggedIn();
+    } else if (!_accountStore.hasAccount) {
+      throw UnimplementedError(); // TODO
+    }
+
+    Account? account;
+    try {
+      // restore from storage
+      final restoredAccount = _accountStore.getAccount();
+      await _keyManager.loadKey();
+      account = await Account.restore(
+        _client,
+        restoredAccount,
+        _keyManager.accountKey,
+      );
+
+      // refresh tokens and persist again
+      await account.fetchToken();
+      final savedAccount = await account.save(_keyManager.accountKey);
+      await _accountStore.saveAccount(savedAccount);
+
+      await _createRepoManager(account);
+      _account = account;
+    } catch (_) {
+      account?.dispose();
+      rethrow;
+    }
+  }
+
+  Future<void> logOut() async {
+    if (_account == null && !_accountStore.hasAccount) {
+      throw UnimplementedError(); // TODO
+    }
+
+    _repoManager = null;
+    _account?.dispose();
+    _account = null;
+
+    await _storageManager.erase();
+
+    await _keyManager.discardKey();
+  }
+
+  Future<void> _persistNewAccount(Account account) async {
+    try {
+      await _keyManager.createKey();
+      final savedAccount = await account.save(_keyManager.accountKey);
+      await _accountStore.saveAccount(savedAccount);
+
+      await _createRepoManager(account);
+      _account = account;
+    } catch (_) {
+      account.dispose();
+      rethrow;
+    }
   }
 
   Future<void> _createRepoManager(Account account) async {
