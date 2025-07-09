@@ -18,6 +18,7 @@ import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
+import '../util/late_ref.dart';
 import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
 import 'repository_metadata.dart';
@@ -28,7 +29,7 @@ class RepositoryManager {
   final CollectionStore _store;
   final CollectionConflictResolver _conflictResolver;
   final FactoryRegistry _registry;
-  final SyncConfig _config;
+  final LateRef<SyncConfig> _config;
   final OnlineWrapper _online;
 
   late final CollectionBackgroundSync _backgroundSync;
@@ -61,6 +62,14 @@ class RepositoryManager {
       _collectionManager,
       _conflictResolver,
     );
+  }
+
+  Future<void> init() async {
+    await _backgroundSync.init();
+  }
+
+  Future<void> dispose() async {
+    await _backgroundSync.dispose();
   }
 
   Future<Repository<TRecord>> openPrimary<TRecord extends ItemRecord>({
@@ -142,7 +151,7 @@ class RepositoryManager {
       final result = await _store.saveLocal(collection, expectedEtag: null);
       collection = await _handleSaveResult(collection, result);
 
-      if (_config.waitForUpload) {
+      if (_config.current.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
 
@@ -194,9 +203,11 @@ class RepositoryManager {
 
     try {
       _checkWritable(collection);
+      final currentEtag = collection.etag;
       await collection.setMeta(meta);
+      await _store.saveLocal(collection, expectedEtag: currentEtag);
 
-      if (_config.waitForUpload) {
+      if (_config.current.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
     } finally {
@@ -211,9 +222,11 @@ class RepositoryManager {
     try {
       collection = await _getCol<TRecord>(colUid);
       _checkWritable(collection);
+      final currentEtag = collection.etag;
       await collection.delete();
+      await _store.saveLocal(collection, expectedEtag: currentEtag);
 
-      if (_config.waitForUpload) {
+      if (_config.current.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
 
@@ -336,7 +349,7 @@ class RepositoryManager {
     Collection collection,
   ) async {
     final itemManager = _collectionManager.getItemManager(collection);
-    return Repository.internal(
+    final repo = Repository.internal(
       _online,
       collection,
       _registry.itemFactoryFor<TRecord>(),
@@ -344,5 +357,7 @@ class RepositoryManager {
       await _storageManager.createItemStore(collection, itemManager),
       _config,
     );
+    await repo.init();
+    return repo;
   }
 }

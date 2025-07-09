@@ -13,10 +13,8 @@ class FactoryRegistry {
   void registerType<TRecord extends ItemRecord>(
     String collectionType,
     ItemRecordFactory<TRecord> factory,
-  ) => _repositoryConfig[TRecord] = (
-    collectionType: collectionType,
-    factory: factory,
-  );
+  ) => _repositoryConfig[TRecord] =
+      (collectionType: collectionType, factory: factory) as _Registration;
 
   String typeFor<TRecord extends ItemRecord>() =>
       _registration<TRecord>().collectionType;

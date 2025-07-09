@@ -99,8 +99,8 @@ class HiveStorageManager implements StorageManager {
       '$_itemBoxPrefix${collection.uid}';
 
   BoxBase<T> _box<T>(String boxName) => switch (_storageMode) {
-    StorageMode.cached => _hive.box(boxName),
-    StorageMode.lazy => _hive.lazyBox(boxName),
+    StorageMode.cached => _hive.box<T>(boxName),
+    StorageMode.lazy => _hive.lazyBox<T>(boxName),
   };
 
   Future<BoxBase<T>> _openBox<T>(String boxName) async =>
@@ -129,6 +129,12 @@ class HiveStorageManager implements StorageManager {
     }
   }
 
-  Iterable<BoxBase<dynamic>> get _openBoxes =>
-      _knownBoxes.where(_hive.isBoxOpen).map(_box<dynamic>);
+  Iterable<BoxBase<dynamic>> get _openBoxes => _knownBoxes
+      .where(_hive.isBoxOpen)
+      .map(
+        (boxName) => switch (boxName) {
+          _collectionBoxName => _box<CollectionInfo>(boxName),
+          _ => _box<ItemInfo>(boxName),
+        },
+      );
 }

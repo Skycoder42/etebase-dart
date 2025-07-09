@@ -2,6 +2,5 @@ import 'package:etebase/etebase.dart';
 
 import 'items.dart';
 
-abstract interface class ItemRecordFactory<TRecord extends ItemRecord> {
-  TRecord createRecord(Repository<TRecord> repository, Item item);
-}
+typedef ItemRecordFactory<TRecord extends ItemRecord> =
+    TRecord Function(Repository<TRecord> repository, Item item);

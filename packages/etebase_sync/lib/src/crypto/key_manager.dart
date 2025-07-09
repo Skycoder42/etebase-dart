@@ -36,6 +36,9 @@ class KeyManager {
   Future<void> loadKey() async {
     dispose();
     final masterKey = await _keystore.loadStorageKey(_prefix);
+    if (masterKey == null) {
+      throw UnimplementedError(); // TODO real exception
+    }
     try {
       _deriveKeys(masterKey);
     } finally {

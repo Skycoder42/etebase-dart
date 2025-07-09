@@ -16,6 +16,7 @@ import '../sync/background_sync.dart';
 import '../sync/sync_config.dart';
 import '../sync/sync_event.dart';
 import '../sync/sync_mode.dart';
+import '../util/late_ref.dart';
 import 'item_record_factory.dart';
 import 'record_state.dart';
 

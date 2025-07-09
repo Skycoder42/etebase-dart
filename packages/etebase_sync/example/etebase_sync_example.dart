@@ -1,62 +1,117 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:etebase/etebase.dart';
-import 'package:etebase_sync/src/api/conflict_resolution/conflict_resolver.dart';
-import 'package:etebase_sync/src/api/online_checker.dart';
-import 'package:etebase_sync/src/api/repository.dart';
+import 'package:etebase_sync/src/account/etebase_sync.dart';
+import 'package:etebase_sync/src/collections/collection_conflict_resolver.dart';
 import 'package:etebase_sync/src/collections/repository_metadata.dart';
-import 'package:etebase_sync/src/impl/etebase_sync_impl.dart';
-import 'package:etebase_sync/src/impl/sync_cache_impl.dart';
+import 'package:etebase_sync/src/crypto/key_manager.dart';
+import 'package:etebase_sync/src/crypto/keystore.dart';
+import 'package:etebase_sync/src/items/factory_registry.dart';
+import 'package:etebase_sync/src/items/proxy_record.dart';
+import 'package:etebase_sync/src/online/server_ping_online_checker.dart';
+import 'package:etebase_sync/src/storage/hive/hive_storage_manager.dart';
+import 'package:etebase_sync/src/sync/storage_mode.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium_sumo.dart';
+
+class InMemoryKeystore implements Keystore {
+  SecureKey? _key;
+
+  @override
+  Future<void> deleteStorageKey([String? prefix]) => Future.sync(() {
+    _key?.dispose();
+    _key = null;
+  });
+
+  @override
+  Future<SecureKey?> loadStorageKey([String? prefix]) => Future.value(_key);
+
+  @override
+  Future<void> saveStorageKey(SecureKey key, [String? prefix]) =>
+      Future.sync(() {
+        _key = key;
+      });
+}
+
+class StringRecord extends ProxyRecord<String> {
+  StringRecord(super.repository, super._item);
+
+  @override
+  dynamic encode(String data) => data;
+
+  @override
+  String decode(dynamic data) => data as String;
+}
 
 Future<void> main() async {
   final sodium = await SodiumSumoInit.init(
     // replace with wherever libsodium is located on your machine
-    () => DynamicLibrary.open('/usr/lib/libsodium.so'),
+    () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so'),
   );
+
   final client = Client.create(
     sodium,
     'etebase_sync_example',
     Uri.http('127.0.0.1:3735'),
-  )..registerCustomMetadata(RepositoryMetadata.fromJson);
-  final userdata = base64Url.encode(client.randombytes(24));
-  final account = await Account.signup(
-    client,
-    User(username: userdata, email: '$userdata@mail.com'),
-    base64.encode(client.randombytes(32)),
   );
 
-  final sync = EtebaseSyncImpl(
-    const OnlineChecker.alwaysOnline(),
-    const ConflictResolver.remote(),
-    account,
-    SyncCacheImpl(0, Hive),
-  )..registerRepositoryType<String>('test', Repository<String>.new);
+  Hive.init(Directory.systemTemp.createTempSync().path);
+
+  final sync = EtebaseSync(
+    client,
+    HiveStorageManager(0, Hive, StorageMode.cached),
+    FactoryRegistry(),
+    const CollectionConflictResolver(),
+    ServerPingOnlineChecker(client),
+    KeyManager(InMemoryKeystore(), sodium),
+  )..registerType('etebase_sync.example.string', StringRecord.new);
+  await sync.init();
+
+  final username = base64Url.encode(client.randombytes(24));
+  await sync.signup(
+    username: username,
+    email: '$username@mail.com',
+    password: base64.encode(client.randombytes(32)),
+  );
+
   final repoMgr = sync.repositoryManager;
 
-  final primary = await repoMgr.openPrimary<String>();
-  print(primary.collection.uid);
+  final primary = await repoMgr.openPrimary<StringRecord>();
+  print(primary.uid);
 
-  final all = await repoMgr.list<String>();
-  print(all);
+  // final all = await repoMgr.list<StringRecord>();
+  // print(all);
 
-  await repoMgr.create<String>(const RepositoryMetadata(name: 'Other'));
+  // final created = await repoMgr.create<StringRecord>(
+  //   const RepositoryMetadata(name: 'Other'),
+  // );
+  // print(created.uid);
 
-  await repoMgr.updateMeta<String>(
-    all.keys.single,
-    all.values.single.copyWith(name: 'Testing'),
-  );
+  // await repoMgr.updateMeta<StringRecord>(
+  //   all.keys.single,
+  //   all.values.single.copyWith(name: 'Testing'),
+  // );
 
-  print(await repoMgr.list<String>());
+  // print(await repoMgr.list<StringRecord>());
 
-  await repoMgr.delete<String>(all.keys.single);
+  // await repoMgr.delete<StringRecord>(all.keys.single);
 
-  print(await repoMgr.list<String>());
+  // print(await repoMgr.list<StringRecord>());
 
-  final newPrimary = await repoMgr.openPrimary<String>();
-  print(newPrimary.collection.uid);
+  // final newPrimary = await repoMgr.openPrimary<StringRecord>();
+  // print(newPrimary.uid);
 
-  print(await repoMgr.getMeta<String>(newPrimary.collection.uid));
+  // print(await repoMgr.getMeta<StringRecord>(newPrimary.uid));
+
+  print('disposing1');
+  await primary.dispose();
+  print('disposing2');
+  // await created.dispose();
+  print('disposing3');
+  // await newPrimary.dispose();
+  print('disposing4');
+  await sync.dispose();
+  print('disposed');
 }

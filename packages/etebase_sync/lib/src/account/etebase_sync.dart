@@ -1,9 +1,11 @@
 import 'package:etebase/etebase.dart';
 
+import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
 import '../collections/repository_manager.dart';
 import '../crypto/key_manager.dart';
 import '../exceptions/already_logged_in.dart';
+import '../exceptions/not_logged_in.dart';
 import '../items/factory_registry.dart';
 import '../items/item_record_factory.dart';
 import '../items/items.dart';
@@ -11,6 +13,7 @@ import '../online/online_checker.dart';
 import '../storage/account_store.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
+import '../util/late_ref.dart';
 
 class EtebaseSync {
   final Client _client;
@@ -22,7 +25,7 @@ class EtebaseSync {
 
   late final AccountStore _accountStore;
 
-  late SyncConfig _currentConfig;
+  final _config = LateRef<SyncConfig>();
   Account? _account;
   RepositoryManager? _repoManager;
 
@@ -36,19 +39,26 @@ class EtebaseSync {
   );
 
   Future<void> init() async {
+    _client.registerCustomMetadata(RepositoryMetadata.fromJson);
+
+    await _storageManager.init();
     _accountStore = await _storageManager.createAccountStore();
-    _currentConfig = _accountStore.getSyncConfig() ?? const SyncConfig();
+    _config.current = _accountStore.getSyncConfig() ?? const SyncConfig();
   }
 
   Future<void> dispose() async {
-    await Future.wait([_client.dispose(), _storageManager.dispose()]);
+    await Future.wait([
+      ?_repoManager?.dispose(),
+      _client.dispose(),
+      _storageManager.dispose(),
+    ]);
   }
 
-  SyncConfig get config => _currentConfig;
+  SyncConfig get config => _config.current;
 
   RepositoryManager get repositoryManager => switch (_repoManager) {
     final RepositoryManager rm => rm,
-    _ => throw UnimplementedError(), // TODO real exception
+    _ => throw NotLoggedIn(),
   };
 
   void registerType<TRecord extends ItemRecord>(
@@ -57,9 +67,8 @@ class EtebaseSync {
   ) => _registry.registerType<TRecord>(collectionType, factory);
 
   Future<void> updateConfig(SyncConfig config) async {
-    _currentConfig = config;
     await _accountStore.saveSyncConfig(config);
-    // TODO handle update while running
+    _config.current = config;
   }
 
   Future<void> login({
@@ -95,7 +104,7 @@ class EtebaseSync {
     if (_account != null) {
       throw AlreadyLoggedIn();
     } else if (!_accountStore.hasAccount) {
-      throw UnimplementedError(); // TODO
+      throw NotLoggedIn();
     }
 
     Account? account;
@@ -124,9 +133,10 @@ class EtebaseSync {
 
   Future<void> logOut() async {
     if (_account == null && !_accountStore.hasAccount) {
-      throw UnimplementedError(); // TODO
+      throw NotLoggedIn();
     }
 
+    await _repoManager?.dispose();
     _repoManager = null;
     _account?.dispose();
     _account = null;
@@ -151,15 +161,17 @@ class EtebaseSync {
   }
 
   Future<void> _createRepoManager(Account account) async {
+    await _repoManager?.dispose();
     _repoManager = RepositoryManager.create(
       account.collectionManager,
       _storageManager,
       _registry,
       await _storageManager.createCollectionStore(account.collectionManager),
       _conflictResolver,
-      _currentConfig, // TODO handle changes
+      _config, // TODO handle changes
       _onlineChecker,
     );
+    await _repoManager!.init();
   }
 
   factory EtebaseSync.instance() => throw UnimplementedError();

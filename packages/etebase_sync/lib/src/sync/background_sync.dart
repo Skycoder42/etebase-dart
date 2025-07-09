@@ -69,11 +69,10 @@ abstract base class BackgroundSync<
 
   @mustCallSuper
   Future<void> dispose() async {
-    await Future.wait([
-      _remoteSub.cancel(),
-      _cacheSub.cancel(),
-      _syncedController.close(),
-    ]);
+    // do not await, as for broadcast streams it may never complete
+    unawaited(_remoteSub.cancel());
+    unawaited(_cacheSub.cancel());
+    unawaited(_syncedController.close());
   }
 
   @visibleForOverriding

@@ -6,7 +6,7 @@ class Repository<TRecord extends ItemRecord> {
   final ItemRecordFactory<TRecord> _factory;
   final ItemManager _itemManager;
   final ItemStore _store;
-  final SyncConfig _config;
+  final LateRef<SyncConfig> _config;
 
   late final ItemBackgroundSync _backgroundSync;
 
@@ -30,12 +30,13 @@ class Repository<TRecord extends ItemRecord> {
     this._store,
     this._config,
   ) {
+    // TODO recreate background sync when config changes
     _backgroundSync = ItemBackgroundSync.forMode(
       _online,
       _store,
       _itemManager,
       this,
-      _config.syncMode,
+      _config.current.syncMode,
     );
   }
 
@@ -43,6 +44,10 @@ class Repository<TRecord extends ItemRecord> {
 
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
+
+  Future<void> init() async {
+    await _backgroundSync.init();
+  }
 
   Future<void> dispose() async {
     await _backgroundSync.dispose();
@@ -116,7 +121,7 @@ class Repository<TRecord extends ItemRecord> {
         throw ItemDeleted(item.uid);
       }
 
-      final record = _factory.createRecord(this, item);
+      final record = _factory(this, item);
       await record.init(created: created);
       if (forceState != null) {
         record._state = forceState;
@@ -161,7 +166,7 @@ class Repository<TRecord extends ItemRecord> {
       record._state = RecordState.locked;
       await _saveToCache(record);
 
-      if (_config.waitForUpload) {
+      if (_config.current.waitForUpload) {
         await _backgroundSync.waitForSync(record.uid);
       }
     } finally {
