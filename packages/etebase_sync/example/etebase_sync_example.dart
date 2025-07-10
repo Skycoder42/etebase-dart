@@ -13,6 +13,7 @@ import 'package:etebase_sync/src/items/proxy_record.dart';
 import 'package:etebase_sync/src/online/server_ping_online_checker.dart';
 import 'package:etebase_sync/src/storage/hive/hive_storage_manager.dart';
 import 'package:etebase_sync/src/sync/storage_mode.dart';
+import 'package:etebase_sync/src/sync/sync_mode.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:sodium/sodium_sumo.dart';
 
@@ -68,6 +69,9 @@ Future<void> main() async {
     KeyManager(InMemoryKeystore(), sodium),
   )..registerType('etebase_sync.example.string', StringRecord.new);
   await sync.init();
+  // await sync.updateConfig(
+  //   sync.config.copyWith(syncMode: const SyncMode.manual()),
+  // );
 
   final username = base64Url.encode(client.randombytes(24));
   await sync.signup(
@@ -81,36 +85,36 @@ Future<void> main() async {
   final primary = await repoMgr.openPrimary<StringRecord>();
   print(primary.uid);
 
-  // final all = await repoMgr.list<StringRecord>();
-  // print(all);
+  final all = await repoMgr.list<StringRecord>();
+  print(all);
 
-  // final created = await repoMgr.create<StringRecord>(
-  //   const RepositoryMetadata(name: 'Other'),
-  // );
-  // print(created.uid);
+  final created = await repoMgr.create<StringRecord>(
+    const RepositoryMetadata(name: 'Other'),
+  );
+  print(created.uid);
 
-  // await repoMgr.updateMeta<StringRecord>(
-  //   all.keys.single,
-  //   all.values.single.copyWith(name: 'Testing'),
-  // );
+  await repoMgr.updateMeta<StringRecord>(
+    all.keys.single,
+    all.values.single.copyWith(name: 'Testing'),
+  );
 
-  // print(await repoMgr.list<StringRecord>());
+  print(await repoMgr.list<StringRecord>());
 
-  // await repoMgr.delete<StringRecord>(all.keys.single);
+  await repoMgr.delete<StringRecord>(all.keys.single);
 
-  // print(await repoMgr.list<StringRecord>());
+  print(await repoMgr.list<StringRecord>());
 
-  // final newPrimary = await repoMgr.openPrimary<StringRecord>();
-  // print(newPrimary.uid);
+  final newPrimary = await repoMgr.openPrimary<StringRecord>();
+  print(newPrimary.uid);
 
-  // print(await repoMgr.getMeta<StringRecord>(newPrimary.uid));
+  print(await repoMgr.getMeta<StringRecord>(newPrimary.uid));
 
   print('disposing1');
   await primary.dispose();
   print('disposing2');
-  // await created.dispose();
+  await created.dispose();
   print('disposing3');
-  // await newPrimary.dispose();
+  await newPrimary.dispose();
   print('disposing4');
   await sync.dispose();
   print('disposed');

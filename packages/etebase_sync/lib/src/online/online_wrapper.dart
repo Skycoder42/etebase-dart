@@ -89,28 +89,16 @@ class OnlineWrapper {
   Stream<T> streamOnline<T>(
     Stream<T> Function() callback, {
     Stream<T> Function()? whenOffline,
-  }) async* {
-    if (await isOnline) {
-      try {
-        // TODO can be done cleaner? Ideally, the stream continues on other
-        // errors and only aborts on offline errors
-        await for (final event in callback()) {
-          yield event;
-        }
-        return;
-      } on ConnectionProblem {
-        _resetOnlineStatus();
-        // break
-      } on TemporaryServerProblem {
-        _resetOnlineStatus();
-        // break
-      } catch (_) {
-        rethrow;
-      }
-    }
-
-    yield* whenOffline?.call() ?? const Stream.empty();
-  }
+  }) => Stream.fromFuture(isOnline)
+      .asyncExpand(
+        (isOnline) =>
+            isOnline ? callback() : whenOffline?.call() ?? Stream<T>.empty(),
+      )
+      // TODO use transformer to exit on these errors
+      .handleError(
+        test: (e) => e is ConnectionProblem || e is TemporaryServerProblem,
+        (Object _) {},
+      );
 
   Future<void> _listen() async {
     await _subscription?.cancel();

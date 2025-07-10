@@ -195,8 +195,8 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
 
   @override
   Future<void> dispose() async {
-    if (_syncBlocker case final Completer<bool> completer
-        when !completer.isCompleted) {
+    final completer = _syncBlocker ??= Completer<bool>();
+    if (!completer.isCompleted) {
       completer.complete(false);
     }
 
