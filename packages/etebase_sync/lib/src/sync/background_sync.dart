@@ -6,6 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
 import '../exceptions/item_deleted.dart';
+import '../logging/sync_logger.dart';
 import '../models/conflict_origin.dart';
 import '../online/online_wrapper.dart';
 import '../storage/save_result.dart';
@@ -24,6 +25,8 @@ abstract base class BackgroundSync<
   final OnlineWrapper online;
   @protected
   final TStore store;
+  @protected
+  final SyncLogger logger;
 
   final _syncLock = Lock();
   final _syncedController = StreamController<SyncEvent>.broadcast(sync: true);
@@ -36,7 +39,7 @@ abstract base class BackgroundSync<
   @protected
   bool get isDownSyncActive => _downSyncActive;
 
-  BackgroundSync(this.online, this.store);
+  BackgroundSync(this.online, this.store, this.logger);
 
   Stream<SyncEvent> get syncEvents => _syncedController.stream;
 
@@ -52,7 +55,7 @@ abstract base class BackgroundSync<
         .whereNotNull()
         .listen(
           _syncedController.add,
-          onError: _handleError,
+          onError: (Object e, StackTrace s) => _handleError('upload', e, s),
           // TODO handle onDone
           cancelOnError: false,
         );
@@ -61,7 +64,7 @@ abstract base class BackgroundSync<
         .asyncExpand(_handleResponse)
         .listen(
           _syncedController.add,
-          onError: _handleError,
+          onError: (Object e, StackTrace s) => _handleError('download', e, s),
           // TODO handle onDone
           cancelOnError: false,
         );
@@ -77,6 +80,9 @@ abstract base class BackgroundSync<
 
   @visibleForOverriding
   Stream<TResponse> streamRemote();
+
+  @visibleForOverriding
+  bool shouldSkip(TItem item) => false;
 
   @visibleForOverriding
   Future<void> updateStoken(TResponse response);
@@ -103,42 +109,52 @@ abstract base class BackgroundSync<
       .expand((_) => store.getPendingUploads());
 
   Future<SyncEvent?> _handleUpload(String uid) => _syncLock.synchronized(
-    () => online.runOnline(() async {
-      final item = await store.getItem(uid, forUpload: true);
-      if (item == null) {
-        return null;
-      }
+    () => online.runOnline(
+      () async {
+        final item = await store.getItem(uid, forUpload: true);
+        if (item == null) {
+          logger.uploadSkipped(uid);
+          return null;
+        }
 
-      try {
-        await upload(item);
-        final remoteEtag = item.etag;
-        final result = await store.saveUploaded(item);
-        final savedEtag = await _handleSaveResult(item, remoteEtag, result);
-        return _createEvent(
-          uid: uid,
-          remoteEtag: remoteEtag,
-          cacheEtag: savedEtag,
-        );
-      } on Conflict {
-        final remoteItem = await download(item.uid);
-        final remoteEtag = remoteItem.etag;
-        final resolvedEtag = await _resolveConflict(
-          remote: remoteItem,
-          cache: item,
-          remoteEtag: remoteEtag,
-          origin: ConflictOrigin.server,
-        );
-        return _createEvent(
-          uid: uid,
-          remoteEtag: remoteEtag,
-          cacheEtag: resolvedEtag,
-        );
-      } finally {
-        // disposing items multiple times is save, so dispose even
-        // if already disposed by conflict handling
-        item.dispose();
-      }
-    }, whenOffline: () => SyncEvent.offline(uid)),
+        try {
+          final remoteEtag = item.etag;
+          logger.uploadStarted(uid, remoteEtag);
+          await upload(item);
+          logger.uploadAccepted(uid, remoteEtag);
+          final result = await store.saveUploaded(item);
+          final savedEtag = await _handleSaveResult(item, remoteEtag, result);
+          return _createEvent(
+            uid: uid,
+            remoteEtag: remoteEtag,
+            cacheEtag: savedEtag,
+          );
+        } on Conflict {
+          logger.downloadItem(uid);
+          final remoteItem = await download(uid);
+          final remoteEtag = remoteItem.etag;
+          final resolvedEtag = await _resolveConflict(
+            remote: remoteItem,
+            cache: item,
+            remoteEtag: remoteEtag,
+            origin: ConflictOrigin.server,
+          );
+          return _createEvent(
+            uid: uid,
+            remoteEtag: remoteEtag,
+            cacheEtag: resolvedEtag,
+          );
+        } finally {
+          // disposing items multiple times is save, so dispose even
+          // if already disposed by conflict handling
+          item.dispose();
+        }
+      },
+      whenOffline: () {
+        logger.uploadOffline(uid);
+        return SyncEvent.offline(uid);
+      },
+    ),
   );
 
   Stream<SyncEvent> _handleResponse(TResponse response) async* {
@@ -147,8 +163,14 @@ abstract base class BackgroundSync<
       yield SyncEvent.downloadStarted(scopeFor(response));
     }
 
+    logger.downloadResponse(response);
     for (final item in response.data) {
       try {
+        if (shouldSkip(item)) {
+          logger.downloadSkipped(item.uid);
+          continue;
+        }
+
         yield await _syncLock.synchronized(() async {
           final result = await store.saveRemote(item);
           final savedEtag = await _handleSaveResult(item, item.etag, result);
@@ -158,7 +180,9 @@ abstract base class BackgroundSync<
         // ignore: avoid_catches_without_on_clauses
       } catch (e, s) {
         // workaround, as one cannot yield multiple exceptions from an async*
-        _handleError(e, s);
+        _handleError('download', e, s);
+      } finally {
+        item.dispose();
       }
     }
 
@@ -174,15 +198,20 @@ abstract base class BackgroundSync<
     TItem item,
     String remoteEtag,
     SaveResult<TItem> result,
-  ) async => switch (result) {
-    SaveOk(:final etag) => etag,
-    SaveConflict(:final cacheItem) => await _resolveConflict(
-      remote: item,
-      cache: cacheItem,
-      remoteEtag: remoteEtag,
-      origin: ConflictOrigin.cache,
-    ),
-  };
+  ) async {
+    switch (result) {
+      case SaveOk(:final etag):
+        logger.saved(item.uid, cacheEtag: etag, remoteEtag: remoteEtag);
+        return etag;
+      case SaveConflict(:final cacheItem):
+        return await _resolveConflict(
+          remote: item,
+          cache: cacheItem,
+          remoteEtag: remoteEtag,
+          origin: ConflictOrigin.cache,
+        );
+    }
+  }
 
   Future<String> _resolveConflict({
     required TItem remote,
@@ -192,6 +221,12 @@ abstract base class BackgroundSync<
   }) async {
     try {
       final cacheEtag = cache.etag;
+      logger.conflict(
+        remote.uid,
+        cacheEtag: cacheEtag,
+        remoteEtag: remoteEtag,
+        itemEtag: remote.etag,
+      );
       await resolveConflict(remote, cache, origin);
       final result = await store.saveLocal(
         remote,
@@ -233,11 +268,11 @@ abstract base class BackgroundSync<
     }
   }
 
-  void _handleError(Object error, StackTrace stackTrace) {
+  void _handleError(String context, Object error, StackTrace stackTrace) {
+    logger.error(context, error, stackTrace);
+
     if (_syncedController.hasListener) {
       _syncedController.addError(error, stackTrace);
-    } else {
-      Zone.current.handleUncaughtError(error, stackTrace);
     }
   }
 }

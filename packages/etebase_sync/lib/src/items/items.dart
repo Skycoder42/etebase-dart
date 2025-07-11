@@ -3,10 +3,12 @@ import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../exceptions/item_deleted.dart';
 import '../exceptions/read_only.dart';
+import '../logging/sync_logger.dart';
 import '../models/conflict_origin.dart';
 import '../models/etebase_target.dart';
 import '../online/online_wrapper.dart';

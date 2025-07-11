@@ -5,12 +5,15 @@ abstract base class ItemBackgroundSync
     extends BackgroundSync<Item, ItemListResponse<Item>, ItemStore> {
   final ItemManager _itemManager;
   final Repository _repository;
+  final String _colUid;
 
   ItemBackgroundSync(
     super.online,
     super.store,
     this._itemManager,
     this._repository,
+    this._colUid,
+    super.logger,
   );
 
   factory ItemBackgroundSync.forMode(
@@ -18,6 +21,8 @@ abstract base class ItemBackgroundSync
     ItemStore store,
     ItemManager itemManager,
     Repository repository,
+    String colUid,
+    SyncLogger logger,
     SyncMode syncMode,
   ) => switch (syncMode) {
     SyncModeManual() => _ManualBackgroundSync(
@@ -25,6 +30,8 @@ abstract base class ItemBackgroundSync
       store,
       itemManager,
       repository,
+      colUid,
+      logger,
     ),
     SyncModePeriodic(:final period, :final fireImmediately) =>
       _PeriodicBackgroundSync(
@@ -32,6 +39,8 @@ abstract base class ItemBackgroundSync
         store,
         itemManager,
         repository,
+        colUid,
+        logger,
         period: period,
         fireImmediately: fireImmediately,
       ),
@@ -40,10 +49,15 @@ abstract base class ItemBackgroundSync
       store,
       itemManager,
       repository,
+      colUid,
+      logger,
     ),
   };
 
   Future<void> sync();
+
+  @override
+  bool shouldSkip(Item item) => item.uid == _colUid;
 
   @override
   Future<void> updateStoken(ItemListResponse<Item> response) async =>
@@ -88,6 +102,8 @@ abstract base class _PullBasedBackgroundSync extends ItemBackgroundSync {
     super.store,
     super._itemManager,
     super._repository,
+    super._colUid,
+    super.logger,
   );
 
   Stream<ItemListResponse<Item>> _fetchUpdates(String? stoken) {
@@ -95,6 +111,7 @@ abstract base class _PullBasedBackgroundSync extends ItemBackgroundSync {
     return online.streamOnline<ItemListResponse<Item>>(
       () async* {
         do {
+          logger.downloadFetching(stoken);
           response = await _itemManager.list(
             ItemFetchOptions(
               stoken: response?.stoken ?? stoken,
@@ -104,13 +121,16 @@ abstract base class _PullBasedBackgroundSync extends ItemBackgroundSync {
           yield response!;
         } while (!response!.isDone);
       },
-      whenOffline: () => Stream.value(
-        ItemListResponse(
-          data: const [],
-          stoken: response?.stoken ?? stoken,
-          isDone: true,
-        ),
-      ),
+      whenOffline: () {
+        logger.downloadOffline();
+        return Stream.value(
+          ItemListResponse(
+            data: const [],
+            stoken: response?.stoken ?? stoken,
+            isDone: true,
+          ),
+        );
+      },
     );
   }
 }
@@ -123,6 +143,8 @@ final class _ManualBackgroundSync extends _PullBasedBackgroundSync {
     super.store,
     super._itemManager,
     super._repository,
+    super._colUid,
+    super.logger,
   );
 
   @override
@@ -132,6 +154,7 @@ final class _ManualBackgroundSync extends _PullBasedBackgroundSync {
   @override
   Future<void> sync() async {
     if (!isDownSyncActive) {
+      logger.downloadTriggered('Manual sync');
       _controller.add(await store.getStoken());
     }
 
@@ -153,7 +176,9 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
     super.online,
     super.store,
     super._itemManager,
-    super._repository, {
+    super._repository,
+    super._colUid,
+    super.logger, {
     required this.period,
     required this.fireImmediately,
   });
@@ -165,6 +190,7 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
   @override
   Future<void> sync() async {
     if (!isDownSyncActive) {
+      logger.downloadTriggered('Manual sync');
       _controller.add(await store.getStoken());
     }
 
@@ -172,15 +198,24 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
   }
 
   @override
-  Stream<ItemListResponse<Item>> streamRemote() => MergeStream([
-    // periodic sync
-    Stream<void>.periodic(period).asyncMap((_) => store.getStoken()),
-    if (fireImmediately)
-      // initial sync, as periodic only emits after the first period expired
-      Stream.fromFuture(store.getStoken()),
-    // manual sync
-    _controller.stream,
-  ]).asyncExpand(_fetchUpdates);
+  Stream<ItemListResponse<Item>> streamRemote() {
+    if (fireImmediately) {
+      logger.downloadTriggered('Periodic timer trigger');
+    }
+
+    return MergeStream([
+      // periodic sync
+      Stream<void>.periodic(period).asyncMap((_) {
+        logger.downloadTriggered('Periodic timer trigger');
+        return store.getStoken();
+      }),
+      if (fireImmediately)
+        // initial sync, as periodic only emits after the first period expired
+        Stream.fromFuture(store.getStoken()),
+      // manual sync
+      _controller.stream,
+    ]).asyncExpand(_fetchUpdates);
+  }
 }
 
 final class _LiveBackgroundSync extends ItemBackgroundSync {
@@ -191,6 +226,8 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
     super.store,
     super._itemManager,
     super._repository,
+    super._colUid,
+    super.logger,
   );
 
   @override
@@ -222,11 +259,14 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
   @override
   Stream<ItemListResponse<Item>> streamRemote() async* {
     while ((await _syncBlocker?.future) ?? true) {
+      logger.downloadWaiting();
       await online.waitForOnline();
 
+      logger.downloadTriggered('Live sync (re)start');
       yield* online
           .streamOnline(() async* {
             final stoken = await store.getStoken();
+            logger.downloadFetching(stoken);
             yield* _itemManager.subscribeChanges(
               ItemFetchOptions(stoken: stoken, withCollection: false),
             );

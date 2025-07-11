@@ -128,7 +128,7 @@ abstract base class HiveStore<
           _pendingUploads.remove(item.uid);
           return SaveResult.ok(item.etag);
         } else {
-          await itemBox.put(item.uid, cacheItem.withRemoteEtag(item.etag));
+          await itemBox.put(item.uid, createItemInfo(item, item.etag));
           _pendingUploads.remove(item.uid);
           return SaveResult.ok(item.etag);
         }

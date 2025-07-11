@@ -4,17 +4,17 @@ import 'dart:io';
 
 import 'package:etebase/etebase.dart';
 import 'package:etebase_sync/src/account/etebase_sync.dart';
+import 'package:etebase_sync/src/account/key_manager.dart';
+import 'package:etebase_sync/src/account/keystore.dart';
 import 'package:etebase_sync/src/collections/collection_conflict_resolver.dart';
 import 'package:etebase_sync/src/collections/repository_metadata.dart';
-import 'package:etebase_sync/src/crypto/key_manager.dart';
-import 'package:etebase_sync/src/crypto/keystore.dart';
 import 'package:etebase_sync/src/items/factory_registry.dart';
 import 'package:etebase_sync/src/items/proxy_record.dart';
 import 'package:etebase_sync/src/online/server_ping_online_checker.dart';
 import 'package:etebase_sync/src/storage/hive/hive_storage_manager.dart';
 import 'package:etebase_sync/src/sync/storage_mode.dart';
-import 'package:etebase_sync/src/sync/sync_mode.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:logging/logging.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 class InMemoryKeystore implements Keystore {
@@ -47,6 +47,10 @@ class StringRecord extends ProxyRecord<String> {
 }
 
 Future<void> main() async {
+  Logger.root
+    ..level = Level.ALL
+    ..onRecord.listen(print);
+
   final sodium = await SodiumSumoInit.init(
     // replace with wherever libsodium is located on your machine
     () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so'),
@@ -69,9 +73,6 @@ Future<void> main() async {
     KeyManager(InMemoryKeystore(), sodium),
   )..registerType('etebase_sync.example.string', StringRecord.new);
   await sync.init();
-  // await sync.updateConfig(
-  //   sync.config.copyWith(syncMode: const SyncMode.manual()),
-  // );
 
   final username = base64Url.encode(client.randombytes(24));
   await sync.signup(
@@ -82,40 +83,58 @@ Future<void> main() async {
 
   final repoMgr = sync.repositoryManager;
 
+  print('>>>>>>>>> openPrimary');
   final primary = await repoMgr.openPrimary<StringRecord>();
-  print(primary.uid);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< ${primary.uid}');
 
+  print('>>>>>>>>> list');
   final all = await repoMgr.list<StringRecord>();
-  print(all);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< $all');
 
+  print('>>>>>>>>> create');
   final created = await repoMgr.create<StringRecord>(
     const RepositoryMetadata(name: 'Other'),
   );
-  print(created.uid);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< ${created.uid}');
 
+  print('>>>>>>>>> updateMeta');
   await repoMgr.updateMeta<StringRecord>(
     all.keys.single,
     all.values.single.copyWith(name: 'Testing'),
   );
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<<');
 
-  print(await repoMgr.list<StringRecord>());
+  print('>>>>>>>>> list');
+  final all2 = await repoMgr.list<StringRecord>();
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< $all2');
 
+  print('>>>>>>>>> delete');
   await repoMgr.delete<StringRecord>(all.keys.single);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<<');
 
-  print(await repoMgr.list<StringRecord>());
+  print('>>>>>>>>> list');
+  final all3 = await repoMgr.list<StringRecord>(sync: false);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< $all3');
 
+  print('>>>>>>>>> openPrimary');
   final newPrimary = await repoMgr.openPrimary<StringRecord>();
-  print(newPrimary.uid);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< ${newPrimary.uid}');
 
-  print(await repoMgr.getMeta<StringRecord>(newPrimary.uid));
+  print('>>>>>>>>> getMeta');
+  final meta = await repoMgr.getMeta<StringRecord>(newPrimary.uid);
+  await Future<void>.delayed(const Duration(seconds: 1));
+  print('<<<<<<<<< $meta');
 
-  print('disposing1');
   await primary.dispose();
-  print('disposing2');
   await created.dispose();
-  print('disposing3');
   await newPrimary.dispose();
-  print('disposing4');
   await sync.dispose();
-  print('disposed');
 }

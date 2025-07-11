@@ -36,6 +36,9 @@ class Repository<TRecord extends ItemRecord> {
       _store,
       _itemManager,
       this,
+      _collection.uid,
+      // TODO fix this
+      SyncLogger(Logger('etebase_sync.repository.${_collection.uid}'), 'item'),
       _config.current.syncMode,
     );
   }

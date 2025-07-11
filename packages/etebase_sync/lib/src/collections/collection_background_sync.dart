@@ -33,6 +33,7 @@ final class CollectionBackgroundSync
     super.store,
     this._collectionManager,
     this._conflictResolver,
+    super.logger,
   );
 
   @override
@@ -42,6 +43,7 @@ final class CollectionBackgroundSync
   Future<void> sync(String collectionType) async {
     // TODO this if condition wont work
     if (!isDownSyncActive) {
+      logger.downloadTriggered('Manual sync');
       _controller.add((
         collectionType: collectionType,
         stoken: await store.getStoken(collectionType),
@@ -98,21 +100,26 @@ final class CollectionBackgroundSync
         .streamOnline<CollectionListResponse<Collection>>(
           () async* {
             do {
+              final stoken = response?.stoken ?? request.stoken;
+              logger.downloadFetching(stoken);
               response = await _collectionManager.list(
                 request.collectionType,
-                FetchOptions(stoken: response?.stoken ?? request.stoken),
+                FetchOptions(stoken: stoken),
               );
               await _handleRemovedMemberships(response!);
               yield response!;
             } while (!response!.isDone);
           },
-          whenOffline: () => Stream.value(
-            CollectionListResponse(
-              data: const [],
-              stoken: response?.stoken ?? request.stoken,
-              isDone: true,
-            ),
-          ),
+          whenOffline: () {
+            logger.downloadOffline();
+            return Stream.value(
+              CollectionListResponse(
+                data: const [],
+                stoken: response?.stoken ?? request.stoken,
+                isDone: true,
+              ),
+            );
+          },
         )
         .doOnData(
           (response) =>
@@ -125,6 +132,7 @@ final class CollectionBackgroundSync
   ) async {
     if (response.removedMemberships case final List<RemovedCollection> cols) {
       for (final RemovedCollection(:uid) in cols) {
+        logger.downloadRemoved(uid);
         // TODO handle this
       }
     }

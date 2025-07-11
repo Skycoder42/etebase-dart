@@ -3,7 +3,7 @@ import 'package:etebase/etebase.dart';
 import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
 import '../collections/repository_manager.dart';
-import '../crypto/key_manager.dart';
+import 'key_manager.dart';
 import '../exceptions/already_logged_in.dart';
 import '../exceptions/not_logged_in.dart';
 import '../items/factory_registry.dart';

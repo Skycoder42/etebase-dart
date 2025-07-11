@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logging/logging.dart';
 
 import '../exceptions/cache_miss.dart';
 import '../exceptions/collection_type_mismatch.dart';
@@ -10,6 +11,7 @@ import '../exceptions/read_only.dart';
 import '../exceptions/unresolved_conflict.dart';
 import '../items/factory_registry.dart';
 import '../items/items.dart';
+import '../logging/sync_logger.dart';
 import '../models/conflict_origin.dart';
 import '../models/etebase_target.dart';
 import '../online/online_checker.dart';
@@ -61,6 +63,7 @@ class RepositoryManager {
       _store,
       _collectionManager,
       _conflictResolver,
+      SyncLogger(Logger('etebase_sync.repositoryManager'), 'collection'),
     );
   }
 
