@@ -63,16 +63,24 @@ abstract base class HiveStore<
           if (!item.isDeleted) {
             await itemBox.put(item.uid, createItemInfo(item, item.etag));
             _pendingUploads.remove(item.uid);
+            return SaveResult.ok(item.etag);
+          } else {
+            return SaveResult.ok(item.etag, SaveAction.unchanged);
           }
-          return SaveResult.ok(item.etag);
         }
 
         if (oldItem.remoteEtag == item.etag) {
-          return SaveResult.ok(oldItem.localEtag);
+          return SaveResult.ok(oldItem.localEtag, SaveAction.unchanged);
         }
 
         if (oldItem.localEtag != oldItem.remoteEtag) {
           return SaveResult.conflict(createItem(oldItem));
+        }
+
+        if (item.isDeleted) {
+          await itemBox.delete(item.uid);
+          _pendingUploads.remove(item.uid);
+          return SaveResult.ok(item.etag, SaveAction.deleted);
         }
 
         await itemBox.put(item.uid, createItemInfo(item, item.etag));
@@ -113,7 +121,7 @@ abstract base class HiveStore<
         final cacheItem = await boxGet(item.uid);
         if (cacheItem == null) {
           if (item.isDeleted) {
-            return SaveResult.ok(item.etag);
+            return SaveResult.ok(item.etag, SaveAction.unchanged);
           } else {
             await itemBox.put(item.uid, createItemInfo(item, item.etag));
             _pendingUploads.remove(item.uid);
@@ -126,11 +134,11 @@ abstract base class HiveStore<
         } else if (item.isDeleted) {
           await itemBox.delete(item.uid);
           _pendingUploads.remove(item.uid);
-          return SaveResult.ok(item.etag);
+          return SaveResult.ok(item.etag, SaveAction.deleted);
         } else {
           await itemBox.put(item.uid, createItemInfo(item, item.etag));
           _pendingUploads.remove(item.uid);
-          return SaveResult.ok(item.etag);
+          return SaveResult.ok(item.etag, SaveAction.unchanged);
         }
       });
 

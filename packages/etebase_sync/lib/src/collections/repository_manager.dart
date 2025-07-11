@@ -11,7 +11,9 @@ import '../exceptions/read_only.dart';
 import '../exceptions/unresolved_conflict.dart';
 import '../items/factory_registry.dart';
 import '../items/items.dart';
-import '../logging/sync_logger.dart';
+import '../logging/online_logger.dart';
+import '../logging/repository_logger.dart';
+import '../logging/repository_manager_logger.dart';
 import '../models/conflict_origin.dart';
 import '../models/etebase_target.dart';
 import '../online/online_checker.dart';
@@ -33,6 +35,7 @@ class RepositoryManager {
   final FactoryRegistry _registry;
   final LateRef<SyncConfig> _config;
   final OnlineWrapper _online;
+  final RepositoryManagerLogger _logger;
 
   late final CollectionBackgroundSync _backgroundSync;
 
@@ -46,6 +49,7 @@ class RepositoryManager {
     this._backgroundSync,
     this._config,
     this._online,
+    this._logger,
   );
 
   @internal
@@ -57,13 +61,14 @@ class RepositoryManager {
     this._conflictResolver,
     this._config,
     OnlineChecker online,
-  ) : _online = OnlineWrapper(online) {
+    this._logger,
+  ) : _online = OnlineWrapper(online, OnlineLogger(Logger('etebase_sync'))) {
     _backgroundSync = CollectionBackgroundSync(
       _online,
       _store,
       _collectionManager,
       _conflictResolver,
-      SyncLogger(Logger('etebase_sync.repositoryManager'), 'collection'),
+      _logger,
     );
   }
 
@@ -101,8 +106,10 @@ class RepositoryManager {
 
       switch (primaryCollections) {
         case []:
+          _logger.primaryCreate(collectionType);
           return await create<TRecord>(const RepositoryMetadata(primary: true));
         case [(final collection, _)]:
+          _logger.primaryFound(collectionType, collection.uid);
           return _createRepo<TRecord>(collection);
         default:
           return await _resolvePrimaryConflict(
@@ -145,8 +152,10 @@ class RepositoryManager {
   Future<Repository<TRecord>> create<TRecord extends ItemRecord>([
     RepositoryMetadata? meta,
   ]) async {
+    final collectionType = _registry.typeFor<TRecord>();
+    _logger.create(collectionType);
     var collection = await _collectionManager.create(
-      _registry.typeFor<TRecord>(),
+      collectionType,
       meta ?? const RepositoryMetadata(),
       Uint8List(0),
     );
@@ -202,13 +211,18 @@ class RepositoryManager {
     String colUid,
     RepositoryMetadata meta,
   ) async {
-    final collection = await _getCol<TRecord>(colUid);
+    _logger.updateMeta(colUid);
+    var collection = await _getCol<TRecord>(colUid);
 
     try {
       _checkWritable(collection);
       final currentEtag = collection.etag;
       await collection.setMeta(meta);
-      await _store.saveLocal(collection, expectedEtag: currentEtag);
+      final result = await _store.saveLocal(
+        collection,
+        expectedEtag: currentEtag,
+      );
+      collection = await _handleSaveResult(collection, result);
 
       if (_config.current.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
@@ -221,13 +235,18 @@ class RepositoryManager {
   // TODO handle deletion gracefully -> all items must be deleted!
 
   Future<void> delete<TRecord extends ItemRecord>(String colUid) async {
+    _logger.delete(colUid);
     Collection? collection;
     try {
       collection = await _getCol<TRecord>(colUid);
       _checkWritable(collection);
       final currentEtag = collection.etag;
       await collection.delete();
-      await _store.saveLocal(collection, expectedEtag: currentEtag);
+      final result = await _store.saveLocal(
+        collection,
+        expectedEtag: currentEtag,
+      );
+      collection = await _handleSaveResult(collection, result);
 
       if (_config.current.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
@@ -279,7 +298,8 @@ class RepositoryManager {
     SaveResult<Collection> result,
   ) async {
     switch (result) {
-      case SaveOk():
+      case SaveOk(:final etag, :final action):
+        _logger.saved(collection.uid, action, cacheEtag: etag);
         return collection;
       case SaveConflict<Collection>(:final cacheItem):
         try {
@@ -298,6 +318,11 @@ class RepositoryManager {
     Collection conflicted,
     String expectedEtag,
   ) async {
+    _logger.conflict(
+      target.uid,
+      cacheEtag: target.etag,
+      itemEtag: conflicted.etag,
+    );
     await _conflictResolver.resolveConflict(
       target,
       conflicted,
@@ -315,6 +340,7 @@ class RepositoryManager {
     final conflictMap = {
       for (final (collection, meta) in primaryCollections) collection.uid: meta,
     };
+    _logger.primaryConflict(collectionType, conflictMap.keys);
     final actual = await _conflictResolver.resolveMultiplePrimaryCollections(
       collectionType,
       conflictMap,
@@ -345,6 +371,7 @@ class RepositoryManager {
       );
     }
 
+    _logger.primaryFound(collectionType, primaryCol.uid);
     return _createRepo<TRecord>(primaryCol);
   }
 
@@ -359,6 +386,7 @@ class RepositoryManager {
       itemManager,
       await _storageManager.createItemStore(collection, itemManager),
       _config,
+      RepositoryLogger(_logger.parent, collection.uid),
     );
     await repo.init();
     return repo;

@@ -23,7 +23,9 @@ sealed class RepositoryMetadata
     @dateTimeMillis DateTime? mtime,
     String? name,
     String? itemType,
+
     // custom properties
+
     /// Marks a collection as the primary collection for the given
     /// [Collection.collectionType].
     @Default(false) bool primary,

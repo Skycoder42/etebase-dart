@@ -1,19 +1,20 @@
 import 'package:etebase/etebase.dart';
+import 'package:logging/logging.dart';
 
 import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
 import '../collections/repository_manager.dart';
-import 'key_manager.dart';
 import '../exceptions/already_logged_in.dart';
 import '../exceptions/not_logged_in.dart';
 import '../items/factory_registry.dart';
-import '../items/item_record_factory.dart';
 import '../items/items.dart';
+import '../logging/repository_manager_logger.dart';
 import '../online/online_checker.dart';
 import '../storage/account_store.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
 import '../util/late_ref.dart';
+import 'key_manager.dart';
 
 class EtebaseSync {
   final Client _client;
@@ -170,6 +171,7 @@ class EtebaseSync {
       _conflictResolver,
       _config, // TODO handle changes
       _onlineChecker,
+      RepositoryManagerLogger(Logger('etebase_sync')), // TODO
     );
     await _repoManager!.init();
   }

@@ -266,7 +266,7 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
       yield* online
           .streamOnline(() async* {
             final stoken = await store.getStoken();
-            logger.downloadFetching(stoken);
+            logger.downloadSyncing(stoken);
             yield* _itemManager.subscribeChanges(
               ItemFetchOptions(stoken: stoken, withCollection: false),
             );

@@ -43,7 +43,7 @@ final class CollectionBackgroundSync
   Future<void> sync(String collectionType) async {
     // TODO this if condition wont work
     if (!isDownSyncActive) {
-      logger.downloadTriggered('Manual sync');
+      logger.downloadTriggered('Manual sync', collectionType);
       _controller.add((
         collectionType: collectionType,
         stoken: await store.getStoken(collectionType),
@@ -101,7 +101,7 @@ final class CollectionBackgroundSync
           () async* {
             do {
               final stoken = response?.stoken ?? request.stoken;
-              logger.downloadFetching(stoken);
+              logger.downloadFetching(stoken, request.collectionType);
               response = await _collectionManager.list(
                 request.collectionType,
                 FetchOptions(stoken: stoken),
@@ -111,7 +111,7 @@ final class CollectionBackgroundSync
             } while (!response!.isDone);
           },
           whenOffline: () {
-            logger.downloadOffline();
+            logger.downloadOffline(request.collectionType);
             return Stream.value(
               CollectionListResponse(
                 data: const [],

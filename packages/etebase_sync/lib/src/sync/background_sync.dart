@@ -50,6 +50,9 @@ abstract base class BackgroundSync<
   Future<void> init() async {
     _cacheSub = store
         .streamModified()
+        // delay ensure that events are processed after whatever triggered them
+        // finishes processing
+        .interval(const Duration(milliseconds: 1))
         .mergeWith([_pendingUploadsAfterReconnect()])
         .asyncMap(_handleUpload)
         .whereNotNull()
@@ -163,7 +166,7 @@ abstract base class BackgroundSync<
       yield SyncEvent.downloadStarted(scopeFor(response));
     }
 
-    logger.downloadResponse(response);
+    logger.downloadResponse(response, scopeFor(response));
     for (final item in response.data) {
       try {
         if (shouldSkip(item)) {
@@ -200,8 +203,8 @@ abstract base class BackgroundSync<
     SaveResult<TItem> result,
   ) async {
     switch (result) {
-      case SaveOk(:final etag):
-        logger.saved(item.uid, cacheEtag: etag, remoteEtag: remoteEtag);
+      case SaveOk(:final etag, :final action):
+        logger.saved(item.uid, action, cacheEtag: etag, remoteEtag: remoteEtag);
         return etag;
       case SaveConflict(:final cacheItem):
         return await _resolveConflict(

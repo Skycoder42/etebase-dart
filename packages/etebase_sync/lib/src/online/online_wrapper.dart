@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:etebase/etebase.dart';
 import 'package:meta/meta.dart';
 
+import '../logging/online_logger.dart';
 import 'online_checker.dart';
 import 'online_status.dart';
 
@@ -11,6 +12,7 @@ class OnlineWrapper {
   static const defaultWaitInterval = Duration(seconds: 30);
 
   final OnlineChecker _onlineChecker;
+  final OnlineLogger _logger;
   final Duration _waitInterval;
 
   final _onlineNotifier = StreamController<OnlineStatus>.broadcast(sync: true);
@@ -20,7 +22,8 @@ class OnlineWrapper {
   Timer? _timer;
 
   OnlineWrapper(
-    this._onlineChecker, [
+    this._onlineChecker,
+    this._logger, [
     this._waitInterval = defaultWaitInterval,
   ]) {
     unawaited(_listen());
@@ -59,6 +62,7 @@ class OnlineWrapper {
     }
 
     if (_subscription == null) {
+      _logger.pingStarted(_waitInterval);
       _timer ??= Timer.periodic(_waitInterval, _pingOnline);
     }
 
@@ -97,7 +101,7 @@ class OnlineWrapper {
       // TODO use transformer to exit on these errors
       .handleError(
         test: (e) => e is ConnectionProblem || e is TemporaryServerProblem,
-        (Object _) {},
+        (Object _) => _resetOnlineStatus(),
       );
 
   Future<void> _listen() async {
@@ -108,6 +112,9 @@ class OnlineWrapper {
       onDone: _listen,
       cancelOnError: false,
     );
+    if (_subscription != null) {
+      _logger.watchStarted();
+    }
   }
 
   void _setOnlineStatus(OnlineStatus status, {bool overwrite = true}) {
@@ -116,6 +123,7 @@ class OnlineWrapper {
     }
 
     _currentStatus = status;
+    _logger.statusChanged(status);
     if (_onlineNotifier.hasListener) {
       _onlineNotifier.add(status);
     }
@@ -124,6 +132,7 @@ class OnlineWrapper {
   void _resetOnlineStatus() {
     if (_subscription == null) {
       _currentStatus = OnlineStatus.offline;
+      _logger.statusChanged(_currentStatus!);
     }
   }
 
@@ -138,6 +147,7 @@ class OnlineWrapper {
       // check if online and cancel if that is the case, otherwise the timer
       // will fire again
       cancelTimer = await isOnline;
+      _logger.ping(_currentStatus ?? OnlineStatus.offline);
 
       // ignore: avoid_catches_without_on_clauses rethrows
     } catch (e, s) {
@@ -152,10 +162,9 @@ class OnlineWrapper {
   }
 
   void _handleError(Object error, StackTrace stackTrace) {
+    _logger.error(error, stackTrace);
     if (_onlineNotifier.hasListener) {
       _onlineNotifier.addError(error, stackTrace);
-    } else {
-      Zone.current.handleUncaughtError(error, stackTrace);
     }
   }
 }

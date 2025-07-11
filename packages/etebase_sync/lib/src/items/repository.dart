@@ -7,6 +7,7 @@ class Repository<TRecord extends ItemRecord> {
   final ItemManager _itemManager;
   final ItemStore _store;
   final LateRef<SyncConfig> _config;
+  final RepositoryLogger _logger;
 
   late final ItemBackgroundSync _backgroundSync;
 
@@ -19,6 +20,7 @@ class Repository<TRecord extends ItemRecord> {
     this._store,
     this._config,
     this._backgroundSync,
+    this._logger,
   );
 
   @internal
@@ -29,6 +31,7 @@ class Repository<TRecord extends ItemRecord> {
     this._itemManager,
     this._store,
     this._config,
+    this._logger,
   ) {
     // TODO recreate background sync when config changes
     _backgroundSync = ItemBackgroundSync.forMode(
@@ -37,8 +40,7 @@ class Repository<TRecord extends ItemRecord> {
       _itemManager,
       this,
       _collection.uid,
-      // TODO fix this
-      SyncLogger(Logger('etebase_sync.repository.${_collection.uid}'), 'item'),
+      _logger,
       _config.current.syncMode,
     );
   }
@@ -91,6 +93,7 @@ class Repository<TRecord extends ItemRecord> {
   Future<TRecord> create() async {
     _checkWritable();
 
+    _logger.create();
     final item = await _itemManager.create(
       ItemMetadata(itemType: _collection.collectionType),
       Uint8List(0),
@@ -167,6 +170,7 @@ class Repository<TRecord extends ItemRecord> {
     final recordState = record._state;
     try {
       record._state = RecordState.locked;
+      _logger.persist(record.uid);
       await _saveToCache(record);
 
       if (_config.current.waitForUpload) {
@@ -180,6 +184,11 @@ class Repository<TRecord extends ItemRecord> {
   Future<String> _saveToCache(TRecord record) async {
     // If etag has not changed, item was not modified -> no need to save
     if (record._item.etag == record._cacheEtag) {
+      _logger.saved(
+        record.uid,
+        SaveAction.unchanged,
+        cacheEtag: record._item.etag,
+      );
       return record._item.etag;
     }
 
@@ -188,7 +197,8 @@ class Repository<TRecord extends ItemRecord> {
       expectedEtag: record._cacheEtag,
     );
     switch (result) {
-      case SaveOk(:final etag):
+      case SaveOk(:final etag, :final action):
+        _logger.saved(record.uid, action, cacheEtag: etag);
         record._cacheEtag = etag;
         return etag;
       case SaveConflict(:final cacheItem):
@@ -205,6 +215,11 @@ class Repository<TRecord extends ItemRecord> {
     Item canonicalItem,
     String cacheEtag,
   ) async {
+    _logger.conflict(
+      target.uid,
+      cacheEtag: cacheEtag,
+      itemEtag: target._item.etag,
+    );
     final canonical = await _createRecord(
       canonicalItem,
       allowDeleted: true,

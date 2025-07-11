@@ -3,11 +3,11 @@ import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../exceptions/item_deleted.dart';
 import '../exceptions/read_only.dart';
+import '../logging/repository_logger.dart';
 import '../logging/sync_logger.dart';
 import '../models/conflict_origin.dart';
 import '../models/etebase_target.dart';
@@ -19,7 +19,7 @@ import '../sync/sync_config.dart';
 import '../sync/sync_event.dart';
 import '../sync/sync_mode.dart';
 import '../util/late_ref.dart';
-import 'item_record_factory.dart';
+import 'factory_registry.dart';
 import 'record_state.dart';
 
 part 'item_background_sync.dart';

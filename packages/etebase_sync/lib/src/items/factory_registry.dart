@@ -1,6 +1,10 @@
+import 'package:etebase/etebase.dart';
+
 import '../exceptions/missing_type_registration_error.dart';
-import 'item_record_factory.dart';
 import 'items.dart';
+
+typedef ItemRecordFactory<TRecord extends ItemRecord> =
+    TRecord Function(Repository<TRecord> repository, Item item);
 
 typedef _Registration<TRecord extends ItemRecord> = ({
   String collectionType,
