@@ -5,9 +5,9 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../exceptions/conflict_origin.dart';
 import '../exceptions/item_deleted.dart';
 import '../logging/sync_logger.dart';
-import '../models/conflict_origin.dart';
 import '../online/online_wrapper.dart';
 import '../storage/save_result.dart';
 import '../storage/store.dart';

@@ -7,6 +7,8 @@ import 'package:logging/logging.dart';
 
 import '../exceptions/cache_miss.dart';
 import '../exceptions/collection_type_mismatch.dart';
+import '../exceptions/conflict_origin.dart';
+import '../exceptions/etebase_target.dart';
 import '../exceptions/read_only.dart';
 import '../exceptions/unresolved_conflict.dart';
 import '../items/factory_registry.dart';
@@ -14,8 +16,6 @@ import '../items/items.dart';
 import '../logging/online_logger.dart';
 import '../logging/repository_logger.dart';
 import '../logging/repository_manager_logger.dart';
-import '../models/conflict_origin.dart';
-import '../models/etebase_target.dart';
 import '../online/online_checker.dart';
 import '../online/online_wrapper.dart';
 import '../storage/collection_store.dart';

@@ -1,6 +1,6 @@
-import '../models/conflict_origin.dart';
-import '../models/etebase_target.dart';
+import 'conflict_origin.dart';
 import 'etebase_sync_exception.dart';
+import 'etebase_target.dart';
 
 class UnresolvedConflict extends EtebaseSyncException {
   final EtebaseTarget target;

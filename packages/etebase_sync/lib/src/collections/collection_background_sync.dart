@@ -4,7 +4,7 @@ import 'package:etebase/etebase.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/conflict_origin.dart';
+import '../exceptions/conflict_origin.dart';
 import '../storage/collection_store.dart';
 import '../sync/background_sync.dart';
 import '../sync/sync_event.dart';

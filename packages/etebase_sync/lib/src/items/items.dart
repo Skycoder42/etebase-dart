@@ -5,12 +5,12 @@ import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../exceptions/conflict_origin.dart';
+import '../exceptions/etebase_target.dart';
 import '../exceptions/item_deleted.dart';
 import '../exceptions/read_only.dart';
 import '../logging/repository_logger.dart';
 import '../logging/sync_logger.dart';
-import '../models/conflict_origin.dart';
-import '../models/etebase_target.dart';
 import '../online/online_wrapper.dart';
 import '../storage/item_store.dart';
 import '../storage/save_result.dart';

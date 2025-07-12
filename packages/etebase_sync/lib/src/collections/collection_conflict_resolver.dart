@@ -4,10 +4,10 @@ import 'package:etebase/etebase.dart';
 import 'package:meta/meta.dart';
 
 import '../../etebase_sync.dart';
+import '../exceptions/conflict_origin.dart';
+import '../exceptions/etebase_target.dart';
 import '../exceptions/item_deleted.dart';
 import '../exceptions/unresolved_conflict.dart';
-import '../models/conflict_origin.dart';
-import '../models/etebase_target.dart';
 import 'conflict_resolution.dart';
 
 class CollectionConflictResolver {

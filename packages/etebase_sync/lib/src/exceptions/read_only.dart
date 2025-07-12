@@ -1,5 +1,5 @@
-import '../models/etebase_target.dart';
 import 'etebase_sync_exception.dart';
+import 'etebase_target.dart';
 
 class ReadOnly extends EtebaseSyncException {
   final String uid;

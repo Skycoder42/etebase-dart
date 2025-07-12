@@ -178,5 +178,5 @@ class EtebaseSync {
 
   factory EtebaseSync.instance() => throw UnimplementedError();
 
-  factory EtebaseSync.create(String prefix) => throw UnimplementedError();
+  factory EtebaseSync.create() => throw UnimplementedError();
 }
