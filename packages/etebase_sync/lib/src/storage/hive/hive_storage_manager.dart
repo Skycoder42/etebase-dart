@@ -13,22 +13,30 @@ import 'item_info.dart';
 
 @internal
 class HiveStorageManager implements StorageManager {
-  static const _boxPrefix = meta.package;
-  static const _metaBoxName = '$_boxPrefix.meta';
-  static const _stokenBoxName = '$_boxPrefix.stokens';
-  static const _collectionBoxName = '$_boxPrefix.collections';
-  static const _itemBoxPrefix = '$_boxPrefix.items.';
-
   static const _metaBoxKeyPrefix = 'box.';
 
   final int _typeIdOffset;
   final HiveInterface _hive;
   final StorageMode _storageMode;
+  final String? _prefix;
 
   late final Box<dynamic> _metaBox;
   late final Box<String> _stokenBox;
 
-  HiveStorageManager(this._typeIdOffset, this._hive, this._storageMode);
+  HiveStorageManager(
+    this._typeIdOffset,
+    this._hive,
+    this._storageMode, [
+    this._prefix,
+  ]);
+
+  late final _boxPrefix = _prefix != null
+      ? '${meta.package}.$_prefix'
+      : meta.package;
+  late final _metaBoxName = '$_boxPrefix.meta';
+  late final _stokenBoxName = '$_boxPrefix.stokens';
+  late final _collectionBoxName = '$_boxPrefix.collections';
+  late final _itemBoxPrefix = '$_boxPrefix.items.';
 
   @override
   Future<void> init() async {
@@ -132,9 +140,8 @@ class HiveStorageManager implements StorageManager {
   Iterable<BoxBase<dynamic>> get _openBoxes => _knownBoxes
       .where(_hive.isBoxOpen)
       .map(
-        (boxName) => switch (boxName) {
-          _collectionBoxName => _box<CollectionInfo>(boxName),
-          _ => _box<ItemInfo>(boxName),
-        },
+        (boxName) => boxName == _collectionBoxName
+            ? _box<CollectionInfo>(boxName)
+            : _box<ItemInfo>(boxName),
       );
 }

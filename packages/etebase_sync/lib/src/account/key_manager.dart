@@ -16,13 +16,13 @@ class KeyManager {
 
   SecureKey get accountKey => _accountKey!;
 
-  void dispose() {
+  Future<void> dispose() async {
     _accountKey?.dispose();
+    await _keystore.dispose();
   }
 
   Future<void> createKey() async {
-    await _keystore.deleteStorageKey(_prefix);
-    dispose();
+    await discardKey();
 
     final masterKey = _sodium.crypto.kdf.keygen();
     try {
@@ -34,7 +34,9 @@ class KeyManager {
   }
 
   Future<void> loadKey() async {
-    dispose();
+    _accountKey?.dispose();
+    _accountKey = null;
+
     final masterKey = await _keystore.loadStorageKey(_prefix);
     if (masterKey == null) {
       throw UnimplementedError(); // TODO real exception
@@ -47,7 +49,8 @@ class KeyManager {
   }
 
   Future<void> discardKey() async {
-    dispose();
+    _accountKey?.dispose();
+    _accountKey = null;
     await _keystore.deleteStorageKey(_prefix);
   }
 

@@ -1,4 +1,7 @@
 import 'package:etebase/etebase.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:meta/meta.dart';
+import 'package:sodium/sodium_sumo.dart';
 
 import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
@@ -10,18 +13,24 @@ import '../items/items.dart';
 import '../logging/account_logger.dart';
 import '../online/online_checker.dart';
 import '../online/online_wrapper.dart';
+import '../online/server_ping_online_checker.dart';
 import '../storage/account_store.dart';
+import '../storage/hive/hive_storage_manager.dart';
 import '../storage/storage_manager.dart';
+import '../sync/storage_mode.dart';
 import '../sync/sync_config.dart';
 import '../util/late_ref.dart';
 import 'key_manager.dart';
+import 'keystore.dart';
 
 class EtebaseSync {
+  static EtebaseSync? _instance;
+
   final Client _client;
   final StorageManager _storageManager;
   final FactoryRegistry _registry;
   final CollectionConflictResolver _conflictResolver;
-  final OnlineChecker _onlineChecker;
+  final OnlineWrapper _online;
   final KeyManager _keyManager;
   final AccountLogger _logger;
 
@@ -31,15 +40,74 @@ class EtebaseSync {
   Account? _account;
   RepositoryManager? _repoManager;
 
-  EtebaseSync(
+  factory EtebaseSync({
+    required SodiumSumo sodium,
+    required Client client,
+    required Keystore keystore,
+    StorageManager? storageManager,
+    CollectionConflictResolver? conflictResolver,
+    OnlineChecker? onlineChecker,
+    AccountLogger? logger,
+    int hiveTypeIdOffset = 100,
+    StorageMode storageMode = StorageMode.cached,
+  }) {
+    if (_instance != null) {
+      throw UnimplementedError(); // TODO
+    }
+
+    final accountLogger = logger ?? AccountLogger();
+    return _instance = EtebaseSync.internal(
+      client,
+      storageManager ?? HiveStorageManager(hiveTypeIdOffset, Hive, storageMode),
+      FactoryRegistry(),
+      conflictResolver ?? const CollectionConflictResolver(),
+      OnlineWrapper(
+        onlineChecker ?? ServerPingOnlineChecker(client),
+        accountLogger.online,
+      ),
+      KeyManager(keystore, sodium),
+      accountLogger,
+    );
+  }
+
+  factory EtebaseSync.prefixed({
+    required String prefix,
+    required Client client,
+    required SodiumSumo sodium,
+    required Keystore keystore,
+    StorageManager? storageManager,
+    CollectionConflictResolver? conflictResolver,
+    OnlineChecker? onlineChecker,
+    AccountLogger? logger,
+    int hiveTypeIdOffset = 100,
+    StorageMode storageMode = StorageMode.cached,
+  }) {
+    final accountLogger = logger ?? AccountLogger(prefix);
+    return EtebaseSync.internal(
+      client,
+      storageManager ??
+          HiveStorageManager(hiveTypeIdOffset, Hive, storageMode, prefix),
+      FactoryRegistry(),
+      conflictResolver ?? const CollectionConflictResolver(),
+      OnlineWrapper(
+        onlineChecker ?? ServerPingOnlineChecker(client),
+        accountLogger.online,
+      ),
+      KeyManager(keystore, sodium, prefix),
+      accountLogger,
+    );
+  }
+
+  @visibleForTesting
+  EtebaseSync.internal(
     this._client,
     this._storageManager,
     this._registry,
     this._conflictResolver,
-    this._onlineChecker,
-    this._keyManager, {
-    AccountLogger? logger,
-  }) : _logger = logger ?? AccountLogger();
+    this._online,
+    this._keyManager,
+    this._logger,
+  );
 
   Future<void> init() async {
     _client.registerCustomMetadata(RepositoryMetadata.fromJson);
@@ -50,10 +118,16 @@ class EtebaseSync {
   }
 
   Future<void> dispose() async {
+    if (_instance == this) {
+      _instance = null;
+    }
+
     await Future.wait([
       ?_repoManager?.dispose(),
       _client.dispose(),
       _storageManager.dispose(),
+      _online.dispose(),
+      Future.sync(_keyManager.dispose),
     ]);
   }
 
@@ -182,13 +256,9 @@ class EtebaseSync {
       await _storageManager.createCollectionStore(account.collectionManager),
       _conflictResolver,
       _config, // TODO handle changes
-      OnlineWrapper(_onlineChecker, _logger.online),
+      _online,
       _logger.collection,
     );
     await _repoManager!.init();
   }
-
-  factory EtebaseSync.instance() => throw UnimplementedError();
-
-  factory EtebaseSync.create() => throw UnimplementedError();
 }

@@ -4,21 +4,18 @@ import 'dart:io';
 
 import 'package:etebase/etebase.dart';
 import 'package:etebase_sync/src/account/etebase_sync.dart';
-import 'package:etebase_sync/src/account/key_manager.dart';
 import 'package:etebase_sync/src/account/keystore.dart';
-import 'package:etebase_sync/src/collections/collection_conflict_resolver.dart';
 import 'package:etebase_sync/src/collections/repository_metadata.dart';
-import 'package:etebase_sync/src/items/factory_registry.dart';
 import 'package:etebase_sync/src/items/proxy_record.dart';
-import 'package:etebase_sync/src/online/server_ping_online_checker.dart';
-import 'package:etebase_sync/src/storage/hive/hive_storage_manager.dart';
-import 'package:etebase_sync/src/sync/storage_mode.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:logging/logging.dart';
 import 'package:sodium/sodium_sumo.dart';
 
 class InMemoryKeystore implements Keystore {
   SecureKey? _key;
+
+  @override
+  Future<void> dispose() => Future.sync(() => _key?.dispose());
 
   @override
   Future<void> deleteStorageKey([String? prefix]) => Future.sync(() {
@@ -31,9 +28,7 @@ class InMemoryKeystore implements Keystore {
 
   @override
   Future<void> saveStorageKey(SecureKey key, [String? prefix]) =>
-      Future.sync(() {
-        _key = key;
-      });
+      Future.sync(() => _key = key);
 }
 
 class StringRecord extends ProxyRecord<String> {
@@ -65,12 +60,9 @@ Future<void> main() async {
   Hive.init(Directory.systemTemp.createTempSync().path);
 
   final sync = EtebaseSync(
-    client,
-    HiveStorageManager(0, Hive, StorageMode.cached),
-    FactoryRegistry(),
-    const CollectionConflictResolver(),
-    ServerPingOnlineChecker(client),
-    KeyManager(InMemoryKeystore(), sodium),
+    sodium: sodium,
+    client: client,
+    keystore: InMemoryKeystore(),
   )..registerType('etebase_sync.example.string', StringRecord.new);
   await sync.init();
 
