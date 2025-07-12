@@ -1,7 +1,6 @@
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
-import 'package:sodium/sodium_sumo.dart';
 
 import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
@@ -41,7 +40,6 @@ class EtebaseSync {
   RepositoryManager? _repoManager;
 
   factory EtebaseSync({
-    required SodiumSumo sodium,
     required Client client,
     required Keystore keystore,
     StorageManager? storageManager,
@@ -65,7 +63,7 @@ class EtebaseSync {
         onlineChecker ?? ServerPingOnlineChecker(client),
         accountLogger.online,
       ),
-      KeyManager(keystore, sodium),
+      KeyManager(keystore, client),
       accountLogger,
     );
   }
@@ -73,7 +71,6 @@ class EtebaseSync {
   factory EtebaseSync.prefixed({
     required String prefix,
     required Client client,
-    required SodiumSumo sodium,
     required Keystore keystore,
     StorageManager? storageManager,
     CollectionConflictResolver? conflictResolver,
@@ -93,7 +90,7 @@ class EtebaseSync {
         onlineChecker ?? ServerPingOnlineChecker(client),
         accountLogger.online,
       ),
-      KeyManager(keystore, sodium, prefix),
+      KeyManager(keystore, client, prefix),
       accountLogger,
     );
   }
@@ -132,6 +129,8 @@ class EtebaseSync {
   }
 
   SyncConfig get config => _config.current;
+
+  bool get hasStoredAccount => _accountStore.hasAccount;
 
   RepositoryManager get repositoryManager => switch (_repoManager) {
     final RepositoryManager rm => rm,

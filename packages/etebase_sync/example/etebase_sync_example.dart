@@ -59,11 +59,8 @@ Future<void> main() async {
 
   Hive.init(Directory.systemTemp.createTempSync().path);
 
-  final sync = EtebaseSync(
-    sodium: sodium,
-    client: client,
-    keystore: InMemoryKeystore(),
-  )..registerType('etebase_sync.example.string', StringRecord.new);
+  final sync = EtebaseSync(client: client, keystore: InMemoryKeystore())
+    ..registerType('etebase_sync.example.string', StringRecord.new);
   await sync.init();
 
   final username = base64Url.encode(client.randombytes(24));
