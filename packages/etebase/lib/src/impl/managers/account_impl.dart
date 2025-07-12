@@ -39,6 +39,12 @@ class AccountImpl implements Account, AuthTokenSource {
   final BoxCryptoManager identityCryptoManager;
 
   @override
+  String get username => _user.username;
+
+  @override
+  String get email => _user.email;
+
+  @override
   AuthToken get authToken => _authToken;
 
   AccountImpl(

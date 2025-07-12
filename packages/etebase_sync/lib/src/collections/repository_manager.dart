@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:logging/logging.dart';
 
 import '../exceptions/cache_miss.dart';
 import '../exceptions/collection_type_mismatch.dart';
@@ -13,10 +12,7 @@ import '../exceptions/read_only.dart';
 import '../exceptions/unresolved_conflict.dart';
 import '../items/factory_registry.dart';
 import '../items/items.dart';
-import '../logging/online_logger.dart';
-import '../logging/repository_logger.dart';
-import '../logging/repository_manager_logger.dart';
-import '../online/online_checker.dart';
+import '../logging/collections_logger.dart';
 import '../online/online_wrapper.dart';
 import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
@@ -35,7 +31,7 @@ class RepositoryManager {
   final FactoryRegistry _registry;
   final LateRef<SyncConfig> _config;
   final OnlineWrapper _online;
-  final RepositoryManagerLogger _logger;
+  final CollectionsLogger _logger;
 
   late final CollectionBackgroundSync _backgroundSync;
 
@@ -60,9 +56,9 @@ class RepositoryManager {
     this._store,
     this._conflictResolver,
     this._config,
-    OnlineChecker online,
+    this._online,
     this._logger,
-  ) : _online = OnlineWrapper(online, OnlineLogger(Logger('etebase_sync'))) {
+  ) {
     _backgroundSync = CollectionBackgroundSync(
       _online,
       _store,
@@ -386,7 +382,7 @@ class RepositoryManager {
       itemManager,
       await _storageManager.createItemStore(collection, itemManager),
       _config,
-      RepositoryLogger(_logger.parent, collection.uid),
+      _logger.items(collection.uid),
     );
     await repo.init();
     return repo;

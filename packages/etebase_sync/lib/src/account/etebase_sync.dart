@@ -1,5 +1,4 @@
 import 'package:etebase/etebase.dart';
-import 'package:logging/logging.dart';
 
 import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
@@ -8,8 +7,9 @@ import '../exceptions/already_logged_in.dart';
 import '../exceptions/not_logged_in.dart';
 import '../items/factory_registry.dart';
 import '../items/items.dart';
-import '../logging/repository_manager_logger.dart';
+import '../logging/account_logger.dart';
 import '../online/online_checker.dart';
+import '../online/online_wrapper.dart';
 import '../storage/account_store.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
@@ -23,6 +23,7 @@ class EtebaseSync {
   final CollectionConflictResolver _conflictResolver;
   final OnlineChecker _onlineChecker;
   final KeyManager _keyManager;
+  final AccountLogger _logger;
 
   late final AccountStore _accountStore;
 
@@ -36,8 +37,9 @@ class EtebaseSync {
     this._registry,
     this._conflictResolver,
     this._onlineChecker,
-    this._keyManager,
-  );
+    this._keyManager, {
+    AccountLogger? logger,
+  }) : _logger = logger ?? AccountLogger();
 
   Future<void> init() async {
     _client.registerCustomMetadata(RepositoryMetadata.fromJson);
@@ -80,6 +82,7 @@ class EtebaseSync {
       throw AlreadyLoggedIn();
     }
 
+    _logger.login();
     final account = await Account.login(_client, username, password);
     await _persistNewAccount(account);
   }
@@ -93,6 +96,7 @@ class EtebaseSync {
       throw AlreadyLoggedIn();
     }
 
+    _logger.signup();
     final account = await Account.signup(
       _client,
       User(username: username, email: email),
@@ -108,6 +112,7 @@ class EtebaseSync {
       throw NotLoggedIn();
     }
 
+    _logger.restore();
     Account? account;
     try {
       // restore from storage
@@ -120,9 +125,12 @@ class EtebaseSync {
       );
 
       // refresh tokens and persist again
+      _logger.fetch();
       await account.fetchToken();
+      _logger.saving();
       final savedAccount = await account.save(_keyManager.accountKey);
       await _accountStore.saveAccount(savedAccount);
+      _logger.authenticated();
 
       await _createRepoManager(account);
       _account = account;
@@ -137,6 +145,7 @@ class EtebaseSync {
       throw NotLoggedIn();
     }
 
+    _logger.logout();
     await _repoManager?.dispose();
     _repoManager = null;
     _account?.dispose();
@@ -145,13 +154,16 @@ class EtebaseSync {
     await _storageManager.erase();
 
     await _keyManager.discardKey();
+    _logger.loggedOut();
   }
 
   Future<void> _persistNewAccount(Account account) async {
     try {
+      _logger.saving();
       await _keyManager.createKey();
       final savedAccount = await account.save(_keyManager.accountKey);
       await _accountStore.saveAccount(savedAccount);
+      _logger.authenticated();
 
       await _createRepoManager(account);
       _account = account;
@@ -170,8 +182,8 @@ class EtebaseSync {
       await _storageManager.createCollectionStore(account.collectionManager),
       _conflictResolver,
       _config, // TODO handle changes
-      _onlineChecker,
-      RepositoryManagerLogger(Logger('etebase_sync')), // TODO
+      OnlineWrapper(_onlineChecker, _logger.online),
+      _logger.collection,
     );
     await _repoManager!.init();
   }

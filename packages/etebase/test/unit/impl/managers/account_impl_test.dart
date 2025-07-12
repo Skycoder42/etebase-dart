@@ -491,6 +491,18 @@ void main() {
         expect(sut.authToken, AuthToken.empty);
       });
 
+      test('username returns login user response username', () {
+        final result = sut.username;
+
+        expect(result, testUser.username);
+      });
+
+      test('email returns login user response email', () {
+        final result = sut.email;
+
+        expect(result, testUser.email);
+      });
+
       test('collectionManager returns single CollectionManager', () {
         final result = sut.collectionManager;
 

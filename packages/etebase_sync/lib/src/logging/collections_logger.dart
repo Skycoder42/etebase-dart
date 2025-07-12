@@ -1,12 +1,15 @@
 import 'package:logging/logging.dart';
 
+import 'items_logger.dart';
 import 'sync_logger.dart';
 
-class RepositoryManagerLogger extends SyncLogger {
-  final Logger parent;
+class CollectionsLogger extends SyncLogger {
+  final Logger _parent;
 
-  RepositoryManagerLogger(this.parent)
-    : super(Logger('${parent.fullName}.repositoryManager'), 'collection');
+  CollectionsLogger(this._parent)
+    : super(Logger('${_parent.fullName}.repositoryManager'), 'collection');
+
+  ItemsLogger items(String colUid) => ItemsLogger(_parent, colUid);
 
   String _catPrimary(String collectionType) => '[primary:$collectionType]';
 

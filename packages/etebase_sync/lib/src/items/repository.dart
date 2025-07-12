@@ -7,7 +7,7 @@ class Repository<TRecord extends ItemRecord> {
   final ItemManager _itemManager;
   final ItemStore _store;
   final LateRef<SyncConfig> _config;
-  final RepositoryLogger _logger;
+  final ItemsLogger _logger;
 
   late final ItemBackgroundSync _backgroundSync;
 

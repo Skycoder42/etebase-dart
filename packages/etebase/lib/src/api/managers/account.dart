@@ -41,6 +41,10 @@ abstract interface class Account {
     SecureKey? encryptionKey,
   ]) => (client as ClientImpl).restoreAccount(accountDataStored, encryptionKey);
 
+  String get username;
+
+  String get email;
+
   /// Return a [CollectionManager] for creating, fetching and uploading
   /// collections.
   CollectionManager get collectionManager;

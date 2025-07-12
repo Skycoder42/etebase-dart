@@ -9,7 +9,7 @@ import '../exceptions/conflict_origin.dart';
 import '../exceptions/etebase_target.dart';
 import '../exceptions/item_deleted.dart';
 import '../exceptions/read_only.dart';
-import '../logging/repository_logger.dart';
+import '../logging/items_logger.dart';
 import '../logging/sync_logger.dart';
 import '../online/online_wrapper.dart';
 import '../storage/item_store.dart';
