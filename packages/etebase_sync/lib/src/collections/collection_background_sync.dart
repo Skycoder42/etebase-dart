@@ -112,12 +112,10 @@ final class CollectionBackgroundSync
           },
           whenOffline: () {
             logger.downloadOffline(request.collectionType);
-            return Stream.value(
-              CollectionListResponse(
-                data: const [],
-                stoken: response?.stoken ?? request.stoken,
-                isDone: true,
-              ),
+            return CollectionListResponse(
+              data: const [],
+              stoken: response?.stoken ?? request.stoken,
+              isDone: true,
             );
           },
         )

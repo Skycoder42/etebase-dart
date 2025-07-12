@@ -50,14 +50,21 @@ class OnlineWrapper {
       }
     }
 
-    final status = await _onlineChecker.checkOnlineStatus();
-    // do not overwrite any update received in parallel by the subscription
-    _setOnlineStatus(status, overwrite: _subscription == null);
-    return status.isOnline;
+    try {
+      final status = await _onlineChecker.checkOnlineStatus();
+      // do not overwrite any update received in parallel by the subscription
+      _setOnlineStatus(status, overwrite: _subscription == null);
+      return status.isOnline;
+
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e, s) {
+      _logger.error(e, s);
+      return false;
+    }
   }
 
-  Future<void> waitForOnline() {
-    if (_currentStatus case OnlineStatus(isOnline: true)) {
+  Future<void> waitForOnline() async {
+    if (await isOnline) {
       return Future.value();
     }
 
@@ -66,12 +73,12 @@ class OnlineWrapper {
       _timer ??= Timer.periodic(_waitInterval, _pingOnline);
     }
 
-    return _onlineNotifier.stream.firstWhere((s) => s.isOnline);
+    await _onlineNotifier.stream.firstWhere((s) => s.isOnline);
   }
 
   Future<T> runOnline<T>(
     FutureOr<T> Function() callback, {
-    FutureOr<T> Function()? whenOffline,
+    T Function()? whenOffline,
   }) async {
     if (await isOnline) {
       try {
@@ -92,23 +99,20 @@ class OnlineWrapper {
 
   Stream<T> streamOnline<T>(
     Stream<T> Function() callback, {
-    Stream<T> Function()? whenOffline,
-  }) => Stream.fromFuture(isOnline)
-      .asyncExpand(
-        (isOnline) =>
-            isOnline ? callback() : whenOffline?.call() ?? Stream<T>.empty(),
-      )
-      // TODO use transformer to exit on these errors
-      .handleError(
-        test: (e) => e is ConnectionProblem || e is TemporaryServerProblem,
-        (Object _) => _resetOnlineStatus(),
-      );
+    T Function()? whenOffline,
+  }) => Stream.fromFuture(isOnline).asyncExpand(
+    (isOnline) => switch (isOnline) {
+      true => _OnlineWrapperStreamBuilder(callback(), whenOffline).stream,
+      false when whenOffline != null => Stream.value(whenOffline()),
+      false => const Stream.empty(),
+    },
+  );
 
   Future<void> _listen() async {
     await _subscription?.cancel();
     _subscription = _onlineChecker.watchOnlineStatus()?.listen(
       _setOnlineStatus,
-      onError: _handleError,
+      onError: _logger.error,
       onDone: _listen,
       cancelOnError: false,
     );
@@ -151,7 +155,7 @@ class OnlineWrapper {
 
       // ignore: avoid_catches_without_on_clauses rethrows
     } catch (e, s) {
-      _handleError(e, s);
+      _logger.error(e, s);
     } finally {
       if (cancelTimer) {
         timer.cancel();
@@ -160,11 +164,45 @@ class OnlineWrapper {
       }
     }
   }
+}
 
-  void _handleError(Object error, StackTrace stackTrace) {
-    _logger.error(error, stackTrace);
-    if (_onlineNotifier.hasListener) {
-      _onlineNotifier.addError(error, stackTrace);
+class _OnlineWrapperStreamBuilder<T> {
+  final Stream<T> _stream;
+  final T Function()? _whenOffline;
+
+  late final StreamController<T> _controller = _stream.isBroadcast
+      ? StreamController.broadcast(onListen: _onListen, onCancel: _onCancel)
+      : StreamController(onListen: _onListen, onCancel: _onCancel);
+  late final StreamSubscription<T> _subscription;
+
+  _OnlineWrapperStreamBuilder(this._stream, this._whenOffline);
+
+  Stream<T> get stream => _controller.stream;
+
+  void _onListen() {
+    _subscription = _stream.listen(
+      _controller.add,
+      onError: _onError,
+      onDone: _controller.close,
+      cancelOnError: false,
+    );
+  }
+
+  void _onCancel() {
+    unawaited(_subscription.cancel());
+    unawaited(_controller.close());
+  }
+
+  void _onError(Object error, StackTrace stackTrace) {
+    if (error case ConnectionProblem() || TemporaryServerProblem()) {
+      if (_whenOffline != null) {
+        _controller.add(_whenOffline());
+      }
+
+      unawaited(_subscription.cancel());
+      unawaited(_controller.close());
+    } else {
+      _controller.addError(error, stackTrace);
     }
   }
 }

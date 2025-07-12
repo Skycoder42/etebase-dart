@@ -123,12 +123,10 @@ abstract base class _PullBasedBackgroundSync extends ItemBackgroundSync {
       },
       whenOffline: () {
         logger.downloadOffline();
-        return Stream.value(
-          ItemListResponse(
-            data: const [],
-            stoken: response?.stoken ?? stoken,
-            isDone: true,
-          ),
+        return ItemListResponse(
+          data: const [],
+          stoken: response?.stoken ?? stoken,
+          isDone: true,
         );
       },
     );
