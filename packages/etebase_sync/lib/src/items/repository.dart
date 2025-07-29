@@ -6,7 +6,7 @@ class Repository<TRecord extends ItemRecord> {
   final ItemRecordFactory<TRecord> _factory;
   final ItemManager _itemManager;
   final ItemStore _store;
-  final LateRef<SyncConfig> _config;
+  final SyncConfig _config;
   final ItemsLogger _logger;
 
   late final ItemBackgroundSync _backgroundSync;
@@ -41,7 +41,7 @@ class Repository<TRecord extends ItemRecord> {
       this,
       _collection.uid,
       _logger,
-      _config.current.syncMode,
+      _config.syncMode,
     );
   }
 
@@ -173,7 +173,7 @@ class Repository<TRecord extends ItemRecord> {
       _logger.persist(record.uid);
       await _saveToCache(record);
 
-      if (_config.current.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(record.uid);
       }
     } finally {

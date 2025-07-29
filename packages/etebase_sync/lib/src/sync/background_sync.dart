@@ -34,6 +34,7 @@ abstract base class BackgroundSync<
   late final StreamSubscription<void> _cacheSub;
   late final StreamSubscription<void> _remoteSub;
 
+  // TODO ensure this works for all (edge) cases
   var _downSyncActive = false;
 
   @protected

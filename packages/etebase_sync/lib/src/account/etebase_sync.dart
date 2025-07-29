@@ -2,9 +2,9 @@ import 'package:etebase/etebase.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
 
-import '../../etebase_sync.dart';
 import '../collections/collection_conflict_resolver.dart';
 import '../collections/repository_manager.dart';
+import '../collections/repository_metadata.dart';
 import '../exceptions/already_logged_in.dart';
 import '../exceptions/not_logged_in.dart';
 import '../items/factory_registry.dart';
@@ -18,7 +18,6 @@ import '../storage/hive/hive_storage_manager.dart';
 import '../storage/storage_manager.dart';
 import '../sync/storage_mode.dart';
 import '../sync/sync_config.dart';
-import '../util/late_ref.dart';
 import 'key_manager.dart';
 import 'keystore.dart';
 
@@ -35,7 +34,7 @@ class EtebaseSync {
 
   late final AccountStore _accountStore;
 
-  final _config = LateRef<SyncConfig>();
+  late SyncConfig _config;
   Account? _account;
   RepositoryManager? _repoManager;
 
@@ -50,7 +49,10 @@ class EtebaseSync {
     StorageMode storageMode = StorageMode.cached,
   }) {
     if (_instance != null) {
-      throw UnimplementedError(); // TODO
+      throw StateError(
+        'Another EtebaseSync instance has already been created. '
+        'If you need multiple instances, use EtebaseSync.prefixed instead.',
+      );
     }
 
     final accountLogger = logger ?? AccountLogger();
@@ -111,7 +113,7 @@ class EtebaseSync {
 
     await _storageManager.init();
     _accountStore = await _storageManager.createAccountStore();
-    _config.current = _accountStore.getSyncConfig() ?? const SyncConfig();
+    _config = _accountStore.getSyncConfig() ?? const SyncConfig();
   }
 
   Future<void> dispose() async {
@@ -128,7 +130,7 @@ class EtebaseSync {
     ]);
   }
 
-  SyncConfig get config => _config.current;
+  SyncConfig get config => _config;
 
   bool get hasStoredAccount => _accountStore.hasAccount;
 
@@ -142,9 +144,20 @@ class EtebaseSync {
     ItemRecordFactory<TRecord> factory,
   ) => _registry.registerType<TRecord>(collectionType, factory);
 
+  /// Updates the current sync configuration.
+  ///
+  /// Changing the [config] will update the internal state and persist the
+  /// config to the storage for persistence. The [repositoryManager] will also
+  /// be updated to use the new [config] immediately and newly created
+  /// [Repository] instances will use it as well.
+  ///
+  /// **Attention:** Any existing [Repository] will **not** be updated with the
+  /// new config. If you need that, you will have to dispose and recreate all
+  /// used repositories.
   Future<void> updateConfig(SyncConfig config) async {
     await _accountStore.saveSyncConfig(config);
-    _config.current = config;
+    _config = config;
+    _repoManager?.updateConfig(config);
   }
 
   Future<void> login({
@@ -254,7 +267,7 @@ class EtebaseSync {
       _registry,
       await _storageManager.createCollectionStore(account.collectionManager),
       _conflictResolver,
-      _config, // TODO handle changes
+      _config,
       _online,
       _logger.collection,
     );

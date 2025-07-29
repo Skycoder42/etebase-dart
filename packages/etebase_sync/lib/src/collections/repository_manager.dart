@@ -18,7 +18,6 @@ import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
-import '../util/late_ref.dart';
 import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
 import 'repository_metadata.dart';
@@ -29,7 +28,7 @@ class RepositoryManager {
   final CollectionStore _store;
   final CollectionConflictResolver _conflictResolver;
   final FactoryRegistry _registry;
-  final LateRef<SyncConfig> _config;
+  SyncConfig _config;
   final OnlineWrapper _online;
   final CollectionsLogger _logger;
 
@@ -68,12 +67,20 @@ class RepositoryManager {
     );
   }
 
+  @internal
   Future<void> init() async {
     await _backgroundSync.init();
   }
 
+  @internal
   Future<void> dispose() async {
     await _backgroundSync.dispose();
+  }
+
+  @internal
+  // ignore: use_setters_to_change_properties because internal method
+  void updateConfig(SyncConfig config) {
+    _config = config;
   }
 
   Future<Repository<TRecord>> openPrimary<TRecord extends ItemRecord>({
@@ -159,7 +166,7 @@ class RepositoryManager {
       final result = await _store.saveLocal(collection, expectedEtag: null);
       collection = await _handleSaveResult(collection, result);
 
-      if (_config.current.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
 
@@ -220,7 +227,7 @@ class RepositoryManager {
       );
       collection = await _handleSaveResult(collection, result);
 
-      if (_config.current.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
     } finally {
@@ -244,7 +251,7 @@ class RepositoryManager {
       );
       collection = await _handleSaveResult(collection, result);
 
-      if (_config.current.waitForUpload) {
+      if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
 
