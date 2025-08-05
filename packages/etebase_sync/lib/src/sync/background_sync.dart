@@ -13,8 +13,6 @@ import '../storage/save_result.dart';
 import '../storage/store.dart';
 import 'sync_event.dart';
 
-// TODO error handling
-
 @internal
 abstract base class BackgroundSync<
   TItem extends Item,
@@ -190,7 +188,6 @@ abstract base class BackgroundSync<
 
         // ignore: avoid_catches_without_on_clauses
       } catch (e, s) {
-        // workaround, as one cannot yield multiple exceptions from an async*
         _handleError('download', e, s);
       } finally {
         item.dispose();

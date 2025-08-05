@@ -264,6 +264,23 @@ class RepositoryManager {
     }
   }
 
+  Future<void> forceDelete(String uid) async {
+    final collection = await _collectionManager.fetch(
+      uid,
+      const FetchOptions(prefetch: PrefetchOption.medium),
+    );
+    try {
+      if (collection.isDeleted) {
+        return;
+      }
+
+      await collection.delete();
+      await _collectionManager.upload(collection);
+    } finally {
+      collection.dispose();
+    }
+  }
+
   Future<Collection> _getCol<TRecord extends ItemRecord>(
     String colUid,
     bool didSync,

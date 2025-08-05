@@ -33,7 +33,6 @@ class Repository<TRecord extends ItemRecord> {
     this._config,
     this._logger,
   ) {
-    // TODO recreate background sync when config changes
     _backgroundSync = ItemBackgroundSync.forMode(
       _online,
       _store,
@@ -57,6 +56,7 @@ class Repository<TRecord extends ItemRecord> {
   }
 
   Future<void> dispose() async {
+    // TODO dispose all records?
     await _backgroundSync.dispose();
     _itemManager.dispose();
     _collection.dispose();
@@ -114,6 +114,23 @@ class Repository<TRecord extends ItemRecord> {
       throw CacheMiss(EtebaseTarget.item, uid, didSync: sync);
     }
     return await _createRecord(item);
+  }
+
+  Future<void> forceDelete(String uid) async {
+    final item = await _itemManager.fetch(
+      uid,
+      const ItemFetchOptions(prefetch: PrefetchOption.medium),
+    );
+    try {
+      if (item.isDeleted) {
+        return;
+      }
+
+      await item.delete();
+      await _itemManager.batch([item]);
+    } finally {
+      item.dispose();
+    }
   }
 
   void _checkWritable() {
