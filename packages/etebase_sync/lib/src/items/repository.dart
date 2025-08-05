@@ -103,11 +103,15 @@ class Repository<TRecord extends ItemRecord> {
     return await _createRecord(item, created: true);
   }
 
-  Future<TRecord?> open(String uid) async {
+  Future<TRecord> open(String uid, {bool sync = false}) async {
+    if (sync) {
+      await _backgroundSync.sync();
+    }
+
     final item = await _store.getItem(uid);
     if (item == null || item.isDeleted) {
       item?.dispose();
-      return null;
+      throw CacheMiss(EtebaseTarget.item, uid, didSync: sync);
     }
     return await _createRecord(item);
   }

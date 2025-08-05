@@ -188,7 +188,7 @@ class RepositoryManager {
       await _backgroundSync.sync(_registry.typeFor<TRecord>());
     }
 
-    final collection = await _getCol<TRecord>(colUid);
+    final collection = await _getCol<TRecord>(colUid, sync);
     try {
       return _createRepo<TRecord>(collection);
     } catch (_) {
@@ -205,7 +205,7 @@ class RepositoryManager {
       await _backgroundSync.sync(_registry.typeFor<TRecord>());
     }
 
-    final collection = await _getCol<TRecord>(colUid);
+    final collection = await _getCol<TRecord>(colUid, sync);
     try {
       return await collection.getMeta<RepositoryMetadata>();
     } finally {
@@ -218,7 +218,7 @@ class RepositoryManager {
     RepositoryMetadata meta,
   ) async {
     _logger.updateMeta(colUid);
-    var collection = await _getCol<TRecord>(colUid);
+    var collection = await _getCol<TRecord>(colUid, false);
 
     try {
       _checkWritable(collection);
@@ -244,7 +244,7 @@ class RepositoryManager {
     _logger.delete(colUid);
     Collection? collection;
     try {
-      collection = await _getCol<TRecord>(colUid);
+      collection = await _getCol<TRecord>(colUid, false);
       _checkWritable(collection);
       final currentEtag = collection.etag;
       await collection.delete();
@@ -257,8 +257,6 @@ class RepositoryManager {
       if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
-
-      // TODO change type
     } on CacheMiss {
       return;
     } finally {
@@ -266,12 +264,15 @@ class RepositoryManager {
     }
   }
 
-  Future<Collection> _getCol<TRecord extends ItemRecord>(String colUid) async {
+  Future<Collection> _getCol<TRecord extends ItemRecord>(
+    String colUid,
+    bool didSync,
+  ) async {
     final collection = await _store.getItem(colUid);
 
     try {
       if (collection == null || collection.isDeleted) {
-        throw CacheMiss(colUid); // TODO change exception
+        throw CacheMiss(EtebaseTarget.collection, colUid, didSync: didSync);
       }
       _validateType<TRecord>(collection);
       return collection;
