@@ -29,16 +29,12 @@ abstract base class BackgroundSync<
   final SyncLogger logger;
 
   final _syncLock = Lock();
-  final _syncedController = StreamController<SyncEvent>.broadcast(sync: true);
+  final _syncedController = StreamController<SyncEvent>.broadcast();
 
   late final StreamSubscription<void> _cacheSub;
   late final StreamSubscription<void> _remoteSub;
 
-  // TODO ensure this works for all (edge) cases
-  var _downSyncActive = false;
-
-  @protected
-  bool get isDownSyncActive => _downSyncActive;
+  final _activeDownSyncs = <String?>{};
 
   BackgroundSync(this.online, this.store, this.logger);
 
@@ -107,6 +103,19 @@ abstract base class BackgroundSync<
     ConflictOrigin origin,
   );
 
+  @protected
+  bool isDownSyncActive([String? scope]) => _activeDownSyncs.contains(scope);
+
+  @protected
+  bool markDownSyncActive([String? scope]) {
+    if (_activeDownSyncs.add(scope)) {
+      _syncedController.add(SyncEvent.downloadStarted(scope));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Stream<String> _pendingUploadsAfterReconnect() => online.stream
       .distinct()
       .where((e) => e.isOnline)
@@ -162,12 +171,10 @@ abstract base class BackgroundSync<
   );
 
   Stream<SyncEvent> _handleResponse(TResponse response) async* {
-    if (!_downSyncActive) {
-      _downSyncActive = true;
-      yield SyncEvent.downloadStarted(scopeFor(response));
-    }
+    final scope = scopeFor(response);
+    markDownSyncActive(scope);
 
-    logger.downloadResponse(response, scopeFor(response));
+    logger.downloadResponse(response, scope);
     for (final item in response.data) {
       try {
         if (shouldSkip(item)) {
@@ -192,9 +199,8 @@ abstract base class BackgroundSync<
 
     await updateStoken(response);
 
-    if (response.isDone) {
-      _downSyncActive = false;
-      yield SyncEvent.downloadFinished(scopeFor(response));
+    if (response.isDone && _activeDownSyncs.remove(scope)) {
+      yield SyncEvent.downloadFinished(scope);
     }
   }
 

@@ -48,7 +48,8 @@ Future<void> main() async {
 
   final sodium = await SodiumSumoInit.init(
     // replace with wherever libsodium is located on your machine
-    () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so'),
+    // () => DynamicLibrary.open('/usr/lib/aarch64-linux-gnu/libsodium.so'),
+    () => DynamicLibrary.open('/usr/lib/libsodium.so'),
   );
 
   final client = Client.create(
@@ -71,6 +72,7 @@ Future<void> main() async {
   );
 
   final repoMgr = sync.repositoryManager;
+  repoMgr.syncEvents.listen((e) => print('### $e'));
 
   print('>>>>>>>>> openPrimary');
   final primary = await repoMgr.openPrimary<StringRecord>();

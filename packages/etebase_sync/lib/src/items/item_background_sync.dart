@@ -151,7 +151,7 @@ final class _ManualBackgroundSync extends _PullBasedBackgroundSync {
 
   @override
   Future<void> sync() async {
-    if (!isDownSyncActive) {
+    if (markDownSyncActive()) {
       logger.downloadTriggered('Manual sync');
       _controller.add(await store.getStoken());
     }
@@ -187,7 +187,7 @@ final class _PeriodicBackgroundSync extends _PullBasedBackgroundSync {
 
   @override
   Future<void> sync() async {
-    if (!isDownSyncActive) {
+    if (markDownSyncActive()) {
       logger.downloadTriggered('Manual sync');
       _controller.add(await store.getStoken());
     }
@@ -245,11 +245,10 @@ final class _LiveBackgroundSync extends ItemBackgroundSync {
       if (!syncBlocker.isCompleted) {
         syncBlocker.complete(true);
       }
-    } else if (!isDownSyncActive) {
-      return;
-    }
-
-    if (await online.isOnline) {
+      if (await online.isOnline) {
+        await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
+      }
+    } else if (await online.isOnline && isDownSyncActive()) {
       await syncEvents.whereType<SyncDownloadFinishedEvent>().first;
     }
   }

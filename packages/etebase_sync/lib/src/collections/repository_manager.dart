@@ -18,6 +18,7 @@ import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
+import '../sync/sync_event.dart';
 import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
 import 'repository_metadata.dart';
@@ -66,6 +67,8 @@ class RepositoryManager {
       _logger,
     );
   }
+
+  Stream<SyncEvent> get syncEvents => _backgroundSync.syncEvents;
 
   @internal
   Future<void> init() async {

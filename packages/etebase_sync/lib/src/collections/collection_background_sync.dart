@@ -41,8 +41,7 @@ final class CollectionBackgroundSync
       await Future.wait([super.dispose(), _controller.close()]);
 
   Future<void> sync(String collectionType) async {
-    // TODO this if condition wont work
-    if (!isDownSyncActive) {
+    if (markDownSyncActive(collectionType)) {
       logger.downloadTriggered('Manual sync', collectionType);
       _controller.add((
         collectionType: collectionType,

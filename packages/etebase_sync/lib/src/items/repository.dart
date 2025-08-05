@@ -50,6 +50,8 @@ class Repository<TRecord extends ItemRecord> {
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly;
 
+  Stream<SyncEvent> get syncEvents => _backgroundSync.syncEvents;
+
   Future<void> init() async {
     await _backgroundSync.init();
   }
