@@ -109,8 +109,7 @@ class Repository<TRecord extends ItemRecord> {
     }
 
     final item = await _store.getItem(uid);
-    if (item == null || item.isDeleted) {
-      item?.dispose();
+    if (item == null) {
       throw CacheMiss(EtebaseTarget.item, uid, didSync: sync);
     }
     return await _createRecord(item);
@@ -233,6 +232,9 @@ class Repository<TRecord extends ItemRecord> {
   /// After resolution, the [target] will be updated to instead reference
   /// [canonicalItem] with a last known cache etag of [cacheEtag]. As part of
   /// the resolution, [canonicalItem] may be updated with changes from [target].
+  ///
+  /// If [canonicalItem] is deleted ([Item.isDeleted]), an [ItemDeleted]
+  /// exception will be thrown instead.
   Future<void> _resolveCacheConflict(
     TRecord target,
     Item canonicalItem,
@@ -245,7 +247,6 @@ class Repository<TRecord extends ItemRecord> {
     );
     final canonical = await _createRecord(
       canonicalItem,
-      allowDeleted: true,
       forceState: RecordState.conflictResolving,
     );
 

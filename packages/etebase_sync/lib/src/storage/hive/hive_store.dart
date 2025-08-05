@@ -101,7 +101,7 @@ abstract base class HiveStore<
       }
     } else {
       if (oldItem == null) {
-        return throw ItemDeleted(item.uid);
+        throw ItemDeleted(item.uid);
       } else if (oldItem.localEtag != expectedEtag) {
         return SaveResult.conflict(createItem(oldItem));
       }

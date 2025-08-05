@@ -45,6 +45,7 @@ abstract class ItemRecord {
   }
 
   @mustCallSuper
+  @visibleForOverriding
   Future<void> init({required bool created}) async {
     if (_state != RecordState.uninitialized) {
       throw StateError('Record has already been initialized');
@@ -60,7 +61,7 @@ abstract class ItemRecord {
 
   @mustCallSuper
   void dispose() {
-    if (_state case RecordState.disposed || RecordState.detached) {
+    if (_state case RecordState.disposed || RecordState.detaching) {
       return;
     }
 
@@ -69,7 +70,7 @@ abstract class ItemRecord {
   }
 
   void _detach() {
-    _state = RecordState.detached;
+    _state = RecordState.detaching;
     dispose();
     _state = RecordState.disposed;
   }
@@ -85,6 +86,8 @@ abstract class ItemRecord {
 
     await _repository._refresh(this, sync);
   }
+
+  // TODO add sync for live updates
 
   @mustCallSuper
   Future<void> save() async {
@@ -111,7 +114,11 @@ abstract class ItemRecord {
       return;
     }
 
-    await _repository._persist(this);
+    try {
+      await _repository._persist(this);
+    } on ItemDeleted {
+      // ignore, because the desired state has been reached
+    }
   }
 
   @visibleForOverriding
@@ -127,7 +134,7 @@ abstract class ItemRecord {
   ) => Future.value();
 
   Future<void> _updateItem(Item item, String cacheEtag) async {
-    // TODO state check needed?
+    _checkInitialized();
 
     _cacheEtag = cacheEtag;
     if (identical(_item, item)) {
@@ -141,8 +148,6 @@ abstract class ItemRecord {
     if (!item.isDeleted) {
       deserialize(await item.getContent());
     }
-
-    // TODO throw ItemDeleted?
   }
 
   Future<void> _updateMeta() async {
@@ -156,7 +161,7 @@ abstract class ItemRecord {
     switch (_state) {
       case RecordState.uninitialized:
         throw StateError('Record has not been initialized yet');
-      case RecordState.disposed || RecordState.detached:
+      case RecordState.disposed || RecordState.detaching:
         throw StateError('Record has been disposed');
       case _:
         break;

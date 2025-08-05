@@ -8,6 +8,7 @@ import '../exceptions/cache_miss.dart';
 import '../exceptions/collection_type_mismatch.dart';
 import '../exceptions/conflict_origin.dart';
 import '../exceptions/etebase_target.dart';
+import '../exceptions/item_deleted.dart';
 import '../exceptions/read_only.dart';
 import '../exceptions/unresolved_conflict.dart';
 import '../items/factory_registry.dart';
@@ -98,12 +99,18 @@ class RepositoryManager {
     try {
       await for (final collection in _store.listCollections(collectionType)) {
         try {
-          final meta = await collection.getMeta<RepositoryMetadata>();
-          if (meta.primary) {
-            primaryCollections.add((collection, meta));
-          } else {
+          if (collection.isDeleted) {
             collection.dispose();
+            continue;
           }
+
+          final meta = await collection.getMeta<RepositoryMetadata>();
+          if (!meta.primary) {
+            collection.dispose();
+            continue;
+          }
+
+          primaryCollections.add((collection, meta));
         } catch (_) {
           collection.dispose();
           rethrow;
@@ -257,6 +264,8 @@ class RepositoryManager {
       if (_config.waitForUpload) {
         await _backgroundSync.waitForSync(collection.uid);
       }
+    } on ItemDeleted {
+      return;
     } on CacheMiss {
       return;
     } finally {
@@ -288,10 +297,22 @@ class RepositoryManager {
     final collection = await _store.getItem(colUid);
 
     try {
-      if (collection == null || collection.isDeleted) {
+      if (collection == null) {
         throw CacheMiss(EtebaseTarget.collection, colUid, didSync: didSync);
+      } else if (collection.isDeleted) {
+        throw ItemDeleted(collection.uid, EtebaseTarget.collection);
       }
-      _validateType<TRecord>(collection);
+
+      final expectedType = _registry.typeFor<TRecord>();
+      if (collection.collectionType != expectedType) {
+        final actType = collection.collectionType;
+        throw CollectionTypeMismatch(
+          colUid: collection.uid,
+          expectedCollectionType: expectedType,
+          actualCollectionType: actType,
+        );
+      }
+
       return collection;
     } catch (_) {
       collection?.dispose();
@@ -305,22 +326,12 @@ class RepositoryManager {
     }
   }
 
-  void _validateType<TRecord extends ItemRecord>(Collection instance) {
-    final expectedType = _registry.typeFor<TRecord>();
-    if (instance.collectionType != expectedType) {
-      final actType = instance.collectionType;
-      throw CollectionTypeMismatch(
-        colUid: instance.uid,
-        expectedCollectionType: expectedType,
-        actualCollectionType: actType,
-      );
-    }
-  }
-
   Future<Collection> _handleSaveResult(
     Collection collection,
     SaveResult<Collection> result,
   ) async {
+    // TODO check ItemDeleted handling and handling of deleted items in general
+
     switch (result) {
       case SaveOk(:final etag, :final action):
         _logger.saved(collection.uid, action, cacheEtag: etag);
@@ -376,6 +387,7 @@ class RepositoryManager {
         continue;
       }
 
+      _checkWritable(collection);
       final cacheEtag = collection.etag;
       await collection.setMeta(meta.copyWith(primary: false));
       final result = await _store.saveLocal(

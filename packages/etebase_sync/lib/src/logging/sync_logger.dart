@@ -142,6 +142,11 @@ class SyncLogger {
   void error(String context, Object error, StackTrace stackTrace) =>
       logger.severe('Unexpected error in $context', error, stackTrace);
 
+  void streamClosed(String direction) => logger.warning(
+    '$direction stream did close unexpectedly. '
+    'No events will be synced anymore.',
+  );
+
   String _remote(String? etag) => etag != null ? ' (Remote etag: $etag)' : '';
 
   String _cacheAndRemote(String cacheEtag, String? remoteEtag) =>

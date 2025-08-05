@@ -4,5 +4,5 @@ enum RecordState {
   locked,
   conflictResolving,
   disposed,
-  detached,
+  detaching,
 }

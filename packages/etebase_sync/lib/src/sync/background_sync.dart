@@ -54,7 +54,7 @@ abstract base class BackgroundSync<
         .listen(
           _syncedController.add,
           onError: (Object e, StackTrace s) => _handleError('upload', e, s),
-          // TODO handle onDone
+          onDone: () => logger.streamClosed('Storage'),
           cancelOnError: false,
         );
 
@@ -63,7 +63,7 @@ abstract base class BackgroundSync<
         .listen(
           _syncedController.add,
           onError: (Object e, StackTrace s) => _handleError('download', e, s),
-          // TODO handle onDone
+          onDone: () => logger.streamClosed('Remote'),
           cancelOnError: false,
         );
   }
