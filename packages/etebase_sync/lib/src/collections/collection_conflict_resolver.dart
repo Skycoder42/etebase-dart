@@ -54,7 +54,6 @@ extension CollectionConflictResolverX on CollectionConflictResolver {
         break;
       case ConflictResolutionUpdate() when target.isDeleted:
         throw ItemDeleted(target.uid);
-
       case ConflictResolutionUpdate(:final meta):
         await target.setMeta<RepositoryMetadata>(meta);
       case ConflictResolutionDelete(:final RepositoryMetadata meta):

@@ -330,8 +330,6 @@ class RepositoryManager {
     Collection collection,
     SaveResult<Collection> result,
   ) async {
-    // TODO check ItemDeleted handling and handling of deleted items in general
-
     switch (result) {
       case SaveOk(:final etag, :final action):
         _logger.saved(collection.uid, action, cacheEtag: etag);
@@ -353,6 +351,10 @@ class RepositoryManager {
     Collection conflicted,
     String expectedEtag,
   ) async {
+    if (target.isDeleted) {
+      throw ItemDeleted(target.uid, EtebaseTarget.collection);
+    }
+
     _logger.conflict(
       target.uid,
       cacheEtag: target.etag,
