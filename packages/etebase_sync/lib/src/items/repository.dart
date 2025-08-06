@@ -1,6 +1,9 @@
 part of 'items.dart';
 
-class Repository<TRecord extends ItemRecord> {
+class Repository<TRecord extends ItemRecord>
+    with DisposeScope
+    implements ScopeDisposable {
+  final RepositoryManager _repoManager;
   final OnlineWrapper _online;
   final Collection _collection;
   final ItemRecordFactory<TRecord> _factory;
@@ -13,6 +16,7 @@ class Repository<TRecord extends ItemRecord> {
 
   @visibleForTesting
   Repository.forTesting(
+    this._repoManager,
     this._online,
     this._collection,
     this._factory,
@@ -25,6 +29,7 @@ class Repository<TRecord extends ItemRecord> {
 
   @internal
   Repository.internal(
+    this._repoManager,
     this._online,
     this._collection,
     this._factory,
@@ -52,14 +57,17 @@ class Repository<TRecord extends ItemRecord> {
   Stream<SyncEvent> get syncEvents => _backgroundSync.syncEvents;
 
   Future<void> init() async {
+    _repoManager.attach(this);
     await _backgroundSync.init();
   }
 
+  @override
   Future<void> dispose() async {
-    // TODO dispose all records?
+    await super.dispose();
     await _backgroundSync.dispose();
     _itemManager.dispose();
     _collection.dispose();
+    _repoManager.detach(this);
   }
 
   Future<void> sync() async => await _backgroundSync.sync();

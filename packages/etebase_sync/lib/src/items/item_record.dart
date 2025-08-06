@@ -1,6 +1,6 @@
 part of 'items.dart';
 
-abstract class ItemRecord {
+abstract class ItemRecord implements ScopeDisposable {
   final Repository _repository;
   final bool automaticTimestamps;
 
@@ -51,6 +51,7 @@ abstract class ItemRecord {
       throw StateError('Record has already been initialized');
     }
 
+    _repository.attach(this);
     _currentMeta = await _item.getMeta();
     if (!created && !_item.isDeleted) {
       deserialize(await _item.getContent());
@@ -59,20 +60,24 @@ abstract class ItemRecord {
     _state = RecordState.ready;
   }
 
+  // Must use Null instead of void to conform to the interface
+  @override
   @mustCallSuper
-  void dispose() {
+  Null dispose() {
     if (_state case RecordState.disposed || RecordState.detaching) {
       return;
     }
 
     _item.dispose();
     _state = RecordState.disposed;
+    _repository.detach(this);
   }
 
   void _detach() {
     _state = RecordState.detaching;
     dispose();
     _state = RecordState.disposed;
+    _repository.detach(this);
   }
 
   @mustCallSuper

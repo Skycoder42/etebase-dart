@@ -5,6 +5,7 @@ import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../collections/repository_manager.dart';
 import '../exceptions/cache_miss.dart';
 import '../exceptions/conflict_origin.dart';
 import '../exceptions/etebase_target.dart';
@@ -19,6 +20,7 @@ import '../sync/background_sync.dart';
 import '../sync/sync_config.dart';
 import '../sync/sync_event.dart';
 import '../sync/sync_mode.dart';
+import '../util/dispose_scope.dart';
 import 'factory_registry.dart';
 import 'record_state.dart';
 

@@ -20,11 +20,12 @@ import '../storage/save_result.dart';
 import '../storage/storage_manager.dart';
 import '../sync/sync_config.dart';
 import '../sync/sync_event.dart';
+import '../util/dispose_scope.dart';
 import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
 import 'repository_metadata.dart';
 
-class RepositoryManager {
+class RepositoryManager with DisposeScope {
   final CollectionManager _collectionManager;
   final StorageManager _storageManager;
   final CollectionStore _store;
@@ -76,8 +77,10 @@ class RepositoryManager {
     await _backgroundSync.init();
   }
 
+  @override
   @internal
   Future<void> dispose() async {
+    await super.dispose();
     await _backgroundSync.dispose();
   }
 
@@ -418,6 +421,7 @@ class RepositoryManager {
   ) async {
     final itemManager = _collectionManager.getItemManager(collection);
     final repo = Repository.internal(
+      this,
       _online,
       collection,
       _registry.itemFactoryFor<TRecord>(),
