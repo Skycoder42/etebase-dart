@@ -20,5 +20,7 @@ abstract interface class StorageManager {
     ItemManager itemManager,
   );
 
+  Future<void> eraseItemStore(String colUid);
+
   Future<void> erase();
 }

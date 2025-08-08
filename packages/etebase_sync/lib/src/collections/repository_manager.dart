@@ -248,9 +248,9 @@ class RepositoryManager with DisposeScope {
     }
   }
 
-  // TODO handle deletion gracefully -> all items must be deleted!
-
   Future<void> delete<TRecord extends ItemRecord>(String colUid) async {
+    await _closeRepoAndClearCache<TRecord>(colUid);
+
     _logger.delete(colUid);
     Collection? collection;
     try {
@@ -432,5 +432,19 @@ class RepositoryManager with DisposeScope {
     );
     await repo.init();
     return repo;
+  }
+
+  Future<void> _closeRepoAndClearCache<TRecord extends ItemRecord>(
+    String colUid,
+  ) async {
+    // dispose any open repositories on this collection
+    await Future.wait(
+      findDisposables<Repository<TRecord>>(
+        (repository) => repository.uid == colUid,
+      ).map((repo) => repo.dispose()),
+    );
+
+    // clear from cache
+    await _storageManager.eraseItemStore(colUid);
   }
 }

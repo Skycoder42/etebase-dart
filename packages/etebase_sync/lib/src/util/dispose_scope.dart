@@ -28,4 +28,8 @@ mixin DisposeScope {
       await Future.wait(pendingDisposes);
     }
   }
+
+  @protected
+  Iterable<T> findDisposables<T>(bool Function(T) filter) =>
+      _items.map((r) => r.target).whereType<T>().where(filter);
 }

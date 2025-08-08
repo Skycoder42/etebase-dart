@@ -18,7 +18,7 @@ final class HiveItemStore extends HiveStore<Item, ItemInfo>
 
   final _writeLock = Lock();
 
-  String get _stokenKey => 'items.$colUid';
+  String get _stokenKey => stokenKeyFor(colUid);
 
   HiveItemStore(this.colUid, this._itemManager, this._stokenBox, super.itemBox);
 
@@ -45,4 +45,6 @@ final class HiveItemStore extends HiveStore<Item, ItemInfo>
     localEtag: item.etag,
     remoteEtag: remoteEtag,
   );
+
+  static String stokenKeyFor(String colUid) => 'items.$colUid';
 }

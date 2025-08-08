@@ -79,14 +79,25 @@ class HiveStorageManager implements StorageManager {
     collection.uid,
     itemManager,
     _stokenBox,
-    await _getBox(_itemBoxName(collection)),
+    await _getBox(_itemBoxName(collection.uid)),
   );
+
+  @override
+  Future<void> eraseItemStore(String colUid) async {
+    final itemBoxName = _itemBoxName(colUid);
+    if (_hive.isBoxOpen(itemBoxName)) {
+      await _box<ItemInfo>(itemBoxName).close();
+    }
+    await _hive.deleteBoxFromDisk(itemBoxName);
+    await _metaBox.delete(_metaBoxKey(itemBoxName));
+    await _stokenBox.delete(HiveItemStore.stokenKeyFor(colUid));
+  }
 
   @override
   Future<void> erase() async {
     for (final boxName in _knownBoxes) {
       if (_hive.isBoxOpen(boxName)) {
-        await _box<dynamic>(boxName).close();
+        await _genericBox(boxName).close();
       }
       await _hive.deleteBoxFromDisk(boxName);
     }
@@ -103,25 +114,27 @@ class HiveStorageManager implements StorageManager {
     }
   }
 
-  String _itemBoxName(Collection collection) =>
-      '$_itemBoxPrefix${collection.uid}';
+  String _itemBoxName(String colUid) => '$_itemBoxPrefix$colUid';
 
-  BoxBase<T> _box<T>(String boxName) => switch (_storageMode) {
-    StorageMode.cached => _hive.box<T>(boxName),
-    StorageMode.lazy => _hive.lazyBox<T>(boxName),
-  };
+  String _metaBoxKey(String boxName) => '$_metaBoxKeyPrefix$boxName';
 
-  Future<BoxBase<T>> _openBox<T>(String boxName) async =>
+  BoxBase<T> _box<T extends ItemInfoBase>(String boxName) =>
+      switch (_storageMode) {
+        StorageMode.cached => _hive.box<T>(boxName),
+        StorageMode.lazy => _hive.lazyBox<T>(boxName),
+      };
+
+  Future<BoxBase<T>> _openBox<T extends ItemInfoBase>(String boxName) async =>
       switch (_storageMode) {
         StorageMode.cached => await _hive.openBox(boxName),
         StorageMode.lazy => await _hive.openLazyBox(boxName),
       };
 
-  Future<BoxBase<T>> _getBox<T>(String boxName) async {
+  Future<BoxBase<T>> _getBox<T extends ItemInfoBase>(String boxName) async {
     if (_hive.isBoxOpen(boxName)) {
       return _box<T>(boxName);
     } else {
-      final metaKey = '$_metaBoxKeyPrefix$boxName';
+      final metaKey = _metaBoxKey(boxName);
       if (!_metaBox.containsKey(metaKey)) {
         await _metaBox.put(metaKey, null);
       }
@@ -137,11 +150,16 @@ class HiveStorageManager implements StorageManager {
     }
   }
 
-  Iterable<BoxBase<dynamic>> get _openBoxes => _knownBoxes
+  Iterable<BoxBase<ItemInfoBase>> get _openBoxes => _knownBoxes
       .where(_hive.isBoxOpen)
       .map(
         (boxName) => boxName == _collectionBoxName
             ? _box<CollectionInfo>(boxName)
             : _box<ItemInfo>(boxName),
       );
+
+  BoxBase<ItemInfoBase> _genericBox(String boxName) =>
+      boxName == _collectionBoxName
+      ? _box<CollectionInfo>(boxName)
+      : _box<ItemInfo>(boxName);
 }
