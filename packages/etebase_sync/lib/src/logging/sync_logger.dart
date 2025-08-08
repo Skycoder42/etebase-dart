@@ -111,7 +111,7 @@ class SyncLogger {
   }) {
     final direction = remoteEtag == null ? 'local' : 'remote';
     switch (action) {
-      case SaveAction.saved:
+      case SaveAction.saved || SaveAction.created:
         logger.fine(
           '${catItem(uid, cacheEtag)} '
           'Saved $direction $type to storage${_remote(remoteEtag)}',

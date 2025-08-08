@@ -134,8 +134,12 @@ abstract base class BackgroundSync<
           await upload(item);
           logger.uploadAccepted(uid, remoteEtag);
           final result = await store.saveUploaded(item);
-          final savedEtag = await _handleSaveResult(item, remoteEtag, result);
-          return _createEvent(
+          final (savedEtag, _) = await _handleSaveResult(
+            item,
+            remoteEtag,
+            result,
+          );
+          return _createUploadedEvent(
             uid: uid,
             remoteEtag: remoteEtag,
             cacheEtag: savedEtag,
@@ -144,13 +148,13 @@ abstract base class BackgroundSync<
           logger.downloadItem(uid);
           final remoteItem = await download(uid);
           final remoteEtag = remoteItem.etag;
-          final resolvedEtag = await _resolveConflict(
+          final (resolvedEtag, _) = await _resolveConflict(
             remote: remoteItem,
             cache: item,
             remoteEtag: remoteEtag,
             origin: ConflictOrigin.server,
           );
-          return _createEvent(
+          return _createUploadedEvent(
             uid: uid,
             remoteEtag: remoteEtag,
             cacheEtag: resolvedEtag,
@@ -182,8 +186,16 @@ abstract base class BackgroundSync<
 
         yield await _syncLock.synchronized(() async {
           final result = await store.saveRemote(item);
-          final savedEtag = await _handleSaveResult(item, item.etag, result);
-          return SyncEvent.downloaded(item.uid, savedEtag);
+          final (savedEtag, action) = await _handleSaveResult(
+            item,
+            item.etag,
+            result,
+          );
+          return SyncEvent.downloaded(
+            item.uid,
+            savedEtag,
+            isNew: action == SaveAction.created,
+          );
         });
 
         // ignore: avoid_catches_without_on_clauses
@@ -201,7 +213,7 @@ abstract base class BackgroundSync<
     }
   }
 
-  Future<String> _handleSaveResult(
+  Future<(String, SaveAction)> _handleSaveResult(
     TItem item,
     String remoteEtag,
     SaveResult<TItem> result,
@@ -209,7 +221,7 @@ abstract base class BackgroundSync<
     switch (result) {
       case SaveOk(:final etag, :final action):
         logger.saved(item.uid, action, cacheEtag: etag, remoteEtag: remoteEtag);
-        return etag;
+        return (etag, action);
       case SaveConflict(:final cacheItem):
         return await _resolveConflict(
           remote: item,
@@ -220,7 +232,7 @@ abstract base class BackgroundSync<
     }
   }
 
-  Future<String> _resolveConflict({
+  Future<(String, SaveAction)> _resolveConflict({
     required TItem remote,
     required TItem cache,
     required String remoteEtag,
@@ -246,7 +258,7 @@ abstract base class BackgroundSync<
       /// impossible. If it does happen, return the [remoteEtag]. This will
       /// always trigger a [SyncEvent.uploaded] event, which is what we want,
       /// as the item was resolved somewhere else and thus we are done here.
-      return remoteEtag;
+      return (remoteEtag, SaveAction.deleted);
     } finally {
       remote.dispose();
       cache.dispose();
@@ -263,7 +275,7 @@ abstract base class BackgroundSync<
   /// before being saved to the cache and thus another upload for that modified
   /// version will be triggered. Only after that modified version was uploaded
   /// we are done. Thus, no event for this upload.
-  SyncEvent? _createEvent({
+  SyncEvent? _createUploadedEvent({
     required String uid,
     required String remoteEtag,
     required String cacheEtag,

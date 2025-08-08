@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'save_result.freezed.dart';
 
-enum SaveAction { saved, deleted, unchanged }
+enum SaveAction { created, saved, deleted, unchanged }
 
 @freezed
 sealed class SaveResult<TItem extends Item> with _$SaveResult<TItem> {

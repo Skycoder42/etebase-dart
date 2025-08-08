@@ -63,7 +63,7 @@ abstract base class HiveStore<
           if (!item.isDeleted) {
             await itemBox.put(item.uid, createItemInfo(item, item.etag));
             _pendingUploads.remove(item.uid);
-            return SaveResult.ok(item.etag);
+            return SaveResult.ok(item.etag, SaveAction.created);
           } else {
             return SaveResult.ok(item.etag, SaveAction.unchanged);
           }
@@ -112,7 +112,10 @@ abstract base class HiveStore<
       createItemInfo(item, remoteEtag ?? oldItem?.remoteEtag),
     );
     _pendingUploads.add(item.uid);
-    return SaveResult.ok(item.etag);
+    return SaveResult.ok(
+      item.etag,
+      expectedEtag == null ? SaveAction.created : SaveAction.saved,
+    );
   });
 
   @override

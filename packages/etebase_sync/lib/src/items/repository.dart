@@ -80,8 +80,6 @@ class Repository<TRecord extends ItemRecord>
     yield* _store.listUids();
   }
 
-  // TODO add watch to be notified of changed/new items?
-
   Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
     if (sync) {
       await _backgroundSync.sync();

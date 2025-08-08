@@ -4,14 +4,19 @@ part 'sync_event.freezed.dart';
 
 @freezed
 sealed class SyncEvent with _$SyncEvent {
-  const factory SyncEvent.uploaded(String uid, String etag) = SyncUploadedEvent;
-  const factory SyncEvent.offline(String uid) = SyncOfflineEvent;
   const factory SyncEvent.downloadStarted([String? scope]) =
       SyncDownloadStartedEvent;
-  const factory SyncEvent.downloaded(String uid, String etag) =
-      SyncDownloadedEvent;
   const factory SyncEvent.downloadFinished([String? scope]) =
       SyncDownloadFinishedEvent;
+
+  const factory SyncEvent.downloaded(
+    String uid,
+    String etag, {
+    @Default(false) bool isNew,
+  }) = SyncDownloadedEvent;
+  const factory SyncEvent.uploaded(String uid, String etag) = SyncUploadedEvent;
+
+  const factory SyncEvent.offline(String uid) = SyncOfflineEvent;
 
   const SyncEvent._();
 
