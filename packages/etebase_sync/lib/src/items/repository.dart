@@ -80,6 +80,8 @@ class Repository<TRecord extends ItemRecord>
     yield* _store.listUids();
   }
 
+  // TODO add watch to be notified of changed/new items?
+
   Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
     if (sync) {
       await _backgroundSync.sync();
@@ -169,7 +171,7 @@ class Repository<TRecord extends ItemRecord>
     }
   }
 
-  Future<void> _refresh(TRecord record, bool sync) async {
+  Future<bool> _refresh(TRecord record, bool sync) async {
     if (sync) {
       await _backgroundSync.sync();
     }
@@ -188,8 +190,10 @@ class Repository<TRecord extends ItemRecord>
       // update record if necessary
       if (cacheItem.etag != record.etag) {
         await record._updateItem(cacheItem, cacheItem.etag);
+        return true;
       } else {
         cacheItem.dispose();
+        return false;
       }
     } finally {
       record._state = recordState;

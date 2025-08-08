@@ -81,18 +81,45 @@ abstract class ItemRecord implements ScopeDisposable {
   }
 
   @mustCallSuper
-  Future<void> refresh({bool sync = false}) async {
+  Future<bool> refresh({bool sync = false}) async {
     _checkUnlocked();
 
     // created items cannot be refresh until saved once
     if (_cacheEtag == null) {
-      return;
+      return false;
     }
 
-    await _repository._refresh(this, sync);
+    return await _repository._refresh(this, sync);
   }
 
-  // TODO add sync for live updates
+  Stream<String> watch({bool sync = false}) {
+    final syncStream = sync
+        ? Stream.value(null).asyncMap((_) => _repository.sync()).cast<String?>()
+        : null;
+
+    final watchEtagStream = _repository.syncEvents
+        .where((e) => e.uid == _item.uid)
+        .map(
+          (event) => switch (event) {
+            SyncUploadedEvent(:final etag) ||
+            SyncDownloadedEvent(:final etag) => etag,
+            _ => null,
+          },
+        );
+
+    final mergeStream = syncStream != null
+        ? MergeStream([syncStream, watchEtagStream])
+        : watchEtagStream;
+    return mergeStream.whereNotNull().asyncMap((etag) async {
+      if (etag == _item.etag) {
+        return null;
+      }
+      if (!await refresh()) {
+        return null;
+      }
+      return _item.etag;
+    }).whereNotNull();
+  }
 
   @mustCallSuper
   Future<void> save() async {
@@ -176,8 +203,9 @@ abstract class ItemRecord implements ScopeDisposable {
   void _checkUnlocked() {
     _checkInitialized();
     if (_state case RecordState.locked) {
-      // TODO real exception
-      throw StateError('Record is locked!');
+      throw StateError(
+        'Record is locked! Another asynchronous operation is still pending.',
+      );
     }
   }
 
