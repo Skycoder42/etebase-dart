@@ -141,6 +141,8 @@ class RepositoryManager with DisposeScope {
     }
   }
 
+  // TODO add list all / types ?
+
   Future<Map<String, RepositoryMetadata>> list<TRecord extends ItemRecord>({
     bool sync = true,
   }) async {
