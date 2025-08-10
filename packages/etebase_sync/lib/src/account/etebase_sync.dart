@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
@@ -13,6 +15,7 @@ import '../logging/account_logger.dart';
 import '../online/online_checker.dart';
 import '../online/online_wrapper.dart';
 import '../online/server_ping_online_checker.dart';
+import '../share/invitation_user_validator.dart';
 import '../storage/account_store.dart';
 import '../storage/hive/hive_storage_manager.dart';
 import '../storage/storage_manager.dart';
@@ -30,6 +33,7 @@ class EtebaseSync {
   final CollectionConflictResolver _conflictResolver;
   final OnlineWrapper _online;
   final KeyManager _keyManager;
+  final InvitationUserValidator _invitationUserValidator;
   final AccountLogger _logger;
 
   late final AccountStore _accountStore;
@@ -44,6 +48,7 @@ class EtebaseSync {
     StorageManager? storageManager,
     CollectionConflictResolver? conflictResolver,
     OnlineChecker? onlineChecker,
+    InvitationUserValidator? invitationUserValidator,
     AccountLogger? logger,
     int hiveTypeIdOffset = 100,
     StorageMode storageMode = StorageMode.cached,
@@ -66,6 +71,7 @@ class EtebaseSync {
         accountLogger.online,
       ),
       KeyManager(keystore, client),
+      invitationUserValidator ?? const RejectValidator(),
       accountLogger,
     );
   }
@@ -77,6 +83,7 @@ class EtebaseSync {
     StorageManager? storageManager,
     CollectionConflictResolver? conflictResolver,
     OnlineChecker? onlineChecker,
+    InvitationUserValidator? invitationUserValidator,
     AccountLogger? logger,
     int hiveTypeIdOffset = 100,
     StorageMode storageMode = StorageMode.cached,
@@ -93,6 +100,7 @@ class EtebaseSync {
         accountLogger.online,
       ),
       KeyManager(keystore, client, prefix),
+      invitationUserValidator ?? const RejectValidator(),
       accountLogger,
     );
   }
@@ -105,8 +113,16 @@ class EtebaseSync {
     this._conflictResolver,
     this._online,
     this._keyManager,
+    this._invitationUserValidator,
     this._logger,
   );
+
+  @internal
+  Account get account => _account!;
+
+  @internal
+  InvitationUserValidator get invitationUserValidator =>
+      _invitationUserValidator;
 
   Future<void> init() async {
     _client.registerCustomMetadata(RepositoryMetadata.fromJson);
@@ -243,6 +259,11 @@ class EtebaseSync {
     _logger.loggedOut();
   }
 
+  String prettyFingerprint(
+    Uint8List key, [
+    String delimiter = Client.defaultFingerprintDelimiter,
+  ]) => _client.prettyFingerprint(key, delimiter);
+
   Future<void> _persistNewAccount(Account account) async {
     try {
       _logger.saving();
@@ -262,6 +283,7 @@ class EtebaseSync {
   Future<void> _createRepoManager(Account account) async {
     await _repoManager?.dispose();
     _repoManager = RepositoryManager.create(
+      this,
       account.collectionManager,
       _storageManager,
       _registry,

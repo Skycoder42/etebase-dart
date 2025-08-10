@@ -1,23 +1,35 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
 
-abstract class ShareManager {
+import '../account/etebase_sync.dart';
+import '../exceptions/user_profile_mismatch.dart';
+import 'invitation_user_validator.dart';
+import 'user_info.dart';
+
+class ShareManager {
+  final EtebaseSync _sync;
   final Collection _collection;
-  final CollectionInvitationManager _collectionInvitationManager;
+  final CollectionInvitationManager _invitationManager;
   final CollectionMemberManager _memberManager;
+  final InvitationUserValidator _invitationUserValidator;
 
   ShareManager(
+    this._sync,
     this._collection,
-    this._collectionInvitationManager,
+    this._invitationManager,
     this._memberManager,
+    this._invitationUserValidator,
   );
+
+  void dispose() {
+    _collection.dispose();
+  }
 
   Stream<SignedInvitation> listInvitations() async* {
     IteratorListResponse<SignedInvitation>? response;
     do {
-      response = await _collectionInvitationManager.listOutgoing(
+      response = await _invitationManager.listOutgoing(
         IteratorFetchOptions(iterator: response?.iterator),
       );
       for (final invitation in response.data) {
@@ -32,14 +44,15 @@ abstract class ShareManager {
     String username,
     CollectionAccessLevel accessLevel,
   ) async {
-    final profile = await _collectionInvitationManager.fetchUserProfile(
-      username,
-    );
-    if (!await validateUserProfile(username, profile)) {
-      throw UnimplementedError(); // TODO
+    final profile = await _invitationManager.fetchUserProfile(username);
+    if (!await _invitationUserValidator.validateUserForInvite(
+      _collection.uid,
+      UserInfo(_sync, username, profile),
+    )) {
+      throw UserProfileMismatch(username, profile);
     }
 
-    await _collectionInvitationManager.invite(
+    await _invitationManager.invite(
       _collection,
       username,
       profile.pubkey,
@@ -56,22 +69,34 @@ abstract class ShareManager {
             'but is for ${invitation.collection}',
       );
     }
-    await _collectionInvitationManager.disinvite(invitation);
+    await _invitationManager.disinvite(invitation);
   }
 
-  Stream<CollectionMember> listMembers() async* {
+  Stream<MemberInfo> listMembers() async* {
     IteratorListResponse<CollectionMember>? response;
     do {
       response = await _memberManager.list(
         IteratorFetchOptions(iterator: response?.iterator),
       );
       for (final member in response.data) {
-        yield member;
+        final profile = await _invitationManager.fetchUserProfile(
+          member.username,
+        );
+        yield MemberInfo(_sync, member.username, member.accessLevel, profile);
       }
     } while (!response.isDone);
   }
 
-  // TODO here
+  Future<void> remove(String username) async =>
+      await _memberManager.remove(username);
 
-  FutureOr<bool> validateUserProfile(String username, UserProfile profile);
+  Future<void> modifyAccessLevel(
+    String username,
+    CollectionAccessLevel accessLevel,
+  ) async => await _memberManager.modifyAccessLevel(username, accessLevel);
+
+  Future<void> leave() async {
+    await _memberManager.leave();
+    // TODO local cleanup
+  }
 }

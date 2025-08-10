@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../account/etebase_sync.dart';
 import '../exceptions/cache_miss.dart';
 import '../exceptions/collection_type_mismatch.dart';
 import '../exceptions/conflict_origin.dart';
@@ -15,6 +16,7 @@ import '../items/factory_registry.dart';
 import '../items/items.dart';
 import '../logging/collections_logger.dart';
 import '../online/online_wrapper.dart';
+import '../share/share_manager.dart';
 import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
 import '../storage/storage_manager.dart';
@@ -26,6 +28,7 @@ import 'collection_conflict_resolver.dart';
 import 'repository_metadata.dart';
 
 class RepositoryManager with DisposeScope {
+  final EtebaseSync _sync;
   final CollectionManager _collectionManager;
   final StorageManager _storageManager;
   final CollectionStore _store;
@@ -39,6 +42,7 @@ class RepositoryManager with DisposeScope {
 
   @visibleForTesting
   RepositoryManager.internal(
+    this._sync,
     this._collectionManager,
     this._storageManager,
     this._registry,
@@ -52,6 +56,7 @@ class RepositoryManager with DisposeScope {
 
   @internal
   RepositoryManager.create(
+    this._sync,
     this._collectionManager,
     this._storageManager,
     this._registry,
@@ -276,6 +281,19 @@ class RepositoryManager with DisposeScope {
     } finally {
       collection?.dispose();
     }
+  }
+
+  Future<ShareManager> manageShares<TRecord extends ItemRecord>(
+    String colUid,
+  ) async {
+    final collection = await _getCol<TRecord>(colUid, false);
+    return ShareManager(
+      _sync,
+      collection,
+      _sync.account.invitationManager,
+      _collectionManager.getMemberManager(collection),
+      _sync.invitationUserValidator,
+    );
   }
 
   Future<void> forceDelete(String uid) async {

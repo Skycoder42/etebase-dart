@@ -7,7 +7,7 @@ import '../../sync/storage_mode.dart';
 import '../account_store.dart';
 import '../storage_manager.dart';
 import 'hive_account_store.dart';
-import 'hive_collection_store .dart';
+import 'hive_collection_store.dart';
 import 'hive_item_store.dart';
 import 'item_info.dart';
 
