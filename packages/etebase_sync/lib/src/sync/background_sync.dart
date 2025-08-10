@@ -95,6 +95,9 @@ abstract base class BackgroundSync<
   Future<TItem> download(String uid);
 
   @visibleForOverriding
+  Future<void> onDeleted(String uid) => Future.value();
+
+  @visibleForOverriding
   Future<void> resolveConflict(
     TItem target,
     TItem conflicted,
@@ -220,6 +223,9 @@ abstract base class BackgroundSync<
   ) async {
     switch (result) {
       case SaveOk(:final etag, :final action):
+        if (action == SaveAction.deleted) {
+          await onDeleted(item.uid);
+        }
         logger.saved(item.uid, action, cacheEtag: etag, remoteEtag: remoteEtag);
         return (etag, action);
       case SaveConflict(:final cacheItem):

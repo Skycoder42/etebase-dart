@@ -12,6 +12,8 @@ import 'collection_conflict_resolver.dart';
 
 typedef _SyncRequest = ({String collectionType, String? stoken});
 
+typedef OnDeletedCallback = Future<void> Function(String colUid);
+
 @internal
 final class CollectionBackgroundSync
     extends
@@ -22,6 +24,7 @@ final class CollectionBackgroundSync
         > {
   final CollectionManager _collectionManager;
   final CollectionConflictResolver _conflictResolver;
+  final OnDeletedCallback _onDeleted;
 
   final _collectionResponseTypes = Expando<String>(
     'CollectionBackgroundSync._collectionResponseTypes',
@@ -33,6 +36,7 @@ final class CollectionBackgroundSync
     super.store,
     this._collectionManager,
     this._conflictResolver,
+    this._onDeleted,
     super.logger,
   );
 
@@ -82,6 +86,9 @@ final class CollectionBackgroundSync
   @override
   Future<Collection> download(String uid) async =>
       await _collectionManager.fetch(uid);
+
+  @override
+  Future<void> onDeleted(String uid) async => await _onDeleted(uid);
 
   @override
   Future<void> resolveConflict(
