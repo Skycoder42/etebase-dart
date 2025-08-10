@@ -10,6 +10,7 @@ import '../exceptions/cache_miss.dart';
 import '../exceptions/conflict_origin.dart';
 import '../exceptions/etebase_target.dart';
 import '../exceptions/item_deleted.dart';
+import '../exceptions/item_locked.dart';
 import '../exceptions/read_only.dart';
 import '../logging/items_logger.dart';
 import '../logging/sync_logger.dart';

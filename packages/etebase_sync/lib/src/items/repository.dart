@@ -14,6 +14,8 @@ class Repository<TRecord extends ItemRecord>
 
   late final ItemBackgroundSync _backgroundSync;
 
+  bool _destroyed = false;
+
   @visibleForTesting
   Repository.forTesting(
     this._repoManager,
@@ -52,9 +54,11 @@ class Repository<TRecord extends ItemRecord>
   String get uid => _collection.uid;
 
   bool get isReadOnly =>
-      _collection.accessLevel == CollectionAccessLevel.readOnly;
+      _collection.accessLevel == CollectionAccessLevel.readOnly || _destroyed;
 
-  Stream<SyncEvent> get syncEvents => _backgroundSync.syncEvents;
+  Stream<SyncEvent> get syncEvents => _destroyed
+      ? Stream.error(ItemDeleted(uid, EtebaseTarget.collection))
+      : _backgroundSync.syncEvents;
 
   Future<void> init() async {
     _repoManager.attach(this);
@@ -70,9 +74,13 @@ class Repository<TRecord extends ItemRecord>
     _repoManager.detach(this);
   }
 
-  Future<void> sync() async => await _backgroundSync.sync();
+  Future<void> sync() async {
+    _checkAlive();
+    await _backgroundSync.sync();
+  }
 
   Stream<String> list({bool sync = false}) async* {
+    _checkAlive();
     if (sync) {
       await _backgroundSync.sync();
     }
@@ -81,6 +89,7 @@ class Repository<TRecord extends ItemRecord>
   }
 
   Future<Map<String, ItemMetadata>> listMeta({bool sync = false}) async {
+    _checkAlive();
     if (sync) {
       await _backgroundSync.sync();
     }
@@ -112,6 +121,7 @@ class Repository<TRecord extends ItemRecord>
   }
 
   Future<TRecord> open(String uid, {bool sync = false}) async {
+    _checkAlive();
     if (sync) {
       await _backgroundSync.sync();
     }
@@ -124,6 +134,7 @@ class Repository<TRecord extends ItemRecord>
   }
 
   Future<void> forceDelete(String uid) async {
+    _checkAlive();
     final item = await _itemManager.fetch(
       uid,
       const ItemFetchOptions(prefetch: PrefetchOption.medium),
@@ -140,7 +151,23 @@ class Repository<TRecord extends ItemRecord>
     }
   }
 
+  @internal
+  Future<void> destroy() async {
+    _destroyed = true;
+    for (final record in findDisposables<ItemRecord>()) {
+      record._state = RecordState.destroyed;
+    }
+    await dispose();
+  }
+
+  void _checkAlive() {
+    if (_destroyed) {
+      throw ItemDeleted(uid, EtebaseTarget.collection);
+    }
+  }
+
   void _checkWritable() {
+    _checkAlive();
     if (isReadOnly) {
       throw ReadOnly(_collection.uid, EtebaseTarget.collection);
     }
@@ -170,6 +197,7 @@ class Repository<TRecord extends ItemRecord>
   }
 
   Future<bool> _refresh(TRecord record, bool sync) async {
+    _checkAlive();
     if (sync) {
       await _backgroundSync.sync();
     }
@@ -194,11 +222,14 @@ class Repository<TRecord extends ItemRecord>
         return false;
       }
     } finally {
-      record._state = recordState;
+      if (record._state != RecordState.destroyed) {
+        record._state = recordState;
+      }
     }
   }
 
   Future<void> _persist(TRecord record) async {
+    _checkAlive();
     final recordState = record._state;
     try {
       record._state = RecordState.locked;
@@ -209,11 +240,14 @@ class Repository<TRecord extends ItemRecord>
         await _backgroundSync.waitForSync(record.uid);
       }
     } finally {
-      record._state = recordState;
+      if (record._state != RecordState.destroyed) {
+        record._state = recordState;
+      }
     }
   }
 
   Future<String> _saveToCache(TRecord record) async {
+    _checkAlive();
     // If etag has not changed, item was not modified -> no need to save
     if (record._item.etag == record._cacheEtag) {
       _logger.saved(

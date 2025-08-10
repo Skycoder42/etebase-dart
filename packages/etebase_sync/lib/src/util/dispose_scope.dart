@@ -30,6 +30,8 @@ mixin DisposeScope {
   }
 
   @protected
-  Iterable<T> findDisposables<T>(bool Function(T) filter) =>
-      _items.map((r) => r.target).whereType<T>().where(filter);
+  Iterable<T> findDisposables<T>([bool Function(T)? filter]) {
+    final matchingByType = _items.map((r) => r.target).whereType<T>();
+    return filter != null ? matchingByType.where(filter) : matchingByType;
+  }
 }

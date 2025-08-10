@@ -29,7 +29,7 @@ abstract class ItemRecord implements ScopeDisposable {
   String get etag => _item.etag;
 
   @nonVirtual
-  bool get isDeleted => _item.isDeleted;
+  bool get isDeleted => _item.isDeleted || _state == RecordState.destroyed;
 
   @nonVirtual
   ItemMetadata get meta {
@@ -202,10 +202,13 @@ abstract class ItemRecord implements ScopeDisposable {
 
   void _checkUnlocked() {
     _checkInitialized();
-    if (_state case RecordState.locked) {
-      throw StateError(
-        'Record is locked! Another asynchronous operation is still pending.',
-      );
+    switch (_state) {
+      case RecordState.locked:
+        throw RecordLocked(uid);
+      case RecordState.destroyed:
+        throw ItemDeleted(uid);
+      case _:
+        break;
     }
   }
 

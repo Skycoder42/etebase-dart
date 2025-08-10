@@ -6,7 +6,7 @@ class ItemDeleted extends EtebaseSyncException {
   final EtebaseTarget target;
 
   ItemDeleted(this.uid, [this.target = EtebaseTarget.item])
-    : super('Collection/Item with uid "$uid" has been deleted!');
+    : super('The ${target.name} with uid "$uid" has been deleted!');
 
   @override
   String get name => 'ItemDeleted';

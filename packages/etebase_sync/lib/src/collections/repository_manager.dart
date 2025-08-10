@@ -71,7 +71,7 @@ class RepositoryManager with DisposeScope {
       _store,
       _collectionManager,
       _conflictResolver,
-      _closeRepoAndClearCache,
+      _destroyRepo,
       _logger,
     );
   }
@@ -258,6 +258,9 @@ class RepositoryManager with DisposeScope {
 
   Future<void> delete<TRecord extends ItemRecord>(String colUid) async {
     _logger.delete(colUid);
+
+    await _destroyRepo(colUid);
+
     Collection? collection;
     try {
       collection = await _getCol<TRecord>(colUid, false);
@@ -355,7 +358,7 @@ class RepositoryManager with DisposeScope {
     switch (result) {
       case SaveOk(:final etag, :final action):
         if (action == SaveAction.deleted) {
-          await _closeRepoAndClearCache(collection.uid);
+          await _destroyRepo(collection.uid);
         }
         _logger.saved(collection.uid, action, cacheEtag: etag);
         return collection;
@@ -456,12 +459,12 @@ class RepositoryManager with DisposeScope {
     return repo;
   }
 
-  Future<void> _closeRepoAndClearCache(String colUid) async {
-    // dispose any open repositories on this collection
+  Future<void> _destroyRepo(String colUid) async {
+    // destroy any open repositories on this collection
     await Future.wait(
       findDisposables<Repository>(
         (repository) => repository.uid == colUid,
-      ).map((repo) => repo.dispose()),
+      ).map((repo) => repo.destroy()),
     );
 
     // clear from cache
