@@ -87,8 +87,10 @@ class ClientImpl implements Client, NetworkClient {
   SecureKey randomKey(int size) => crypto.secureRandom(size);
 
   @override
-  String prettyFingerprint(Uint8List content) =>
-      crypto.prettyFingerprint(content);
+  String prettyFingerprint(
+    Uint8List content, [
+    String delimiter = Client.defaultFingerprintDelimiter,
+  ]) => crypto.prettyFingerprint(content, delimiter);
 
   @override
   void registerCustomMetadata<TMeta extends ItemMetadata>(

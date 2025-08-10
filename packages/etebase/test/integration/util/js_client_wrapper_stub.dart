@@ -144,7 +144,6 @@ abstract class JsClientWrapper {
 
   JsClientWrapper.base();
 
-  // ignore: use_setters_to_change_properties
   void configureAccount(Account account, [Collection? collection]) {
     this.account = account;
     if (collection != null) {

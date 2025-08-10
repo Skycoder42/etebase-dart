@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:sodium/sodium_sumo.dart';
 
+import '../../impl/crypto/crypto_service.dart';
 import '../../impl/crypto/crypto_utils.dart';
 import '../../impl/managers/client_impl.dart';
 import '../models/item_metadata.dart';
@@ -22,6 +23,10 @@ abstract interface class Client {
 
   /// The current version of the internal data model.
   static const currentVersion = CryptoUtils.currentVersion;
+
+  /// The default delimiter used for separating segments of a fingerprint
+  static const defaultFingerprintDelimiter =
+      CryptoService.defaultFingerprintDelimiter;
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
@@ -101,7 +106,10 @@ abstract interface class Client {
   /// 19189   84243   25687   20837
   /// 47924   46071   54113   18789
   /// ```
-  String prettyFingerprint(Uint8List content);
+  String prettyFingerprint(
+    Uint8List content, [
+    String delimiter = defaultFingerprintDelimiter,
+  ]);
 
   /// Registers a new item metadata type [TMeta] for this client.
   ///

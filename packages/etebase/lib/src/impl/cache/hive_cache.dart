@@ -157,7 +157,6 @@ class HiveCache implements Cache {
 
   @override
   Stream<String> persistedItemUids(String colUid) => Stream.fromFuture(
-    // ignore: discarded_futures
     _itemBox(colUid),
   ).expand((itemBox) => itemBox?.keys.cast() ?? const []);
 

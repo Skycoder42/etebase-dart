@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/models/fetch_options.dart';
@@ -20,7 +18,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),

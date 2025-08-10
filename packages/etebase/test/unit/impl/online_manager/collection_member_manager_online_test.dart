@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'package:etebase/src/api/models/collection_access_level.dart';
 import 'package:etebase/src/api/models/collection_member.dart';
 import 'package:etebase/src/api/models/fetch_options.dart';

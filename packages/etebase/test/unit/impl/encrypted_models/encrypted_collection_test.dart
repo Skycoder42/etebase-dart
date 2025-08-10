@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -26,7 +24,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
 @GenerateNiceMocks([

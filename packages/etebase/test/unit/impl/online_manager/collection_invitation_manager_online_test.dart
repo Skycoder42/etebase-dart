@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/models/collection_access_level.dart';

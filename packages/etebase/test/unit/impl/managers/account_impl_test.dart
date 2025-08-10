@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
@@ -34,7 +32,6 @@ import 'package:test/test.dart';
 
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
-// ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
   MockSpec<MainCryptoManager>(),
@@ -467,7 +464,6 @@ void main() {
     });
 
     group('members', () {
-      // ignore: unused_local_variable
       late AccountImpl sut;
 
       setUp(() {

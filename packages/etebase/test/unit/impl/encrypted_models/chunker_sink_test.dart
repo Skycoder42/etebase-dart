@@ -8,13 +8,11 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 @GenerateNiceMocks([MockSpec<EventSink<Uint8List>>(), MockSpec<Rollsum>()])
 import 'chunker_sink_test.mocks.dart';
 
 void main() {
   group('$ChunkerSink', () {
-    // ignore: close_sinks mock class
     final mockEventSink = MockEventSink();
     final mockRollsum = MockRollsum();
 

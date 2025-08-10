@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
@@ -23,7 +21,6 @@ import 'package:test/test.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../test_helpers.dart';
-// ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<WebSocketChannel>(),
   MockSpec<WebSocketSink>(),

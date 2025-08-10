@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'package:etebase/src/impl/models/auth_token.dart';
 import 'package:etebase/src/impl/online_managers/base_manager.dart';
 import 'package:etebase/src/impl/online_managers/base_network.dart';
@@ -10,7 +8,6 @@ import 'package:test/test.dart';
 
 import '../../test_helpers.dart';
 
-// ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<BaseNetwork>(),
   MockSpec<AuthTokenSource>(),
