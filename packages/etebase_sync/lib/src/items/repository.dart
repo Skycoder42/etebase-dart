@@ -57,7 +57,10 @@ class Repository<TRecord extends ItemRecord>
       _collection.accessLevel == CollectionAccessLevel.readOnly || _destroyed;
 
   Stream<SyncEvent> get syncEvents => _destroyed
-      ? Stream.error(ItemDeleted(uid, EtebaseTarget.collection))
+      ? Stream.error(
+          ItemDeleted(uid, EtebaseTarget.collection),
+          StackTrace.current,
+        )
       : _backgroundSync.syncEvents;
 
   Future<void> init() async {
