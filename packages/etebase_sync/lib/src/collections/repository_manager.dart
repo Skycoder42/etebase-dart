@@ -16,6 +16,7 @@ import '../items/factory_registry.dart';
 import '../items/items.dart';
 import '../logging/collections_logger.dart';
 import '../online/online_wrapper.dart';
+import '../share/share_callbacks.dart';
 import '../share/share_manager.dart';
 import '../storage/collection_store.dart';
 import '../storage/save_result.dart';
@@ -294,7 +295,8 @@ class RepositoryManager with DisposeScope {
       collection,
       _sync.account.invitationManager,
       _collectionManager.getMemberManager(collection),
-      _sync.invitationUserValidator,
+      _sync.shareCallbacks,
+      _destroyRepo,
     );
   }
 
@@ -444,6 +446,7 @@ class RepositoryManager with DisposeScope {
   Future<Repository<TRecord>> _createRepo<TRecord extends ItemRecord>(
     Collection collection,
   ) async {
+    final isRemoved = await _store.isRemoved(collection.uid);
     final itemManager = _collectionManager.getItemManager(collection);
     final repo = Repository.internal(
       this,
@@ -453,13 +456,18 @@ class RepositoryManager with DisposeScope {
       itemManager,
       await _storageManager.createItemStore(collection, itemManager),
       _config,
+      isRemoved: isRemoved,
       _logger.items(collection.uid),
     );
     await repo.init();
     return repo;
   }
 
-  Future<void> _destroyRepo(String colUid) async {
+  Future<void> _destroyRepo(String colUid, {bool isUnshare = false}) async {
+    if (isUnshare && await _unshare(colUid)) {
+      return;
+    }
+
     // destroy any open repositories on this collection
     await Future.wait(
       findDisposables<Repository>(
@@ -469,5 +477,40 @@ class RepositoryManager with DisposeScope {
 
     // clear from cache
     await _storageManager.eraseItemStore(colUid);
+  }
+
+  Future<bool> _unshare(String colUid) async {
+    try {
+      final action = await _sync.shareCallbacks.onCollectionRemoved(colUid);
+      switch (action) {
+        case CollectionRemovedAction.delete:
+          // Continue with destruction of local copy
+          return false;
+        case CollectionRemovedAction.keepLocalCopy:
+          // mark collection as removed
+          break;
+      }
+      // ignore: avoid_catching_errors to handle missing implementation
+    } on UnsupportedError catch (e, s) {
+      _logger.error(
+        'A collection was removed, but share callbacks are not implemented. '
+        'Local copy of collection with uid "$colUid" will be deleted',
+        e,
+        s,
+      );
+      return false;
+    }
+
+    // mark any open repository as removed
+    await Future.wait(
+      findDisposables<Repository>(
+        (repository) => repository.uid == colUid,
+      ).map((repo) => repo.markRemoved()),
+    );
+
+    // mark as removed in the store
+    await _store.markRemoved(colUid);
+
+    return true;
   }
 }

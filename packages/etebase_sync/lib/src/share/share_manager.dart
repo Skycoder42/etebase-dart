@@ -4,15 +4,18 @@ import 'package:etebase/etebase.dart';
 
 import '../account/etebase_sync.dart';
 import '../exceptions/user_profile_mismatch.dart';
-import 'invitation_user_validator.dart';
+import 'share_callbacks.dart';
 import 'user_info.dart';
+
+typedef OnLeaveCallback = Future<void> Function(String colUid);
 
 class ShareManager {
   final EtebaseSync _sync;
   final Collection _collection;
   final CollectionInvitationManager _invitationManager;
   final CollectionMemberManager _memberManager;
-  final InvitationUserValidator _invitationUserValidator;
+  final ShareCallbacks _invitationUserValidator;
+  final OnLeaveCallback _onLeaveCallback;
 
   ShareManager(
     this._sync,
@@ -20,6 +23,7 @@ class ShareManager {
     this._invitationManager,
     this._memberManager,
     this._invitationUserValidator,
+    this._onLeaveCallback,
   );
 
   void dispose() {
@@ -97,6 +101,6 @@ class ShareManager {
 
   Future<void> leave() async {
     await _memberManager.leave();
-    // TODO local cleanup
+    await _onLeaveCallback(_collection.uid);
   }
 }

@@ -6,4 +6,5 @@ enum RecordState {
   disposed,
   detaching,
   destroyed,
+  removed,
 }

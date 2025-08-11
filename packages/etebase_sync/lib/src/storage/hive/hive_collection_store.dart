@@ -44,6 +44,22 @@ final class HiveCollectionStore extends HiveStore<Collection, CollectionInfo>
       .map(createItem);
 
   @override
+  Future<bool> isRemoved(String uid) async {
+    final info = await boxGet(uid);
+    return info?.isRemoved ?? true;
+  }
+
+  @override
+  Future<bool> markRemoved(String uid) async {
+    final info = await boxGet(uid);
+    if (info == null) {
+      return false;
+    }
+    await itemBox.put(uid, info.copyWith(isRemoved: true));
+    return true;
+  }
+
+  @override
   Collection createItem(CollectionInfo itemInfo) =>
       _collectionManager.cacheLoad(itemInfo.data);
 

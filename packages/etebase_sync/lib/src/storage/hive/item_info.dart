@@ -19,6 +19,7 @@ sealed class ItemInfoBase with _$ItemInfoBase {
     required Uint8List data,
     required String localEtag,
     required String? remoteEtag,
+    @Default(false) bool isRemoved,
   }) = CollectionInfo;
 }
 
@@ -77,18 +78,22 @@ final class CollectionInfoAdapter extends _ItemInfoBaseAdapter<CollectionInfo> {
   @override
   CollectionInfo read(BinaryReader reader) {
     final collectionType = reader.readString();
+    final isRemoved = reader.readBool();
     final (:data, :localEtag, :remoteEtag) = _readBase(reader);
     return CollectionInfo(
       collectionType: collectionType,
       data: data,
       localEtag: localEtag,
       remoteEtag: remoteEtag,
+      isRemoved: isRemoved,
     );
   }
 
   @override
   void write(BinaryWriter writer, CollectionInfo obj) {
-    writer.writeString(obj.collectionType);
+    writer
+      ..writeString(obj.collectionType)
+      ..writeBool(obj.isRemoved);
     _writeBase(writer, obj);
   }
 }

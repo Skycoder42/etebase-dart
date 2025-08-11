@@ -93,6 +93,17 @@ abstract class ItemRecord implements ScopeDisposable {
   }
 
   Stream<String> watch({bool sync = false}) {
+    // use try/catch to easily convert exception to an error stream to not break
+    // the method signature
+    try {
+      _checkUnlocked();
+    } on RecordLocked {
+      // continue, as watching is allowed even when locked
+      // ignore: avoid_catches_without_on_clauses is returned as error stream
+    } catch (e, s) {
+      return Stream.error(e, s);
+    }
+
     final syncStream = sync
         ? Stream.value(null).asyncMap((_) => _repository.sync()).cast<String?>()
         : null;
@@ -207,6 +218,8 @@ abstract class ItemRecord implements ScopeDisposable {
         throw RecordLocked(uid);
       case RecordState.destroyed:
         throw ItemDeleted(uid);
+      case RecordState.removed:
+        throw AccessRevoked(_repository.uid);
       case _:
         break;
     }

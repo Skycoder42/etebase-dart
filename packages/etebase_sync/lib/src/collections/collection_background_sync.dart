@@ -12,7 +12,8 @@ import 'collection_conflict_resolver.dart';
 
 typedef _SyncRequest = ({String collectionType, String? stoken});
 
-typedef OnDeletedCallback = Future<void> Function(String colUid);
+typedef OnDeletedCallback =
+    Future<void> Function(String colUid, {bool isUnshare});
 
 @internal
 final class CollectionBackgroundSync
@@ -137,7 +138,7 @@ final class CollectionBackgroundSync
     if (response.removedMemberships case final List<RemovedCollection> cols) {
       for (final RemovedCollection(:uid) in cols) {
         logger.downloadRemoved(uid);
-        // TODO handle this
+        await _onDeleted(uid, isUnshare: true);
       }
     }
   }

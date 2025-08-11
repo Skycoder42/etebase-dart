@@ -6,6 +6,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../collections/repository_manager.dart';
+import '../exceptions/access_revoked.dart';
 import '../exceptions/cache_miss.dart';
 import '../exceptions/conflict_origin.dart';
 import '../exceptions/etebase_target.dart';

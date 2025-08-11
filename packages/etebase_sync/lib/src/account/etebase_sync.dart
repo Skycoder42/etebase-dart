@@ -15,7 +15,7 @@ import '../logging/account_logger.dart';
 import '../online/online_checker.dart';
 import '../online/online_wrapper.dart';
 import '../online/server_ping_online_checker.dart';
-import '../share/invitation_user_validator.dart';
+import '../share/share_callbacks.dart';
 import '../storage/account_store.dart';
 import '../storage/hive/hive_storage_manager.dart';
 import '../storage/storage_manager.dart';
@@ -33,7 +33,7 @@ class EtebaseSync {
   final CollectionConflictResolver _conflictResolver;
   final OnlineWrapper _online;
   final KeyManager _keyManager;
-  final InvitationUserValidator _invitationUserValidator;
+  final ShareCallbacks _shareCallbacks;
   final AccountLogger _logger;
 
   late final AccountStore _accountStore;
@@ -48,7 +48,7 @@ class EtebaseSync {
     StorageManager? storageManager,
     CollectionConflictResolver? conflictResolver,
     OnlineChecker? onlineChecker,
-    InvitationUserValidator? invitationUserValidator,
+    ShareCallbacks? invitationUserValidator,
     AccountLogger? logger,
     int hiveTypeIdOffset = 100,
     StorageMode storageMode = StorageMode.cached,
@@ -71,7 +71,7 @@ class EtebaseSync {
         accountLogger.online,
       ),
       KeyManager(keystore, client),
-      invitationUserValidator ?? const RejectValidator(),
+      invitationUserValidator ?? const UnimplementedShareCallbacks(),
       accountLogger,
     );
   }
@@ -83,7 +83,7 @@ class EtebaseSync {
     StorageManager? storageManager,
     CollectionConflictResolver? conflictResolver,
     OnlineChecker? onlineChecker,
-    InvitationUserValidator? invitationUserValidator,
+    ShareCallbacks? invitationUserValidator,
     AccountLogger? logger,
     int hiveTypeIdOffset = 100,
     StorageMode storageMode = StorageMode.cached,
@@ -100,7 +100,7 @@ class EtebaseSync {
         accountLogger.online,
       ),
       KeyManager(keystore, client, prefix),
-      invitationUserValidator ?? const RejectValidator(),
+      invitationUserValidator ?? const UnimplementedShareCallbacks(),
       accountLogger,
     );
   }
@@ -113,7 +113,7 @@ class EtebaseSync {
     this._conflictResolver,
     this._online,
     this._keyManager,
-    this._invitationUserValidator,
+    this._shareCallbacks,
     this._logger,
   );
 
@@ -121,8 +121,7 @@ class EtebaseSync {
   Account get account => _account!;
 
   @internal
-  InvitationUserValidator get invitationUserValidator =>
-      _invitationUserValidator;
+  ShareCallbacks get shareCallbacks => _shareCallbacks;
 
   Future<void> init() async {
     _client.registerCustomMetadata(RepositoryMetadata.fromJson);

@@ -10,4 +10,8 @@ abstract interface class CollectionStore implements Store<Collection> {
   Future<void> saveStoken(String collectionType, String? stoken);
 
   Stream<Collection> listCollections(String collectionType);
+
+  Future<bool> isRemoved(String uid);
+
+  Future<bool> markRemoved(String uid);
 }
