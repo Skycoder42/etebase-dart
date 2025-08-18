@@ -15,7 +15,6 @@ class Repository<TRecord extends ItemRecord>
   late final ItemBackgroundSync _backgroundSync;
 
   bool _destroyed = false;
-  bool _removed = false;
 
   @visibleForTesting
   Repository.forTesting(
@@ -39,10 +38,9 @@ class Repository<TRecord extends ItemRecord>
     this._itemManager,
     this._store,
     this._config,
-    this._logger, {
-    bool isRemoved = false,
-  }) : _removed = isRemoved {
-    if (_removed) {
+    this._logger,
+  ) {
+    if (_collection.isRemoved) {
       return;
     }
 
@@ -62,9 +60,9 @@ class Repository<TRecord extends ItemRecord>
   bool get isReadOnly =>
       _collection.accessLevel == CollectionAccessLevel.readOnly ||
       _destroyed ||
-      _removed;
+      _collection.isRemoved;
 
-  Stream<SyncEvent> get syncEvents => (_destroyed || _removed)
+  Stream<SyncEvent> get syncEvents => (_destroyed || _collection.isRemoved)
       ? Stream.error(
           _destroyed
               ? ItemDeleted(uid, EtebaseTarget.collection)
@@ -75,7 +73,7 @@ class Repository<TRecord extends ItemRecord>
 
   Future<void> init() async {
     _repoManager.attach(this);
-    if (!_removed) {
+    if (!_collection.isRemoved) {
       await _backgroundSync.init();
     }
   }
@@ -83,7 +81,7 @@ class Repository<TRecord extends ItemRecord>
   @override
   Future<void> dispose() async {
     await super.dispose();
-    if (!_removed) {
+    if (!_collection.isRemoved) {
       await _backgroundSync.dispose();
     }
     _itemManager.dispose();
@@ -179,11 +177,11 @@ class Repository<TRecord extends ItemRecord>
 
   @internal
   Future<void> markRemoved() async {
-    if (_removed || _destroyed) {
+    if (_collection.isRemoved || _destroyed) {
       return;
     }
 
-    _removed = true;
+    _collection.isRemoved = true;
     for (final record in findDisposables<ItemRecord>()) {
       record._state = RecordState.removed;
     }
@@ -198,7 +196,7 @@ class Repository<TRecord extends ItemRecord>
 
   void _checkCanSync() {
     _checkAlive();
-    if (_removed) {
+    if (_collection.isRemoved) {
       throw AccessRevoked(uid);
     }
   }
@@ -225,7 +223,7 @@ class Repository<TRecord extends ItemRecord>
       await record.init(created: created);
       if (forceState != null) {
         record._state = forceState;
-      } else if (_removed) {
+      } else if (_collection.isRemoved) {
         record._state = RecordState.removed;
       }
       return record;
@@ -284,7 +282,7 @@ class Repository<TRecord extends ItemRecord>
   void _restoreRecordState(TRecord record, RecordState state) {
     if (_destroyed) {
       record._state = RecordState.destroyed;
-    } else if (_removed) {
+    } else if (_collection.isRemoved) {
       record._state = RecordState.destroyed;
     } else {
       record._state = state;

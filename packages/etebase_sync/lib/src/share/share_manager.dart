@@ -7,7 +7,7 @@ import '../exceptions/user_profile_mismatch.dart';
 import 'share_callbacks.dart';
 import 'user_info.dart';
 
-typedef OnLeaveCallback = Future<void> Function(String colUid);
+typedef OnLeaveCallback = Future<void> Function(String colUid, {bool discard});
 
 class ShareManager {
   final EtebaseSync _sync;
@@ -101,6 +101,6 @@ class ShareManager {
 
   Future<void> leave() async {
     await _memberManager.leave();
-    await _onLeaveCallback(_collection.uid);
+    await _onLeaveCallback(_collection.uid, discard: true);
   }
 }

@@ -6,7 +6,7 @@ class AccessRevoked extends EtebaseSyncException {
   AccessRevoked(this.uid)
     : super(
         'Access to collection with uid "$uid" has been revoked. '
-        'Only the local copy can be accessed.',
+        'Only the local readonly copy can be accessed.',
       );
 
   @override

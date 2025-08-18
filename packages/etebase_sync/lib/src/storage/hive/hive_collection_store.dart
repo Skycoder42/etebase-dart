@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../../collections/removed_collection_extension.dart';
 import '../collection_store.dart';
 import 'hive_store.dart';
 import 'item_info.dart';
@@ -44,12 +45,6 @@ final class HiveCollectionStore extends HiveStore<Collection, CollectionInfo>
       .map(createItem);
 
   @override
-  Future<bool> isRemoved(String uid) async {
-    final info = await boxGet(uid);
-    return info?.isRemoved ?? true;
-  }
-
-  @override
   Future<bool> markRemoved(String uid) async {
     final info = await boxGet(uid);
     if (info == null) {
@@ -60,8 +55,14 @@ final class HiveCollectionStore extends HiveStore<Collection, CollectionInfo>
   }
 
   @override
+  Future<void> discard(String uid) async {
+    await itemBox.delete(uid);
+  }
+
+  @override
   Collection createItem(CollectionInfo itemInfo) =>
-      _collectionManager.cacheLoad(itemInfo.data);
+      _collectionManager.cacheLoad(itemInfo.data)
+        ..isRemoved = itemInfo.isRemoved;
 
   @override
   CollectionInfo createItemInfo(Collection item, String? remoteEtag) =>
@@ -70,6 +71,7 @@ final class HiveCollectionStore extends HiveStore<Collection, CollectionInfo>
         data: _collectionManager.cacheSave(item),
         localEtag: item.etag,
         remoteEtag: remoteEtag,
+        isRemoved: item.isRemoved,
       );
 
   String _stokenKey(String collectionType) => 'collections.$collectionType';

@@ -5,6 +5,7 @@ import 'package:etebase/etebase.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../account/etebase_sync.dart';
+import '../exceptions/access_revoked.dart';
 import '../exceptions/cache_miss.dart';
 import '../exceptions/collection_type_mismatch.dart';
 import '../exceptions/conflict_origin.dart';
@@ -26,6 +27,7 @@ import '../sync/sync_event.dart';
 import '../util/dispose_scope.dart';
 import 'collection_background_sync.dart';
 import 'collection_conflict_resolver.dart';
+import 'removed_collection_extension.dart';
 import 'repository_metadata.dart';
 
 class RepositoryManager with DisposeScope {
@@ -265,6 +267,13 @@ class RepositoryManager with DisposeScope {
     Collection? collection;
     try {
       collection = await _getCol<TRecord>(colUid, false);
+
+      // special handling for removed collections -> are simply deleted locally
+      if (collection.isRemoved) {
+        await _store.discard(colUid);
+        return;
+      }
+
       _checkWritable(collection);
       final currentEtag = collection.etag;
       await collection.delete();
@@ -350,6 +359,8 @@ class RepositoryManager with DisposeScope {
   void _checkWritable(Collection collection) {
     if (collection.accessLevel == CollectionAccessLevel.readOnly) {
       throw ReadOnly(collection.uid, EtebaseTarget.collection);
+    } else if (collection.isRemoved) {
+      throw AccessRevoked(collection.uid);
     }
   }
 
@@ -446,7 +457,6 @@ class RepositoryManager with DisposeScope {
   Future<Repository<TRecord>> _createRepo<TRecord extends ItemRecord>(
     Collection collection,
   ) async {
-    final isRemoved = await _store.isRemoved(collection.uid);
     final itemManager = _collectionManager.getItemManager(collection);
     final repo = Repository.internal(
       this,
@@ -456,16 +466,24 @@ class RepositoryManager with DisposeScope {
       itemManager,
       await _storageManager.createItemStore(collection, itemManager),
       _config,
-      isRemoved: isRemoved,
       _logger.items(collection.uid),
     );
     await repo.init();
     return repo;
   }
 
-  Future<void> _destroyRepo(String colUid, {bool isUnshare = false}) async {
+  Future<void> _destroyRepo(
+    String colUid, {
+    bool isUnshare = false,
+    bool discard = false,
+  }) async {
     if (isUnshare && await _unshare(colUid)) {
       return;
+    }
+
+    // delete from collection store if requested
+    if (isUnshare || discard) {
+      await _store.discard(colUid);
     }
 
     // destroy any open repositories on this collection

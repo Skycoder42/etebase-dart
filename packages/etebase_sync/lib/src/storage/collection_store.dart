@@ -11,7 +11,7 @@ abstract interface class CollectionStore implements Store<Collection> {
 
   Stream<Collection> listCollections(String collectionType);
 
-  Future<bool> isRemoved(String uid);
-
   Future<bool> markRemoved(String uid);
+
+  Future<void> discard(String uid);
 }
