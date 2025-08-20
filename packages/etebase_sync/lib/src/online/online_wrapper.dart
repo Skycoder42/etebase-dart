@@ -31,7 +31,8 @@ class OnlineWrapper {
 
   Future<void> dispose() async {
     _timer?.cancel();
-    await Future.wait([?_subscription?.cancel(), _onlineNotifier.close()]);
+    await Future.wait([?_subscription?.cancel(), _onlineChecker.dispose()]);
+    unawaited(_onlineNotifier.close());
   }
 
   Stream<OnlineStatus> get stream => _onlineNotifier.stream;

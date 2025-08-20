@@ -123,6 +123,7 @@ class EtebaseSync {
   @internal
   ShareCallbacks get shareCallbacks => _shareCallbacks;
 
+  // TODO auto-init on demand
   Future<void> init() async {
     _client.registerCustomMetadata(RepositoryMetadata.fromJson);
 

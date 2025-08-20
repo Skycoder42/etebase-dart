@@ -6,4 +6,6 @@ abstract interface class OnlineChecker {
   Future<OnlineStatus> checkOnlineStatus();
 
   Stream<OnlineStatus>? watchOnlineStatus();
+
+  Future<void> dispose();
 }

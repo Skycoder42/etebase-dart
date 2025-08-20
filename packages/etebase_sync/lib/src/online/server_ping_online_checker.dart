@@ -24,4 +24,7 @@ class ServerPingOnlineChecker implements OnlineChecker {
 
   @override
   Stream<OnlineStatus>? watchOnlineStatus() => null;
+
+  @override
+  Future<void> dispose() => Future.value();
 }
