@@ -1,0 +1,17 @@
+name: Automatic dependency updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "38 1 * * 4"
+
+jobs:
+  ci:
+    name: Updates
+    uses: Skycoder42/dart_test_tools/.github/workflows/auto-update.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    with:
+      validationWorkflow: etebase_ci.yaml

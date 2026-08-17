@@ -14,6 +14,7 @@ jobs:
     uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
     with:
       workingDirectory: packages/etebase
+      flutter: true
       buildRunner: true
       unitTestPaths: -P unit
       coverageExclude: >-
@@ -23,15 +24,15 @@ jobs:
       integrationTestPaths: -P integration
       integrationTestCacheConfig: >-
         {
-          "key": "etebase-cache_1.0.20_0.7.15",
+          "key": "etebase-cache_0.8.3",
           "path": "packages/etebase/tool/integration/cache"
         }
       integrationTestSetup: >-
         {
           "linux": "bash tool/integration/setup_linux.sh",
           "macos": "bash tool/integration/setup_macos.sh",
-          "windows": "bash tool/integration/setup_win.sh 1.0.20",
-          "web": "bash tool/integration/setup_web.sh 0.7.15"
+          "windows": "bash tool/integration/setup_win.sh",
+          "web": "bash tool/integration/setup_web.sh 0.8.3"
         }
 
   cd:
@@ -39,8 +40,10 @@ jobs:
     uses: Skycoder42/dart_test_tools/.github/workflows/release.yml@main
     needs:
       - ci
+    permissions:
+      contents: write
+      actions: write
     with:
       workingDirectory: packages/etebase
       tagPrefix: etebase-v
-    secrets:
-      githubToken: ${{ secrets.GH_PAT }}
+      publishWorkflow: etebase_cd.yaml

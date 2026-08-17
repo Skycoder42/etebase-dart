@@ -15,23 +15,20 @@ jobs:
     uses: Skycoder42/dart_test_tools/.github/workflows/flutter.yml@main
     with:
       workingDirectory: packages/etebase_flutter
+      buildDependencies: sodium
       buildRunner: false
       integrationTestProject: example
       integrationTestPaths: integration_test/app_test.dart
-    #   firebaseProjectId: etebase-dart
-    # secrets:
-    #   firebaseCredentials: ${{ secrets.FIREBASE_CREDENTIALS }}
-    #   provisioningProfile: ${{ secrets.PROVISIONING_PROFILE }}
-    #   signingIdentity: ${{ secrets.SIGNING_IDENTITY }}
-    #   signingIdentityPassphrase: ${{ secrets.SIGNING_IDENTITY_PASSPHRASE }}
 
   cd:
     name: CD
     uses: Skycoder42/dart_test_tools/.github/workflows/release.yml@main
     needs:
       - ci
+    permissions:
+      contents: write
+      actions: write
     with:
       workingDirectory: packages/etebase_flutter
       tagPrefix: etebase_flutter-v
-    secrets:
-      githubToken: ${{ secrets.GH_PAT }}
+      publishWorkflow: etebase_flutter_cd.yaml

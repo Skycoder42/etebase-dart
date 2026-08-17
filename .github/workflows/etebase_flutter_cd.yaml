@@ -1,9 +1,12 @@
 name: CD - Publish etebase_flutter to pub.dev
 
 on:
-  push:
-    tags:
-      - "etebase_flutter-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: The version to be deployed
+        required: true
 
 jobs:
   publish:
@@ -14,4 +17,5 @@ jobs:
     with:
       tagPrefix: etebase_flutter-v
       workingDirectory: packages/etebase_flutter
+      version: ${{ inputs.version }}
       flutter: true

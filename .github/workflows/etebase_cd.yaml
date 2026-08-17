@@ -1,9 +1,12 @@
 name: CD - Publish etebase to pub.dev
 
 on:
-  push:
-    tags:
-      - "etebase-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: The version to be deployed
+        required: true
 
 jobs:
   publish:
@@ -13,9 +16,7 @@ jobs:
       id-token: write
     with:
       tagPrefix: etebase-v
+      version: ${{ inputs.version }}
+      flutter: true
       workingDirectory: packages/etebase
       buildRunner: true
-      buildRunnerArgs: >-
-        --delete-conflicting-outputs
-        --define etebase:etebase_client_builder=restoreMode=true
-        --define etebase:etebase_isolate_builder=restoreMode=true
