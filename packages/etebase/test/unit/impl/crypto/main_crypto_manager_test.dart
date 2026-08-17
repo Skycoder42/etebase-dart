@@ -67,9 +67,8 @@ void main() {
         final testPrivKey = FakeSecureKey(54);
         final testPubKey = Uint8List.fromList([5, 4]);
 
-        when(
-          mockSodium.crypto.scalarmult.base(n: anyNamed('n')),
-        ).thenReturn(testPubKey);
+        when(mockSodium.crypto.scalarmult.base(n: anyNamed('n')))
+            .thenReturn(testPubKey);
 
         final result = sut.createIdentityCryptoManager(testPrivKey);
 

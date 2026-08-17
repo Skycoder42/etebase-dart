@@ -7,7 +7,7 @@ abstract class EtebaseException implements Exception {
 
   /// @nodoc
   @protected
-  EtebaseException(this.message);
+  new(this.message);
 
   /// @nodoc
   @visibleForOverriding

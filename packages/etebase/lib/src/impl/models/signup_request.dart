@@ -14,7 +14,7 @@ part 'signup_request.g.dart';
 @freezed
 sealed class SignupRequest with _$SignupRequest {
   @msgPackBytes
-  const factory SignupRequest({
+  const factory({
     required User user,
     required Uint8List salt,
     required Uint8List loginPubkey,
@@ -22,6 +22,5 @@ sealed class SignupRequest with _$SignupRequest {
     required Uint8List encryptedContent,
   }) = _SignupRequest;
 
-  factory SignupRequest.fromJson(Map<String, dynamic> json) =>
-      _$SignupRequestFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$SignupRequestFromJson(json);
 }

@@ -10,7 +10,7 @@ class PermissionDenied extends HttpFailure {
   static const statusCode = 403;
 
   /// Default constructor.
-  PermissionDenied(String message, [HttpErrorContent? error])
+  new(String message, [HttpErrorContent? error])
     : super(statusCode, message, error);
 
   @override

@@ -11,7 +11,7 @@ class FakeEncryptedCollectionItem extends Fake
   @override
   final String? lastEtag;
 
-  FakeEncryptedCollectionItem(this.uid, this.lastEtag);
+  new(this.uid, this.lastEtag);
 }
 
 void main() {

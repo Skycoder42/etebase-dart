@@ -1,8 +1,8 @@
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/etebase.dart';
 import 'package:etebase_flutter/src/api/item_metadata_extensions.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   group('ItemMetadataExtensions', () {

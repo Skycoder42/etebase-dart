@@ -9,7 +9,7 @@ import '../../../api/managers/crypto_executor.dart';
 
 @internal
 class AsyncCryptoExecutor implements CryptoExecutor {
-  const AsyncCryptoExecutor(SodiumSumo _);
+  const new(SodiumSumo _);
 
   Never _throwUnsupported() => throw UnsupportedError(
     'CryptoExecutor.async / Client.createAsync is not supported on JS platforms',

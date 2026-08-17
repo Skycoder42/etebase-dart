@@ -12,7 +12,7 @@ import 'crypto_utils.dart';
 class CryptoMac {
   final GenericHashConsumer _consumer;
 
-  CryptoMac(
+  new(
     CryptoExecutor executor, {
     SecureKey? key,
     int length = CryptoUtils.hashSize,

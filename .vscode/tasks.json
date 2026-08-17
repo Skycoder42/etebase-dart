@@ -4,15 +4,14 @@
 		{
 			"type": "dart",
 			"command": "dart",
-			"cwd": "packages/etebase",
 			"args": [
 				"run",
 				"build_runner",
-				"watch"
+				"watch",
+				"--workspace"
 			],
 			"problemMatcher": [],
 			"label": "dart: dart run build_runner watch",
-			"detail": "packages/etebase",
 			"group": {
 				"kind": "build",
 				"isDefault": true

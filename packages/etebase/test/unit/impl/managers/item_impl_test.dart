@@ -9,7 +9,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
@@ -95,9 +94,8 @@ void main() {
     test('getMeta calls getMeta on encrypted', () async {
       const testMeta = ItemMetadata(name: 'test');
 
-      when(
-        mockEncrypted.getMeta<ItemMetadata>(mockClient, mockItemCM),
-      ).thenReturnAsync(testMeta);
+      when(mockEncrypted.getMeta<ItemMetadata>(mockClient, mockItemCM))
+          .thenReturnAsync(testMeta);
 
       final result = await sut.getMeta<ItemMetadata>();
       expect(result, testMeta);
@@ -126,9 +124,8 @@ void main() {
     test('getContent calls getContent on encrypted', () async {
       final testContent = Uint8List.fromList([33, 4, 12, 12]);
 
-      when(
-        mockEncrypted.getContent(mockClient, mockItemCM),
-      ).thenReturnAsync(testContent);
+      when(mockEncrypted.getContent(mockClient, mockItemCM))
+          .thenReturnAsync(testContent);
 
       final result = await sut.getContent();
       expect(result, testContent);
@@ -139,9 +136,8 @@ void main() {
     test('getContentStream calls getContentStream on encrypted', () async {
       final testContent = Uint8List.fromList([33, 4, 12, 12]);
 
-      when(
-        mockEncrypted.getContentStream(mockClient, mockItemCM),
-      ).thenStream(Stream.value(testContent));
+      when(mockEncrypted.getContentStream(mockClient, mockItemCM))
+          .thenStream(Stream.value(testContent));
 
       final result = sut.getContentStream();
       await expectLater(result, emitsInOrder([testContent, emitsDone]));

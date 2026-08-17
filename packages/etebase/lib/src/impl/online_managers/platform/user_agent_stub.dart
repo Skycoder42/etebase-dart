@@ -16,9 +16,8 @@ abstract base class UserAgent {
       ..write(clientName)
       ..write(' (');
 
-    final allValues = [
-      'package:${pubspec.package}/${pubspec.version}',
-    ].followedBy(values);
+    final allValues = ['package:${pubspec.package}/${pubspec.version}']
+        .followedBy(values);
     var first = true;
     for (final value in allValues) {
       if (first) {

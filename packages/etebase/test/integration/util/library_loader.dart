@@ -3,7 +3,6 @@ import 'dart:math';
 
 // ignore: no_self_package_imports
 import 'package:etebase/etebase.dart';
-import 'package:sodium/sodium_sumo.dart';
 import 'package:uuid/data.dart';
 import 'package:uuid/rng.dart';
 import 'package:uuid/uuid.dart';
@@ -16,10 +15,10 @@ import 'library_loader_stub.dart'
 export 'library_loader_stub.dart'
     if (dart.library.io) 'library_loader_vm.dart'
     if (dart.library.js_interop) 'library_loader_js.dart'
-    show getLibsodium, kIsWeb;
+    show kIsWeb, prepareSodium;
 
 final _rng = Random.secure();
-final _uuid = Uuid(goptions: GlobalOptions(CryptoRNG()));
+const _uuid = Uuid(goptions: GlobalOptions(CryptoRNG()));
 
 final serverUri = Uri.http('127.0.0.1:3735');
 
@@ -30,14 +29,14 @@ Future<Client> createClient({bool useDefaultServer = false}) async {
   // ignore: avoid_print
   print('Running client in ${useAsync ? 'async' : 'sync'} mode');
 
+  prepareSodium();
+  // ignore: async_return_with_no_await false positive
   return useAsync
       ? await Client.createAsync(
-          await SodiumSumoInit.init(getLibsodium),
           'package:etebase/test/integration',
           useDefaultServer ? null : serverUri,
         )
       : Client.create(
-          await SodiumSumoInit.init(getLibsodium),
           'package:etebase/test/integration',
           useDefaultServer ? null : serverUri,
         );

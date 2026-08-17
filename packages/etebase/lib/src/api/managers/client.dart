@@ -9,8 +9,9 @@ import 'crypto_executor.dart';
 
 /// A callback that takes a [json] map and returns an instance of a type that
 /// implements [ItemMetadata].
-typedef MetaFromJson<TMeta extends ItemMetadata> =
-    TMeta Function(Map<String, dynamic> json);
+typedef MetaFromJson<TMeta extends ItemMetadata> = TMeta Function(
+  Map<String, dynamic> json,
+);
 
 /// The network client to use to interact with the Etebase server.
 ///
@@ -25,22 +26,17 @@ abstract interface class Client {
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
-  /// {@template client_create_sodium}
-  /// The [sodium] instance is required to perform cryptographic operations.
-  /// See [package:sodium](https://pub.dev/packages/sodium) for how to get such
-  /// an instance.
-  /// {@endtemplate}
-  ///
   /// {@template client_create_others}
   /// The [clientName] will be used to populate the `User-Agent` header in all
   /// requests to the server. If no [serverUrl] is provided, the
   /// [defaultServerUrl] is used.
   /// {@endtemplate}
-  factory Client.create(
-    SodiumSumo sodium,
-    String clientName, [
-    Uri? serverUrl,
-  ]) => ClientImpl.create(CryptoExecutor.sync(sodium), clientName, serverUrl);
+  static Future<Client> create(String clientName, [Uri? serverUrl]) async =>
+      ClientImpl.create(
+        CryptoExecutor.sync(await SodiumSumoInit.init()),
+        clientName,
+        serverUrl,
+      );
 
   /// Creates a new client object for the server located at [serverUrl].
   ///
@@ -51,15 +47,12 @@ abstract interface class Client {
   /// contents in a context where blocking the main thread for a few
   /// milliseconds would be a problem!
   ///
-  /// {@macro client_create_sodium}
-  ///
   /// {@macro client_create_others}
   static Future<Client> createAsync(
-    SodiumSumo sodium,
     String clientName, [
     Uri? serverUrl,
   ]) async => ClientImpl.create(
-    await CryptoExecutor.async(sodium),
+    await CryptoExecutor.async(await SodiumSumoInit.init()),
     clientName,
     serverUrl,
   );
@@ -73,7 +66,7 @@ abstract interface class Client {
   /// single isolate or need more control over the background execution).
   ///
   /// {@macro client_create_others}
-  factory Client.createCustom(
+  factory createCustom(
     CryptoExecutor cryptoExecutor,
     String clientName, [
     Uri? serverUrl,

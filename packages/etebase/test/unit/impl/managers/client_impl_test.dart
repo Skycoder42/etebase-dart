@@ -26,7 +26,7 @@ import '../../test_helpers.dart';
 ])
 import 'client_impl_test.mocks.dart';
 
-class FakeMeta extends Fake implements ItemMetadata {}
+class FakeMeta extends Fake implements ItemMetadata;
 
 void main() {
   group('$ClientImpl', () {
@@ -224,9 +224,8 @@ void main() {
       test('prettyFingerprint returns crypto prettyFingerprint', () {
         final testBytes = Uint8List.fromList([43, 44, 1]);
         const testFingerprint = 'test-fingerprint';
-        when(
-          mockCryptoService.prettyFingerprint(any),
-        ).thenReturn(testFingerprint);
+        when(mockCryptoService.prettyFingerprint(any))
+            .thenReturn(testFingerprint);
 
         final result = sut.prettyFingerprint(testBytes);
 

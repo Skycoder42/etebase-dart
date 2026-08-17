@@ -16,7 +16,7 @@ class KeyDerivator {
   @visibleForTesting
   final CryptoExecutor executor;
 
-  KeyDerivator(this.executor);
+  new(this.executor);
 
   Uint8List randomSalt() =>
       executor.execSync((sodium) => sodium.randombytes.buf(saltSize));

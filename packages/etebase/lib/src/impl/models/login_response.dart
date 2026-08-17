@@ -10,11 +10,8 @@ part 'login_response.g.dart';
 @internal
 @freezed
 sealed class LoginResponse with _$LoginResponse {
-  const factory LoginResponse({
-    required String token,
-    required LoginResponseUser user,
-  }) = _LoginResponse;
+  const factory({required String token, required LoginResponseUser user}) =
+      _LoginResponse;
 
-  factory LoginResponse.fromJson(Map<String, dynamic> json) =>
-      _$LoginResponseFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$LoginResponseFromJson(json);
 }

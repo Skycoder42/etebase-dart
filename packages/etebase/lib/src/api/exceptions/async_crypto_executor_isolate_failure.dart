@@ -8,8 +8,7 @@ class AsyncCryptoExecutorIsolateFailure extends EtebaseException {
   final String originalMessage;
 
   /// Default constructor.
-  AsyncCryptoExecutorIsolateFailure(this.originalMessage)
-    : super(originalMessage);
+  new(this.originalMessage) : super(originalMessage);
 
   @override
   String get name => 'AsyncCryptoExecutorIsolateFailure';

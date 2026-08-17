@@ -21,7 +21,7 @@ class CollectionInvitationManagerImpl implements CollectionInvitationManager {
   final AccountImpl _account;
   final CollectionInvitationManagerOnline _online;
 
-  CollectionInvitationManagerImpl(this._client, this._account, this._online);
+  new(this._client, this._account, this._online);
 
   @override
   Uint8List get pubkey => _account.identityCryptoManager.pubkey;

@@ -2,6 +2,7 @@
 
 import 'package:etebase/etebase.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:sodium/sodium_sumo.dart';
 
 import '../impl/flutter_client_impl.dart';
 
@@ -31,7 +32,7 @@ abstract interface class FlutterClient implements Client {
   }) async {
     await FlutterClientImpl.hiveInit(autoInitHive);
     return FlutterClientImpl.create(
-      CryptoExecutor.sync(await FlutterClientImpl.sodiumInstance),
+      CryptoExecutor.sync(await SodiumSumoInit.init()),
       await FlutterClientImpl.clientName,
       serverUrl,
     );
@@ -53,7 +54,7 @@ abstract interface class FlutterClient implements Client {
   }) async {
     await FlutterClientImpl.hiveInit(autoInitHive);
     return FlutterClientImpl.create(
-      await CryptoExecutor.async(await FlutterClientImpl.sodiumInstance),
+      await CryptoExecutor.async(await SodiumSumoInit.init()),
       await FlutterClientImpl.clientName,
       serverUrl,
     );

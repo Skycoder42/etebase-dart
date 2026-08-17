@@ -21,7 +21,7 @@ class CollectionManagerImpl implements CollectionManager {
   final AccountCryptoManager _cryptoManager;
   final CollectionManagerOnline _online;
 
-  CollectionManagerImpl(this._client, this._cryptoManager, this._online);
+  new(this._client, this._cryptoManager, this._online);
 
   @override
   Future<CollectionImpl> create<TMeta extends ItemMetadata>(

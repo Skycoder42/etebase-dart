@@ -6,7 +6,7 @@ class ConnectionProblem extends EtebaseException {
   final Exception innerException;
 
   /// Default constructor.
-  ConnectionProblem(this.innerException) : super(innerException.toString());
+  new(this.innerException) : super(innerException.toString());
 
   @override
   String get name => 'ConnectionProblem';

@@ -13,11 +13,11 @@ part 'signed_invitation_content.g.dart';
 @internal
 sealed class SignedInvitationContent with _$SignedInvitationContent {
   @msgPackBytes
-  const factory SignedInvitationContent({
+  const factory({
     required Uint8List encryptionKey,
     required String collectionType,
   }) = _SignedInvitationContent;
 
-  factory SignedInvitationContent.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$SignedInvitationContentFromJson(json);
 }

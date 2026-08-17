@@ -3,6 +3,13 @@ include: package:dart_test_tools/package.yaml
 analyzer:
   exclude:
     - lib/src/gen
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:

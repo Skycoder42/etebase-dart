@@ -11,14 +11,9 @@ import '../../test_helpers.dart';
 import 'online_manager_mocks.dart';
 
 class TestableBaseManager extends BaseManager {
-  TestableBaseManager({
-    required super.client,
-    required super.authTokenSource,
-    super.path,
-  });
+  new({required super.client, required super.authTokenSource, super.path});
 
-  TestableBaseManager.fromNetwork(super._network, super.authTokenSource)
-    : super.fromNetwork();
+  new fromNetwork(super._network, super.authTokenSource) : super.fromNetwork();
 }
 
 void main() {

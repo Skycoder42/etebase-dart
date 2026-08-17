@@ -14,11 +14,6 @@ function startServer {
   echo ::endgroup::
 }
 
-# install libsodium
-echo "::group::Install libsodium"
-brew install libsodium
-echo ::endgroup::
-
 # install js client
 echo "::group::Restoring js_client"
 npm --prefix tool/js_client install

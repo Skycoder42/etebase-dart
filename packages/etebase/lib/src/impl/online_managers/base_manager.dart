@@ -19,7 +19,7 @@ class BaseManager {
 
   final AuthTokenSource authTokenSource;
 
-  BaseManager({
+  new({
     required NetworkClient client,
     required this.authTokenSource,
     List<String> path = const [],
@@ -29,7 +29,7 @@ class BaseManager {
        );
 
   @visibleForTesting
-  BaseManager.fromNetwork(this._network, this.authTokenSource);
+  new fromNetwork(this._network, this.authTokenSource);
 
   @protected
   @visibleForTesting

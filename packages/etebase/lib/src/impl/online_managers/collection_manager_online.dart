@@ -12,13 +12,11 @@ import 'collection_item_manager_online.dart';
 
 @internal
 class CollectionManagerOnline extends BaseManager {
-  CollectionManagerOnline({
-    required super.client,
-    required super.authTokenSource,
-  }) : super(path: const ['collection']);
+  new({required super.client, required super.authTokenSource})
+    : super(path: const ['collection']);
 
   @visibleForTesting
-  CollectionManagerOnline.fromNetwork(
+  new fromNetwork(
     super._network,
     super.authTokenSource,
     // ignore: invalid_use_of_visible_for_testing_member for tests

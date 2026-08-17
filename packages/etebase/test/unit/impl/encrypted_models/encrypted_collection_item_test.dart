@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -21,7 +19,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
 @GenerateNiceMocks([
@@ -34,7 +31,7 @@ import '../crypto/crypto_mocks.dart';
 ])
 import 'encrypted_collection_item_test.mocks.dart';
 
-class FakeItemMetadata extends Fake implements ItemMetadata {}
+class FakeItemMetadata extends Fake implements ItemMetadata;
 
 void main() {
   group('$EncryptedCollectionItem', () {
@@ -210,9 +207,8 @@ void main() {
         mockMessagePackConverter.decode<CachedCollectionItem>(testEncodedItem),
       ).thenReturn(testItemCacheData);
       provideDummy(testRevisionCacheData);
-      when(
-        mockMessagePackConverter.decode<CachedRevision>(testEncodedContent),
-      ).thenReturn(testRevisionCacheData);
+      when(mockMessagePackConverter.decode<CachedRevision>(testEncodedContent))
+          .thenReturn(testRevisionCacheData);
 
       final sut = EncryptedCollectionItem.cacheLoad(
         mockClient,
@@ -232,12 +228,10 @@ void main() {
       clearInteractions(mockMessagePackConverter);
 
       // with content
-      when(
-        mockMessagePackConverter.encode(testItemCacheData),
-      ).thenReturn(testEncodedItem);
-      when(
-        mockMessagePackConverter.encode(testRevisionCacheData),
-      ).thenReturn(testEncodedContent);
+      when(mockMessagePackConverter.encode(testItemCacheData))
+          .thenReturn(testEncodedItem);
+      when(mockMessagePackConverter.encode(testRevisionCacheData))
+          .thenReturn(testEncodedContent);
 
       final cachedWithContent = sut.cacheSave(mockClient, saveContent: true);
       expect(cachedWithContent, testEncodedItem);
@@ -257,9 +251,8 @@ void main() {
           CachedChunk(Uint8List.fromList([2])),
         ],
       );
-      when(
-        mockMessagePackConverter.encode(testRevisionWithoutContentCacheData),
-      ).thenReturn(testEncodedContent);
+      when(mockMessagePackConverter.encode(testRevisionWithoutContentCacheData))
+          .thenReturn(testEncodedContent);
 
       final cachedWithoutContent = sut.cacheSave(
         mockClient,
@@ -475,9 +468,8 @@ void main() {
         test('can handle custom metadata classes', () async {
           final otherMeta = FakeItemMetadata();
 
-          when(
-            mockRevision.getMeta<FakeItemMetadata>(any, any, any),
-          ).thenReturnAsync(otherMeta);
+          when(mockRevision.getMeta<FakeItemMetadata>(any, any, any))
+              .thenReturnAsync(otherMeta);
 
           final result = await sut.getMeta<FakeItemMetadata>(
             mockClient,
@@ -596,9 +588,8 @@ void main() {
       });
 
       test('getContentStream', () async {
-        when(
-          mockRevision.getContentStream(any, any),
-        ).thenStream(Stream.value(testContent));
+        when(mockRevision.getContentStream(any, any))
+            .thenStream(Stream.value(testContent));
 
         final result = sut.getContentStream(mockClient, mockItemCm);
 

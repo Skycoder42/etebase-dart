@@ -10,7 +10,7 @@ class Unauthorized extends HttpFailure {
   static const statusCode = 401;
 
   /// Default constructor.
-  Unauthorized(String message, [HttpErrorContent? error])
+  new(String message, [HttpErrorContent? error])
     : super(statusCode, message, error);
 
   @override

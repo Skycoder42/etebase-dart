@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_asserts_with_message
-
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -23,7 +21,6 @@ import 'package:mockito/mockito.dart';
 import 'package:msgpack_codec/msgpack_codec.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
   MockSpec<CryptoService>(),
@@ -41,9 +38,9 @@ class TestItemMetadata implements ItemMetadata {
   final ItemMetadata _self;
   final String extra;
 
-  const TestItemMetadata(this._self, this.extra);
+  const new(this._self, this.extra);
 
-  TestItemMetadata.fromJson(Map<String, dynamic> json)
+  new fromJson(Map<String, dynamic> json)
     : _self = ItemMetadata.fromJson(json),
       extra = json['extra'] as String;
 
@@ -206,12 +203,10 @@ void main() {
         final [Uint8List data] = unwrap(raw, smCryptoPadSmall);
         return data;
       });
-      // ignore: discarded_futures
       when(mockCryptoService.bufferPad(any)).thenAnswer((i) {
         final [Uint8List data] = i.positionalArguments;
         return wrap(smCryptoPad, [data]);
       });
-      // ignore: discarded_futures
       when(mockCryptoService.bufferUnpad(any)).thenAnswer((i) {
         final [Uint8List raw] = i.positionalArguments;
         final [Uint8List data] = unwrap(raw, smCryptoPad);
@@ -233,14 +228,12 @@ void main() {
           ..last = 0;
       });
 
-      // ignore: discarded_futures
       when(mockCryptoManager.encryptDetached(any, any)).thenAnswer((i) {
         final [Uint8List msg, Uint8List? ad] = i.positionalArguments;
         final cipher = wrap(smCmDetachedCrypt, [msg, ad]);
         final mac = wrap(smCmDetachedMac, [msg, ad]);
         return (mac: mac, nonceCipherText: cipher);
       });
-      // ignore: discarded_futures
       when(mockCryptoManager.decryptDetached(any, any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List mac, Uint8List? ad] =
             i.positionalArguments;
@@ -254,7 +247,6 @@ void main() {
         expect(msgM, msgC);
         return msgC;
       });
-      // ignore: discarded_futures
       when(mockCryptoManager.verify(any, any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List mac, Uint8List? ad] =
             i.positionalArguments;
@@ -267,21 +259,17 @@ void main() {
         expect(adM, ad);
         expect(msgM, msgC);
       });
-      when(
-        // ignore: discarded_futures
-        mockCryptoManager.calculateMac(any, withKey: anyNamed('withKey')),
-      ).thenAnswer((i) {
-        final [Uint8List message] = i.positionalArguments;
-        final {#withKey: bool withKey} = i.namedArguments;
-        return wrap(smCmMac, [message, withKey]);
-      });
-      // ignore: discarded_futures
+      when(mockCryptoManager.calculateMac(any, withKey: anyNamed('withKey')))
+          .thenAnswer((i) {
+            final [Uint8List message] = i.positionalArguments;
+            final {#withKey: bool withKey} = i.namedArguments;
+            return wrap(smCmMac, [message, withKey]);
+          });
       when(mockCryptoManager.encrypt(any, any)).thenAnswer((i) {
         final [Uint8List msg, Uint8List? ad] = i.positionalArguments;
         final cipher = wrap(smCmCrypt, [msg, ad]);
         return cipher;
       });
-      // ignore: discarded_futures
       when(mockCryptoManager.decrypt(any, any)).thenAnswer((i) {
         final [Uint8List cipher, Uint8List? ad] = i.positionalArguments;
         final [Uint8List msgC, Uint8List? adC] = unwrap(cipher, smCmCrypt);
@@ -289,24 +277,22 @@ void main() {
         return msgC;
       });
 
-      when(
-        mockCryptoManager.getCryptoMac(withKey: anyNamed('withKey')),
-      ).thenAnswer((i) {
-        final {#withKey: bool withKey} = i.namedArguments;
-        final values = <dynamic>[withKey];
-        final cm = MockCryptoMac();
-        when(cm.update(any)).thenAnswer((i) {
-          final [Uint8List data] = i.positionalArguments;
-          values.add(wrap(smMacUpdate, [data]));
-        });
-        when(cm.updateWithLenPrefix(any)).thenAnswer((i) {
-          final [Uint8List data] = i.positionalArguments;
-          values.add(wrap(smMacUpdateLen, [data]));
-        });
-        // ignore: discarded_futures
-        when(cm.finalize()).thenAnswer((i) async => wrap(smMac, values));
-        return cm;
-      });
+      when(mockCryptoManager.getCryptoMac(withKey: anyNamed('withKey')))
+          .thenAnswer((i) {
+            final {#withKey: bool withKey} = i.namedArguments;
+            final values = <dynamic>[withKey];
+            final cm = MockCryptoMac();
+            when(cm.update(any)).thenAnswer((i) {
+              final [Uint8List data] = i.positionalArguments;
+              values.add(wrap(smMacUpdate, [data]));
+            });
+            when(cm.updateWithLenPrefix(any)).thenAnswer((i) {
+              final [Uint8List data] = i.positionalArguments;
+              values.add(wrap(smMacUpdateLen, [data]));
+            });
+            when(cm.finalize()).thenAnswer((i) async => wrap(smMac, values));
+            return cm;
+          });
     }
 
     void setupRollsum(int blockSize) {
@@ -801,9 +787,8 @@ void main() {
       final testWrappedCached = wrap(184, testCached.toJson());
 
       provideDummy(testCached);
-      when(
-        mockMessagePackConverter.decode<CachedRevision>(any),
-      ).thenReturn(testCached);
+      when(mockMessagePackConverter.decode<CachedRevision>(any))
+          .thenReturn(testCached);
       when(mockMessagePackConverter.encode(any)).thenReturn(testWrappedCached);
 
       final revision = EncryptedRevision.cacheLoad(
@@ -904,9 +889,8 @@ void main() {
             content: testContent,
           );
 
-          when(
-            mockCryptoManager.verify(any, any, any),
-          ).thenThrow(CryptoFailure());
+          when(mockCryptoManager.verify(any, any, any))
+              .thenThrow(CryptoFailure());
 
           await expectLater(
             sut.verify(mockClient, mockCryptoManager, testAd),

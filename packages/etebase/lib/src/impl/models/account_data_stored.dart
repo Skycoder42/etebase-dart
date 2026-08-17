@@ -13,11 +13,9 @@ part 'account_data_stored.g.dart';
 @internal
 sealed class AccountDataStored with _$AccountDataStored {
   @msgPackBytes
-  const factory AccountDataStored({
-    required int version,
-    required Uint8List encryptedData,
-  }) = _AccountDataStored;
+  const factory({required int version, required Uint8List encryptedData}) =
+      _AccountDataStored;
 
-  factory AccountDataStored.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$AccountDataStoredFromJson(json);
 }

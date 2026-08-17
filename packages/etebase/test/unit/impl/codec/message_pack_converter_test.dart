@@ -12,17 +12,17 @@ import 'package:test/test.dart';
 class CustomType {
   final int value;
 
-  const CustomType(this.value);
+  const new(this.value);
 
-  factory CustomType.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       CustomType(json['value'] as int);
 
   // ignore: avoid_unused_constructor_parameters
-  factory CustomType.withFormatException(Map<String, dynamic> json) =>
+  factory withFormatException(Map<String, dynamic> json) =>
       throw const FormatException();
 
   // ignore: avoid_unused_constructor_parameters
-  factory CustomType.withOtherError(Map<String, dynamic> json) => throw Error();
+  factory withOtherError(Map<String, dynamic> json) => throw Error();
 
   Map<String, dynamic> toJson() => {'value': value};
 

@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 @TestOn('!windows')
 library;
 

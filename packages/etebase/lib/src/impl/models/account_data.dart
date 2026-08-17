@@ -14,7 +14,7 @@ part 'account_data.g.dart';
 @freezed
 sealed class AccountData with _$AccountData {
   @msgPackBytes
-  const factory AccountData({
+  const factory({
     required LoginResponseUser user,
     required String authToken,
     required Uri serverUrl,
@@ -22,6 +22,5 @@ sealed class AccountData with _$AccountData {
     required Uint8List key,
   }) = _AccountData;
 
-  factory AccountData.fromJson(Map<String, dynamic> json) =>
-      _$AccountDataFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$AccountDataFromJson(json);
 }

@@ -11,11 +11,11 @@ part 'item_batch_request.g.dart';
 @freezed
 @internal
 sealed class ItemBatchRequest with _$ItemBatchRequest {
-  const factory ItemBatchRequest({
+  const factory({
     required List<EncryptedCollectionItem> items,
     List<CollectionItemFetchInfo>? deps,
   }) = _ItemBatchRequest;
 
-  factory ItemBatchRequest.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$ItemBatchRequestFromJson(json);
 }

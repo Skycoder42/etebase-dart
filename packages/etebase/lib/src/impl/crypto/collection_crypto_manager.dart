@@ -9,10 +9,5 @@ import 'minimal_collection_crypto_manager.dart';
 class CollectionCryptoManager extends MinimalCollectionCryptoManager {
   final AccountCryptoManager accountCryptoManager;
 
-  CollectionCryptoManager(
-    super.executor,
-    this.accountCryptoManager,
-    super.key,
-    super.version,
-  );
+  new(super.executor, this.accountCryptoManager, super.key, super.version);
 }

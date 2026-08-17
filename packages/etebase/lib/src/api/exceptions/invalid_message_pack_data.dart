@@ -6,7 +6,7 @@ class InvalidMessagePackData extends EtebaseException {
   final Object? innerError;
 
   /// Default constructor.
-  InvalidMessagePackData(super.message, [this.innerError]);
+  new(super.message, [this.innerError]);
 
   @override
   String get name => 'InvalidMessagePackData';

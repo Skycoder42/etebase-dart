@@ -16,7 +16,7 @@ part 'signed_invitation_base.g.dart';
 sealed class SignedInvitationBase with _$SignedInvitationBase {
   @JsonSerializable(createToJson: true)
   @msgPackBytes
-  const factory SignedInvitationBase.write({
+  const factory write({
     required String uid,
     required int version,
     required String username,
@@ -28,7 +28,7 @@ sealed class SignedInvitationBase with _$SignedInvitationBase {
   @JsonSerializable(createToJson: true)
   @msgPackBytes
   @Implements<SignedInvitation>()
-  const factory SignedInvitationBase.read({
+  const factory read({
     required String uid,
     required int version,
     required String username,
@@ -39,7 +39,7 @@ sealed class SignedInvitationBase with _$SignedInvitationBase {
     @JsonKey(name: 'fromPubkey') required Uint8List fromPubKey,
   }) = SignedInvitationRead;
 
-  const SignedInvitationBase._();
+  const new _();
 
   Map<String, dynamic> toJson() => switch (this) {
     final SignedInvitationWrite w => _$SignedInvitationWriteToJson(w),

@@ -9,7 +9,7 @@ part 'http_error_content.g.dart';
 @Freezed(toStringOverride: false)
 sealed class HttpErrorContent with _$HttpErrorContent {
   /// Default constructor.
-  const factory HttpErrorContent({
+  const factory({
     /// The error code of the error.
     String? code,
 
@@ -23,11 +23,11 @@ sealed class HttpErrorContent with _$HttpErrorContent {
   /// @nodoc
   // coverage:ignore-start
   @internal
-  factory HttpErrorContent.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$HttpErrorContentFromJson(json);
   // coverage:ignore-end
 
-  const HttpErrorContent._();
+  const new _();
 
   @override
   String toString({bool withErrors = true}) {

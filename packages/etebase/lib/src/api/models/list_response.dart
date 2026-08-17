@@ -27,7 +27,7 @@ sealed class ListResponse<T extends Object> with _$ListResponse<T> {
   /// The response of fetching an item list.
   @JsonSerializable(genericArgumentFactories: true)
   @With.fromString('_ItemMixin<T>')
-  const factory ListResponse.item({
+  const factory item({
     /// List of collections included in the response.
     required List<T> data,
 
@@ -41,7 +41,7 @@ sealed class ListResponse<T extends Object> with _$ListResponse<T> {
   /// The response of fetching a collection list.
   @JsonSerializable(genericArgumentFactories: true)
   @With.fromString('_CollectionMixin<T>')
-  const factory ListResponse.collection({
+  const factory collection({
     /// List of collections included in the response.
     required List<T> data,
 
@@ -58,7 +58,7 @@ sealed class ListResponse<T extends Object> with _$ListResponse<T> {
   /// The response of fetching a generic iterable data list.
   @JsonSerializable(genericArgumentFactories: true)
   @With.fromString('_IteratorMixin<T>')
-  const factory ListResponse.iterator({
+  const factory iterator({
     /// List of collections included in the response.
     required List<T> data,
 
@@ -69,7 +69,7 @@ sealed class ListResponse<T extends Object> with _$ListResponse<T> {
     required String? iterator,
   }) = IteratorListResponse<T>;
 
-  const ListResponse._();
+  const new _();
 
   // coverage:ignore-start
   /// Creates a new response by mapping the [data].

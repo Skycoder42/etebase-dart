@@ -1,23 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:etebase/etebase.dart';
-import 'package:sodium/sodium_sumo.dart';
 
 void main(List<String> args) async {
-  final sodium = await SodiumSumoInit.init(
-    // replace with wherever libsodium is located on your machine
-    () => DynamicLibrary.open('/usr/lib/libsodium.so'),
-  );
-
-  final client = Client.create(
-    sodium,
-    'test_client',
-    Uri.http('127.0.0.1:3735'),
-  );
+  final client = await Client.create('test_client', Uri.http('127.0.0.1:3735'));
 
   final userName = base64Url.encode(client.randombytes(18));
   print(userName);

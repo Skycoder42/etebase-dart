@@ -18,12 +18,9 @@ class BoxCryptoManager implements CryptoManagerBase {
   final KeyPair _keyPair;
   var _disposed = false;
 
-  BoxCryptoManager(this.executor, this._keyPair);
+  new(this.executor, this._keyPair);
 
-  factory BoxCryptoManager.fromSeed(
-    CryptoExecutor executor, [
-    SecureKey? seed,
-  ]) {
+  factory fromSeed(CryptoExecutor executor, [SecureKey? seed]) {
     final cm = BoxCryptoManager(
       executor,
       executor.execSync(

@@ -15,7 +15,7 @@ class ItemImpl implements Item {
   final EncryptedCollectionItem encrypted;
   final String colUid;
 
-  ItemImpl(this._client, this._cm, this.encrypted, this.colUid);
+  new(this._client, this._cm, this.encrypted, this.colUid);
 
   @override
   String get uid => encrypted.uid;

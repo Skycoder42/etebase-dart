@@ -16,7 +16,7 @@ class ChunkerSink implements EventSink<List<int>> {
 
   final _chunkBuilder = BytesBuilder(copy: false);
 
-  ChunkerSink(this.sink, this.chunker);
+  new(this.sink, this.chunker);
 
   @override
   void add(List<int> event) {
@@ -69,7 +69,7 @@ class ChunkerStreamTransformer
     extends StreamTransformerBase<List<int>, Uint8List> {
   final Rollsum chunker;
 
-  const ChunkerStreamTransformer(this.chunker);
+  const new(this.chunker);
 
   @override
   Stream<Uint8List> bind(Stream<List<int>> stream) =>

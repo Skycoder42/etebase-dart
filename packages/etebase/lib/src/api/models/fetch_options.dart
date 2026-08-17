@@ -1,5 +1,4 @@
 // coverage:ignore-file
-// ignore_for_file: invalid_annotation_target, unused_element
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -10,7 +9,7 @@ part 'fetch_options.freezed.dart';
 /// Configuration options for data fetching.
 @Freezed(copyWith: true)
 sealed class FetchOptionsBase with _$FetchOptionsBase {
-  const factory FetchOptionsBase({
+  const factory({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -21,7 +20,7 @@ sealed class FetchOptionsBase with _$FetchOptionsBase {
     PrefetchOption? prefetch,
   }) = FetchOptions;
 
-  const factory FetchOptionsBase.item({
+  const factory item({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -35,7 +34,7 @@ sealed class FetchOptionsBase with _$FetchOptionsBase {
     bool? withCollection,
   }) = ItemFetchOptions;
 
-  const factory FetchOptionsBase.iterator({
+  const factory iterator({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -43,7 +42,7 @@ sealed class FetchOptionsBase with _$FetchOptionsBase {
     String? iterator,
   }) = IteratorFetchOptions;
 
-  const factory FetchOptionsBase.revision({
+  const factory revision({
     /// Limit the amount of items returned.
     int? limit,
 
@@ -54,7 +53,7 @@ sealed class FetchOptionsBase with _$FetchOptionsBase {
     PrefetchOption? prefetch,
   }) = RevisionFetchOptions;
 
-  const FetchOptionsBase._();
+  const new _();
 }
 
 @internal

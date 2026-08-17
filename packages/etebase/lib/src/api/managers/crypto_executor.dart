@@ -11,12 +11,11 @@ import '../exceptions/crypto_failure.dart';
 typedef SyncCallback<T> = T Function(SodiumSumo sodium);
 
 /// A callback for a asynchronous cryptographic operations.
-typedef AsyncCallback<T> =
-    T Function(
-      SodiumSumo sodium,
-      List<SecureKey> secureKeys,
-      List<KeyPair> keyPairs,
-    );
+typedef AsyncCallback<T> = T Function(
+  SodiumSumo sodium,
+  List<SecureKey> secureKeys,
+  List<KeyPair> keyPairs,
+);
 
 /// Defines an service that can run cryptographic operations synchronously and
 /// asynchronously, using whatever execution model is preferred.
@@ -27,7 +26,7 @@ typedef AsyncCallback<T> =
 abstract interface class CryptoExecutor {
   /// Creates a default instance of a [CryptoExecutor] that executes most
   /// operations synchronously.
-  factory CryptoExecutor.sync(SodiumSumo sodium) = SyncCryptoExecutor;
+  factory sync(SodiumSumo sodium) = SyncCryptoExecutor;
 
   /// Creates a default instance of a [CryptoExecutor] that executes most
   /// operations asynchronously on a separate isolate.

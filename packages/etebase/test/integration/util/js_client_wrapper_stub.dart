@@ -9,7 +9,7 @@ part 'js_client_wrapper_stub.freezed.dart';
 part 'js_client_wrapper_stub.g.dart';
 
 final class _BinaryConverter implements JsonConverter<Uint8List, String> {
-  const _BinaryConverter();
+  const new();
 
   @override
   Uint8List fromJson(String json) => base64UrlNoPad.decode(json);
@@ -23,23 +23,23 @@ const _binary = _BinaryConverter();
 @Freezed(unionKey: 'action')
 sealed class Action with _$Action {
   // account test
-  const factory Action.signUp(String username, String email, String password) =
+  const factory signUp(String username, String email, String password) =
       _SignUp;
-  const factory Action.signIn(String username, String password) = _SignIn;
+  const factory signIn(String username, String password) = _SignIn;
   @_binary
-  const factory Action.saveAccount(
+  const factory saveAccount(
     String username,
     String password,
     Uint8List encryptionKey,
   ) = _SaveAccount;
   @_binary
-  const factory Action.restoreAccount(String data, Uint8List encryptionKey) =
+  const factory restoreAccount(String data, Uint8List encryptionKey) =
       _RestoreAccount;
 
   // collection test
-  const factory Action.listCollections(List<String> types) = _ListCollections;
+  const factory listCollections(List<String> types) = _ListCollections;
   @_binary
-  const factory Action.validateCollection(
+  const factory validateCollection(
     String uid, {
     ItemMetadata? meta,
     Uint8List? content,
@@ -47,13 +47,13 @@ sealed class Action with _$Action {
     CollectionAccessLevel? accessLevel,
   }) = _ValidateCollection;
   @_binary
-  const factory Action.createCollection(
+  const factory createCollection(
     String collectionType,
     ItemMetadata meta,
     Uint8List content,
   ) = _CreateCollection;
   @_binary
-  const factory Action.updateCollection(
+  const factory updateCollection(
     String uid, {
     ItemMetadata? meta,
     Uint8List? content,
@@ -61,32 +61,31 @@ sealed class Action with _$Action {
     @Default(false) bool preserveContent,
   }) = _UpdateCollection;
   @_binary
-  const factory Action.restoreCollection(
+  const factory restoreCollection(
     Uint8List data, {
     ItemMetadata? meta,
     Uint8List? content,
     @Default(false) bool noContent,
     bool? isDeleted,
   }) = _RestoreCollection;
-  const factory Action.saveCollection(
+  const factory saveCollection(
     String uid, {
     @Default(true) bool preserveContent,
   }) = _SaveCollection;
 
   // item test
-  const factory Action.listItems() = _ListItems;
+  const factory listItems() = _ListItems;
   @_binary
-  const factory Action.validateItem(
+  const factory validateItem(
     String uid, {
     ItemMetadata? meta,
     Uint8List? content,
     bool? isDeleted,
   }) = _ValidateItem;
   @_binary
-  const factory Action.createItem(ItemMetadata meta, Uint8List content) =
-      _CreateItem;
+  const factory createItem(ItemMetadata meta, Uint8List content) = _CreateItem;
   @_binary
-  const factory Action.updateItem(
+  const factory updateItem(
     String uid, {
     ItemMetadata? meta,
     Uint8List? content,
@@ -94,24 +93,22 @@ sealed class Action with _$Action {
     @Default(false) bool preserveContent,
   }) = _UpdateItem;
   @_binary
-  const factory Action.restoreItem(
+  const factory restoreItem(
     Uint8List data, {
     ItemMetadata? meta,
     Uint8List? content,
     @Default(false) bool noContent,
     bool? isDeleted,
   }) = _RestoreItem;
-  const factory Action.saveItem(
-    String uid, {
-    @Default(true) bool preserveContent,
-  }) = _SaveItem;
+  const factory saveItem(String uid, {@Default(true) bool preserveContent}) =
+      _SaveItem;
 
   // sharing test
   @_binary
-  const factory Action.validatePubkey(Uint8List pubkey, String fingerprint) =
+  const factory validatePubkey(Uint8List pubkey, String fingerprint) =
       _ValidatePubkey;
   @_binary
-  const factory Action.acceptInvitation({
+  const factory acceptInvitation({
     required String collection,
     required Uint8List fromPubKey,
     required String fromUsername,
@@ -119,16 +116,16 @@ sealed class Action with _$Action {
     @Default(true) bool accept,
   }) = _AcceptInvitation;
   @_binary
-  const factory Action.invite({
+  const factory invite({
     required String colUid,
     required Uint8List pubKey,
     required String username,
     required CollectionAccessLevel accessLevel,
   }) = _Invite;
 
-  factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
 
-  const Action._();
+  const new _();
 
   @internal
   String get $type;
@@ -140,11 +137,10 @@ abstract class JsClientWrapper {
   @protected
   late final Collection collection;
 
-  factory JsClientWrapper() => throw UnimplementedError('Unsupported platform');
+  factory() => throw UnimplementedError('Unsupported platform');
 
-  JsClientWrapper.base();
+  new base();
 
-  // ignore: use_setters_to_change_properties
   void configureAccount(Account account, [Collection? collection]) {
     this.account = account;
     if (collection != null) {

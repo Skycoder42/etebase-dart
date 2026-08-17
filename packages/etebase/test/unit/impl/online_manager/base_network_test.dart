@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -24,7 +22,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<NetworkClient>(),
@@ -73,9 +70,8 @@ void main() {
     });
 
     test('asserts if baseUrl ends with /', () {
-      when(
-        mockNetworkClient.baseUrl,
-      ).thenReturn(Uri.https('test.com', '/base/'));
+      when(mockNetworkClient.baseUrl)
+          .thenReturn(Uri.https('test.com', '/base/'));
 
       expect(
         () => BaseNetwork(client: mockNetworkClient),
@@ -86,17 +82,15 @@ void main() {
     group('invoke', () {
       group('(requests)', () {
         setUp(() {
-          when(
-            mockClient.send(any),
-          ).thenReturnAsync(StreamedResponse(const Stream.empty(), 200));
+          when(mockClient.send(any))
+              .thenReturnAsync(StreamedResponse(const Stream.empty(), 200));
         });
 
         test('sends basic request', () async {
           await sut.invoke<void>();
 
-          final [Request request] = verify(
-            mockClient.send(captureAny),
-          ).captured;
+          final [Request request] = verify(mockClient.send(captureAny))
+              .captured;
 
           expect(request.method, 'GET');
           expect(
@@ -125,9 +119,8 @@ void main() {
             authToken: testToken,
           );
 
-          final [Request request] = verify(
-            mockClient.send(captureAny),
-          ).captured;
+          final [Request request] = verify(mockClient.send(captureAny))
+              .captured;
 
           expect(request.method, 'PATCH');
           expect(
@@ -161,9 +154,8 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] = verify(
-            mockClient.send(captureAny),
-          ).captured;
+          final [Request request] = verify(mockClient.send(captureAny))
+              .captured;
 
           expect(request.body, testBody);
           expect(request.bodyBytes, utf8.encode(testBody));
@@ -181,9 +173,8 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] = verify(
-            mockClient.send(captureAny),
-          ).captured;
+          final [Request request] = verify(mockClient.send(captureAny))
+              .captured;
 
           expect(request.bodyFields, testBody);
           expect(request.body, testStrBody);
@@ -192,10 +183,7 @@ void main() {
           expect(request.contentLength, testStrBody.length);
           expect(
             request.headers,
-            containsPair(
-              'content-type',
-              'application/x-www-form-urlencoded; charset=utf-8',
-            ),
+            containsPair('content-type', 'application/x-www-form-urlencoded'),
           );
         });
 
@@ -204,9 +192,8 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] = verify(
-            mockClient.send(captureAny),
-          ).captured;
+          final [Request request] = verify(mockClient.send(captureAny))
+              .captured;
 
           expect(request.bodyBytes, testBody);
           expect(request.contentLength, testBody.length);
@@ -224,9 +211,8 @@ void main() {
 
           await sut.invoke<void>(body: testBody);
 
-          final [Request request] = verify(
-            mockClient.send(captureAny),
-          ).captured;
+          final [Request request] = verify(mockClient.send(captureAny))
+              .captured;
 
           expect(request.bodyBytes, testBodyBytes);
           expect(request.contentLength, testBodyBytes.length);
@@ -323,7 +309,7 @@ void main() {
               StreamedResponse(
                 const Stream.empty(),
                 200,
-                headers: {if (fixture != null) 'content-type': fixture},
+                headers: {'content-type': ?fixture},
               ),
             );
 
@@ -415,9 +401,8 @@ void main() {
               headers: {'content-type': 'application/msgpack'},
             ),
           );
-          when(
-            mockConverter.decode<HttpErrorContent>(any),
-          ).thenReturn(testError);
+          when(mockConverter.decode<HttpErrorContent>(any))
+              .thenReturn(testError);
 
           await expectLater(
             () => sut.invoke<void>(),
@@ -451,9 +436,8 @@ void main() {
                 headers: {'content-type': 'application/msgpack'},
               ),
             );
-            when(
-              mockConverter.decode<HttpErrorContent>(any),
-            ).thenThrow(Exception('test'));
+            when(mockConverter.decode<HttpErrorContent>(any))
+                .thenThrow(Exception('test'));
 
             await expectLater(
               () => sut.invoke<void>(),

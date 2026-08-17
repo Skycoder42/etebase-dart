@@ -10,7 +10,7 @@ import 'crypto_manager.dart';
 class AccountCryptoManager extends CryptoManager {
   static const _colTypePadSize = 32;
 
-  AccountCryptoManager(super.executor, super.key, super.version);
+  new(super.executor, super.key, super.version);
 
   @override
   @visibleForOverriding

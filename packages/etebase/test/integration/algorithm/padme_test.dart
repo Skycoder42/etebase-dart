@@ -10,7 +10,8 @@ void main() {
   late CryptoService sut;
 
   setUpAll(() async {
-    final sodium = await SodiumSumoInit.init(getLibsodium);
+    prepareSodium();
+    final sodium = await SodiumSumoInit.init();
     final executor = SyncCryptoExecutor(sodium);
     sut = CryptoService(executor);
   });

@@ -10,7 +10,7 @@ part 'custom_metadata.g.dart';
 @Freezed(fromJson: true, toJson: true, copyWith: true)
 sealed class CustomMetadata with _$CustomMetadata implements ItemMetadata {
   @JsonSerializable(includeIfNull: false)
-  const factory CustomMetadata({
+  const factory({
     String? color,
     String? description,
     @dateTimeMillis DateTime? mtime,
@@ -19,6 +19,5 @@ sealed class CustomMetadata with _$CustomMetadata implements ItemMetadata {
     @Default(false) bool confirmed,
   }) = _CustomMetadata;
 
-  factory CustomMetadata.fromJson(Map<String, dynamic> json) =>
-      _$CustomMetadataFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$CustomMetadataFromJson(json);
 }

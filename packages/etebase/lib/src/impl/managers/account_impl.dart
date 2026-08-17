@@ -41,7 +41,7 @@ class AccountImpl implements Account, AuthTokenSource {
   @override
   AuthToken get authToken => _authToken;
 
-  AccountImpl(
+  new(
     this._client,
     this._mainCryptoManager,
     this._user,
@@ -50,7 +50,7 @@ class AccountImpl implements Account, AuthTokenSource {
     this.identityCryptoManager,
   ) : _authToken = AuthToken(authToken);
 
-  factory AccountImpl._create(
+  factory _create(
     CryptoArena arena,
     ClientImpl client,
     MainCryptoManager mainCryptoManager,

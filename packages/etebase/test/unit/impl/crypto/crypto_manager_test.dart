@@ -15,7 +15,7 @@ const testContext = 'testCtx';
 const testContextPadded = 'testCtx  ';
 
 class TestableCryptoManager extends CryptoManager {
-  TestableCryptoManager(super.executor, super.key, super.version);
+  new(super.executor, super.key, super.version);
 
   @override
   String get context => testContext;
@@ -35,9 +35,8 @@ void main() {
       mockSodium.resetAndSetup();
       mockCryptoExecutor.resetAndSetup();
 
-      when(
-        mockSodium.crypto.kdf.contextBytes,
-      ).thenReturn(testContextPadded.length);
+      when(mockSodium.crypto.kdf.contextBytes)
+          .thenReturn(testContextPadded.length);
 
       sut = TestableCryptoManager(
         mockCryptoExecutor,
@@ -130,9 +129,8 @@ void main() {
       final testCipher = Uint8List.fromList([6, 55, 5]);
 
       when(mockSodium.randombytes.buf(any)).thenReturn(testNonce);
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
           message: anyNamed('message'),
@@ -177,9 +175,8 @@ void main() {
       final testCipher = Uint8List.fromList([6, 55, 5]);
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
           cipherText: anyNamed('cipherText'),
@@ -223,9 +220,8 @@ void main() {
       final testCipher = Uint8List.fromList([6, 55, 5]);
 
       when(mockSodium.randombytes.buf(any)).thenReturn(testNonce);
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
           message: anyNamed('message'),
@@ -271,9 +267,8 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
       when(mockSodium.secureCopy(any)).thenReturn(testKey);
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
           cipherText: anyNamed('cipherText'),
@@ -319,9 +314,8 @@ void main() {
       final testMac = Uint8List.fromList([7, 4, 9]);
 
       when(mockSodium.randombytes.buf(any)).thenReturn(testNonce);
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encryptDetached(
           message: anyNamed('message'),
@@ -368,9 +362,8 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
       final testMac = Uint8List.fromList([7, 4, 9]);
 
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.decryptDetached(
           cipherText: anyNamed('cipherText'),
@@ -420,9 +413,8 @@ void main() {
       final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
       final testMac = Uint8List.fromList([7, 4, 9]);
 
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
 
       await sut.verify(testNonceCipher, testMac, testAd);
 
@@ -627,9 +619,8 @@ void main() {
           outLen: anyNamed('outLen'),
         ),
       ).thenReturn(testHash);
-      when(
-        mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-      ).thenReturn(testNonce.length);
+      when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+          .thenReturn(testNonce.length);
       when(
         mockSodium.crypto.aeadXChaCha20Poly1305IETF.encrypt(
           message: anyNamed('message'),
@@ -685,9 +676,8 @@ void main() {
         final testCipher = Uint8List.fromList([6, 55, 5]);
         final testNonceCipher = Uint8List.fromList(testNonce + testCipher);
 
-        when(
-          mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes,
-        ).thenReturn(testNonce.length);
+        when(mockSodium.crypto.aeadXChaCha20Poly1305IETF.nonceBytes)
+            .thenReturn(testNonce.length);
         when(
           mockSodium.crypto.aeadXChaCha20Poly1305IETF.decrypt(
             cipherText: anyNamed('cipherText'),

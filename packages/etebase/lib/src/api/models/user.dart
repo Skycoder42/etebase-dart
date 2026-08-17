@@ -9,7 +9,7 @@ part 'user.g.dart';
 @freezed
 sealed class User with _$User {
   /// Default constructor.
-  const factory User({
+  const factory({
     /// The username.
     required String username,
 
@@ -17,5 +17,5 @@ sealed class User with _$User {
     required String email,
   }) = _User;
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

@@ -1,3 +1,3 @@
 const kIsWeb = false;
 
-dynamic getLibsodium() => throw UnsupportedError('Platform not supported');
+void prepareSodium() => throw UnsupportedError('Platform not supported');

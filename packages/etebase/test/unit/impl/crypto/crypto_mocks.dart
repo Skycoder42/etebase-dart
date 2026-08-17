@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -26,7 +24,7 @@ import 'crypto_mocks.mocks.dart';
 
 export 'crypto_mocks.mocks.dart';
 
-class FakeGenericHashConsumer extends Fake implements GenericHashConsumer {}
+class FakeGenericHashConsumer extends Fake implements GenericHashConsumer;
 
 class FakeSecureKey extends Fake implements SecureKey {
   final int id;
@@ -34,7 +32,7 @@ class FakeSecureKey extends Fake implements SecureKey {
   bool disposed = false;
   Uint8List? writeBuffer;
 
-  FakeSecureKey(this.id);
+  new(this.id);
 
   @override
   void dispose() => disposed = true;
@@ -156,7 +154,7 @@ class MockSodium extends MockSodiumBase {
 class MockCryptoExecutor extends MockCryptoExecutorBase {
   final MockSodium _mockSodium;
 
-  MockCryptoExecutor(this._mockSodium);
+  new(this._mockSodium);
 
   void resetAndSetup() {
     reset(this);

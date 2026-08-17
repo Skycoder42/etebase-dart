@@ -19,7 +19,7 @@ class LoginCryptoManager implements CryptoManagerBase {
 
   var _disposed = false;
 
-  LoginCryptoManager(this.executor, this.keyPair);
+  new(this.executor, this.keyPair);
 
   Uint8List get pubkey => keyPair.publicKey;
 

@@ -55,9 +55,8 @@ void main() {
         final testPasswordBytes = utf8.encode(testPassword).signedView();
         final testKey = FakeSecureKey(87);
 
-        when(
-          mockSodium.crypto.pwhash.saltBytes,
-        ).thenReturn(testActualSalt.length);
+        when(mockSodium.crypto.pwhash.saltBytes)
+            .thenReturn(testActualSalt.length);
         when(mockSodium.crypto.pwhash.opsLimitInteractive).thenReturn(1);
         when(mockSodium.crypto.pwhash.opsLimitModerate).thenReturn(2);
         when(mockSodium.crypto.pwhash.opsLimitSensitive).thenReturn(3);

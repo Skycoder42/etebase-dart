@@ -29,7 +29,7 @@ class ItemManagerImpl implements ItemManager {
   @visibleForTesting
   final String colUid;
 
-  ItemManagerImpl(this.client, this.cryptoManager, this.online, this.colUid);
+  new(this.client, this.cryptoManager, this.online, this.colUid);
 
   @override
   void dispose() {
@@ -171,10 +171,8 @@ class ItemManagerImpl implements ItemManager {
   @override
   Stream<ItemListResponse<ItemImpl>> subscribeChanges([
     ItemFetchOptions? options,
-  ]) => online
-      .subscribeChanges(options)
-      // ignore: discarded_futures
-      .asyncMap((res) => res.map(_createItem));
+  ]) =>
+      online.subscribeChanges(options).asyncMap((res) => res.map(_createItem));
 
   ItemImpl _createItem(
     EncryptedCollectionItem encrypted, [

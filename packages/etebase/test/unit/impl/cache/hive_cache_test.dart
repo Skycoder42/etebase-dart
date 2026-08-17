@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
@@ -21,7 +19,7 @@ import '../../test_helpers.dart';
 
 @GenerateNiceMocks([
   MockSpec<HiveInterface>(),
-  // ignore: strict_raw_type
+  // ignore: no_raw_types, strict_raw_type
   MockSpec<LazyBox>(),
   MockSpec<ClientImpl>(),
   MockSpec<AccountImpl>(),
@@ -30,13 +28,13 @@ import '../../test_helpers.dart';
 ])
 import 'hive_cache_test.mocks.dart';
 
-class FakeSecureKey extends Fake implements SecureKey {}
+class FakeSecureKey extends Fake implements SecureKey;
 
 class FakeCollection extends Fake implements Collection {
   @override
   final String uid;
 
-  FakeCollection(this.uid);
+  new(this.uid);
 }
 
 void main() {
@@ -57,12 +55,10 @@ void main() {
       reset(mockMetaBox);
       reset(mockCollectionBox);
 
-      when(
-        mockHive.openLazyBox<String>('$testEncodedUserName.meta'),
-      ).thenReturnAsync(mockMetaBox);
-      when(
-        mockHive.openLazyBox<Uint8List>('$testEncodedUserName.collection'),
-      ).thenReturnAsync(mockCollectionBox);
+      when(mockHive.openLazyBox<String>('$testEncodedUserName.meta'))
+          .thenReturnAsync(mockMetaBox);
+      when(mockHive.openLazyBox<Uint8List>('$testEncodedUserName.collection'))
+          .thenReturnAsync(mockCollectionBox);
 
       sut = HiveCache(mockClient, mockHive, testUserName);
 
@@ -258,9 +254,8 @@ void main() {
           fixture,
         ) async {
           when(mockMetaBox.get(any)).thenReturnAsync(accountData);
-          when(
-            mockClient.restoreAccount(any, any),
-          ).thenReturnAsync(mockAccount);
+          when(mockClient.restoreAccount(any, any))
+              .thenReturnAsync(mockAccount);
 
           final result = await sut.loadAccount(fixture);
           expect(result, same(mockAccount));
@@ -381,9 +376,8 @@ void main() {
         'collectionSet persists collection in collection box',
         [false, true],
         (fixture) async {
-          when(
-            mockColMgr.cacheSave(any, saveContent: anyNamed('saveContent')),
-          ).thenReturn(testColData);
+          when(mockColMgr.cacheSave(any, saveContent: anyNamed('saveContent')))
+              .thenReturn(testColData);
 
           await sut.collectionSet(
             mockColMgr,
@@ -529,9 +523,8 @@ void main() {
       group('itemSet', () {
         testData('persists item in open box', [false, true], (fixture) async {
           when(mockHive.isBoxOpen(any)).thenReturn(true);
-          when(
-            mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')),
-          ).thenReturn(testItemData);
+          when(mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')))
+              .thenReturn(testItemData);
 
           await sut.itemSet(
             mockItemMgr,
@@ -552,9 +545,8 @@ void main() {
         testData('persists item in newly opened box', [false, true], (
           fixture,
         ) async {
-          when(
-            mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')),
-          ).thenReturn(testItemData);
+          when(mockItemMgr.cacheSave(any, saveContent: anyNamed('saveContent')))
+              .thenReturn(testItemData);
 
           await sut.itemSet(
             mockItemMgr,

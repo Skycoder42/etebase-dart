@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
@@ -34,7 +32,6 @@ import 'package:test/test.dart';
 
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
-// ignore: directives_ordering
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
   MockSpec<MainCryptoManager>(),
@@ -99,9 +96,8 @@ void main() {
           version: anyNamed('version'),
         ),
       ).thenReturn(mockMainCM);
-      when(
-        mockCryptoService.createIdentityCryptoManager(any),
-      ).thenReturn(mockIdCM);
+      when(mockCryptoService.createIdentityCryptoManager(any))
+          .thenReturn(mockIdCM);
       when(
         mockCryptoService.createStorageCryptoManager(
           any,
@@ -110,9 +106,8 @@ void main() {
       ).thenReturn(mockStorageCM);
 
       when(mockMainCM.createLoginCryptoManager()).thenReturn(mockLoginCM);
-      when(
-        mockMainCM.createAccountCryptoManager(any),
-      ).thenReturn(mockAccountCM);
+      when(mockMainCM.createAccountCryptoManager(any))
+          .thenReturn(mockAccountCM);
       when(mockMainCM.createIdentityCryptoManager(any)).thenReturn(mockIdCM);
     });
 
@@ -143,9 +138,8 @@ void main() {
 
         provideDummy(testLoginResponse);
 
-        when(
-          mockCryptoService.secureCopy(any),
-        ).thenReturnInOrder([testAccKey, testIdPrivKey]);
+        when(mockCryptoService.secureCopy(any))
+            .thenReturnInOrder([testAccKey, testIdPrivKey]);
 
         when(mockMainCM.encryptKey(any)).thenReturn(testEncryptedContent);
         when(mockMainCM.decryptKey(any)).thenReturn(testDecryptedKey);
@@ -175,9 +169,8 @@ void main() {
           when(mockCryptoService.secureRandom(any)).thenReturn(testAccKey);
           when(mockCryptoService.secureAlloc(any)).thenReturn(testCombinedKey);
 
-          when(
-            mockAuthenticator.signup(any),
-          ).thenReturnAsync(testLoginResponse);
+          when(mockAuthenticator.signup(any))
+              .thenReturnAsync(testLoginResponse);
         });
 
         test('signs up with server and creates account', () async {
@@ -265,9 +258,8 @@ void main() {
         setUp(() {
           provideDummy(testChallenge);
 
-          when(
-            mockAuthenticator.loginChallenge(any),
-          ).thenReturnAsync(testChallenge);
+          when(mockAuthenticator.loginChallenge(any))
+              .thenReturnAsync(testChallenge);
 
           when(mockAuthenticator.login(any)).thenReturnAsync(testLoginResponse);
         });
@@ -375,13 +367,11 @@ void main() {
               testAccountDataStoredData,
             ),
           ).thenReturn(testAccountDataStored);
-          when(
-            mockConverter.decode<AccountData>(testEncryptedData),
-          ).thenReturn(testAccountData);
+          when(mockConverter.decode<AccountData>(testEncryptedData))
+              .thenReturn(testAccountData);
 
-          when(
-            mockStorageCM.decrypt(any, any),
-          ).thenReturn(testAccountDataBytes);
+          when(mockStorageCM.decrypt(any, any))
+              .thenReturn(testAccountDataBytes);
           when(mockStorageCM.decryptKey(any)).thenReturn(testAccountKey);
         });
 
@@ -467,7 +457,6 @@ void main() {
     });
 
     group('members', () {
-      // ignore: unused_local_variable
       late AccountImpl sut;
 
       setUp(() {
@@ -525,9 +514,8 @@ void main() {
 
         when(mockConverter.encode(any)).thenReturn(testEncodedResponse);
         when(mockLoginCM.signDetached(any)).thenReturn(testSignature);
-        when(
-          mockAuthenticator.loginChallenge(any),
-        ).thenReturnAsync(testChallenge);
+        when(mockAuthenticator.loginChallenge(any))
+            .thenReturnAsync(testChallenge);
         when(mockAuthenticator.login(any)).thenReturnAsync(testLoginResponse);
 
         await sut.fetchToken();
@@ -595,9 +583,8 @@ void main() {
 
           when(mockConverter.encode(any)).thenReturn(testEncodedResponse);
 
-          when(
-            mockCryptoService.createMainCryptoManager(testNewKey),
-          ).thenReturn(mockMainCMNew);
+          when(mockCryptoService.createMainCryptoManager(testNewKey))
+              .thenReturn(mockMainCMNew);
 
           when(
             mockKeyDerivator.call(
@@ -606,17 +593,15 @@ void main() {
             ),
           ).thenReturnAsync(testNewKey);
 
-          when(
-            mockAuthenticator.loginChallenge(any),
-          ).thenReturnAsync(testChallenge);
+          when(mockAuthenticator.loginChallenge(any))
+              .thenReturnAsync(testChallenge);
 
           when(mockMainCM.decrypt(any)).thenReturn(testEncodedAccountData);
 
           when(mockLoginCM.signDetached(any)).thenReturn(testSignature);
 
-          when(
-            mockMainCMNew.createLoginCryptoManager(),
-          ).thenReturn(mockLoginCMNew);
+          when(mockMainCMNew.createLoginCryptoManager())
+              .thenReturn(mockLoginCMNew);
           when(mockMainCMNew.encrypt(any)).thenReturn(testNewEncryptedContent);
 
           when(mockLoginCMNew.pubkey).thenReturn(testNewLoginPubKey);
@@ -664,9 +649,8 @@ void main() {
           () async {
             final testException = Exception('test-exception');
 
-            when(
-              mockAuthenticator.changePassword(any, any),
-            ).thenThrow(testException);
+            when(mockAuthenticator.changePassword(any, any))
+                .thenThrow(testException);
 
             await expectLater(
               () => sut.changePassword(testNewPassword),
@@ -687,9 +671,8 @@ void main() {
 
         final result = await sut.fetchDashboardUrl();
 
-        verify(
-          mockAuthenticator.getDashboardUrl(const AuthToken(testToken)),
-        ).called(1);
+        verify(mockAuthenticator.getDashboardUrl(const AuthToken(testToken)))
+            .called(1);
 
         expect(result, testUrl);
       });

@@ -66,7 +66,7 @@ abstract interface class ItemMetadata {
   Map<String, dynamic> toJson();
 
   /// Default constructor.
-  const factory ItemMetadata({
+  const factory({
     String? color,
     String? description,
     DateTime? mtime,
@@ -75,7 +75,7 @@ abstract interface class ItemMetadata {
   }) = _ItemMetadataImpl;
 
   /// Deserializes the [ItemMetadata] from a [json] object.
-  factory ItemMetadata.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$ItemMetadataImplFromJson(json);
 }
 
@@ -99,7 +99,7 @@ extension ItemMetadataCopyWithX on ItemMetadata {
 sealed class ItemMetadataImpl with _$ItemMetadataImpl {
   @JsonSerializable(includeIfNull: false)
   @Implements<ItemMetadata>()
-  const factory ItemMetadataImpl({
+  const factory({
     String? color,
     String? description,
     @dateTimeMillis DateTime? mtime,

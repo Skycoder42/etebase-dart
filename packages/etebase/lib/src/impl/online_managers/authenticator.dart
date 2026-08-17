@@ -14,14 +14,14 @@ import 'base_network.dart';
 class Authenticator {
   final BaseNetwork _network;
 
-  Authenticator(NetworkClient client)
+  new(NetworkClient client)
     : _network = BaseNetwork(
         client: client,
         path: const ['api', 'v1', 'authentication'],
       );
 
   @visibleForTesting
-  Authenticator.fromNetwork(this._network);
+  new fromNetwork(this._network);
 
   @visibleForTesting
   Uri get apiUrl => _network.apiUrl;

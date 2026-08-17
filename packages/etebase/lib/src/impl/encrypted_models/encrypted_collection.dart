@@ -50,7 +50,7 @@ class EncryptedCollection {
 
   bool get isMissingContent => item.isMissingContent;
 
-  EncryptedCollection();
+  new();
 
   static Future<(EncryptedCollection, CollectionCryptoManager)> create(
     ClientImpl client,
@@ -83,13 +83,10 @@ class EncryptedCollection {
     }
   }
 
-  factory EncryptedCollection.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$EncryptedCollectionFromJson(json);
 
-  factory EncryptedCollection.cacheLoad(
-    ClientImpl client,
-    Uint8List cachedData,
-  ) {
+  factory cacheLoad(ClientImpl client, Uint8List cachedData) {
     final cached = client.converter.decode<CachedCollection>(cachedData);
     return EncryptedCollection()
       .._collectionKey = cached.collectionKey

@@ -13,9 +13,8 @@ part 'collection_list_request.g.dart';
 @internal
 sealed class CollectionListRequest with _$CollectionListRequest {
   @msgPackBytes
-  const factory CollectionListRequest(List<Uint8List> collectionTypes) =
-      _CollectionListRequest;
+  const factory(List<Uint8List> collectionTypes) = _CollectionListRequest;
 
-  factory CollectionListRequest.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$CollectionListRequestFromJson(json);
 }

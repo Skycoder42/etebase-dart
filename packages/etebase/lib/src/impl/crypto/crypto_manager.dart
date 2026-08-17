@@ -41,7 +41,7 @@ abstract class CryptoManager implements CryptoManagerBase {
   final _disposables = <SecureKey>[];
   var _disposed = false;
 
-  CryptoManager(this.executor, this.key, this.version);
+  new(this.executor, this.key, this.version);
 
   @visibleForOverriding
   String get context;

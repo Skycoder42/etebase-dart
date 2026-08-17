@@ -3,15 +3,12 @@ import 'package:etebase/src/impl/managers/client_impl.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:meta/meta.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:sodium_libs/sodium_libs_sumo.dart';
 
 import '../api/flutter_client.dart';
 
 @internal
 // ignore: invalid_use_of_internal_member
 class FlutterClientImpl extends ClientImpl implements FlutterClient {
-  static Future<SodiumSumo> get sodiumInstance => SodiumSumoInit.init();
-
   static Future<String> get clientName async {
     final packageInfo = await PackageInfo.fromPlatform();
     return '${packageInfo.packageName}/${packageInfo.version}/${packageInfo.buildNumber}';
@@ -25,12 +22,9 @@ class FlutterClientImpl extends ClientImpl implements FlutterClient {
     }
 
     _didHiveInit = true;
-    return Hive.initFlutter('etebase');
+    return await Hive.initFlutter('etebase');
   }
 
-  FlutterClientImpl.create(
-    super.cryptoExecutor,
-    super.clientName,
-    super.serverUrl,
-  ) : super.create();
+  new create(super.cryptoExecutor, super.clientName, super.serverUrl)
+    : super.create();
 }

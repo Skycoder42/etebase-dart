@@ -8,8 +8,8 @@ part 'removed_collection.g.dart';
 @freezed
 @internal
 sealed class RemovedCollection with _$RemovedCollection {
-  const factory RemovedCollection(String uid) = _RemovedCollection;
+  const factory(String uid) = _RemovedCollection;
 
-  factory RemovedCollection.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$RemovedCollectionFromJson(json);
 }

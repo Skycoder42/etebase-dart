@@ -43,29 +43,26 @@ class ClientImpl implements Client, NetworkClient {
   final Uri baseUrl;
   final CryptoService crypto;
 
-  ClientImpl(
+  new(
     this.httpClient,
     this.userAgent,
     this.baseUrl,
     this.converter,
     this.crypto, {
-    bool ownedClient = false,
-  }) : _ownedClient = ownedClient {
+    this._ownedClient = false,
+  }) {
     if (baseUrl.path.endsWith('/')) {
       throw ApiMissuse('The serverUrl must not end with /');
     }
   }
 
-  ClientImpl.create(
-    CryptoExecutor cryptoExecutor,
-    String clientName, [
-    Uri? serverUrl,
-  ]) : httpClient = http.Client(),
-       userAgent = UserAgent.build(clientName),
-       converter = MessagePackConverter(),
-       baseUrl = serverUrl ?? defaultUrl,
-       crypto = CryptoService(cryptoExecutor),
-       _ownedClient = true;
+  new create(CryptoExecutor cryptoExecutor, String clientName, [Uri? serverUrl])
+    : httpClient = http.Client(),
+      userAgent = UserAgent.build(clientName),
+      converter = MessagePackConverter(),
+      baseUrl = serverUrl ?? defaultUrl,
+      crypto = CryptoService(cryptoExecutor),
+      _ownedClient = true;
 
   Authenticator get authenticator => Authenticator(this);
 

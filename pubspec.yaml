@@ -2,8 +2,9 @@ name: etebase_dart
 publish_to: none
 
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.13.0
 
 workspace:
   - packages/etebase
   - packages/etebase_flutter
+  - packages/etebase_flutter/example

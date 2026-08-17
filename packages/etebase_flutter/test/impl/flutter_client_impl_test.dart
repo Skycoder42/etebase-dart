@@ -8,47 +8,20 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:sodium_libs/sodium_libs_sumo.dart';
 
-class FakeSodiumSumo extends Fake implements SodiumSumo {
-  @override
-  SodiumVersion get version => const SodiumVersion(26, 2, '1.0.20');
-}
-
-class FakeCryptoExecutor extends Fake implements CryptoExecutor {}
+class FakeCryptoExecutor extends Fake implements CryptoExecutor;
 
 class TestPathProviderPlatform extends PathProviderPlatform {
   final String testPath;
 
-  TestPathProviderPlatform(this.testPath);
+  new(this.testPath);
 
   @override
   Future<String?> getApplicationDocumentsPath() => Future.value(testPath);
 }
 
-class TestSodiumPlatform extends SodiumPlatform {
-  final SodiumSumo sodium;
-
-  TestSodiumPlatform(this.sodium);
-
-  @override
-  Future<Sodium> loadSodium() => Future.value(sodium);
-
-  @override
-  Future<SodiumSumo> loadSodiumSumo() => Future.value(sodium);
-}
-
 void main() {
   group('$FlutterClientImpl', () {
-    test('sodiumInstance initializes flutter sodium', () async {
-      final testSodium = FakeSodiumSumo();
-      SodiumPlatform.instance = TestSodiumPlatform(testSodium);
-
-      final result = await FlutterClientImpl.sodiumInstance;
-
-      expect(result, same(testSodium));
-    });
-
     test('clientName creates name from package info', () async {
       const packageName = 'test_package_name';
       const version = '1.2.3';

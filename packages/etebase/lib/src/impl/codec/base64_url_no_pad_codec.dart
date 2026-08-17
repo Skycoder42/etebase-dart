@@ -6,7 +6,7 @@ import 'package:msgpack_codec/msgpack_codec.dart';
 
 @internal
 class Base64UrlSafeNoPadEncoder extends Converter<Uint8List, String> {
-  const Base64UrlSafeNoPadEncoder();
+  const new();
 
   @override
   String convert(Uint8List input) {
@@ -18,7 +18,7 @@ class Base64UrlSafeNoPadEncoder extends Converter<Uint8List, String> {
 
 @internal
 class Base64UrlSafeNoPadDecoder extends Converter<String, Uint8List> {
-  const Base64UrlSafeNoPadDecoder();
+  const new();
 
   @override
   Uint8List convert(String input) =>
@@ -27,7 +27,7 @@ class Base64UrlSafeNoPadDecoder extends Converter<String, Uint8List> {
 
 @internal
 class Base64UrlSafeNoPadCodec extends Codec<Uint8List, String> {
-  const Base64UrlSafeNoPadCodec();
+  const new();
 
   @override
   Base64UrlSafeNoPadEncoder get encoder => const Base64UrlSafeNoPadEncoder();

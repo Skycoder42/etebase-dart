@@ -15,13 +15,13 @@ part 'removed_collection.g.dart';
 @freezed
 sealed class RemovedCollection with _$RemovedCollection {
   /// Default constructor
-  const factory RemovedCollection(
+  const factory(
     /// The uid of the removed collection.
     String uid,
   ) = _RemovedCollection;
 
   /// @nodoc
   @internal
-  factory RemovedCollection.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$RemovedCollectionFromJson(json);
 }

@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_annotation_target
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../api/models/fetch_options.dart';
@@ -10,7 +8,7 @@ part 'http_fetch_options.freezed.dart';
 @internal
 @freezed
 sealed class HttpFetchOptions with _$HttpFetchOptions {
-  const factory HttpFetchOptions({
+  const factory({
     int? limit,
     String? iterator,
     String? stoken,

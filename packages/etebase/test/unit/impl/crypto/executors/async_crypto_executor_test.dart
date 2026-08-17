@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 @TestOn('dart-vm')
 library;
 
@@ -23,7 +21,7 @@ class FakeSecureKey extends Fake implements SecureKey {
   final int id;
   bool disposed = false;
 
-  FakeSecureKey(this.id);
+  new(this.id);
 
   @override
   void dispose() => disposed = true;
@@ -36,18 +34,22 @@ class FakeTransferrableSecureKey extends Fake
     implements TransferrableSecureKey {
   final int id;
 
-  FakeTransferrableSecureKey(this.id);
+  new(this.id);
 }
 
 class FakeTransferrableKeyPair extends Fake implements TransferrableKeyPair {
   final Uint8List pub;
   final int priv;
 
-  FakeTransferrableKeyPair(this.pub, this.priv);
+  new(this.pub, this.priv);
+}
+
+void _setupDummies() {
+  provideDummy(KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey(-1)));
 }
 
 void _createTransferMocks(MockSodiumSumo mockSodiumSumo) {
-  provideDummy(KeyPair(publicKey: Uint8List(0), secretKey: FakeSecureKey(-1)));
+  _setupDummies();
 
   when(mockSodiumSumo.createTransferrableSecureKey(any)).thenAnswer(
     (i) => FakeTransferrableSecureKey(
@@ -85,11 +87,6 @@ void main() {
       reset(mockSodiumSumo);
 
       _createTransferMocks(mockSodiumSumo);
-      when(mockSodiumSumo.isolateFactory).thenReturn(() async {
-        final mock = MockSodiumSumo();
-        _createTransferMocks(mock);
-        return mock;
-      });
 
       sut = AsyncCryptoExecutor(mockSodiumSumo);
     });
@@ -163,7 +160,7 @@ void main() {
 
     group('execAsync', () {
       setUp(() async {
-        await sut.initialize();
+        await sut.initialize(setupIsolate: _setupDummies);
       });
 
       tearDown(() async {
@@ -365,7 +362,7 @@ void main() {
 
     group('exec', () {
       setUp(() async {
-        await sut.initialize();
+        await sut.initialize(setupIsolate: _setupDummies);
       });
 
       tearDown(() async {

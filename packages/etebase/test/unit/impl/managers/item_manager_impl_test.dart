@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -21,7 +19,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
@@ -29,7 +26,7 @@ import '../../test_helpers.dart';
   MockSpec<CollectionItemCryptoManager>(),
   MockSpec<CollectionItemManagerOnline>(),
   MockSpec<EncryptedCollectionItem>(),
-  // ignore: strict_raw_type
+  // ignore: no_raw_types, strict_raw_type
   MockSpec<Callable2>(),
 ])
 import 'item_manager_impl_test.mocks.dart';
@@ -67,9 +64,8 @@ void main() {
       reset(mockOnline);
       reset(mockEncrypted);
 
-      when(
-        mockClient.createEncryptedCollectionItem(any, any, any),
-      ).thenReturnAsync((mockEncrypted, mockItemCM));
+      when(mockClient.createEncryptedCollectionItem(any, any, any))
+          .thenReturnAsync((mockEncrypted, mockItemCM));
 
       when(mockEncrypted.getCryptoManager(any, any)).thenReturn(mockItemCM);
 
@@ -476,12 +472,10 @@ void main() {
       setUp(() {
         when(mockEncrypted.missingChunks).thenReturn([testChunk1, testChunk2]);
 
-        when(
-          mockOnline.chunkDownload(any, testChunk1.uid, any),
-        ).thenReturnAsync(testData1);
-        when(
-          mockOnline.chunkDownload(any, testChunk2.uid, any),
-        ).thenReturnAsync(testData2);
+        when(mockOnline.chunkDownload(any, testChunk1.uid, any))
+            .thenReturnAsync(testData1);
+        when(mockOnline.chunkDownload(any, testChunk2.uid, any))
+            .thenReturnAsync(testData2);
       });
 
       test('downloads encrypted item chunks', () async {
@@ -529,9 +523,8 @@ void main() {
     test('cacheSave converts item to byte array', () {
       final testData = Uint8List.fromList([4, 5, 11]);
 
-      when(
-        mockEncrypted.cacheSave(any, saveContent: anyNamed('saveContent')),
-      ).thenReturn(testData);
+      when(mockEncrypted.cacheSave(any, saveContent: anyNamed('saveContent')))
+          .thenReturn(testData);
 
       final result = sut.cacheSave(testItem);
       expect(result, testData);
@@ -542,9 +535,8 @@ void main() {
     test('cacheLoad converts byte array to item', () {
       final testData = Uint8List.fromList([4, 5, 11]);
 
-      when(
-        mockClient.cacheLoadEncryptedCollectionItem(any),
-      ).thenReturn(mockEncrypted);
+      when(mockClient.cacheLoadEncryptedCollectionItem(any))
+          .thenReturn(mockEncrypted);
 
       final result = sut.cacheLoad(testData);
 

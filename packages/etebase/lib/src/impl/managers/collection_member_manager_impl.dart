@@ -12,7 +12,7 @@ class CollectionMemberManagerImpl implements CollectionMemberManager {
   @visibleForTesting
   final CollectionMemberManagerOnline online;
 
-  CollectionMemberManagerImpl(this.online);
+  new(this.online);
 
   @override
   Future<IteratorListResponse<CollectionMember>> list([

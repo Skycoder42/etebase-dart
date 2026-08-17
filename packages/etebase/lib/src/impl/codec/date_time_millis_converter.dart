@@ -8,7 +8,7 @@ const dateTimeMillis = DateTimeMillisConverter();
 /// milliseconds. They are counted from the start of the epoch in UTC.
 class DateTimeMillisConverter implements JsonConverter<DateTime, int> {
   /// Default constructor.
-  const DateTimeMillisConverter();
+  const new();
 
   @override
   DateTime fromJson(int json) =>

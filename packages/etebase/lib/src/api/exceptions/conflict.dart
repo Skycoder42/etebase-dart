@@ -10,7 +10,7 @@ class Conflict extends HttpFailure {
   static const statusCode = 409;
 
   /// Default constructor.
-  Conflict(String message, [HttpErrorContent? error])
+  new(String message, [HttpErrorContent? error])
     : super(statusCode, message, error);
 
   @override

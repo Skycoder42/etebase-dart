@@ -38,7 +38,7 @@ import 'type_converter.dart';
 class MessagePackConverter {
   final _factories = <Type, TypeConverter<dynamic>>{};
 
-  MessagePackConverter() {
+  new() {
     _add(ItemMetadata.fromJson);
     _add(UserProfile.fromJson);
     _addWithContainer(
@@ -129,7 +129,6 @@ class MessagePackConverter {
     );
   }
 
-  // ignore: avoid_dynamic_calls
   dynamic _toJson(dynamic data) => switch (data) {
     List() => data.map(_toJson).toList(),
     Map<String, dynamic>() => data.map((k, v) => MapEntry(k, _toJson(v))),
@@ -163,7 +162,6 @@ class MessagePackConverter {
       );
     } on FormatException catch (e, s) {
       Error.throwWithStackTrace(InvalidMessagePackData(e.message, e), s);
-      // ignore: avoid_catches_without_on_clauses
     } catch (e, s) {
       Error.throwWithStackTrace(InvalidMessagePackData(e.toString(), e), s);
     }

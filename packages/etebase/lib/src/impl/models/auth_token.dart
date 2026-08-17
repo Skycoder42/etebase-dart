@@ -9,9 +9,9 @@ part 'auth_token.freezed.dart';
 sealed class AuthToken with _$AuthToken {
   static const empty = AuthToken('');
 
-  const factory AuthToken(String value) = _AuthToken;
+  const factory(String value) = _AuthToken;
 
-  const AuthToken._();
+  const new _();
 
   String get header => value.isEmpty
       ? throw Unauthorized('The account is logged out!')

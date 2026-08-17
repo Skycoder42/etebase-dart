@@ -9,7 +9,7 @@ class WebsocketClosed extends EtebaseException {
   String get reason => message;
 
   /// Default constructor.
-  WebsocketClosed(this.code, [String? reason]) : super(reason ?? '<no reason>');
+  new(this.code, [String? reason]) : super(reason ?? '<no reason>');
 
   @override
   String get name => 'WebsocketClosed';

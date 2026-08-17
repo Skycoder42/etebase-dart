@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_annotation_target
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../encrypted_models/encrypted_collection_item.dart';
@@ -10,13 +8,11 @@ part 'collection_item_fetch_info.g.dart';
 @freezed
 @internal
 sealed class CollectionItemFetchInfo with _$CollectionItemFetchInfo {
-  const factory CollectionItemFetchInfo(
-    String uid, {
-    @JsonKey(includeIfNull: false) String? etag,
-  }) = _CollectionItemFetchInfo;
+  const factory(String uid, {@JsonKey(includeIfNull: false) String? etag}) =
+      _CollectionItemFetchInfo;
 
   // coverage:ignore-start
-  factory CollectionItemFetchInfo.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$CollectionItemFetchInfoFromJson(json);
   // coverage:ignore-end
 }

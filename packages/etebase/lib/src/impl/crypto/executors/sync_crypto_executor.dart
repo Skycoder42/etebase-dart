@@ -10,7 +10,7 @@ import '../../../api/managers/crypto_executor.dart';
 class SyncCryptoExecutor implements CryptoExecutor {
   final SodiumSumo _sodium;
 
-  SyncCryptoExecutor(this._sodium);
+  new(this._sodium);
 
   @override
   void dispose() {}
@@ -24,13 +24,16 @@ class SyncCryptoExecutor implements CryptoExecutor {
     AsyncCallback<T> callback, {
     List<SecureKey> secureKeys = const [],
     List<KeyPair> keyPairs = const [],
-  }) => CryptoFailure.wrap<Future<T>, T>(
-    () => _sodium.runIsolated(
-      callback,
-      secureKeys: secureKeys,
-      keyPairs: keyPairs,
-    ),
-  );
+  }) {
+    final sodium = _sodium;
+    return CryptoFailure.wrap<Future<T>, T>(
+      () => _sodium.runIsolated(
+        (k, p) => callback(sodium, k, p),
+        secureKeys: secureKeys,
+        keyPairs: keyPairs,
+      ),
+    );
+  }
 
   @override
   T exec<T>(

@@ -28,7 +28,7 @@ Future<void> hybridMain(StreamChannel channel, Object? message) async {
 }
 ''';
 
-  JsClientWrapper() : super.base();
+  new() : super.base();
 
   @override
   Future<TRes> executeSignedIn<TRes>(

@@ -20,8 +20,9 @@ part 'encrypted_collection_item.g.dart';
 
 /// @nodoc
 @internal
-typedef WithCmCallback<T> =
-    FutureOr<T> Function(CollectionItemCryptoManager cm);
+typedef WithCmCallback<T> = FutureOr<T> Function(
+  CollectionItemCryptoManager cm,
+);
 
 @internal
 @JsonSerializable()
@@ -58,7 +59,7 @@ class EncryptedCollectionItem {
   bool get _isLocallyChanged => _etag != content.uid;
 
   @visibleForTesting
-  EncryptedCollectionItem();
+  new();
 
   static Future<(EncryptedCollectionItem, CollectionItemCryptoManager)> create(
     ClientImpl client,
@@ -85,13 +86,10 @@ class EncryptedCollectionItem {
     }
   }
 
-  factory EncryptedCollectionItem.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$EncryptedCollectionItemFromJson(json)..markSaved();
 
-  factory EncryptedCollectionItem.cacheLoad(
-    ClientImpl client,
-    Uint8List cachedData,
-  ) {
+  factory cacheLoad(ClientImpl client, Uint8List cachedData) {
     final cached = client.converter.decode<CachedCollectionItem>(cachedData);
     return EncryptedCollectionItem()
       ..uid = client.converter.base64Encode(cached.uid)
@@ -154,7 +152,7 @@ class EncryptedCollectionItem {
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
-    return content.getMeta<TMeta>(client, cm, _getAdditionalMacData());
+    return await content.getMeta<TMeta>(client, cm, _getAdditionalMacData());
   }
 
   Future<void> setContent(
@@ -188,7 +186,7 @@ class EncryptedCollectionItem {
     CollectionItemCryptoManager cm,
   ) async {
     await verify(client, cm);
-    return content.getContent(client, cm);
+    return await content.getContent(client, cm);
   }
 
   Stream<Uint8List> getContentStream(

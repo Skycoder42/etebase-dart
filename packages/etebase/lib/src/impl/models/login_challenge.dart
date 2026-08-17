@@ -13,12 +13,11 @@ part 'login_challenge.g.dart';
 @freezed
 sealed class LoginChallenge with _$LoginChallenge {
   @msgPackBytes
-  const factory LoginChallenge({
+  const factory({
     required Uint8List challenge,
     required Uint8List salt,
     required int version,
   }) = _LoginChallenge;
 
-  factory LoginChallenge.fromJson(Map<String, dynamic> json) =>
-      _$LoginChallengeFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$LoginChallengeFromJson(json);
 }

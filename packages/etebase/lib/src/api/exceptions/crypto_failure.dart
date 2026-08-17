@@ -13,7 +13,7 @@ class CryptoFailure extends EtebaseException {
   final String? originalMessage;
 
   /// Default constructor.
-  CryptoFailure({this.originalMessage})
+  new({this.originalMessage})
     : super('A low level cryptographic operation has failed');
 
   /// @nodoc
@@ -22,7 +22,6 @@ class CryptoFailure extends EtebaseException {
     try {
       final result = callback();
       if (result case final Future<T> castResult) {
-        // ignore: discarded_futures
         return castResult.onError<SodiumException>(_rethrow) as FT;
       } else {
         return result;

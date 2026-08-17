@@ -15,7 +15,7 @@ class CollectionImpl implements Collection {
   final CollectionCryptoManager _cm;
   final EncryptedCollection encrypted;
 
-  CollectionImpl(this._client, this._cm, this.encrypted);
+  new(this._client, this._cm, this.encrypted);
 
   @override
   String get uid => encrypted.uid;

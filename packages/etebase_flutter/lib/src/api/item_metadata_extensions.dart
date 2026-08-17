@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:etebase/etebase.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Helper factory to create [ItemMetadata] with a [color] value that is a
 /// [Color]

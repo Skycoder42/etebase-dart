@@ -4,7 +4,7 @@ import 'crypto_manager.dart';
 
 @internal
 class MinimalCollectionCryptoManager extends CryptoManager {
-  MinimalCollectionCryptoManager(super.executor, super.key, super.version);
+  new(super.executor, super.key, super.version);
 
   @override
   String get context => 'Col';

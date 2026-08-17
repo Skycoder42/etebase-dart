@@ -12,7 +12,7 @@ sealed class CachedCollectionItem with _$CachedCollectionItem {
   @visibleForTesting
   static const cacheFormatVersion = 1;
 
-  const factory CachedCollectionItem({
+  const factory({
     required Uint8List uid,
     required int version,
     required Uint8List? encryptionKey,
@@ -20,7 +20,7 @@ sealed class CachedCollectionItem with _$CachedCollectionItem {
     required Uint8List revision,
   }) = _CachedCollectionItem;
 
-  factory CachedCollectionItem.fromJson(List<dynamic> json) {
+  factory fromJson(List<dynamic> json) {
     if (json[0] != cacheFormatVersion) {
       throw ApiMissuse('Cannot restore cache format version ${json[0]}');
     }
@@ -34,7 +34,7 @@ sealed class CachedCollectionItem with _$CachedCollectionItem {
     );
   }
 
-  const CachedCollectionItem._();
+  const new _();
 
   List<dynamic> toJson() => [
     cacheFormatVersion,

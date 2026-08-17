@@ -23,7 +23,7 @@ class CryptoService {
   @visibleForTesting
   final CryptoExecutor executor;
 
-  CryptoService(this.executor);
+  new(this.executor);
 
   FutureOr<void> dispose() => executor.dispose();
 

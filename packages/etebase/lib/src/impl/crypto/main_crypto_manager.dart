@@ -8,7 +8,7 @@ import 'login_crypto_manager.dart';
 
 @internal
 class MainCryptoManager extends CryptoManager {
-  MainCryptoManager(super.executor, super.key, super.version);
+  new(super.executor, super.key, super.version);
 
   @override
   String get context => 'Main';

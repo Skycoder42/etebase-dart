@@ -1,10 +1,7 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/exceptions/crypto_failure.dart';
-import 'package:etebase/src/api/managers/crypto_executor.dart';
 import 'package:etebase/src/impl/crypto/executors/sync_crypto_executor.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -14,7 +11,7 @@ import 'package:test/test.dart';
 @GenerateNiceMocks([MockSpec<SodiumSumo>()])
 import 'sync_crypto_executor_test.mocks.dart';
 
-class FakeSecureKey extends Fake implements SecureKey {}
+class FakeSecureKey extends Fake implements SecureKey;
 
 void main() {
   group('$SyncCryptoExecutor', () {
@@ -64,11 +61,11 @@ void main() {
           ),
         ).thenAnswer(
           (i) => Future(
-            () => (i.positionalArguments.single as AsyncCallback<bool>).call(
-              mockSodiumSumo,
-              i.namedArguments[#secureKeys] as List<SecureKey>,
-              i.namedArguments[#keyPairs] as List<KeyPair>,
-            ),
+            () => (i.positionalArguments.single as SodiumIsolateCallback<bool>)
+                .call(
+                  i.namedArguments[#secureKeys] as List<SecureKey>,
+                  i.namedArguments[#keyPairs] as List<KeyPair>,
+                ),
           ),
         );
       });
@@ -83,7 +80,7 @@ void main() {
 
         final future = sut.execAsync<bool>(callback);
 
-        verify(mockSodiumSumo.runIsolated<bool>(callback));
+        verify(mockSodiumSumo.runIsolated<bool>(any));
 
         expect(future, completion(isTrue));
         isInvokedLater = true;
@@ -111,7 +108,7 @@ void main() {
 
         verify(
           mockSodiumSumo.runIsolated<bool>(
-            callback,
+            any,
             secureKeys: secureKeys,
             keyPairs: keyPairs,
           ),

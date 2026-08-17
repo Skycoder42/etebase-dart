@@ -28,7 +28,7 @@ enum HttpMethod {
 
   final String verb;
 
-  const HttpMethod(this.verb);
+  new(this.verb);
 }
 
 @internal
@@ -56,7 +56,7 @@ class BaseNetwork {
 
   final Uri apiUrl;
 
-  BaseNetwork({required this.client, Iterable<String> path = const []})
+  new({required this.client, Iterable<String> path = const []})
     : apiUrl = client.baseUrl.replace(
         pathSegments: client.baseUrl.pathSegments.followedBy(path),
       ),

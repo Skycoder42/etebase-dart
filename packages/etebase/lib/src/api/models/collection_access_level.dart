@@ -17,5 +17,5 @@ enum CollectionAccessLevel {
   /// The numeric value of the access level.
   final int value;
 
-  const CollectionAccessLevel(this.value);
+  new(this.value);
 }

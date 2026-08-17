@@ -18,8 +18,8 @@ void main() {
       expect(Client.currentVersion, 1);
     });
 
-    test('create creates client with SyncCryptoExecutor', () {
-      final sut = Client.create(mockSodium, testClientName, testBaseUrl);
+    test('create creates client with SyncCryptoExecutor', () async {
+      final sut = await Client.create(testClientName, testBaseUrl);
       addTearDown(sut.dispose);
 
       expect(
@@ -39,11 +39,7 @@ void main() {
       'createAsync creates client with AsyncCryptoExecutor',
       testOn: 'dart-vm',
       () async {
-        final sut = await Client.createAsync(
-          mockSodium,
-          testClientName,
-          testBaseUrl,
-        );
+        final sut = await Client.createAsync(testClientName, testBaseUrl);
         addTearDown(sut.dispose);
 
         expect(
@@ -60,23 +56,27 @@ void main() {
       },
     );
 
-    test('createCustom creates client with a custom executor', () {
-      final testExecutor = MockCryptoExecutor(mockSodium);
+    test(
+      'createCustom creates client with a custom executor',
+      testOn: 'dart-vm',
+      () {
+        final testExecutor = MockCryptoExecutor(mockSodium);
 
-      final sut = Client.createCustom(
-        testExecutor,
-        testClientName,
-        testBaseUrl,
-      );
-      addTearDown(sut.dispose);
+        final sut = Client.createCustom(
+          testExecutor,
+          testClientName,
+          testBaseUrl,
+        );
+        addTearDown(sut.dispose);
 
-      expect(
-        sut,
-        isA<ClientImpl>()
-            .having((m) => m.crypto.executor, 'crypto.executor', testExecutor)
-            .having((m) => m.userAgent, 'userAgent', contains(testClientName))
-            .having((m) => m.baseUrl, 'baseUrl', testBaseUrl),
-      );
-    });
+        expect(
+          sut,
+          isA<ClientImpl>()
+              .having((m) => m.crypto.executor, 'crypto.executor', testExecutor)
+              .having((m) => m.userAgent, 'userAgent', contains(testClientName))
+              .having((m) => m.baseUrl, 'baseUrl', testBaseUrl),
+        );
+      },
+    );
   });
 }

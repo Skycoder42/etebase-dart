@@ -11,7 +11,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
@@ -102,9 +101,8 @@ void main() {
     });
 
     test('accessLevel returns encrypted.accessLevel', () {
-      when(
-        mockEncrypted.accessLevel,
-      ).thenReturn(CollectionAccessLevel.readWrite);
+      when(mockEncrypted.accessLevel)
+          .thenReturn(CollectionAccessLevel.readWrite);
 
       expect(sut.accessLevel, CollectionAccessLevel.readWrite);
 
@@ -134,9 +132,8 @@ void main() {
     test('getMeta calls getMeta on encrypted', () async {
       const testMeta = ItemMetadata(name: 'test');
 
-      when(
-        mockEncrypted.getMeta<ItemMetadata>(mockClient, mockCollectionCM),
-      ).thenReturnAsync(testMeta);
+      when(mockEncrypted.getMeta<ItemMetadata>(mockClient, mockCollectionCM))
+          .thenReturnAsync(testMeta);
 
       final result = await sut.getMeta<ItemMetadata>();
       expect(result, testMeta);
@@ -171,9 +168,8 @@ void main() {
     test('getContent calls getContent on encrypted', () async {
       final testContent = Uint8List.fromList([33, 4, 12, 12]);
 
-      when(
-        mockEncrypted.getContent(mockClient, mockCollectionCM),
-      ).thenReturnAsync(testContent);
+      when(mockEncrypted.getContent(mockClient, mockCollectionCM))
+          .thenReturnAsync(testContent);
 
       final result = await sut.getContent();
       expect(result, testContent);
@@ -184,9 +180,8 @@ void main() {
     test('getContentStream calls getContentStream on encrypted', () async {
       final testContent = Uint8List.fromList([33, 4, 12, 12]);
 
-      when(
-        mockEncrypted.getContentStream(mockClient, mockCollectionCM),
-      ).thenStream(Stream.value(testContent));
+      when(mockEncrypted.getContentStream(mockClient, mockCollectionCM))
+          .thenStream(Stream.value(testContent));
 
       final result = sut.getContentStream();
       await expectLater(result, emitsInOrder([testContent, emitsDone]));

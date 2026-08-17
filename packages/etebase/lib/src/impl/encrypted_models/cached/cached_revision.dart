@@ -9,14 +9,14 @@ part 'cached_revision.freezed.dart';
 @Freezed(fromJson: false, toJson: false)
 @internal
 sealed class CachedRevision with _$CachedRevision {
-  const factory CachedRevision({
+  const factory({
     required Uint8List uid,
     required Uint8List meta,
     required bool deleted,
     required List<CachedChunk> chunks,
   }) = _CachedRevision;
 
-  factory CachedRevision.fromJson(List<dynamic> json) => CachedRevision(
+  factory fromJson(List<dynamic> json) => CachedRevision(
     uid: json[0] as Uint8List,
     meta: json[1] as Uint8List,
     deleted: json[2] as bool,
@@ -26,7 +26,7 @@ sealed class CachedRevision with _$CachedRevision {
         .toList(),
   );
 
-  const CachedRevision._();
+  const new _();
 
   List<dynamic> toJson() => [
     uid,

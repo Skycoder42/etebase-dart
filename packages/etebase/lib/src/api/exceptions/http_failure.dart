@@ -10,7 +10,7 @@ class HttpFailure extends EtebaseException {
   final HttpErrorContent? error;
 
   /// Default constructor.
-  HttpFailure(this.status, String message, [this.error]) : super(message);
+  new(this.status, String message, [this.error]) : super(message);
 
   @override
   String get name => 'HttpFailure';

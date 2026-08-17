@@ -10,13 +10,11 @@ import 'base_network.dart';
 
 @internal
 class CollectionInvitationManagerOnline extends BaseManager {
-  CollectionInvitationManagerOnline({
-    required super.client,
-    required super.authTokenSource,
-  }) : super(path: const ['invitation']);
+  new({required super.client, required super.authTokenSource})
+    : super(path: const ['invitation']);
 
   @visibleForTesting
-  CollectionInvitationManagerOnline.fromNetwork(
+  new fromNetwork(
     super._network,
     super.authTokenSource,
     // ignore: invalid_use_of_visible_for_testing_member for tests

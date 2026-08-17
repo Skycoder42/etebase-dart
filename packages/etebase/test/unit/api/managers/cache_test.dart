@@ -9,7 +9,7 @@ import '../../test_helpers.dart';
 @GenerateNiceMocks([MockSpec<ClientImpl>()])
 import 'cache_test.mocks.dart';
 
-class FakeCache extends Fake implements HiveCache {}
+class FakeCache extends Fake implements HiveCache;
 
 void main() {
   group('$Cache', () {

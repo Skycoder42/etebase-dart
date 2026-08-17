@@ -13,7 +13,7 @@ sealed class CachedCollection with _$CachedCollection {
   @visibleForTesting
   static const cacheFormatVersion = 1;
 
-  const factory CachedCollection({
+  const factory({
     required Uint8List collectionKey,
     required CollectionAccessLevel accessLevel,
     required String? stoken,
@@ -21,7 +21,7 @@ sealed class CachedCollection with _$CachedCollection {
     required Uint8List collectionType,
   }) = _CachedCollection;
 
-  factory CachedCollection.fromJson(List<dynamic> json) {
+  factory fromJson(List<dynamic> json) {
     if (json[0] != cacheFormatVersion) {
       throw ApiMissuse('Cannot restore cache format version ${json[0]}');
     }
@@ -37,7 +37,7 @@ sealed class CachedCollection with _$CachedCollection {
     );
   }
 
-  const CachedCollection._();
+  const new _();
 
   List<dynamic> toJson() => [
     cacheFormatVersion,

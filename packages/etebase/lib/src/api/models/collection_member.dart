@@ -11,7 +11,7 @@ part 'collection_member.g.dart';
 @freezed
 sealed class CollectionMember with _$CollectionMember {
   /// Default constructor.
-  const factory CollectionMember({
+  const factory({
     /// The username of the member.
     required String username,
 
@@ -21,6 +21,6 @@ sealed class CollectionMember with _$CollectionMember {
 
   /// @nodoc
   @internal
-  factory CollectionMember.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$CollectionMemberFromJson(json);
 }

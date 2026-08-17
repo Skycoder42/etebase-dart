@@ -13,11 +13,8 @@ part 'login_request.g.dart';
 @freezed
 sealed class LoginRequest with _$LoginRequest {
   @msgPackBytes
-  const factory LoginRequest({
-    required Uint8List response,
-    required Uint8List signature,
-  }) = _LoginRequest;
+  const factory({required Uint8List response, required Uint8List signature}) =
+      _LoginRequest;
 
-  factory LoginRequest.fromJson(Map<String, dynamic> json) =>
-      _$LoginRequestFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$LoginRequestFromJson(json);
 }

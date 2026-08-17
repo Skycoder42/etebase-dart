@@ -7,7 +7,7 @@ import 'package:meta/meta_meta.dart';
 @internal
 @Target({TargetKind.constructor, TargetKind.classType})
 class ByteArrayConverter extends JsonConverter<Uint8List, Uint8List> {
-  const ByteArrayConverter();
+  const new();
 
   @override
   Uint8List fromJson(Uint8List json) => json;

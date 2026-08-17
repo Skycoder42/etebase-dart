@@ -21,7 +21,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
@@ -146,13 +145,11 @@ void main() {
 
         provideDummy(testContent);
 
-        when(
-          mockCryptoService.bufferUnpadSmall(any),
-        ).thenReturn(testUnpaddedData);
+        when(mockCryptoService.bufferUnpadSmall(any))
+            .thenReturn(testUnpaddedData);
 
-        when(
-          mockMessagePackConverter.decode<SignedInvitationContent>(any),
-        ).thenReturn(testContent);
+        when(mockMessagePackConverter.decode<SignedInvitationContent>(any))
+            .thenReturn(testContent);
 
         when(
           mockBoxCM.decrypt(

@@ -28,7 +28,7 @@ class EncryptedRevision {
   List<Chunk> chunks = [];
 
   @visibleForTesting
-  EncryptedRevision();
+  new();
 
   static Future<EncryptedRevision> create({
     required ClientImpl client,
@@ -48,10 +48,10 @@ class EncryptedRevision {
     return revision;
   }
 
-  factory EncryptedRevision.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$EncryptedRevisionFromJson(json);
 
-  factory EncryptedRevision.cacheLoad(ClientImpl client, Uint8List cachedData) {
+  factory cacheLoad(ClientImpl client, Uint8List cachedData) {
     final cached = client.converter.decode<CachedRevision>(cachedData);
     return EncryptedRevision()
       ..uid = client.converter.base64Encode(cached.uid)
@@ -227,39 +227,39 @@ class EncryptedRevision {
     CollectionItemCryptoManager cryptoManager,
   ) async* {
     var indices = const [0];
-    final decryptedChunks = await Stream.fromIterable(chunks).asyncMap((
-      chunk,
-    ) async {
-      final Chunk(:uid, :data) = chunk;
-      if (data == null) {
-        throw MissingContent(
-          'Missing content for item. '
-          'Please download it using downloadContent',
-        );
-      }
+    final decryptedChunks = await Stream.fromIterable(chunks)
+        .asyncMap((chunk) async {
+          final Chunk(:uid, :data) = chunk;
+          if (data == null) {
+            throw MissingContent(
+              'Missing content for item. '
+              'Please download it using downloadContent',
+            );
+          }
 
-      final buf = await client.crypto.bufferUnpad(
-        await cryptoManager.decrypt(data),
-      );
-      final hash = await cryptoManager.calculateMac(buf);
+          final buf = await client.crypto.bufferUnpad(
+            await cryptoManager.decrypt(data),
+          );
+          final hash = await cryptoManager.calculateMac(buf);
 
-      if (!const ListEquality<int>().equals(
-        hash,
-        client.converter.base64Decode(uid),
-      )) {
-        throw IntegrityCompromised(
-          "The content's mac is different to the expected mac ($uid)",
-        );
-      }
-      return buf;
-    }).toList();
+          if (!const ListEquality<int>().equals(
+            hash,
+            client.converter.base64Decode(uid),
+          )) {
+            throw IntegrityCompromised(
+              "The content's mac is different to the expected mac ($uid)",
+            );
+          }
+          return buf;
+        })
+        .toList();
 
     // If we have more than one chunk we have the mapping header in the last
     // chunk
     if (chunks.length > 1) {
-      final [List<dynamic> rawIndices, ..._] =
-          client.converter.decodeRaw(decryptedChunks.removeLast())
-              as List<dynamic>;
+      final [List<dynamic> rawIndices, ..._] = client.converter.decodeRaw(
+        decryptedChunks.removeLast(),
+      ) as List<dynamic>;
       indices = rawIndices.cast();
     }
 
@@ -319,6 +319,6 @@ class EncryptedRevision {
     }
     cryptoMac.update(await chunksHash.finalize());
 
-    return cryptoMac.finalize();
+    return await cryptoMac.finalize();
   }
 }

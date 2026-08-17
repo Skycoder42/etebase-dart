@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 
 import 'crypto_mocks.dart';
 
-class FakeAccountCryptoManager extends Fake implements AccountCryptoManager {}
+class FakeAccountCryptoManager extends Fake implements AccountCryptoManager;
 
 void main() {
   group('$CryptoService', () {

@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -26,7 +24,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 import '../crypto/crypto_mocks.dart';
 @GenerateNiceMocks([
@@ -41,7 +38,7 @@ import '../crypto/crypto_mocks.dart';
 ])
 import 'encrypted_collection_test.mocks.dart';
 
-class FakeItemMetadata extends Fake implements ItemMetadata {}
+class FakeItemMetadata extends Fake implements ItemMetadata;
 
 void main() {
   group('$EncryptedCollection', () {
@@ -64,9 +61,8 @@ void main() {
 
       when(mockClient.converter).thenReturn(mockMessagePackConverter);
       when(mockClient.crypto).thenReturn(mockCryptoService);
-      when(
-        mockClient.createEncryptedCollectionItem(any, any, any),
-      ).thenReturnAsync((mockItem, mockItemCm));
+      when(mockClient.createEncryptedCollectionItem(any, any, any))
+          .thenReturnAsync((mockItem, mockItemCm));
 
       when(
         mockCryptoService.createCollectionCryptoManager(
@@ -139,9 +135,8 @@ void main() {
       test('correctly cleans up resources on an exception', () async {
         final testException = Exception('test');
 
-        when(
-          mockClient.createEncryptedCollectionItem(any, any, any),
-        ).thenThrow(testException);
+        when(mockClient.createEncryptedCollectionItem(any, any, any))
+            .thenThrow(testException);
 
         await expectLater(
           () => EncryptedCollection.create(
@@ -250,13 +245,11 @@ void main() {
         mockMessagePackConverter.decode<CachedCollectionItem>(testEncodedItem),
       ).thenReturn(testItemCacheData);
       provideDummy(testRevisionCacheData);
-      when(
-        mockMessagePackConverter.decode<CachedRevision>(testEncodedContent),
-      ).thenReturn(testRevisionCacheData);
+      when(mockMessagePackConverter.decode<CachedRevision>(testEncodedContent))
+          .thenReturn(testRevisionCacheData);
       provideDummy(testColCacheData);
-      when(
-        mockMessagePackConverter.decode<CachedCollection>(testEncodedCol),
-      ).thenReturn(testColCacheData);
+      when(mockMessagePackConverter.decode<CachedCollection>(testEncodedCol))
+          .thenReturn(testColCacheData);
 
       final sut = EncryptedCollection.cacheLoad(mockClient, testEncodedCol);
 
@@ -273,15 +266,12 @@ void main() {
       clearInteractions(mockMessagePackConverter);
 
       // with content
-      when(
-        mockMessagePackConverter.encode(testColCacheData),
-      ).thenReturn(testEncodedCol);
-      when(
-        mockMessagePackConverter.encode(testItemCacheData),
-      ).thenReturn(testEncodedItem);
-      when(
-        mockMessagePackConverter.encode(testRevisionCacheData),
-      ).thenReturn(testEncodedContent);
+      when(mockMessagePackConverter.encode(testColCacheData))
+          .thenReturn(testEncodedCol);
+      when(mockMessagePackConverter.encode(testItemCacheData))
+          .thenReturn(testEncodedItem);
+      when(mockMessagePackConverter.encode(testRevisionCacheData))
+          .thenReturn(testEncodedContent);
 
       final cachedWithContent = sut.cacheSave(mockClient, saveContent: true);
       expect(cachedWithContent, testEncodedCol);
@@ -302,9 +292,8 @@ void main() {
           CachedChunk(Uint8List.fromList([2])),
         ],
       );
-      when(
-        mockMessagePackConverter.encode(testRevisionWithoutContentCacheData),
-      ).thenReturn(testEncodedContent);
+      when(mockMessagePackConverter.encode(testRevisionWithoutContentCacheData))
+          .thenReturn(testEncodedContent);
 
       final cachedWithoutContent = sut.cacheSave(
         mockClient,
@@ -432,9 +421,8 @@ void main() {
       group('getMeta', () {
         test('gets metadata with crypto manager', () async {
           setupWithCm<ItemMetadata>();
-          when(
-            mockItem.getMeta<ItemMetadata>(any, any),
-          ).thenReturnAsync(testMeta);
+          when(mockItem.getMeta<ItemMetadata>(any, any))
+              .thenReturnAsync(testMeta);
 
           final result = await sut.getMeta(mockClient, mockColCm);
 
@@ -450,9 +438,8 @@ void main() {
           final otherMeta = FakeItemMetadata();
 
           setupWithCm<FakeItemMetadata>();
-          when(
-            mockItem.getMeta<FakeItemMetadata>(any, any),
-          ).thenReturnAsync(otherMeta);
+          when(mockItem.getMeta<FakeItemMetadata>(any, any))
+              .thenReturnAsync(otherMeta);
 
           final result = await sut.getMeta<FakeItemMetadata>(
             mockClient,
@@ -505,9 +492,8 @@ void main() {
         clearInteractions(mockItemCm);
 
         when(mockItem.getCryptoManager(any, any)).thenReturn(mockItemCm);
-        when(
-          mockItem.getContentStream(any, any),
-        ).thenStream(Stream.value(testContent));
+        when(mockItem.getContentStream(any, any))
+            .thenStream(Stream.value(testContent));
 
         final result = sut.getContentStream(mockClient, mockColCm);
 
@@ -573,13 +559,11 @@ void main() {
           final testPaddedInvitationData = Uint8List.fromList([9, 88, 5, 1]);
           final testSignedInvitationData = Uint8List.fromList([4, 1, 2, 11]);
 
-          when(
-            mockMessagePackConverter.encode(any),
-          ).thenReturn(testEncodedInvitationData);
+          when(mockMessagePackConverter.encode(any))
+              .thenReturn(testEncodedInvitationData);
           when(mockCryptoService.randomBytes(any)).thenReturn(testInvitationId);
-          when(
-            mockCryptoService.bufferPadSmall(any),
-          ).thenReturn(testPaddedInvitationData);
+          when(mockCryptoService.bufferPadSmall(any))
+              .thenReturn(testPaddedInvitationData);
           when(mockAccountCm.colTypeFromUid(any)).thenReturn(testColTypeName);
           when(
             mockIdCm.encrypt(

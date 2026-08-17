@@ -7,7 +7,7 @@ part 'http_field_error.g.dart';
 @Freezed(toStringOverride: false)
 sealed class HttpFieldError with _$HttpFieldError {
   /// Default constructor.
-  const factory HttpFieldError({
+  const factory({
     /// The error code of the error.
     required String code,
 
@@ -21,11 +21,10 @@ sealed class HttpFieldError with _$HttpFieldError {
   /// @nodoc
   // coverage:ignore-start
   @internal
-  factory HttpFieldError.fromJson(Map<String, dynamic> json) =>
-      _$HttpFieldErrorFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$HttpFieldErrorFromJson(json);
   // coverage:ignore-end
 
-  const HttpFieldError._();
+  const new _();
 
   @override
   String toString() =>

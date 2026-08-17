@@ -9,7 +9,7 @@ import 'crypto_service.dart';
 
 @internal
 abstract base class CryptoUtils {
-  CryptoUtils._();
+  new _();
 
   static const currentVersion = 1;
 

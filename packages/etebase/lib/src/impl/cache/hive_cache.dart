@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
 import 'package:sodium/sodium.dart';
@@ -30,7 +31,7 @@ class HiveCache implements Cache {
   late final LazyBox<String> _metaBox;
   late final LazyBox<Uint8List> _collectionBox;
 
-  HiveCache(this._client, this._hive, String username)
+  new(this._client, this._hive, String username)
     : _encodedUsername = utf8.fuse(base64UrlNoPad).encode(username);
 
   Future<void> initialize() async {
@@ -79,7 +80,7 @@ class HiveCache implements Cache {
     if (accountData == null) {
       throw NotFound('No account has been cached');
     }
-    return _client.restoreAccount(accountData, encryptionKey);
+    return await _client.restoreAccount(accountData, encryptionKey);
   }
 
   @override
@@ -156,10 +157,9 @@ class HiveCache implements Cache {
   }
 
   @override
-  Stream<String> persistedItemUids(String colUid) => Stream.fromFuture(
-    // ignore: discarded_futures
-    _itemBox(colUid),
-  ).expand((itemBox) => itemBox?.keys.cast() ?? const []);
+  Stream<String> persistedItemUids(String colUid) =>
+      Stream.fromFuture(_itemBox(colUid))
+          .expand((itemBox) => itemBox?.keys.cast() ?? const []);
 
   @override
   Future<void> itemSet(
@@ -216,7 +216,7 @@ class HiveCache implements Cache {
     } else if (!create && !await _hive.boxExists(boxName)) {
       return null;
     } else {
-      return _hive.openLazyBox<Uint8List>(boxName);
+      return await _hive.openLazyBox<Uint8List>(boxName);
     }
   }
 

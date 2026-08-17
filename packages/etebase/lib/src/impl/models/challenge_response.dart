@@ -13,14 +13,14 @@ part 'challenge_response.g.dart';
 @Freezed(unionKey: 'action')
 sealed class ChallengeResponse with _$ChallengeResponse {
   @msgPackBytes
-  const factory ChallengeResponse.login({
+  const factory login({
     required String username,
     required Uint8List challenge,
     required String host,
   }) = _LoginChallengeResponse;
 
   @msgPackBytes
-  const factory ChallengeResponse.changePassword({
+  const factory changePassword({
     required String username,
     required Uint8List challenge,
     required String host,
@@ -28,6 +28,6 @@ sealed class ChallengeResponse with _$ChallengeResponse {
     required Uint8List encryptedContent,
   }) = _ChangePasswordChallengeResponse;
 
-  factory ChallengeResponse.fromJson(Map<String, dynamic> json) =>
+  factory fromJson(Map<String, dynamic> json) =>
       _$ChallengeResponseFromJson(json);
 }

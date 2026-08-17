@@ -28,7 +28,7 @@ class Rollsum {
   final Uint8List _window;
   int _wofs;
 
-  Rollsum()
+  new()
     : _s1 = _windowSize * _charOffset,
       _s2 = _windowSize * (_windowSize - 1) * _charOffset,
       _window = Uint8List(_windowSize),

@@ -19,14 +19,14 @@ import 'base_network.dart';
 
 @internal
 class CollectionItemManagerOnline extends BaseManager {
-  CollectionItemManagerOnline({
+  new({
     required super.client,
     required super.authTokenSource,
     required String colUid,
   }) : super(path: ['collection', colUid, 'item']);
 
   @visibleForTesting
-  CollectionItemManagerOnline.fromNetwork(
+  new fromNetwork(
     super._network,
     super.authTokenSource,
     // ignore: invalid_use_of_visible_for_testing_member for tests

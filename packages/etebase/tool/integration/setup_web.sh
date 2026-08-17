@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-version=${1:-0.7.15}
+version=${1:-0.8.3}
 DEST_DIR=$PWD/tool/integration/cache/sodium
 VERSION_FILE="$DEST_DIR/version.txt"
 DART_FILE="$DEST_DIR/sodium.js.dart"

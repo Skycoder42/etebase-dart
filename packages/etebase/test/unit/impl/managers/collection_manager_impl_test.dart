@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'dart:typed_data';
 
 import 'package:etebase/src/api/models/fetch_options.dart';
@@ -20,7 +18,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-// ignore: directives_ordering
 import '../../test_helpers.dart';
 @GenerateNiceMocks([
   MockSpec<ClientImpl>(),
@@ -33,9 +30,9 @@ import '../../test_helpers.dart';
 import 'collection_manager_impl_test.mocks.dart';
 
 class FakeEncryptedCollectionItem extends Fake
-    implements EncryptedCollectionItem {}
+    implements EncryptedCollectionItem;
 
-class FakeAuthTokenSource extends Fake implements AuthTokenSource {}
+class FakeAuthTokenSource extends Fake implements AuthTokenSource;
 
 void main() {
   group('$CollectionManagerImpl', () {
@@ -68,13 +65,11 @@ void main() {
       reset(mockCollectionCM);
       reset(mockItemOnline);
 
-      when(
-        mockClient.createEncryptedCollection(any, any, any, any),
-      ).thenReturnAsync((mockEncryptedCollection, mockCollectionCM));
+      when(mockClient.createEncryptedCollection(any, any, any, any))
+          .thenReturnAsync((mockEncryptedCollection, mockCollectionCM));
 
-      when(
-        mockEncryptedCollection.getCryptoManager(any, any),
-      ).thenReturn(mockCollectionCM);
+      when(mockEncryptedCollection.getCryptoManager(any, any))
+          .thenReturn(mockCollectionCM);
 
       when(mockOnline.itemManager(any)).thenReturn(mockItemOnline);
 
@@ -126,9 +121,8 @@ void main() {
 
       when(mockAccountCM.colTypeToUid(any)).thenReturnInOrder([testUid]);
       when(mockOnline.list(any, any)).thenReturnAsync(testResponse);
-      when(
-        mockEncryptedCollection.getCryptoManager(any, any),
-      ).thenReturn(mockCollectionCM);
+      when(mockEncryptedCollection.getCryptoManager(any, any))
+          .thenReturn(mockCollectionCM);
 
       final result = await sut.list(testColType, testOptions);
 
@@ -163,13 +157,11 @@ void main() {
         removedMemberships: [const RemovedCollection('test-rm')],
       );
 
-      when(
-        mockAccountCM.colTypeToUid(any),
-      ).thenReturnInOrder([testUid1, testUid2]);
+      when(mockAccountCM.colTypeToUid(any))
+          .thenReturnInOrder([testUid1, testUid2]);
       when(mockOnline.list(any, any)).thenReturnAsync(testResponse);
-      when(
-        mockEncryptedCollection.getCryptoManager(any, any),
-      ).thenReturn(mockCollectionCM);
+      when(mockEncryptedCollection.getCryptoManager(any, any))
+          .thenReturn(mockCollectionCM);
 
       final result = await sut.listMulti([
         testColType,
@@ -283,12 +275,10 @@ void main() {
     test('cacheLoad loads collection from bytes', () {
       final testBytes = Uint8List.fromList([12, 32, 4]);
 
-      when(
-        mockClient.cacheLoadEncryptedCollection(any),
-      ).thenReturn(mockEncryptedCollection);
-      when(
-        mockEncryptedCollection.getCryptoManager(any, any),
-      ).thenReturn(mockCollectionCM);
+      when(mockClient.cacheLoadEncryptedCollection(any))
+          .thenReturn(mockEncryptedCollection);
+      when(mockEncryptedCollection.getCryptoManager(any, any))
+          .thenReturn(mockCollectionCM);
 
       final result = sut.cacheLoad(testBytes);
       expect(result.encrypted, same(mockEncryptedCollection));
@@ -308,9 +298,8 @@ void main() {
       when(mockOnline.authTokenSource).thenReturn(testAuthTokenSource);
 
       when(mockEncryptedCollection.uid).thenReturn(testUid);
-      when(
-        mockEncryptedCollection.getCryptoManager(any, any),
-      ).thenReturn(mockCollectionCM);
+      when(mockEncryptedCollection.getCryptoManager(any, any))
+          .thenReturn(mockCollectionCM);
 
       final result = sut.getItemManager(testCollection);
 

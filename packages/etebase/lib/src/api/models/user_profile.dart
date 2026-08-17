@@ -15,7 +15,7 @@ part 'user_profile.g.dart';
 sealed class UserProfile with _$UserProfile {
   /// Default Constructor.
   @msgPackBytes
-  const factory UserProfile({
+  const factory({
     /// The user's identity public key.
     ///
     /// This is used for identifying the user and safely sending them data (such
@@ -25,6 +25,5 @@ sealed class UserProfile with _$UserProfile {
 
   /// @nodoc
   @internal
-  factory UserProfile.fromJson(Map<String, dynamic> json) =>
-      _$UserProfileFromJson(json);
+  factory fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 }

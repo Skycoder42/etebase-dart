@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures
-
 import 'package:dart_test_tools/test.dart';
 import 'package:etebase/src/api/exceptions/api_missuse.dart';
 import 'package:etebase/src/api/exceptions/async_crypto_executor_isolate_failure.dart';

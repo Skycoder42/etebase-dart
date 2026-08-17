@@ -11,7 +11,7 @@ import 'js_client_wrapper_stub.dart' as stub;
 import 'library_loader.dart';
 
 class JsClientWrapper extends stub.JsClientWrapper {
-  JsClientWrapper() : super.base();
+  new() : super.base();
 
   @override
   Future<TRes> executeSignedIn<TRes>(
@@ -75,9 +75,8 @@ class JsClientWrapper extends stub.JsClientWrapper {
       return json.decode(stdoutBuffer.toString()) as TRes;
     } else if (TRes == Uint8List) {
       return base64UrlNoPad.decode(
-            json.decode(stdoutBuffer.toString()) as String,
-          )
-          as TRes;
+        json.decode(stdoutBuffer.toString()) as String,
+      ) as TRes;
     } else if (TRes == List<String>) {
       return (json.decode(stdoutBuffer.toString()) as List<dynamic>)
               .cast<String>()
