@@ -14,7 +14,7 @@ jobs:
     uses: Skycoder42/dart_test_tools/.github/workflows/dart.yml@main
     with:
       workingDirectory: packages/etebase
-      flutter: true
+      needsFlutterSdk: true
       buildRunner: true
       unitTestPaths: -P unit
       coverageExclude: >-

@@ -15,8 +15,8 @@ jobs:
     uses: Skycoder42/dart_test_tools/.github/workflows/flutter.yml@main
     with:
       workingDirectory: packages/etebase_flutter
-      buildDependencies: sodium
-      buildRunner: false
+      buildRunner: true
+      buildRunnerArgs: --workspace
       integrationTestProject: example
       integrationTestPaths: integration_test/app_test.dart
 
