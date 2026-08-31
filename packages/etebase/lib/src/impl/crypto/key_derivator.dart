@@ -26,9 +26,9 @@ class KeyDerivator {
     required String password,
     KeyDerivationDifficulty difficulty = KeyDerivationDifficulty.hard,
   }) => executor.execAsync(
-    (sodium, _, _) => sodium.crypto.pwhash(
+    (sodium, _, _) => sodium.crypto.pwhash.callStr(
       outLen: CryptoUtils.symmetricKeySize,
-      password: password.toCharArray(),
+      password: password,
       salt: salt.sublist(0, sodium.crypto.pwhash.saltBytes),
       opsLimit: switch (difficulty) {
         KeyDerivationDifficulty.hard => sodium.crypto.pwhash.opsLimitSensitive,

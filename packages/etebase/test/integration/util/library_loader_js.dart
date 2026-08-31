@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_ignore, conditional_uri_does_not_exist
+
 import 'package:web/web.dart';
 
 import 'sodium.js.fake.dart'
