@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dart_test_tools/test.dart';
@@ -52,7 +51,6 @@ void main() {
         final testSalt = Uint8List.fromList([2, 4, 3, 7, 0]);
         final testActualSalt = Uint8List.fromList([2, 4, 3]);
         const testPassword = 'test-123';
-        final testPasswordBytes = utf8.encode(testPassword).signedView();
         final testKey = FakeSecureKey(87);
 
         when(mockSodium.crypto.pwhash.saltBytes)
@@ -62,7 +60,7 @@ void main() {
         when(mockSodium.crypto.pwhash.opsLimitSensitive).thenReturn(3);
         when(mockSodium.crypto.pwhash.memLimitModerate).thenReturn(4);
         when(
-          mockSodium.crypto.pwhash.call(
+          mockSodium.crypto.pwhash.callStr(
             outLen: anyNamed('outLen'),
             password: anyNamed('password'),
             salt: anyNamed('salt'),
@@ -91,9 +89,9 @@ void main() {
               mockSodium.crypto.pwhash.opsLimitInteractive,
           },
           mockSodium.crypto.pwhash.memLimitModerate,
-          mockSodium.crypto.pwhash.call(
+          mockSodium.crypto.pwhash.callStr(
             outLen: CryptoUtils.symmetricKeySize,
-            password: testPasswordBytes,
+            password: testPassword,
             salt: testActualSalt,
             opsLimit: fixture.$2,
             memLimit: 4,

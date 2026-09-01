@@ -7,6 +7,6 @@ echo ::endgroup::
 
 echo "::group::Start etesync server"
 pushd tool/integration
-podman compose up -d
+docker compose up -d
 popd
 echo ::endgroup::
