@@ -18,22 +18,26 @@ void main() {
       expect(Client.currentVersion, 1);
     });
 
-    test('create creates client with SyncCryptoExecutor', () async {
-      final sut = await Client.create(testClientName, testBaseUrl);
-      addTearDown(sut.dispose);
+    test(
+      'create creates client with SyncCryptoExecutor',
+      testOn: 'dart-vm',
+      () async {
+        final sut = await Client.create(testClientName, testBaseUrl);
+        addTearDown(sut.dispose);
 
-      expect(
-        sut,
-        isA<ClientImpl>()
-            .having(
-              (m) => m.crypto.executor,
-              'crypto.executor',
-              isA<SyncCryptoExecutor>(),
-            )
-            .having((m) => m.userAgent, 'userAgent', contains(testClientName))
-            .having((m) => m.baseUrl, 'baseUrl', testBaseUrl),
-      );
-    });
+        expect(
+          sut,
+          isA<ClientImpl>()
+              .having(
+                (m) => m.crypto.executor,
+                'crypto.executor',
+                isA<SyncCryptoExecutor>(),
+              )
+              .having((m) => m.userAgent, 'userAgent', contains(testClientName))
+              .having((m) => m.baseUrl, 'baseUrl', testBaseUrl),
+        );
+      },
+    );
 
     test(
       'createAsync creates client with AsyncCryptoExecutor',
